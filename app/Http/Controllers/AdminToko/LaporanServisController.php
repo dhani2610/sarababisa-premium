@@ -48,6 +48,7 @@ class LaporanServisController extends Controller
             ->get()
             ->sum('profittoko');
         $toko = StoreSetting::find(1);
+        
         return view('pages/admintoko/laporan-servis', compact('omzethari', 'profithari', 'omzetbulan', 'profitbulan', 'omzettahun', 'profittahun', 'toko'));
     }
 
@@ -70,7 +71,6 @@ class LaporanServisController extends Controller
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->orderBy('tgl_ambil', 'asc')
             ->get();
-
         // Menghitung total item servis
         $daftar_servis = ServiceTransaction::select('tindakan_servis')->where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', '>=', $start_date)

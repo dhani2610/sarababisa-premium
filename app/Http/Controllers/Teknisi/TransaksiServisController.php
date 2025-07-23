@@ -44,7 +44,7 @@ class TransaksiServisController extends Controller
      */
     public function store(Request $request)
     {
-        $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99'));
+        $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99')).rand(10);
         $nama_pelanggan = Customer::find($request->customers_id);
         $nama_tipe = Type::find($request->types_id);
         $nama_merek = Brand::find($request->brands_id);

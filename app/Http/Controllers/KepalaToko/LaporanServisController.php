@@ -75,6 +75,8 @@ class LaporanServisController extends Controller
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->orderBy('tgl_ambil', 'asc')
             ->get();
+        // dd($services);
+        
 
         // Menghitung total item servis
         $daftar_servis = ServiceTransaction::select('tindakan_servis')->where('status_servis', 'Sudah Diambil')
