@@ -119,6 +119,12 @@
                 <th>Total Pembayaran Tempo</th>
                 <th>: Rp. {{ number_format($total_kredit) }}</th>
             </tr>
+            <tr>
+                <th>Total Modal Sparepart</th>
+				<th>: Rp. {{ number_format($total_modal) }}</th>
+                <th>Total Profit</th>
+				<th>: Rp. {{ number_format($total_profit) }}</th>
+            </tr>
         </tbody>
     </table>
 
