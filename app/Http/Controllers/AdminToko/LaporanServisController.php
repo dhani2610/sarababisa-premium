@@ -164,8 +164,8 @@ class LaporanServisController extends Controller
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('profit');
 
-        // $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
-       return View('pages.admintoko.cetak-laporan-servis', [
+        $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
+    //    return View('pages.admintoko.cetak-laporan-servis', [
             'users' => $users,
             'toko' => $toko,
             'imagePath' => $imagePath,
