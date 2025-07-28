@@ -193,6 +193,7 @@ class LaporanServisController extends Controller
             ->sum('price');
 
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
+        // return view('pages.kepalatoko.cetak-laporan-servis', [
             'users' => $users,
             'imagePath' => $imagePath,
             'services' => $services,
