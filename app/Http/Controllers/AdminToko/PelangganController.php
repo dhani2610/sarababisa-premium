@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\KepalaToko\CustomerRequest;
 use App\Imports\PelangganImport;
+use Illuminate\Support\Facades\Http;
 
 class PelangganController extends Controller
 {
@@ -125,5 +126,47 @@ class PelangganController extends Controller
         toast('Data Pelanggan berhasil dihapus.', 'success');
 
         return redirect()->route('admin-pelanggan.index');
+    }
+
+     public function broadcast(Request $request)
+    {
+        $message = $request->input('message');
+        $numbers = $request->input('customers', []);
+
+        foreach ($numbers as $phone) {
+            // Convert to 62 (if starts with 08)
+            if (str_starts_with($phone, '08')) {
+                $phone = '62' . substr($phone, 1);
+            }
+
+            $this->sendWhatsAppMessage($phone, $message);
+        }
+
+        return redirect()->back()->with('success', 'Pesan berhasil dikirim ke pelanggan yang dipilih.');
+    }
+
+    private function sendWhatsAppMessage($phone, $message)
+    {
+        $token = env('TOKEN_FONNTE');
+        $url = "https://api.fonnte.com/send";
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => "$token",
+                'Content-Type' => 'application/json',
+            ])->post($url, [
+                'target' => $phone,
+                'message' => $message,
+            ]);
+
+            $result = $response->json();
+            if ($response->successful()) {
+                \Log::info("Pesan WA berhasil dikirim ke $phone: " . json_encode($result));
+            } else {
+                \Log::error("Gagal mengirim WA ke $phone: " . json_encode($result));
+            }
+        } catch (\Exception $e) {
+            \Log::error("Error mengirim WA ke $phone: " . $e->getMessage());
+        }
     }
 }
