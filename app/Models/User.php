@@ -47,7 +47,9 @@ class User extends Authenticatable
         'pemilik_rekening',
         'profile_photo_path',
         'workers_id',
-        'exp_date'
+        'exp_date',
+        'phones',   
+        'banks'     
     ];
 
     /**

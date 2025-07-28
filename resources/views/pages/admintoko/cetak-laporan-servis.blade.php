@@ -141,6 +141,7 @@
                 <th>Model Seri</th>
                 <th>Tindakan</th>
                 <th>Teknisi</th>
+				<th>Metode Pembayaran</th>
                 @if ($toko->is_bonus === 1)
 				<th>Modal Sparepart</th>
 				@endif
@@ -194,6 +195,9 @@
                                 -
                             </td>
                         @endif
+                        <td class="capital" style="text-align: left; width: 80px;">
+                           {{ $item->cara_pembayaran }}
+                        </td>
                         @if ($toko->is_bonus === 1)
                         <td style="width: 60px; text-align: right;">Rp.
                             {{ number_format($modal_j[0]) }}
@@ -222,6 +226,9 @@
                                     {{ $tindakan_servis[$i] }}
                                 @endif
                             </td>
+                             <td class="capital" style="text-align: left; width: 80px;">
+                                {{ $item->cara_pembayaran }}
+                            </td>
                             @if ($toko->is_bonus === 1)
                             <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($modal_j[$i]) }}
@@ -230,6 +237,7 @@
                             <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($biaya_j[$i]) }}</td>
                             <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
+                           
                             @if ($toko->is_bonus === 1)
                             <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($biaya_j[$i] - $modal_j[$i]) }}
@@ -256,6 +264,7 @@
                                 {{ json_decode($item->tindakan_servis) ? implode(', ', json_decode($item->tindakan_servis)) : $item->tindakan_servis }}
                             @endif
                         </td>
+                        
                         @if ($item->user)
                             <td style="text-align: left; width: 70px;">
                                 {{ $item->user->name }}
@@ -269,6 +278,9 @@
                                 -
                             </td>
                         @endif
+                        <td class="capital" style="text-align: left; width: 80px;">
+                           {{ $item->cara_pembayaran }}
+                        </td>
                         @if ($toko->is_bonus === 1)
                         <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}
                         </td>

@@ -155,6 +155,7 @@ class TransaksiServisController extends Controller
         $namaPelanggan = $items->customer->nama;
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.notaterima-cetak-termal', [
+        // return view('pages.kepalatoko.servis.notaterima-cetak-termal', [
             'users' => $users,
             'items' => $items,
             'imagePath' => $imagePath,
@@ -179,6 +180,7 @@ class TransaksiServisController extends Controller
         $namaPelanggan = $items->customer->nama;
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
+        // return view('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
             'users' => $users,
             'items' => $items,
             'terms' => $terms,
