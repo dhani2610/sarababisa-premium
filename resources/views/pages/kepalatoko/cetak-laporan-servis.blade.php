@@ -145,7 +145,7 @@
                 <th>Biaya Servis</th>
                 <th>Diskon</th>
                 <th>Profit</th>
-                <th>Metode Pembayaran</th>
+                <th>Pembayaran</th>
             </tr>
         </thead>
         <tbody>

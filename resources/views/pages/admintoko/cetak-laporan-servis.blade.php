@@ -149,7 +149,7 @@
                 @if ($toko->is_bonus === 1)
                     <th>Profit</th>
                 @endif
-                <th>Metode Pembayaran</th>
+                <th>Pembayaran</th>
 
             </tr>
         </thead>
