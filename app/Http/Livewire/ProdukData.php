@@ -50,6 +50,9 @@ class ProdukData extends Component
         $modalready = Product::where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
         $stokhabis = Product::where('stok', 0)->count();
         $nominalterjual = Product::where('stok', 0)->sum('harga_jual');
+
+
+        $productCategoty = Category::orderBy('created_at','asc')->get();
         return view('livewire.produk-data', [
             'brands' => $brands,
             'capacities' => $capacities,
@@ -65,6 +68,7 @@ class ProdukData extends Component
             'stokready' => $stokready,
             'modalready' => $modalready,
             'stokhabis' => $stokhabis,
+            'productCategoty' => $productCategoty,
             'nominalterjual' => $nominalterjual,
             'products' => $this->search === null ?
                 Product::latest()->paginate($this->paginate) :

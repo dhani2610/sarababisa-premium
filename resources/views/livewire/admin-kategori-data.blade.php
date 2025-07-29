@@ -97,7 +97,7 @@
                     @foreach ($categories as $item)
                         <tr>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-medium">{{ $item->id }}</div>
+                                <div class="font-medium">{{ $loop->iteration }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ $item->category_name }}</div>

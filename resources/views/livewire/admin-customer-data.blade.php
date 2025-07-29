@@ -3,51 +3,7 @@
 
     <!-- Page Headers -->
     <!-- Start Broadcast -->
-    <div x-data="{ modalOpen: false }" class="hidden lg:block">
-        <button class="btn bg-green-500 hover:bg-green-600 text-white" @click.prevent="modalOpen = true">
-            <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-                <path d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor"
-                    stroke-width="2" />
-            </svg>
-            Broadcast WA
-        </button>
 
-        <!-- Modal backdrop -->
-        <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen"
-            x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-100"
-            aria-hidden="true" x-cloak>
-        </div>
-
-        <!-- Modal -->
-        <div class="fixed inset-0 z-50 overflow-hidden flex items-center justify-center px-4 sm:px-6" x-show="modalOpen"
-            x-transition:enter="transition ease-in-out duration-200"
-            x-transition:leave="transition ease-in-out duration-200" x-cloak>
-            <div class="bg-white rounded shadow-lg max-w-lg w-full" @click.outside="modalOpen = false"
-                @keydown.escape.window="modalOpen = false">
-                <form action="{{ route('admin.pelanggan.broadcast') }}" method="POST">
-                    @csrf
-                    <div class="px-5 py-4 border-b">
-                        <h2 class="font-semibold text-slate-800">Broadcast WhatsApp</h2>
-                    </div>
-                    <div class="px-5 py-4 space-y-4">
-                        <textarea name="message" class="form-input w-full" rows="4" placeholder="Isi pesan WhatsApp" required></textarea>
-
-                        <select name="customers[]" id="broadcast" class="form-select js-select2 w-full"
-                            multiple="multiple" required>
-                            @foreach (\App\Models\Customer::all() as $cust)
-                                <option value="{{ $cust->nomor_hp }}">{{ $cust->nama }} - {{ $cust->nomor_hp }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="px-5 py-4 border-t flex justify-end space-x-2">
-                        <button type="button" class="btn border" @click="modalOpen = false">Batal</button>
-                        <button type="submit" class="btn bg-green-500 hover:bg-green-600 text-white">Kirim</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
     <div class="sm:flex sm:justify-between sm:items-center mb-3">
         <!-- Left: Title -->
 
@@ -57,6 +13,56 @@
 
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+
+
+            <div x-data="{ modalOpen: false }" class="">
+                <button class="btn bg-green-500 hover:bg-green-600 text-white" @click.prevent="modalOpen = true">
+                    <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
+                        <path d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor"
+                            stroke-width="2" />
+                    </svg>
+                    Broadcast WA
+                </button>
+
+                <!-- Modal backdrop -->
+                <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:leave="transition ease-in duration-100" aria-hidden="true" x-cloak>
+                </div>
+
+                <!-- Modal -->
+                <div class="fixed inset-0 z-50 overflow-hidden flex items-center justify-center px-4 sm:px-6"
+                    x-show="modalOpen" x-transition:enter="transition ease-in-out duration-200"
+                    x-transition:leave="transition ease-in-out duration-200" x-cloak>
+                    <div class="bg-white rounded shadow-lg max-w-lg w-full" @click.outside="modalOpen = false"
+                        @keydown.escape.window="modalOpen = false">
+                        <form action="{{ route('admin.pelanggan.broadcast') }}" method="POST">
+                            @csrf
+                            <div class="px-5 py-4 border-b">
+                                <h2 class="font-semibold text-slate-800">Broadcast WhatsApp</h2>
+                            </div>
+                            <div class="px-5 py-4 space-y-4">
+                                <textarea name="message" class="form-input w-full" rows="4" placeholder="Isi pesan WhatsApp" required></textarea>
+
+                                <select name="customers[]" id="broadcast" class="form-select js-select2 w-full"
+                                    multiple="multiple" required>
+                                    @foreach (\App\Models\Customer::all() as $cust)
+                                        <option value="{{ $cust->nomor_hp }}">{{ $cust->nama }} -
+                                            {{ $cust->nomor_hp }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="px-5 py-4 border-t flex justify-end space-x-2">
+                                <button type="button" class="btn border" @click="modalOpen = false">Batal</button>
+                                <button type="submit"
+                                    class="btn bg-green-500 hover:bg-green-600 text-white">Kirim</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <!-- Search form -->
             <x-search-form placeholder="Masukkan nama pelanggan" />
 
