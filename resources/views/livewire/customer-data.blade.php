@@ -1,4 +1,12 @@
 <div>
+    <style>
+        .ts-wrapper.multi.has-items .ts-control {
+            max-height: 200px !important;
+            /* Atur sesuai kebutuhan */
+            overflow-y: auto !important;
+        }
+    </style>
+
     @include('layouts.messages')
     <!-- Page Headers -->
     <div class="sm:flex sm:justify-between sm:items-center mb-3">
@@ -12,13 +20,11 @@
             <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Daftar Pelanggan ✨</h1>
         </div>
 
-
-
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
 
-             <div x-data="{ modalOpen: false }" class="">
+            <div x-data="{ modalOpen: false }" class="">
                 <button class="btn bg-green-500 hover:bg-green-600 text-white" @click.prevent="modalOpen = true">
                     <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
                         <path d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor"
@@ -34,36 +40,112 @@
                 </div>
 
                 <!-- Modal -->
-                <div class="fixed inset-0 z-50 overflow-hidden flex items-center justify-center px-4 sm:px-6"
-                    x-show="modalOpen" x-transition:enter="transition ease-in-out duration-200"
-                    x-transition:leave="transition ease-in-out duration-200" x-cloak>
-                    <div class="bg-white rounded shadow-lg max-w-lg w-full" @click.outside="modalOpen = false"
-                        @keydown.escape.window="modalOpen = false">
-                        <form action="{{ route('pelanggan.broadcast') }}" method="POST">
-                            @csrf
-                            <div class="px-5 py-4 border-b">
-                                <h2 class="font-semibold text-slate-800">Broadcast WhatsApp</h2>
-                            </div>
-                            <div class="px-5 py-4 space-y-4">
-                                <textarea name="message" class="form-input w-full" rows="4" placeholder="Isi pesan WhatsApp" required></textarea>
+                @if (env('TOKEN_FONNTE') === '')
+                    <div class="fixed inset-0 z-50  flex items-center justify-center px-4 sm:px-6" x-show="modalOpen"
+                        x-transition:enter="transition ease-in-out duration-200"
+                        x-transition:leave="transition ease-in-out duration-200" x-cloak>
+                        <div class="bg-white rounded shadow-lg max-w-5xl w-full overflow-y-auto max-h-screen"
+                            @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
 
-                                <select name="customers[]" id="broadcast" class="form-select js-select2 w-full"
-                                    multiple="multiple" required>
-                                    @foreach (\App\Models\Customer::all() as $cust)
-                                        <option value="{{ $cust->nomor_hp }}">{{ $cust->nama }} -
-                                            {{ $cust->nomor_hp }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="px-5 py-4 border-t flex justify-end space-x-2">
-                                <button type="button" class="btn border" @click="modalOpen = false">Batal</button>
-                                <button type="submit"
-                                    class="btn bg-green-500 hover:bg-green-600 text-white">Kirim</button>
-                            </div>
-                        </form>
+                            <<h2 class="text-2xl font-semibold mb-6 text-center">Pilih Paket Broadcast</h2>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6">
+                                    <!-- Paket Free -->
+                                    <div class="border rounded-lg p-5 shadow hover:shadow-md transition">
+                                        <div class="flex justify-center mb-4">
+                                            <div
+                                                class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                                                🗨️</div>
+                                        </div>
+                                        <h3 class="text-center font-bold text-lg mb-4">Free</h3>
+                                        <ul class="space-y-1 text-sm mb-4">
+                                            <li>✅ 1.000 pesan/bulan</li>
+                                        </ul>
+                                        <a href="https://wa.me/62811801799?text=Saya ingin berlangganan broadcast paket Free (Rp 0)"
+                                            target="_blank" style="background: green;"
+                                            class="block text-center text-white py-2 rounded hover:bg-indigo-800">
+                                            Rp 0
+                                        </a>
+                                    </div>
+
+                                    <!-- Paket Lite -->
+                                    <div class="border rounded-lg p-5 shadow hover:shadow-md transition">
+                                        <div class="flex justify-center mb-4">
+                                            <div
+                                                class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                                                💬</div>
+                                        </div>
+                                        <h3 class="text-center font-bold text-lg mb-4">Lite</h3>
+                                        <ul class="space-y-1 text-sm mb-4">
+                                            <li>✅ 1.000 pesan/bulan</li>
+                                        </ul>
+                                        <a href="https://wa.me/62811801799?text=Saya ingin berlangganan broadcast paket Lite (Rp 25.000)"
+                                            target="_blank" style="background: green;"
+                                            class="block text-center text-white py-2 rounded hover:bg-indigo-800">
+                                            Rp 25.000
+                                        </a>
+                                    </div>
+
+                                    <!-- Paket Regular -->
+                                    <div class="border rounded-lg p-5 shadow hover:shadow-md transition">
+                                        <div class="flex justify-center mb-4">
+                                            <div
+                                                class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                                                📢</div>
+                                        </div>
+                                        <h3 class="text-center font-bold text-lg mb-4">Regular</h3>
+                                        <ul class="space-y-1 text-sm mb-4">
+                                            <li>✅ 10.000 pesan/bulan</li>
+                                        </ul>
+                                        <a href="https://wa.me/62811801799?text=Saya ingin berlangganan broadcast paket Regular (Rp 66.000)"
+                                            target="_blank" style="background: green;"
+                                            class="block text-center text-white py-2 rounded hover:bg-indigo-800">
+                                            Rp 66.000
+                                        </a>
+                                    </div>
+                                </div>
+                        </div>
                     </div>
-                </div>
+                @else
+                    {{-- Modal Form Broadcast jika TOKEN_FONNTE tersedia --}}
+                    <div class="fixed inset-0 z-50 overflow-hidden flex items-center justify-center px-4 sm:px-6"
+                        x-show="modalOpen" x-transition:enter="transition ease-in-out duration-200"
+                        x-transition:leave="transition ease-in-out duration-200" x-cloak>
+                        <div class="bg-white rounded shadow-lg max-w-lg w-full" @click.outside="modalOpen = false"
+                            @keydown.escape.window="modalOpen = false">
+                            <form action="{{ route('pelanggan.broadcast') }}" method="POST">
+                                @csrf
+                                <div class="px-5 py-4 border-b">
+                                    <h2 class="font-semibold text-slate-800">Broadcast WhatsApp</h2>
+                                </div>
+                                <div class="px-5 py-4 space-y-4">
+                                    <textarea name="message" class="form-input w-full" rows="4" placeholder="Isi pesan WhatsApp" required></textarea>
+
+                                    <div>
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" id="select-all-customers" class="form-checkbox">
+                                            <span class="text-sm">Pilih Semua Pelanggan</span>
+                                        </label>
+                                    </div>
+                                    <div id="broadcast-select">
+                                        <select name="customers[]" id="broadcast" class="form-select js-select2 w-full"
+                                            multiple="multiple" required>
+                                            @foreach (\App\Models\Customer::all() as $cust)
+                                                <option value="{{ $cust->nomor_hp }}">{{ $cust->nama }} -
+                                                    {{ $cust->nomor_hp }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="px-5 py-4 border-t flex justify-end space-x-2">
+                                    <button type="button" class="btn border" @click="modalOpen = false">Batal</button>
+                                    <button type="submit"
+                                        class="btn bg-green-500 hover:bg-green-600 text-white">Kirim</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                @endif
             </div>
 
 
@@ -138,7 +220,7 @@
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
             <!-- Start Export Excel -->
 
-           
+
             <a href="{{ route('pelanggan-export') }}" class="hidden lg:block">
                 <button class="btn bg-white border-blue-200 hover:border-blue-300 text-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-export"
@@ -517,6 +599,28 @@
         });
     </script>
 
+    <script>
+        const checkbox = document.getElementById('select-all-customers');
+        const select = document.getElementById('broadcast-select');
+
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                select.style.display = 'none';
+                select.required = false;
+            } else {
+                select.style.display = 'block';
+                select.required = true;
+            }
+        });
+
+        // Optional: hide select awal kalau checkbox udah dicentang pas load
+        window.addEventListener('DOMContentLoaded', () => {
+            if (checkbox.checked) {
+                select.style.display = 'none';
+                select.required = false;
+            }
+        });
+    </script>
 
 
     <!-- Pagination -->

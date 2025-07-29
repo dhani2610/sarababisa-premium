@@ -128,13 +128,19 @@ class PelangganController extends Controller
         return redirect()->route('admin-pelanggan.index');
     }
 
-     public function broadcast(Request $request)
+    public function broadcast(Request $request)
     {
         $message = $request->input('message');
-        $numbers = $request->input('customers', []);
+
+        if ($request->has('customers')) {
+            $numbers = $request->input('customers', []);
+        } else {
+            // Kalau select kosong karena "Pilih Semua" dicentang
+            $numbers = Customer::pluck('nomor_hp')->toArray();
+        }
 
         foreach ($numbers as $phone) {
-            // Convert to 62 (if starts with 08)
+            // Convert ke format 62
             if (str_starts_with($phone, '08')) {
                 $phone = '62' . substr($phone, 1);
             }
@@ -142,7 +148,7 @@ class PelangganController extends Controller
             $this->sendWhatsAppMessage($phone, $message);
         }
 
-        return redirect()->back()->with('success', 'Pesan berhasil dikirim ke pelanggan yang dipilih.');
+        return redirect()->back()->with('success', 'Pesan berhasil dikirim.');
     }
 
     private function sendWhatsAppMessage($phone, $message)
