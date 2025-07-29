@@ -192,8 +192,8 @@ class LaporanServisController extends Controller
             ->whereDate('created_at', '<=', $end_date)
             ->sum('price');
 
-        // $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
-        return view('pages.kepalatoko.cetak-laporan-servis', [
+        $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
+        // return view('pages.kepalatoko.cetak-laporan-servis', [
             'users' => $users,
             'imagePath' => $imagePath,
             'services' => $services,

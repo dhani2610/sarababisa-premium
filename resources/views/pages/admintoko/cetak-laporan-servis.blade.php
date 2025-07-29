@@ -197,7 +197,7 @@
                                 {{ $tindakan_servis[0] }}
                             @endif
                         </td>
-                       
+
                         @if ($toko->is_bonus === 1)
                             <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($modal_j[0]) }}
@@ -216,17 +216,30 @@
                                 {{ number_format($item->profit) }}
                             </td>
                         @endif
-                         <td class="" rowspan="{{ count($tindakan_servis) }}" style="text-align: left; width: 80px;">
+                        <td class="" rowspan="{{ count($tindakan_servis) }}"
+                            style="text-align: left; width: 80px;">
                             @php
                                 $metode = [];
                                 if ($item->tunai > 0) {
-                                    $metode[] = 'Tunai: Rp ' . number_format($item->tunai, 0, ',', '.');
+                                    $metode[] =
+                                        '<div>
+                        <strong>Tunai:</strong><br>
+                        Rp.' .
+                                        number_format($item->tunai, 0, ',', '.') .
+                                        '
+                     </div>';
                                 }
                                 if ($item->transfer > 0) {
-                                    $metode[] = 'Transfer: Rp ' . number_format($item->transfer, 0, ',', '.');
+                                    $metode[] =
+                                        '<div>
+                        <strong>Transfer:</strong><br>
+                        Rp.' .
+                                        number_format($item->transfer, 0, ',', '.') .
+                                        '
+                     </div>';
                                 }
                             @endphp
-                            {!! implode('<br><hr style="margin: 2px 0;">', $metode) !!}
+                            {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
                         </td>
 
                     </tr>
@@ -239,7 +252,7 @@
                                     {{ $tindakan_servis[$i] }}
                                 @endif
                             </td>
-                           
+
                             @if ($toko->is_bonus === 1)
                                 <td style="width: 60px; text-align: right;">Rp.
                                     {{ number_format($modal_j[$i]) }}
@@ -289,8 +302,8 @@
                             @endif
                         </td>
 
-                        
-                     
+
+
 
                         @if ($toko->is_bonus === 1)
                             <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}
@@ -301,17 +314,29 @@
                         @if ($toko->is_bonus === 1)
                             <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
                         @endif
-                           <td class="" style="text-align: left; width: 80px;">
+                        <td class="" style="text-align: left; width: 80px;">
                             @php
                                 $metode = [];
                                 if ($item->tunai > 0) {
-                                    $metode[] = 'Tunai: Rp ' . number_format($item->tunai, 0, ',', '.');
+                                    $metode[] =
+                                        '<div>
+                        <strong>Tunai:</strong><br>
+                        Rp.' .
+                                        number_format($item->tunai, 0, ',', '.') .
+                                        '
+                     </div>';
                                 }
                                 if ($item->transfer > 0) {
-                                    $metode[] = 'Transfer: Rp ' . number_format($item->transfer, 0, ',', '.');
+                                    $metode[] =
+                                        '<div>
+                        <strong>Transfer:</strong><br>
+                        Rp.' .
+                                        number_format($item->transfer, 0, ',', '.') .
+                                        '
+                     </div>';
                                 }
                             @endphp
-                            {!! implode('<br><hr style="margin: 2px 0;">', $metode) !!}
+                            {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
                         </td>
                     </tr>
                 @endif
