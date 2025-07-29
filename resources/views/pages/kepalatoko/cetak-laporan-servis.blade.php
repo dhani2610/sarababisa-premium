@@ -138,14 +138,14 @@
                 <th>No.</th>
                 <th>No. Servis</th>
                 <th>Pelanggan</th>
+                <th>Teknisi</th>
                 <th>Model Seri</th>
                 <th>Tindakan</th>
-                <th>Teknisi</th>
-                <th>Metode Pembayaran</th>
                 <th>Modal Sparepart</th>
                 <th>Biaya Servis</th>
                 <th>Diskon</th>
                 <th>Profit</th>
+                <th>Metode Pembayaran</th>
             </tr>
         </thead>
         <tbody>
@@ -165,6 +165,19 @@
                             {{ $item->nomor_servis }}</td>
                         <td style="text-align: left; width: 70px;" class="capital"
                             rowspan="{{ count($tindakan_servis) }}">{{ $item->nama_pelanggan }}</td>
+                        @if ($item->user)
+                            <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
+                                {{ $item->user->name }}
+                            </td>
+                        @elseif ($item->user()->withTrashed()->first())
+                            <td style="text-align: left; width: 70px;">
+                                {{ $item->user()->withTrashed()->first()->name }}
+                            </td>
+                        @else
+                            <td style="text-align: center; width: 70px;">
+                                -
+                            </td>
+                        @endif
                         <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
                             @if ($item->modelserie)
                                 {{ $item->modelserie->name }}
@@ -179,20 +192,16 @@
                                 {{ $tindakan_servis[0] }}
                             @endif
                         </td>
-                        @if ($item->user)
-                            <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
-                                {{ $item->user->name }}
-                            </td>
-                        @elseif ($item->user()->withTrashed()->first())
-                            <td style="text-align: left; width: 70px;">
-                                {{ $item->user()->withTrashed()->first()->name }}
-                            </td>
-                        @else
-                            <td style="text-align: center; width: 70px;">
-                                -
-                            </td>
-                        @endif
-                        <td class="capital" style="text-align: left; width: 80px;">
+                       
+                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($modal_j[0]) }}
+                        </td>
+                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($biaya_j[0]) }}</td>
+                        {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td> --}}
+                        <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
+                        <td style="width: 60px; text-align: right;">Rp.
+                            {{ number_format($biaya_j[0] - $modal_j[0]) }}</td>
+                             
+                        <td class="capital" rowspan="{{ count($tindakan_servis) }}" style="text-align: left; width: 80px;">
                             @php
                                 $metode = [];
                                 if ($item->tunai > 0) {
@@ -204,13 +213,6 @@
                             @endphp
                             {!! implode('<br><hr style="margin: 2px 0;">', $metode) !!}
                         </td>
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($modal_j[0]) }}
-                        </td>
-                        {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($biaya_j[0]) }}</td> --}}
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td>
-                        <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
-                        <td style="width: 60px; text-align: right;">Rp.
-                            {{ number_format($biaya_j[0] - $modal_j[0]) }}</td>
                     </tr>
                     @for ($k = 1; $k < count($tindakan_servis); $k++)
                         <tr>
@@ -221,7 +223,7 @@
                                     {{ $tindakan_servis[$k] }}
                                 @endif
                             </td>
-                            <td class="capital" style="text-align: left; width: 80px;">
+                            {{-- <td class="capital" style="text-align: left; width: 80px;">
                                 @php
                                     $metode = [];
                                     if ($item->tunai > 0) {
@@ -232,7 +234,7 @@
                                     }
                                 @endphp
                                 {!! implode('<br><hr style="margin: 2px 0;">', $metode) !!}
-                            </td>
+                            </td> --}}
                             <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($modal_j[$k]) }}
                             </td>
@@ -247,6 +249,19 @@
                         <td style="width: 10px;">{{ $i++ }}</td>
                         <td class="text-center" style="width: 60px;">{{ $item->nomor_servis }}</td>
                         <td style="text-align: left; width: 70px;" class="capital">{{ $item->nama_pelanggan }}</td>
+                        @if ($item->user)
+                            <td style="text-align: left; width: 70px;">
+                                {{ $item->user->name }}
+                            </td>
+                        @elseif ($item->user()->withTrashed()->first())
+                            <td style="text-align: left; width: 70px;">
+                                {{ $item->user()->withTrashed()->first()->name }}
+                            </td>
+                        @else
+                            <td style="text-align: center; width: 70px;">
+                                -
+                            </td>
+                        @endif
                         <td style="text-align: left; width: 70px;">
                             @if ($item->modelserie)
                                 {{ $item->modelserie->name }}
@@ -261,19 +276,13 @@
                                 {{ json_decode($item->tindakan_servis) ? implode(', ', json_decode($item->tindakan_servis)) : $item->tindakan_servis }}
                             @endif
                         </td>
-                        @if ($item->user)
-                            <td style="text-align: left; width: 70px;">
-                                {{ $item->user->name }}
-                            </td>
-                        @elseif ($item->user()->withTrashed()->first())
-                            <td style="text-align: left; width: 70px;">
-                                {{ $item->user()->withTrashed()->first()->name }}
-                            </td>
-                        @else
-                            <td style="text-align: center; width: 70px;">
-                                -
-                            </td>
-                        @endif
+                        
+                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}
+                        </td>
+                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td>
+                        <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
+                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
+                        
                         <td class="capital" style="text-align: left; width: 80px;">
                             @php
                                 $metode = [];
@@ -286,11 +295,6 @@
                             @endphp
                             {!! implode('<br><hr style="margin: 2px 0;">', $metode) !!}
                         </td>
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}
-                        </td>
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td>
-                        <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
                     </tr>
                 @endif
             @endforeach

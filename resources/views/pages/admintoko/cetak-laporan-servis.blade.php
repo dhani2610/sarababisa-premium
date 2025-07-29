@@ -138,10 +138,9 @@
                 <th>No.</th>
                 <th>No. Servis</th>
                 <th>Pelanggan</th>
+                <th>Teknisi</th>
                 <th>Model Seri</th>
                 <th>Tindakan</th>
-                <th>Teknisi</th>
-                <th>Metode Pembayaran</th>
                 @if ($toko->is_bonus === 1)
                     <th>Modal Sparepart</th>
                 @endif
@@ -150,6 +149,8 @@
                 @if ($toko->is_bonus === 1)
                     <th>Profit</th>
                 @endif
+                <th>Metode Pembayaran</th>
+
             </tr>
         </thead>
         <tbody>
@@ -169,6 +170,19 @@
                             {{ $item->nomor_servis }}</td>
                         <td style="text-align: left; width: 70px;" class="capital"
                             rowspan="{{ count($tindakan_servis) }}">{{ $item->nama_pelanggan }}</td>
+                        @if ($item->user)
+                            <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
+                                {{ $item->user->name }}
+                            </td>
+                        @elseif ($item->user()->withTrashed()->first())
+                            <td style="text-align: left; width: 70px;">
+                                {{ $item->user()->withTrashed()->first()->name }}
+                            </td>
+                        @else
+                            <td style="text-align: center; width: 70px;">
+                                -
+                            </td>
+                        @endif
                         <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
                             @if ($item->modelserie)
                                 {{ $item->modelserie->name }}
@@ -183,20 +197,26 @@
                                 {{ $tindakan_servis[0] }}
                             @endif
                         </td>
-                        @if ($item->user)
-                            <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
-                                {{ $item->user->name }}
-                            </td>
-                        @elseif ($item->user()->withTrashed()->first())
-                            <td style="text-align: left; width: 70px;">
-                                {{ $item->user()->withTrashed()->first()->name }}
-                            </td>
-                        @else
-                            <td style="text-align: center; width: 70px;">
-                                -
+                       
+                        @if ($toko->is_bonus === 1)
+                            <td style="width: 60px; text-align: right;">Rp.
+                                {{ number_format($modal_j[0]) }}
                             </td>
                         @endif
-                        <td class="capital" style="text-align: left; width: 80px;">
+                        {{-- <td style="width: 60px; text-align: right;">Rp.
+                            {{ number_format($item->omzet) }}</td> --}}
+                        <td style="width: 60px; text-align: right;">Rp.
+                            {{ number_format($biaya_j[0]) }}</td>
+                        <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
+                        @if ($toko->is_bonus === 1)
+                            {{-- <td style="width: 60px; text-align: right;">Rp.
+                            {{ number_format($biaya_j[0] - $modal_j[0]) }}
+                        </td> --}}
+                            <td style="width: 60px; text-align: right;">Rp.
+                                {{ number_format($item->profit) }}
+                            </td>
+                        @endif
+                         <td class="capital" rowspan="{{ count($tindakan_servis) }}" style="text-align: left; width: 80px;">
                             @php
                                 $metode = [];
                                 if ($item->tunai > 0) {
@@ -209,24 +229,6 @@
                             {!! implode('<br><hr style="margin: 2px 0;">', $metode) !!}
                         </td>
 
-                        @if ($toko->is_bonus === 1)
-                            <td style="width: 60px; text-align: right;">Rp.
-                                {{ number_format($modal_j[0]) }}
-                            </td>
-                        @endif
-                        <td style="width: 60px; text-align: right;">Rp.
-                            {{ number_format($item->omzet) }}</td>
-                        {{-- <td style="width: 60px; text-align: right;">Rp.
-                            {{ number_format($biaya_j[0]) }}</td> --}}
-                        <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
-                        @if ($toko->is_bonus === 1)
-                            {{-- <td style="width: 60px; text-align: right;">Rp.
-                            {{ number_format($biaya_j[0] - $modal_j[0]) }}
-                        </td> --}}
-                            <td style="width: 60px; text-align: right;">Rp.
-                                {{ number_format($item->profit) }}
-                            </td>
-                        @endif
                     </tr>
                     @for ($i = 1; $i < count($tindakan_servis); $i++)
                         <tr>
@@ -237,18 +239,7 @@
                                     {{ $tindakan_servis[$i] }}
                                 @endif
                             </td>
-                            <td class="capital" style="text-align: left; width: 80px;">
-                                @php
-                                    $metode = [];
-                                    if ($item->tunai > 0) {
-                                        $metode[] = 'Tunai: Rp ' . number_format($item->tunai, 0, ',', '.');
-                                    }
-                                    if ($item->transfer > 0) {
-                                        $metode[] = 'Transfer: Rp ' . number_format($item->transfer, 0, ',', '.');
-                                    }
-                                @endphp
-                                {{ implode(' + ', $metode) }}
-                            </td>
+                           
                             @if ($toko->is_bonus === 1)
                                 <td style="width: 60px; text-align: right;">Rp.
                                     {{ number_format($modal_j[$i]) }}
@@ -270,6 +261,19 @@
                         <td style="width: 10px;">{{ $no++ }}</td>
                         <td class="text-center" style="width: 60px;">{{ $item->nomor_servis }}</td>
                         <td style="text-align: left; width: 70px;" class="capital">{{ $item->nama_pelanggan }}</td>
+                        @if ($item->user)
+                            <td style="text-align: left; width: 70px;">
+                                {{ $item->user->name }}
+                            </td>
+                        @elseif ($item->user()->withTrashed()->first())
+                            <td style="text-align: left; width: 70px;">
+                                {{ $item->user()->withTrashed()->first()->name }}
+                            </td>
+                        @else
+                            <td style="text-align: center; width: 70px;">
+                                -
+                            </td>
+                        @endif
                         <td style="text-align: left; width: 70px;">
                             @if ($item->modelserie)
                                 {{ $item->modelserie->name }}
@@ -285,20 +289,19 @@
                             @endif
                         </td>
 
-                        @if ($item->user)
-                            <td style="text-align: left; width: 70px;">
-                                {{ $item->user->name }}
-                            </td>
-                        @elseif ($item->user()->withTrashed()->first())
-                            <td style="text-align: left; width: 70px;">
-                                {{ $item->user()->withTrashed()->first()->name }}
-                            </td>
-                        @else
-                            <td style="text-align: center; width: 70px;">
-                                -
+                        
+                     
+
+                        @if ($toko->is_bonus === 1)
+                            <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}
                             </td>
                         @endif
-                        <td class="capital" style="text-align: left; width: 80px;">
+                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td>
+                        <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
+                        @if ($toko->is_bonus === 1)
+                            <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
+                        @endif
+                           <td class="capital" style="text-align: left; width: 80px;">
                             @php
                                 $metode = [];
                                 if ($item->tunai > 0) {
@@ -310,16 +313,6 @@
                             @endphp
                             {!! implode('<br><hr style="margin: 2px 0;">', $metode) !!}
                         </td>
-
-                        @if ($toko->is_bonus === 1)
-                            <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}
-                            </td>
-                        @endif
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td>
-                        <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
-                        @if ($toko->is_bonus === 1)
-                            <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
-                        @endif
                     </tr>
                 @endif
             @endforeach
