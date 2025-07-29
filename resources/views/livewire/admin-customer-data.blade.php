@@ -41,7 +41,7 @@
                 {{-- @if (env('TOKEN_FONNTE') === '' || env('TOKEN_FONNTE') === null || empty(env('TOKEN_FONNTE'))) --}}
                 @if (empty(env('TOKEN_FONNTE')))
 
-                    <div class="fixed inset-0 z-50  flex items-center justify-center px-4 sm:px-6" x-show="modalOpen"
+                    <div class="fixed inset-0 z-50 overflow-y-auto  flex items-center justify-center px-4 sm:px-6" x-show="modalOpen"
                         x-transition:enter="transition ease-in-out duration-200"
                         x-transition:leave="transition ease-in-out duration-200" x-cloak>
                         <div class="bg-white rounded shadow-lg max-w-5xl w-full overflow-y-auto max-h-screen"
