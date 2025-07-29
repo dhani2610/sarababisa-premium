@@ -201,7 +201,7 @@
                         <td style="width: 60px; text-align: right;">Rp.
                             {{ number_format($biaya_j[0] - $modal_j[0]) }}</td>
                              
-                        <td class="capital" rowspan="{{ count($tindakan_servis) }}" style="text-align: left; width: 80px;">
+                        <td class="" rowspan="{{ count($tindakan_servis) }}" style="text-align: left; width: 80px;">
                             @php
                                 $metode = [];
                                 if ($item->tunai > 0) {
