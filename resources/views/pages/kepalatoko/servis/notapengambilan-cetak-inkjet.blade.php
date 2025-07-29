@@ -76,6 +76,9 @@
 <body>
     <table class="w-100">
         <tr>
+            @php
+                $phones = old('phones', json_decode($users->phones ?? '[]', true));
+            @endphp
             @if ($users->profile_photo_path != null)
                 <td class="text-center" style="width: 30%">
                     <img src="data:image/png;base64,{{ Storage::disk('public')->exists($users->profile_photo_path) ? base64_encode(file_get_contents($imagePath)) : '' }}"
@@ -84,11 +87,17 @@
                 <td style="height: 50px; vertical-align: middle; text-align: left; line-height: 1.5em;">
                     <strong>{{ $users->nama_toko }} ({{ $users->deskripsi_toko }})</strong> <br>
                     {{ $users->alamat_toko }} - {{ $users->nomor_hp_toko }}
+                    @foreach ($phones as $index => $phone)
+                        | {{ $phone['title'] }} : {{ $phone['nomor'] }} <br>
+                    @endforeach
                 </td>
             @else
                 <td style="text-align: left; line-height: 1.5em;"><strong>{{ $users->nama_toko }}
                         ({{ $users->deskripsi_toko }})</strong> <br>
                     {{ $users->alamat_toko }} - {{ $users->nomor_hp_toko }}
+                    @foreach ($phones as $index => $phone)
+                        | {{ $phone['title'] }} : {{ $phone['nomor'] }} <br>
+                    @endforeach
                 </td>
             @endif
         </tr>
@@ -169,8 +178,15 @@
                 <td id="data" class="capital">: {{ $items->kondisi_servis }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</th>
                 <td id="data" class="capital">: {{ $items->qc_keluar }}</td>
-                <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
-                <td id="data" class="capital">: {{ $items->cara_pembayaran }}</td>
+                @if ($items->cara_pembayaran === 'Tunai & Transfer')
+                    <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
+                    <td id="data">: Tunai Rp. {{ number_format($items->tunai) }} & Transfer Rp.
+                        {{ number_format($items->transfer) }} </td>
+                @elseif ($items->cara_pembayaran === 'Kredit')
+                    <td id="data" scope="row" style="border-left-style: solid;">Tempo</td>
+                    <td id="data">: Rp. {{ number_format($items->due) }}
+                        ({{ \Carbon\Carbon::parse($items->tempo)->locale('id')->translatedFormat('d F Y') }})</td>
+                @endif
             </tr>
             @if ($items->uang_muka != null && $items->diskon != null)
                 <tr style="border-right-style: solid;">
@@ -327,15 +343,7 @@
                             @endforeach
                         </td>
                     @endif
-                    @if ($items->cara_pembayaran === 'Tunai & Transfer')
-                        <td id="data" scope="row" style="border-left-style: solid;">Jumlah Pembayaran</td>
-                        <td id="data">: Tunai Rp. {{ number_format($items->tunai) }} & Transfer Rp.
-                            {{ number_format($items->transfer) }} </td>
-                    @elseif ($items->cara_pembayaran === 'Kredit')
-                        <td id="data" scope="row" style="border-left-style: solid;">Tempo</td>
-                        <td id="data">: Rp. {{ number_format($items->due) }}
-                            ({{ \Carbon\Carbon::parse($items->tempo)->locale('id')->translatedFormat('d F Y') }})</td>
-                    @endif
+
                 </tr>
             @endif
         </tbody>
@@ -362,8 +370,15 @@
                 @endif
             </tr>
             <tr>
+                @php
+                    $banks = old('banks', json_decode($users->banks ?? '[]', true));
+                @endphp
                 <td rowspan="2" class="text-justify" style="font-style: italic; padding-right: 30px;">
                     {!! $terms->description !!}
+                    @foreach ($banks as $index => $bank)
+                        <br><strong>No. Rekening : {{ $bank['rekening'] }}, {{ $bank['bank'] }} An.
+                            {{ $bank['pemilik'] }} </strong>
+                    @endforeach
                 </td>
                 <th class="text-center" style="vertical-align: top;">Pengambil</th>
                 <th class="text-center" style="vertical-align: top;">Penyerah</th>

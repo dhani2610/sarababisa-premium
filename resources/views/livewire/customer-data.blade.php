@@ -42,13 +42,17 @@
                 <!-- Modal -->
                 @if (empty(env('TOKEN_FONNTE')))
 
-                    <div class="fixed inset-0 z-50 overflow-y-auto  flex items-center justify-center px-4 sm:px-6" x-show="modalOpen"
-                        x-transition:enter="transition ease-in-out duration-200"
+                    <div class="fixed inset-0 z-50 overflow-y-auto  flex items-center justify-center px-4 sm:px-6"
+                        x-show="modalOpen" x-transition:enter="transition ease-in-out duration-200"
                         x-transition:leave="transition ease-in-out duration-200" x-cloak>
                         <div class="bg-white rounded shadow-lg max-w-5xl w-full overflow-y-auto max-h-screen"
                             @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
 
-                            <<h2 class="text-2xl font-semibold mb-6 text-center">Pilih Paket Broadcast</h2>
+                            <button @click="modalOpen = false"
+                                class="absolute top-3 right-3 text-gray-600 hover:text-red-600 text-2xl font-bold focus:outline-none" style="background: red;padding: 3px 10px 4px 10px;-radius: 50%!important;color:white!important">
+                                &times;
+                            </button>
+                            <h2 class="text-2xl font-semibold mb-6 text-center">Pilih Paket Broadcast</h2>
 
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6">
                                     <!-- Paket Free -->

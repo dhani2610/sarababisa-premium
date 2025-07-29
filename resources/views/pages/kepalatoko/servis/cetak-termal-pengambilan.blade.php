@@ -57,6 +57,11 @@
 <body>
     <div class="resi">
         <div class="text-center">
+            @php
+                $phones = old('phones', json_decode($users->phones ?? '[]', true));
+                $banks = old('banks', json_decode($users->banks ?? '[]', true));
+
+            @endphp
             @if ($users->profile_photo_path != null)
                 <img src="data:image/png;base64,{{ Storage::disk('public')->exists($users->profile_photo_path) ? base64_encode(file_get_contents($imagePath)) : '' }}"
                     alt="" height="50">
@@ -64,7 +69,10 @@
             <p>
                 NOTA PENGAMBILAN SERVIS <br>
                 <strong>{{ $users->nama_toko }}</strong> <br>
-                Telp/WA {{ $users->nomor_hp_toko }}
+                Telp/WA {{ $users->nomor_hp_toko }} <br>
+                @foreach ($phones as $index => $phone)
+                    {{ $phone['title'] }}/WA {{ $phone['nomor'] }} <br>
+                @endforeach
             </p>
         </div>
 
@@ -210,6 +218,9 @@
             <small>Dicetak {{ Auth::user()->name }}, <br>
                 [{{ \Carbon\Carbon::now()->translatedFormat('d/m/Y H:i') }}]</small>
             <p>Rek {{ $users->bank }} {{ $users->rekening }} <br> a.n. {{ $users->pemilik_rekening }}</p>
+            @foreach ($banks as $index => $bank)
+                <p>Rek {{ $bank['bank'] }} {{ $bank['rekening'] }} <br> a.n. {{ $bank['pemilik'] }}</p>
+            @endforeach
             <p>Cek status garansi {{ $users->link_toko }}/tracking</p>
             <p>Terima kasih atas kepercayaan Anda telah melakukan Servis di {{ $users->nama_toko }}</p>
         </footer>
