@@ -190,7 +190,7 @@
                                 -
                             @endif
                         </td>
-                        <td class="capital" style="text-align: left; width: 80px;">
+                        <td class="" style="text-align: left; width: 80px;">
                             @if ($item->kondisi_servis != 'Sudah jadi')
                                 {{ $item->kondisi_servis }}
                             @else
@@ -216,7 +216,7 @@
                                 {{ number_format($item->profit) }}
                             </td>
                         @endif
-                         <td class="capital" rowspan="{{ count($tindakan_servis) }}" style="text-align: left; width: 80px;">
+                         <td class="" rowspan="{{ count($tindakan_servis) }}" style="text-align: left; width: 80px;">
                             @php
                                 $metode = [];
                                 if ($item->tunai > 0) {
@@ -232,7 +232,7 @@
                     </tr>
                     @for ($i = 1; $i < count($tindakan_servis); $i++)
                         <tr>
-                            <td class="capital" style="text-align: left; width: 80px;">
+                            <td class="" style="text-align: left; width: 80px;">
                                 @if ($item->kondisi_servis != 'Sudah jadi')
                                     {{ $item->kondisi_servis }}
                                 @else
@@ -281,7 +281,7 @@
                                 -
                             @endif
                         </td>
-                        <td class="capital" style="text-align: left; width: 80px;">
+                        <td class="" style="text-align: left; width: 80px;">
                             @if ($item->kondisi_servis != 'Sudah jadi')
                                 {{ $item->kondisi_servis }}
                             @else
@@ -301,7 +301,7 @@
                         @if ($toko->is_bonus === 1)
                             <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
                         @endif
-                           <td class="capital" style="text-align: left; width: 80px;">
+                           <td class="" style="text-align: left; width: 80px;">
                             @php
                                 $metode = [];
                                 if ($item->tunai > 0) {
