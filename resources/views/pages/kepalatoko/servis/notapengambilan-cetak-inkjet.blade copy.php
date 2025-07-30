@@ -192,7 +192,7 @@
                 <tr style="border-right-style: solid;">
                     <td id="data" scope="row" style="border-left-style: solid;">Tindakan Servis</td>
                     <td id="data" class="capital">
-                        {{-- @if (json_decode($items->tindakan_servis))
+                        @if (json_decode($items->tindakan_servis))
                             @foreach (json_decode($items->tindakan_servis) as $key => $tindakan)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">{{ $tindakan }}
@@ -202,25 +202,7 @@
                             @endforeach
                         @else
                             : {{ $items->tindakan_servis }}
-                        @endif --}}
-                        @if (json_decode($items->tindakan_servis))
-                            @foreach (json_decode($items->tindakan_servis) as $key => $tindakan)
-                                @php
-                                    $garansiList = json_decode($items->exp_garansi_j, true);
-                                    $garansi = isset($garansiList[$key]) && $garansiList[$key]
-                                        ? 'Garansi ' . \Carbon\Carbon::make($garansiList[$key])->format('Y-m-d')
-                                        : 'Garansi tidak ada';
-                                @endphp
-                                <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
-                                    <li style="margin-bottom: 6px">
-                                        {{ $tindakan }} (<strong>{{ $garansi }}</strong>)
-                                    </li>
-                                </ul>
-                            @endforeach
-                        @else
-                            : {{ $items->tindakan_servis }}
                         @endif
-
                     </td>
                     <td id="data" scope="row" style="border-left-style: solid;"></td>
                     <td id="data"></td>
@@ -231,29 +213,13 @@
                     @if (json_decode($items->biaya_j))
                         <td id="data" scope="row" style="border-left-style: solid;">Rincian Biaya Servis</td>
                         <td id="data">
-                            {{-- @foreach (json_decode($items->biaya_j) as $key => $biaya)
+                            @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
                                         {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
                                     </li>
                                 </ul>
-                            @endforeach --}}
-                            @php
-                                $tindakans = json_decode($items->tindakan_servis, true);
-                                $biayas = json_decode($items->biaya_j, true);
-                            @endphp
-
-                            @foreach ($biayas as $key => $biaya)
-                                @php
-                                    $tindakan = isset($tindakans[$key]) ? $tindakans[$key] : 'Tindakan tidak diketahui';
-                                @endphp
-                                <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
-                                    <li style="margin-bottom: 6px">
-                                        {{ $tindakan . ' = Rp. ' . number_format($biaya) }}
-                                    </li>
-                                </ul>
                             @endforeach
-
                         </td>
                     @endif
                     <td id="data" scope="row" style="border-left-style: solid;"></td>
@@ -275,7 +241,7 @@
                 <tr style="border-right-style: solid;">
                     <td id="data" scope="row" style="border-left-style: solid;">Tindakan Servis</td>
                     <td id="data" class="capital">
-                        {{-- @if (json_decode($items->tindakan_servis))
+                        @if (json_decode($items->tindakan_servis))
                             @foreach (json_decode($items->tindakan_servis) as $key => $tindakan)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">{{ $tindakan }}
@@ -285,65 +251,18 @@
                             @endforeach
                         @else
                             : {{ $items->tindakan_servis }}
-                        @endif --}}
-                        @if (json_decode($items->tindakan_servis))
-                            @php
-                                $tindakans = json_decode($items->tindakan_servis, true);
-                                $garansis = json_decode($items->exp_garansi_j, true);
-                            @endphp
-
-                            @foreach ($tindakans as $key => $tindakan)
-                                @php
-                                    $garansi = 'Garansi tidak ada';
-                                    if (isset($garansis[$key]) && !empty($garansis[$key])) {
-                                        try {
-                                            $tanggal = \Carbon\Carbon::make($garansis[$key]);
-                                            if ($tanggal) {
-                                                $garansi = 'Garansi ' . $tanggal->format('Y-m-d');
-                                            }
-                                        } catch (\Exception $e) {
-                                            // Invalid date, keep default "Garansi tidak ada"
-                                        }
-                                    }
-                                @endphp
-                                <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
-                                    <li style="margin-bottom: 6px">
-                                        {{ $tindakan }} (<strong>{{ $garansi }}</strong>)
-                                    </li>
-                                </ul>
-                            @endforeach
-                        @else
-                            : {{ $items->tindakan_servis }}
                         @endif
-
                     </td>
                     @if (json_decode($items->biaya_j))
                         <td id="data" scope="row" style="border-left-style: solid;">Rincian Biaya Servis</td>
                         <td id="data">
-                            {{-- @foreach (json_decode($items->biaya_j) as $key => $biaya)
+                            @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
                                         {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
                                     </li>
                                 </ul>
                             @endforeach
-                             --}}
-                            @php
-                                $biayas = json_decode($items->biaya_j, true);
-                                $tindakans = json_decode($items->tindakan_servis, true);
-                            @endphp
-
-                            @foreach ($biayas as $key => $biaya)
-                                @php
-                                    $tindakan = isset($tindakans[$key]) ? $tindakans[$key] : 'Tindakan tidak tersedia';
-                                @endphp
-                                <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
-                                    <li style="margin-bottom: 6px">
-                                        {{ $tindakan . ' = Rp. ' . number_format($biaya) }}
-                                    </li>
-                                </ul>
-                            @endforeach
-
                         </td>
                     @endif
                     <td id="data" scope="row" style="border-left-style: solid;">Uang Muka</td>
@@ -362,49 +281,27 @@
                     <td id="data" scope="row" style="border-left-style: solid;">Tindakan Servis</td>
                     <td id="data" class="capital">
                         @if (json_decode($items->tindakan_servis))
-                            @php
-                                $tindakans = json_decode($items->tindakan_servis, true);
-                                $garansis = json_decode($items->exp_garansi_j, true);
-                            @endphp
-
-                            @foreach ($tindakans as $key => $tindakan)
-                                @php
-                                    $garansi = isset($garansis[$key]) && $garansis[$key]
-                                        ? 'Garansi ' . \Carbon\Carbon::make($garansis[$key])->format('Y-m-d')
-                                        : 'Garansi tidak ada';
-                                @endphp
+                            @foreach (json_decode($items->tindakan_servis) as $key => $tindakan)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
-                                    <li style="margin-bottom: 6px">
-                                        {{ $tindakan }} (<strong>{{ $garansi }}</strong>)
+                                    <li style="margin-bottom: 6px">{{ $tindakan }}
+                                        (<strong>{{ Carbon\Carbon::make(json_decode($items->exp_garansi_j)[$key])->format('Y-m-d') ? 'Garansi ' . Carbon\Carbon::make(json_decode($items->exp_garansi_j)[$key])->format('Y-m-d') : 'Garansi tidak ada' }}</strong>)
                                     </li>
                                 </ul>
                             @endforeach
                         @else
                             : {{ $items->tindakan_servis }}
                         @endif
-
                     </td>
                     @if (json_decode($items->biaya_j))
                         <td id="data" scope="row" style="border-left-style: solid;">Rincian Biaya Servis</td>
                         <td id="data">
-                            @php
-                                $biayas = json_decode($items->biaya_j, true);
-                                $tindakans = json_decode($items->tindakan_servis, true);
-                            @endphp
-
-                            @if (is_array($biayas))
-                                @foreach ($biayas as $key => $biaya)
-                                    @php
-                                        $tindakan = isset($tindakans[$key]) ? $tindakans[$key] : 'Tindakan tidak tersedia';
-                                    @endphp
-                                    <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
-                                        <li style="margin-bottom: 6px">
-                                            {{ $tindakan . ' = Rp. ' . number_format($biaya) }}
-                                        </li>
-                                    </ul>
-                                @endforeach
-                            @endif
-
+                            @foreach (json_decode($items->biaya_j) as $key => $biaya)
+                                <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
+                                    <li style="margin-bottom: 6px">
+                                        {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
+                                    </li>
+                                </ul>
+                            @endforeach
                         </td>
                     @endif
                     <td id="data" scope="row" style="border-left-style: solid;">Diskon</td>
@@ -422,7 +319,7 @@
                 <tr style="border-right-style: solid; border-bottom-style: solid;">
                     <td id="data" scope="row" style="border-left-style: solid;">Tindakan Servis</td>
                     <td id="data" class="capital">
-                        {{-- @if (json_decode($items->tindakan_servis))
+                        @if (json_decode($items->tindakan_servis))
                             @foreach (json_decode($items->tindakan_servis) as $key => $tindakan)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">{{ $tindakan }}
@@ -432,50 +329,18 @@
                             @endforeach
                         @else
                             : {{ $items->tindakan_servis }}
-                        @endif --}}
-                        @if (json_decode($items->tindakan_servis))
-                            @php
-                                $tindakans = json_decode($items->tindakan_servis, true);
-                                $garansis = json_decode($items->exp_garansi_j, true);
-                            @endphp
-
-                            @foreach ($tindakans as $key => $tindakan)
-                                @php
-                                    $garansi = isset($garansis[$key]) && $garansis[$key]
-                                        ? 'Garansi ' . \Carbon\Carbon::make($garansis[$key])->format('Y-m-d')
-                                        : 'Garansi tidak ada';
-                                @endphp
-                                <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
-                                    <li style="margin-bottom: 6px">
-                                        {{ $tindakan }} (<strong>{{ $garansi }}</strong>)
-                                    </li>
-                                </ul>
-                            @endforeach
-                        @else
-                            : {{ $items->tindakan_servis }}
                         @endif
-
                     </td>
                     @if (json_decode($items->biaya_j))
                         <td id="data" scope="row" style="border-left-style: solid;">Rincian Biaya Servis</td>
                         <td id="data" colspan="3">
-                            @php
-                                $biayas = json_decode($items->biaya_j, true);
-                                $tindakans = json_decode($items->tindakan_servis, true);
-                            @endphp
-
-                            @if (is_array($biayas))
-                                @foreach ($biayas as $key => $biaya)
-                                    @php
-                                        $tindakan = isset($tindakans[$key]) ? $tindakans[$key] : 'Tindakan tidak diketahui';
-                                    @endphp
-                                    <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
-                                        <li style="margin-bottom: 6px">
-                                            {{ $tindakan . ' = Rp. ' . number_format($biaya) }}
-                                        </li>
-                                    </ul>
-                                @endforeach
-                            @endif
+                            @foreach (json_decode($items->biaya_j) as $key => $biaya)
+                                <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
+                                    <li style="margin-bottom: 6px">
+                                        {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
+                                    </li>
+                                </ul>
+                            @endforeach
                         </td>
                     @endif
 

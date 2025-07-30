@@ -124,7 +124,7 @@
                 <tr>
                     <td class="title">Tindakan</td>
                     <td class="value">
-                        @if (json_decode($items->tindakan_servis))
+                        {{-- @if (json_decode($items->tindakan_servis))
                             <ul style="padding-left: 4px;margin-left: 0;">
                                 @php
                                     $garansi = json_decode($items->exp_garansi_j);
@@ -132,6 +132,34 @@
                                 @foreach (json_decode($items->tindakan_servis) as $key => $item)
                                     <li style="margin-top: 5px;">{{ $item }} <br />(<b>Garansi
                                             {{ Carbon\Carbon::create($garansi[$key])->format('d-m-Y') }}</b>)<br />
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            {{ $items->tindakan_servis }}
+                        @endif --}}
+                        @if (json_decode($items->tindakan_servis))
+                            @php
+                                $tindakans = json_decode($items->tindakan_servis, true);
+                                $garansi = json_decode($items->exp_garansi_j, true);
+                            @endphp
+
+                            <ul style="padding-left: 4px; margin-left: 0;">
+                                @foreach ($tindakans as $key => $item)
+                                    @php
+                                        $garansiText = 'Garansi tidak ada';
+                                        if (isset($garansi[$key]) && !empty($garansi[$key])) {
+                                            try {
+                                                $tanggal = \Carbon\Carbon::create($garansi[$key]);
+                                                $garansiText = 'Garansi ' . $tanggal->format('d-m-Y');
+                                            } catch (\Exception $e) {
+                                                // Tanggal tidak valid, biarkan "Garansi tidak ada"
+                                            }
+                                        }
+                                    @endphp
+                                    <li style="margin-top: 5px;">
+                                        {{ $item }} <br />
+                                        (<b>{{ $garansiText }}</b>)<br />
                                     </li>
                                 @endforeach
                             </ul>
