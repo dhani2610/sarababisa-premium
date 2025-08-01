@@ -254,6 +254,7 @@
                             </td>
                             <td style="width: 60px; text-align: right;">Rp. {{ number_format($biaya_j[$k]) }}</td>
                             <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
+                            {{-- <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->profit) }}</td> --}}
                             <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($biaya_j[$k] - $modal_j[$k]) }}</td>
                         </tr>
