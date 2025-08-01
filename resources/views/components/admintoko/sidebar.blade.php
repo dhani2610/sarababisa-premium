@@ -300,7 +300,7 @@
 
             <footer>
                 <div class="pl-3 text-xs text-slate-500 font-semibold fixed bottom-0 pb-5">
-                    © 2023-2024 Saraba Bisa
+                    © 2023-{{ date('Y') }} Saraba Bisa
                 </div>
             </footer>
         </div>
