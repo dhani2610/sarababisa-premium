@@ -405,7 +405,7 @@
                                                 </select>
                                             </div>
                                             <div x-show="showInputManual" class="mt-2">
-                                                <input class="form-input w-full px-2 py-1" type="text" name="tindakan_servis[]"/>
+                                                <input class="form-input w-full px-2 py-1" type="text" name="tindakan_servis"/>
                                             </div>
                                             <input type="hidden" name="prev_modal" value="0">
                                             <input type="hidden" name="prev_biaya" value="0">
