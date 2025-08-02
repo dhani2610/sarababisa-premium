@@ -83,10 +83,10 @@
                         $phones = old('phones', json_decode(Auth::user()->phones ?? '[]', true));
                     @endphp
                     @foreach ($phones as $index => $phone)
-                        <div class="flex items-center space-x-4 mb-2 phone-row">
-                            <input class="form-input w-1/3" type="text" name="phones[{{ $index }}][title]"
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2 phone-row">
+                            <input class="form-input" type="text" name="phones[{{ $index }}][title]"
                                 value="{{ $phone['title'] }}" placeholder="Contoh: CS, Admin">
-                            <input class="form-input w-1/3" type="text" name="phones[{{ $index }}][nomor]"
+                            <input class="form-input" type="text" name="phones[{{ $index }}][nomor]"
                                 value="{{ $phone['nomor'] }}" placeholder="Nomor HP">
                             <button type="button" class="text-red-500 remove-phone">Hapus</button>
                         </div>
@@ -140,9 +140,9 @@
 
     $('#add-phone').click(function() {
         $('#phones-wrapper').append(`
-            <div class="flex items-center space-x-4 mb-2 phone-row">
-                <input class="form-input w-1/3" type="text" name="phones[${phoneIndex}][title]" placeholder="Contoh: CS, Admin">
-                <input class="form-input w-1/3" type="text" name="phones[${phoneIndex}][nomor]" placeholder="Nomor HP">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2 phone-row">
+                <input class="form-input" type="text" name="phones[${phoneIndex}][title]" placeholder="Contoh: CS, Admin">
+                <input class="form-input" type="text" name="phones[${phoneIndex}][nomor]" placeholder="Nomor HP">
                 <button type="button" class="text-red-500 remove-phone">Hapus</button>
             </div>
         `);
