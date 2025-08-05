@@ -125,7 +125,7 @@
                 <th>Total Profit</th>
                 <th>: Rp. {{ number_format($total_profit) }}</th>
             </tr>
-             <tr>
+            <tr>
                 <th>Total DP</th>
                 <th>: Rp. {{ number_format($total_dp) }}</th>
             </tr>
@@ -214,8 +214,8 @@
                         <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
                         @if ($toko->is_bonus === 1)
                             <td style="width: 60px; text-align: right;">Rp.
-                            {{ number_format($biaya_j[0] - $modal_j[0]) }}
-                        </td>
+                                {{ number_format($biaya_j[0] - $modal_j[0]) }}
+                            </td>
                             {{-- <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($item->profit) }}
                             </td> --}}
@@ -344,6 +344,65 @@
                         </td>
                     </tr>
                 @endif
+            @endforeach
+        </tbody>
+    </table>
+
+    <hr>
+    <table id="detail">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>No. Servis</th>
+                <th>Pelanggan</th>
+                <th>Penerima</th>
+                <th>Model Seri</th>
+                <th>Kerusakan</th>
+                <th>Estimasi Biaya</th>
+                <th>DP</th>
+                <th>Pembayaran</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $i = 1;
+            @endphp
+            @foreach ($services as $item)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $item->nomor_servis }}</td>
+                    <td>{{ $item->nama_pelanggan }}</td>
+                    <td>{{ $item->penerima }}</td>
+                    <td>{{ $item->modelserie->name ?? '-' }}</td>
+                    <td>{{ $item->kerusakan }}</td>
+                    <td>Rp. {{ number_format($item->estimasi_biaya) }}</td>
+                    <td>Rp. {{ number_format($item->uang_muka) }}</td>
+                    <td class="" style="text-align: left; width: 80px;">
+                        @php
+                            $metode = [];
+                            if ($item->tunai > 0) {
+                                $metode[] =
+                                    '<div>
+                        <strong>Tunai:</strong><br>
+                        Rp.' .
+                                    number_format($item->tunai, 0, ',', '.') .
+                                    '
+                     </div>';
+                            }
+                            if ($item->transfer > 0) {
+                                $metode[] =
+                                    '<div>
+                        <strong>Transfer:</strong><br>
+                        Rp.' .
+                                    number_format($item->transfer, 0, ',', '.') .
+                                    '
+                     </div>';
+                            }
+                        @endphp
+                        {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
+
+                    </td>
+                </tr>
             @endforeach
         </tbody>
     </table>
