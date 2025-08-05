@@ -10,6 +10,7 @@
             </section>
             <livewire:toggle-tax></livewire:toggle-tax>
             <livewire:toggle-bonus></livewire:toggle-bonus>
+            <livewire:toggle-edit-transaksi></livewire:toggle-edit-transaksi>
         </div>
 
         <!-- Panel footer -->

@@ -13,6 +13,7 @@ use App\Models\ModelSerie;
 use Livewire\WithPagination;
 use App\Models\ServiceAction;
 use App\Models\ServiceTransaction;
+use App\Models\StoreSetting;
 
 class AdminProsesData extends Component
 {
@@ -52,6 +53,7 @@ class AdminProsesData extends Component
         $processes_count = ServiceTransaction::whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
         $users = User::where('role', 'Teknisi')->get();
         $sales = User::where('role', 'Sales')->get();
+        $tokoSetting = StoreSetting::find(1);
         $penerima = User::all();
         $customers = Customer::all();
         $types = Type::all();
@@ -68,6 +70,7 @@ class AdminProsesData extends Component
         $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->count();
         return view('livewire.admin-proses-data', [
             'toko' => $toko,
+            'tokoSetting' => $tokoSetting,
             'processes_count' => $processes_count,
             'jumlah_bisa_diambil' => $jumlah_bisa_diambil,
             'jumlah_sudah_diambil' => $jumlah_sudah_diambil,

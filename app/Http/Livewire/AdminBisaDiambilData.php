@@ -12,6 +12,7 @@ use App\Models\ModelSerie;
 use Livewire\WithPagination;
 use App\Models\ServiceAction;
 use App\Models\ServiceTransaction;
+use App\Models\StoreSetting;
 
 class AdminBisaDiambilData extends Component
 {
@@ -47,6 +48,7 @@ class AdminBisaDiambilData extends Component
     public function render()
     {
         $customers = Customer::all();
+        $tokoSetting = StoreSetting::find(1);
         $toko = User::find(1);
         $users = User::where('role', 'Teknisi')->get();
         $workers = User::all();
@@ -63,6 +65,7 @@ class AdminBisaDiambilData extends Component
             'toko' => $toko,
             'workers' => $workers,
             'customers' => $customers,
+            'tokoSetting' => $tokoSetting,
             'types' => $types,
             'brands' => $brands,
             'model_series' => $model_series,

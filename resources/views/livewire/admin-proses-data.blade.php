@@ -964,6 +964,11 @@
                                     <!-- Start -->
                                     <div class="relative" x-data="{ open: false }" @mouseenter="open = true"
                                         @mouseleave="open = false">
+                                         @php
+                                            $tanggalTransaksi = \Carbon\Carbon::parse($process->created_at);
+                                            $hariIni = \Carbon\Carbon::today();
+                                        @endphp
+                                        @if ($tokoSetting->is_edit_transaksi === 1 || $tanggalTransaksi->isSameDay($hariIni))
                                         <a href="{{ route('admin-ubah-bisa-diambil-edit', $process->id) }}">
                                             <button class="text-slate-400 hover:text-slate-500 rounded-full">
                                                 <span class="sr-only">Konfirmasi</span>
@@ -980,6 +985,7 @@
                                                 </svg>
                                             </button>
                                         </a>
+                                        @endif
                                         <div class="z-10 absolute right-full top-1/2 -translate-y-1/2">
                                             <div class="bg-slate-800 p-2 rounded overflow-hidden mb-2" x-show="open"
                                                 x-transition:enter="transition ease-out duration-200 transform"

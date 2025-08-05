@@ -19,6 +19,8 @@ class StoreSetting extends Model
         'pemilik_rekening',
         'is_tax',
         'ppn',
-        'is_bonus'
+        'is_bonus',
+        'is_edit_transaksi',
     ];
+    
 }
