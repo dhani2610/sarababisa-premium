@@ -70,6 +70,13 @@ class LaporanServisController extends Controller
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->orderBy('tgl_ambil', 'asc')
             ->get();
+        $servicesDP = ServiceTransaction::with('brand', 'modelserie', 'user')->where('status_servis', 'Sudah Diambil')
+            ->whereDate('tgl_ambil', '>=', $start_date)
+            ->whereDate('tgl_ambil', '<=', $end_date)
+            ->whereNotNull('uang_muka')
+            ->where('uang_muka','!=','0')
+            ->orderBy('tgl_ambil', 'asc')
+            ->get();
         // return response()->json($services);
 
         // Menghitung total item servis
@@ -175,6 +182,7 @@ class LaporanServisController extends Controller
             'users' => $users,
             'toko' => $toko,
             'imagePath' => $imagePath,
+            'servicesDP' => $servicesDP,
             'services' => $services,
             'start_date' => $start_date,
             'end_date' => $end_date,

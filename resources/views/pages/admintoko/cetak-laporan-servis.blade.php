@@ -349,6 +349,9 @@
     </table>
 
     <hr>
+    <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
+        Downpayment
+    </h4>
     <table id="detail">
         <thead>
             <tr>
@@ -367,7 +370,7 @@
             @php
                 $i = 1;
             @endphp
-            @foreach ($services as $item)
+            @foreach ($servicesDP as $item)
                 <tr>
                     <td style="width: 10px;">{{ $loop->iteration }}</td>
                     <td>{{ $item->nomor_servis }}</td>

@@ -197,12 +197,21 @@ class LaporanServisController extends Controller
             ->whereDate('created_at', '<=', $end_date)
             ->sum('price');
 
+        $servicesDP = ServiceTransaction::with('brand', 'modelserie', 'user')->where('status_servis', 'Sudah Diambil')
+            ->whereDate('tgl_ambil', '>=', $start_date)
+            ->whereDate('tgl_ambil', '<=', $end_date)
+            ->whereNotNull('uang_muka')
+            ->where('uang_muka','!=','0')
+            ->orderBy('tgl_ambil', 'asc')
+            ->get();
+
             // return response()->json($services);
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
         // return view('pages.kepalatoko.cetak-laporan-servis', [
             'users' => $users,
             'imagePath' => $imagePath,
             'services' => $services,
+            'servicesDP' => $servicesDP,
             'incidents' => $incidents,
             'expenses' => $expenses,
             'start_date' => $start_date,
