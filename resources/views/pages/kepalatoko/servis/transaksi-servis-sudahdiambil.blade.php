@@ -119,6 +119,7 @@
                                         class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                                         type="text" value="{{ number_format($item->biaya) }}" disabled />
                                 </div>
+                                <input type="hidden" id="total_biaya" value="{{ $item->biaya }}">
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Pengecekan Fungsi Masuk</label>
                                     <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->qc_masuk }}" disabled />
@@ -305,7 +306,7 @@
 <script>
     $(document).ready(function () {
         // Ambil total dari input yang disabled (karena kamu format pakai number_format)
-        let totalBiaya = {{ $item->biaya }};
+        let totalBiaya = parseInt($('#total_biaya').val()) || 0;
 
         function updateSisa(from, to) {
             let fromVal = parseInt($(from).val()) || 0;

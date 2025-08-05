@@ -73,7 +73,6 @@
                         <input type="hidden" name="tgl_ambil" value="<?php echo date('Y-m-d H:i:s'); ?>" />
                         <input type="hidden" name="modal_sparepart" value="{{ $item->modal_sparepart }}" />
                         <input type="hidden" name="biaya" value="{{ $item->biaya }}" />
-                        <input type="hidden" id="total_biaya" value="{{ $item->biaya }}">
                         <div class="px-5 py-4">
                             <div class="space-y-3">
                                 <div>
@@ -122,6 +121,7 @@
                                         class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                                         type="text" value="{{ number_format($item->biaya) }}" disabled />
                                 </div>
+                                <input type="hidden" id="total_biaya" value="{{ $item->biaya }}">
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Pengecekan Fungsi Masuk</label>
                                     <input
@@ -326,7 +326,7 @@
 <script>
     $(document).ready(function () {
         // Ambil total dari input yang disabled (karena kamu format pakai number_format)
-        let totalBiaya = {{ $item->biaya }};
+        let totalBiaya = parseInt($('#total_biaya').val()) || 0;
 
         function updateSisa(from, to) {
             let fromVal = parseInt($(from).val()) || 0;
