@@ -349,14 +349,7 @@
     </table>
 
     <hr>
-    <table id="ringkasan">
-        <tbody>
-            <tr>
-                <th>Total DP</th>
-                <th>: Rp. {{ number_format($total_dp) }}</th>
-            </tr>
-        </tbody>
-    </table>
+    
     <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
         Uang Muka
     </h4>
