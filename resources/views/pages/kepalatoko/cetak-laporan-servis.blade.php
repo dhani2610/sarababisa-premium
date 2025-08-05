@@ -335,6 +335,8 @@
             <tr>
                 <th style="width: 40px">Total DP</th>
                 <th>: Rp. {{ number_format($total_dp) }}</th>
+                <th></th>
+                <th></th>
             </tr>
         </tbody>
     </table>
