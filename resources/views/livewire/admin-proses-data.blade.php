@@ -968,7 +968,7 @@
                                             $tanggalTransaksi = \Carbon\Carbon::parse($process->created_at);
                                             $hariIni = \Carbon\Carbon::today();
                                         @endphp
-                                        @if ($tokoSetting->is_edit_transaksi === 1 || $tanggalTransaksi->isSameDay($hariIni))
+                                        @if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni))
                                         <a href="{{ route('admin-ubah-bisa-diambil-edit', $process->id) }}">
                                             <button class="text-slate-400 hover:text-slate-500 rounded-full">
                                                 <span class="sr-only">Konfirmasi</span>
