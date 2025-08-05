@@ -125,6 +125,10 @@
                 <th>Total Profit</th>
                 <th>: Rp. {{ number_format($total_profit) }}</th>
             </tr>
+            <tr>
+                <th>Total DP</th>
+                <th>: Rp. {{ number_format($total_dp) }}</th>
+            </tr>
         </tbody>
     </table>
 
@@ -350,13 +354,11 @@
             <tr>
                 <th>Total DP</th>
                 <th>: Rp. {{ number_format($total_dp) }}</th>
-                <th></th>
-                <th></th>
             </tr>
         </tbody>
     </table>
     <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
-        Downpayment
+        Uang Muka
     </h4>
     <table id="detail">
         <thead>
