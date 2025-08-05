@@ -333,7 +333,7 @@
     <table id="ringkasan">
         <tbody>
             <tr>
-                <th>Total DP</th>
+                <th style="width: 40px">Total DP</th>
                 <th>: Rp. {{ number_format($total_dp) }}</th>
             </tr>
         </tbody>
