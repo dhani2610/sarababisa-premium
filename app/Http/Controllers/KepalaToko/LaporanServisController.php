@@ -97,6 +97,11 @@ class LaporanServisController extends Controller
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('tunai');
 
+        $total_dp = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+            ->whereDate('tgl_ambil', '>=', $start_date)
+            ->whereDate('tgl_ambil', '<=', $end_date)
+            ->sum('uang_muka');
+
         // Menghitung total pembayaran transfer
         $total_transfer = ServiceTransaction::where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', '>=', $start_date)
@@ -213,7 +218,8 @@ class LaporanServisController extends Controller
             'total_servis' => $total_servis,
             'total_tunai' => $total_tunai,
             'total_transfer' => $total_transfer,
-            'total_kredit' => $total_kredit
+            'total_kredit' => $total_kredit,
+            'total_dp' => $total_dp
         ]);
 
         $filename = 'Laporan Transaksi Servis' . ' ' . $start_date . ' ' . 'sd' . ' ' . $end_date . '.pdf';

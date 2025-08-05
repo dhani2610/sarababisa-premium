@@ -164,6 +164,11 @@ class LaporanServisController extends Controller
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('profit');
 
+        $total_dp = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+            ->whereDate('tgl_ambil', '>=', $start_date)
+            ->whereDate('tgl_ambil', '<=', $end_date)
+            ->sum('uang_muka');
+
         // return response()->json($services);
         $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
     //    return View('pages.admintoko.cetak-laporan-servis', [
@@ -183,6 +188,7 @@ class LaporanServisController extends Controller
             'total_servis' => $total_servis,
             'total_tunai' => $total_tunai,
             'total_transfer' => $total_transfer,
+            'total_dp' => $total_dp,
             'total_kredit' => $total_kredit
         ]);
 
