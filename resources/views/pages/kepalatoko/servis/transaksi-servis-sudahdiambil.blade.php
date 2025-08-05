@@ -299,3 +299,34 @@
 
     </div>
 </x-toko-layout>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Ambil total dari input yang disabled (karena kamu format pakai number_format)
+        let totalBiaya = {{ $item->biaya }};
+
+        function updateSisa(from, to) {
+            let fromVal = parseInt($(from).val()) || 0;
+
+            // Batasi nilai agar tidak melebihi total
+            if (fromVal > totalBiaya) {
+                fromVal = totalBiaya;
+                $(from).val(fromVal);
+            }
+
+            // Hitung sisa dan masukkan ke input lawan
+            $(to).val(totalBiaya - fromVal);
+        }
+
+        $('#tunai').on('input', function () {
+            updateSisa('#tunai', '#transfer');
+        });
+
+        $('#transfer').on('input', function () {
+            updateSisa('#transfer', '#tunai');
+        });
+    });
+</script>
+
