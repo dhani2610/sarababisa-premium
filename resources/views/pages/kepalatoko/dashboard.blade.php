@@ -129,7 +129,7 @@
                 </header>
                 <div class="h-full flex flex-col px-5 py-3">
                     <!-- Circle -->
-                 @php
+                @php
                     $circumference = 30 * 2 * pi();
                     $percent = $totalbudgets != 0 ? round(($bulantotalprofitbersih / $totalbudgets) * 100) : 0;
                 @endphp

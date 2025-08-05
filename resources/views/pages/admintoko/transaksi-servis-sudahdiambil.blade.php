@@ -73,6 +73,7 @@
                         <input type="hidden" name="tgl_ambil" value="<?php echo date('Y-m-d H:i:s'); ?>" />
                         <input type="hidden" name="modal_sparepart" value="{{ $item->modal_sparepart }}" />
                         <input type="hidden" name="biaya" value="{{ $item->biaya }}" />
+                        <input type="hidden" id="total_biaya" value="{{ $item->biaya }}">
                         <div class="px-5 py-4">
                             <div class="space-y-3">
                                 <div>
@@ -319,3 +320,32 @@
 
     </div>
 </x-admin-layout>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Ambil total dari input yang disabled (karena kamu format pakai number_format)
+        let totalBiaya = {{ $item->biaya }};
+
+        function updateSisa(from, to) {
+            let fromVal = parseInt($(from).val()) || 0;
+
+            // Batasi nilai agar tidak melebihi total
+            if (fromVal > totalBiaya) {
+                fromVal = totalBiaya;
+                $(from).val(fromVal);
+            }
+
+            // Hitung sisa dan masukkan ke input lawan
+            $(to).val(totalBiaya - fromVal);
+        }
+
+        $('#tunai').on('input', function () {
+            updateSisa('#tunai', '#transfer');
+        });
+
+        $('#transfer').on('input', function () {
+            updateSisa('#transfer', '#tunai');
+        });
+    });
+</script>
