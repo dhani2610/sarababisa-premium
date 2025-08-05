@@ -65,8 +65,14 @@
                     <!-- Circle -->
                     @php
                         $circumference = 30 * 2 * pi();
-                        $percent = round(($totalprofit / $totalbudgets) * 100);
+                        if ($totalbudgets > 0) {
+                            $percent = round(($totalprofit / $totalbudgets) * 100);
+                        } else {
+                            $percent = 0;
+                        }
                     @endphp
+
+                    
                     <div class="inline-flex items-center justify-center overflow-hidden rounded-full">
                         <svg class="w-20 h-20">
                             <circle
