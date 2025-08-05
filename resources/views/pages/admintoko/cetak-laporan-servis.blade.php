@@ -359,7 +359,7 @@
                 <th>Model Seri</th>
                 <th>Kerusakan</th>
                 <th>Estimasi Biaya</th>
-                <th>DP</th>
+                <th>Uang Muka</th>
                 <th>Pembayaran</th>
             </tr>
         </thead>
@@ -369,7 +369,7 @@
             @endphp
             @foreach ($services as $item)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td style="width: 10px;">{{ $loop->iteration }}</td>
                     <td>{{ $item->nomor_servis }}</td>
                     <td>{{ $item->nama_pelanggan }}</td>
                     <td>{{ $item->penerima }}</td>
