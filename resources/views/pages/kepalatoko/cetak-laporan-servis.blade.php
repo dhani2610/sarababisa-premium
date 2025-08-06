@@ -348,7 +348,7 @@
                 <th>Kerusakan</th>
                 <th>Estimasi Biaya</th>
                 <th>Uang Muka</th>
-                <th>Pembayaran</th>
+                {{-- <th>Pembayaran</th> --}}
             </tr>
         </thead>
         <tbody>
@@ -365,7 +365,7 @@
                     <td>{{ $item->kerusakan }}</td>
                     <td>Rp. {{ number_format($item->estimasi_biaya) }}</td>
                     <td>Rp. {{ number_format($item->uang_muka) }}</td>
-                    <td class="" style="text-align: left; width: 80px;">
+                    {{-- <td class="" style="text-align: left; width: 80px;">
                             @php
                                 $metode = [];
                                 if ($item->tunai > 0) {
@@ -389,7 +389,7 @@
                             @endphp
                             {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
 
-                        </td>
+                        </td> --}}
                 </tr>
             @endforeach
         </tbody>
