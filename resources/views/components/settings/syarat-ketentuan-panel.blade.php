@@ -10,7 +10,7 @@
                 <div class="mt-4">
                     <label class="block text-sm font-semibold mb-1" for="description">Pada Nota Terima Servis</label>
                     <textarea name="description" id="description" rows="3" class="w-full">
-                        {!! $termterima->description !!}
+                        {!! $termterima->description ?? '' !!}
                     </textarea>
                 </div>
             </section>
@@ -35,7 +35,7 @@
                 <div class="mt-4">
                     <label class="block text-sm font-semibold mb-1" for="description">Pada Nota Pengambilan Servis</label>
                     <textarea name="description" id="description" rows="3" class="w-full">
-                        {!! $termpengambilan->description !!}
+                        {!! $termpengambilan->description ?? '' !!}
                     </textarea>
                 </div>
             </section>
@@ -60,7 +60,7 @@
                 <div class="mt-4">
                     <label class="block text-sm font-semibold mb-1" for="description">Pada Nota Penjualan</label>
                     <textarea name="description" id="description" rows="3" class="w-full">
-                        {!! $termpenjualan->description !!}
+                        {!! $termpenjualan->description ?? '' !!}
                     </textarea>
                 </div>
             </section>
