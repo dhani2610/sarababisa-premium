@@ -247,14 +247,14 @@
                                                     for="modal_sparepart">Modal Sparepart <span
                                                         class="text-rose-500">*</span></label>
                                                 <input class="form-input w-full px-2 py-1 modal_sparepart"
-                                                    type="number" name="modal_sparepart[]" required />
+                                                    type="number" name="modal_sparepart[]" :required="showDetails" />
                                             </div>
 
                                             <div class="mt-3">
                                                 <label class="block text-sm font-medium mb-1" for="biaya_servis">Biaya
                                                     Servis <span class="text-rose-500">*</span></label>
                                                 <input class="form-input w-full px-2 py-1 biaya_servis" type="number"
-                                                    name="biaya_servis[]" required />
+                                                    name="biaya_servis[]" :required="showDetails" />
                                             </div>
                                         </div>
                                         <div id="servis-lain"></div>
@@ -269,7 +269,7 @@
                                                 for="total_modal_sparepart">Total Modal Sparepart <span
                                                     class="text-rose-500">*</span></label>
                                             <input class="form-input w-full px-2 py-1" type="number"
-                                                name="total_modal_sparepart" id="total_modal_sparepart" required />
+                                                name="total_modal_sparepart" id="total_modal_sparepart" :required="showDetails" />
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya
