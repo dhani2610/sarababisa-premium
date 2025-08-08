@@ -145,6 +145,12 @@ class TransaksiServisLangsungController extends Controller
             $expired = null;
         }
 
+        if ($request->kondisi_servis == 'Dibatalkan') {
+            $finalModal = $request->total_modal_sparepart;
+        }else{
+            $finalModal = $modalSparepart;
+        }
+
         // Transaction create
         ServiceTransaction::create([
             'nomor_servis' => $nomor_servis,
@@ -167,7 +173,7 @@ class TransaksiServisLangsungController extends Controller
             // 'service_actions_id' => $request->service_actions_id,
             'products_id' => $request->products_id[0],
             'tindakan_servis' => count($tindakan_servis) > 0 ? json_encode($tindakan_servis) : null,
-            'modal_sparepart' => $modalSparepart,
+            'modal_sparepart' => $finalModal,
             'biaya' => $request->biaya,
             'catatan' => $request->catatan,
             'persen_teknisi' => $persen_teknisi,

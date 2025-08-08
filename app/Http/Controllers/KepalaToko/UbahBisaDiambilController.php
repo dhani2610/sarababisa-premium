@@ -45,6 +45,7 @@ class UbahBisaDiambilController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // dd($request->all());     
         $item = ServiceTransaction::findOrFail($id);
 
         if ($request->users_id != null) {
@@ -87,6 +88,11 @@ class UbahBisaDiambilController extends Controller
         $profittransaksi = $biaya - $modalSparepart;
         $bagihasil = ($biaya - $modalSparepart) / 100;
 
+        if ($request->kondisi_servis == 'Dibatalkan') {
+            $finalModal = $request->total_modal_sparepart;
+        }else{
+            $finalModal = $modalSparepart;
+        }
         // Transaction create
         $item->update([
             'users_id' => $request->users_id,
@@ -96,7 +102,7 @@ class UbahBisaDiambilController extends Controller
             // 'service_actions_id' => $request->service_actions_id,
             'products_id' => $request->products_id[0] ?? null,
             'tindakan_servis' => count($tindakan_servis) > 0 ? json_encode($tindakan_servis) : null,
-            'modal_sparepart' => $modalSparepart,
+            'modal_sparepart' => $finalModal,
             'biaya' => $biaya,
             'catatan' => $request->catatan,
             'persen_teknisi' => $persen_teknisi,
