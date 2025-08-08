@@ -224,7 +224,11 @@
                             @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
+                                        @if (isset($items->tindakan_servis[$key]))
                                         {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
+                                        @else
+                                        -                                            
+                                        @endif
                                     </li>
                                 </ul>
                             @endforeach
@@ -267,7 +271,11 @@
                             @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
+                                        @if (isset($items->tindakan_servis[$key]))
                                         {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
+                                        @else
+                                        -                                            
+                                        @endif
                                     </li>
                                 </ul>
                             @endforeach
@@ -306,7 +314,11 @@
                             @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
+                                        @if (isset($items->tindakan_servis[$key]))
                                         {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
+                                        @else
+                                        -                                            
+                                        @endif
                                     </li>
                                 </ul>
                             @endforeach
@@ -345,7 +357,11 @@
                            @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
+                                        @if (isset($items->tindakan_servis[$key]))
                                         {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
+                                        @else
+                                        -                                            
+                                        @endif
                                     </li>
                                 </ul>
                             @endforeach
