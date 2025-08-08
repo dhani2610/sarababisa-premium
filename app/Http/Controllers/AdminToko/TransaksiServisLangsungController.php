@@ -36,7 +36,11 @@ class TransaksiServisLangsungController extends Controller
         $nama_merek = Brand::find($request->brands_id);
         $nama_model = ModelSerie::find($request->model_series_id);
         $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
-        $persen_teknisi = User::find($request->users_id)->persen;
+        if ($request->users_id != null) {
+            $persen_teknisi = User::find($request->users_id)->persen;
+        } else {
+            $persen_teknisi = null;
+        }
 
         // --- BLOK LOGIKA YANG DIPERBAIKI ---
         $tindakan_servis = []; // 1. Inisialisasi sebagai array kosong
@@ -158,7 +162,7 @@ class TransaksiServisLangsungController extends Controller
             'status_servis' => "Sudah Diambil",
             'penerima' => $request->penerima,
             'users_id' => $request->users_id,
-            'kondisi_servis' => "Sudah jadi",
+            'kondisi_servis' => $request->kondisi_servis,
             // 'service_actions_id' => $request->service_actions_id[0],
             'products_id' => $request->products_id[0],
             'tindakan_servis' => count($tindakan_servis) > 0 ? json_encode($tindakan_servis) : null,

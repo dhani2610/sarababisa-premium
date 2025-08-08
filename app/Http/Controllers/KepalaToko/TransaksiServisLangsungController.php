@@ -28,6 +28,7 @@ class TransaksiServisLangsungController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all()); 
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99'));
         $nama_pelanggan = Customer::find($request->customers_id);
 
@@ -162,7 +163,7 @@ class TransaksiServisLangsungController extends Controller
             'status_servis' => "Sudah Diambil",
             'penerima' => $request->penerima,
             'users_id' => $request->users_id,
-            'kondisi_servis' => "Sudah jadi",
+            'kondisi_servis' => $request->kondisi_servis,
             // 'service_actions_id' => $request->service_actions_id,
             'products_id' => $request->products_id[0],
             'tindakan_servis' => count($tindakan_servis) > 0 ? json_encode($tindakan_servis) : null,

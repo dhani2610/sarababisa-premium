@@ -347,257 +347,286 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="users_id">Teknisi <span
-                                                    class="text-rose-500">*</span></label>
-                                            <select id="users_id" name="users_id"
-                                                class="form-select text-sm py-1 w-full">
-                                                <option selected value="">Pilih Teknisi</option>
-                                                @foreach ($users as $user)
-                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div x-data="{ showInputManual: false }">
-                                            <div class="flex justify-between items-center mb-1">
-                                                <label class="block text-sm font-medium">
-                                                    Tindakan Servis
-                                                    <span class="text-rose-500">*</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" class="form-checkbox"
-                                                        x-on:click="showInputManual = true" />
-                                                    <span class="text-sm ml-2">Isi Manual</span>
-                                                </label>
-                                            </div>
-                                            <div class="pilih-tindakan">
-                                                <select id="selectjs5" name="service_actions_id[]"
-                                                    class="form-select text-sm py-1 w-full" style="width: 100%;">
-                                                    <option selected value="">Pilih Tindakan</option>
-                                                    @foreach ($service_actions as $action)
-                                                        <option value="{{ $action->id }}">
-                                                            {{ $action->nama_tindakan }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
 
-                                            <div x-show="showInputManual" class="mt-2">
-                                                <input class="form-input w-full px-2 py-1" type="text"
-                                                    name="tindakan_servis[]" />
-                                            </div>
-                                            <input type="hidden" name="prev_modal" value="0">
-                                            <input type="hidden" name="prev_biaya" value="0">
-                                        </div>
-                                        <div x-data="{ showDetails: false }">
-                                            <label class="block text-sm font-medium mb-1" for="modal_sparepart">Apakah
-                                                menggunakan stok sparepart toko?</label>
+                                        <div x-data="{ showDetails: true }">
+                                            <label class="block text-sm font-medium mb-1" for="kondisi_servis">Kondisi
+                                                Servis <span class="text-rose-500">*</span></label>
                                             <div class="flex flex-wrap items-center -m-3">
                                                 <div class="m-3">
                                                     <!-- Start -->
                                                     <label class="flex items-center">
-                                                        <input type="radio" name="radio-buttons" class="form-radio"
-                                                            checked x-on:click="showDetails = false" />
-                                                        <span class="text-sm ml-2">Tidak</span>
+                                                        <input type="radio" name="kondisi_servis"
+                                                            value="Sudah jadi" class="form-radio" checked
+                                                            x-on:click="showDetails = true" />
+                                                        <span class="text-sm ml-2">Sudah jadi</span>
                                                     </label>
                                                     <!-- End -->
                                                 </div>
                                                 <div class="m-3">
                                                     <!-- Start -->
                                                     <label class="flex items-center">
-                                                        <input type="radio" name="radio-buttons" class="form-radio"
-                                                            x-on:click="showDetails = true" />
-                                                        <span class="text-sm ml-2">Ya</span>
+                                                        <input type="radio" name="kondisi_servis"
+                                                            value="Dibatalkan" class="form-radio"
+                                                            x-on:click="showDetails = false" />
+                                                        <span class="text-sm ml-2">Dibatalkan</span>
                                                     </label>
                                                     <!-- End -->
                                                 </div>
                                             </div>
-                                            <div x-show="showDetails" class="mt-3">
-                                                <label class="block text-sm font-medium mb-1"
-                                                    for="products_id[]">Sparepart Toko yg Digunakan</label>
-                                                <select id="selectjs6" name="products_id[]"
-                                                    class="form-select text-sm py-1 w-full" style="width: 100%;">
-                                                    <option selected value="">Pilih Sparepart</option>
-                                                    @foreach ($products as $item)
-                                                        <option value="{{ $item->id }}">{{ $item->product_name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div x-show="showDetails" class="mt-3">
-                                                <label class="block text-sm font-medium mb-1" for="sales_id">Sales
-                                                    Sparepart</label>
-                                                <select id="sales_id" name="sales_id[]"
-                                                    class="form-select text-sm py-1 w-full">
-                                                    <option selected value="1">Tidak ada Sales</option>
-                                                    @foreach ($sales as $user)
-                                                        <option value="{{ $user->id }}">{{ $user->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            <div>
-                                                <label class="block text-sm font-medium mb-1"
-                                                    for="garansi">Garansi</label>
-                                                <select name="garansi[]" class="form-select text-sm py-1 w-full">
-                                                    <option value="">Tidak Ada</option>
-                                                    <option value="1">1 Hari</option>
-                                                    <option value="2">2 Hari</option>
-                                                    <option value="3">3 Hari</option>
-                                                    <option value="4">4 Hari</option>
-                                                    <option value="5">5 Hari</option>
-                                                    <option value="6">6 Hari</option>
-                                                    <option value="7">1 Minggu</option>
-                                                    <option value="14">2 Minggu</option>
-                                                    <option value="21">3 Minggu</option>
-                                                    <option value="30">1 Bulan</option>
-                                                    <option value="60">2 Bulan</option>
-                                                    <option value="90">3 Bulan</option>
-                                                    <option value="120">4 Bulan</option>
-                                                    <option value="150">5 Bulan</option>
-                                                    <option value="180">6 Bulan</option>
-                                                    <option value="210">7 Bulan</option>
-                                                    <option value="240">8 Bulan</option>
-                                                    <option value="270">9 Bulan</option>
-                                                    <option value="300">10 Bulan</option>
-                                                    <option value="330">11 Bulan</option>
-                                                    <option value="365">1 Tahun</option>
-                                                    <option value="730">2 Tahun</option>
-                                                    <option value="1095">3 Tahun</option>
-                                                    <option value="1460">4 Tahun</option>
-                                                    <option value="1825">5 Tahun</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="mt-3">
-                                                <label class="block text-sm font-medium mb-1"
-                                                    for="modal_sparepart">Modal Sparepart <span
-                                                        class="text-rose-500">*</span></label>
-                                                <input class="form-input w-full px-2 py-1 modal_sparepart"
-                                                    type="number" name="modal_sparepart[]" required />
-                                            </div>
-
-                                            <div class="mt-3">
-                                                <label class="block text-sm font-medium mb-1" for="biaya_servis">Biaya
-                                                    Servis <span class="text-rose-500">*</span></label>
-                                                <input class="form-input w-full px-2 py-1 biaya_servis" type="number"
-                                                    name="biaya_servis[]" required />
-                                            </div>
-                                        </div>
-                                        <div id="servis-lain"></div>
-                                        {{-- Tombol tambah servis --}}
-                                        <div>
-                                            <button type="button" class="rounded-lg px-4 py-1 bg-blue-600 text-white"
-                                                id="tambah-servis">+ tambah
-                                                tindakan servis</button>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="qc_keluar">Pengecekan
-                                                Fungsi Keluar <span class="text-rose-500">*</span></label>
-                                            <input id="qc_keluar" name="qc_keluar"
-                                                class="form-input w-full px-2 py-1" type="text"
-                                                placeholder="Contoh: Tombol, Kamera, Speaker, dll" required />
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1"
-                                                for="total_modal_sparepart">Total
-                                                Modal
-                                                Sparepart <span class="text-rose-500">*</span></label>
-                                            <input class="form-input w-full px-2 py-1" type="number"
-                                                name="total_modal_sparepart" id="total_modal_sparepart" />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya
-                                                Servis
-                                                <span class="text-rose-500">*</span></label>
-                                            <input class="form-input w-full px-2 py-1" type="number" name="biaya"
-                                                id="biaya" />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1"
-                                                for="diskon">Diskon</label>
-                                            <input id="diskon" name="diskon" class="form-input w-full px-2 py-1"
-                                                type="text" placeholder="Kosongkan jika tidak ada diskon" />
-                                        </div>
-                                        <div x-data="{ caraPembayaran: 'Tunai' }">
-                                            <label class="block text-sm font-medium mb-1" for="cara_pembayaran">Cara
-                                                Pembayaran</label>
-                                            <select id="cara_pembayaran" name="cara_pembayaran"
-                                                class="form-select text-sm py-1 w-full" x-model="caraPembayaran">
-                                                <option selected value="Tunai">Tunai</option>
-                                                <option value="Transfer">Transfer</option>
-                                                <option value="Kredit">Kredit</option>
-                                                <option value="Tunai & Transfer">Tunai & Transfer</option>
-                                            </select>
-
-                                            <div x-show="caraPembayaran === 'Tunai & Transfer'" class="mt-3">
-                                                <label class="block text-sm font-medium text-indigo-500">Silahkan isi
-                                                    hanya pada salah satu input saja: Tunai / Transfer</label>
-                                                <div class="flex flex-row gap-3">
-                                                    <div class="w-1/2 mb-3 md:mb-0">
-                                                        <label class="block text-sm font-medium mb-1"
-                                                            for="tunai">Tunai</label>
-                                                        <input class="form-input w-full py-1" type="number"
-                                                            name="tunai" id="tunai" value="0" />
+                                            <div x-show="showDetails" class="mt-3 space-y-3">
+                                                <div>
+                                                    <label class="block text-sm font-medium mb-1" for="users_id">Teknisi <span
+                                                            class="text-rose-500">*</span></label>
+                                                    <select id="users_id" name="users_id"
+                                                        class="form-select text-sm py-1 w-full">
+                                                        <option selected value="">Pilih Teknisi</option>
+                                                        @foreach ($users as $user)
+                                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div x-data="{ showInputManual: false }">
+                                                    <div class="flex justify-between items-center mb-1">
+                                                        <label class="block text-sm font-medium">
+                                                            Tindakan Servis
+                                                            <span class="text-rose-500">*</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" class="form-checkbox"
+                                                                x-on:click="showInputManual = true" />
+                                                            <span class="text-sm ml-2">Isi Manual</span>
+                                                        </label>
                                                     </div>
-                                                    <div class="w-1/2 mb-3 md:mb-0">
+                                                    <div class="pilih-tindakan">
+                                                        <select id="selectjs5" name="service_actions_id[]"
+                                                            class="form-select text-sm py-1 w-full" style="width: 100%;">
+                                                            <option selected value="">Pilih Tindakan</option>
+                                                            @foreach ($service_actions as $action)
+                                                                <option value="{{ $action->id }}">
+                                                                    {{ $action->nama_tindakan }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+        
+                                                    <div x-show="showInputManual" class="mt-2">
+                                                        <input class="form-input w-full px-2 py-1" type="text"
+                                                            name="tindakan_servis[]" />
+                                                    </div>
+                                                    <input type="hidden" name="prev_modal" value="0">
+                                                    <input type="hidden" name="prev_biaya" value="0">
+                                                </div>
+                                                <div x-data="{ showDetails: false }">
+                                                    <label class="block text-sm font-medium mb-1" for="modal_sparepart">Apakah
+                                                        menggunakan stok sparepart toko?</label>
+                                                    <div class="flex flex-wrap items-center -m-3">
+                                                        <div class="m-3">
+                                                            <!-- Start -->
+                                                            <label class="flex items-center">
+                                                                <input type="radio" name="radio-buttons" class="form-radio"
+                                                                    checked x-on:click="showDetails = false" />
+                                                                <span class="text-sm ml-2">Tidak</span>
+                                                            </label>
+                                                            <!-- End -->
+                                                        </div>
+                                                        <div class="m-3">
+                                                            <!-- Start -->
+                                                            <label class="flex items-center">
+                                                                <input type="radio" name="radio-buttons" class="form-radio"
+                                                                    x-on:click="showDetails = true" />
+                                                                <span class="text-sm ml-2">Ya</span>
+                                                            </label>
+                                                            <!-- End -->
+                                                        </div>
+                                                    </div>
+                                                    <div x-show="showDetails" class="mt-3">
                                                         <label class="block text-sm font-medium mb-1"
-                                                            for="transfer">Transfer</label>
-                                                        <input class="form-input w-full py-1" type="number"
-                                                            name="transfer" id="transfer" value="0" />
+                                                            for="products_id[]">Sparepart Toko yg Digunakan</label>
+                                                        <select id="selectjs6" name="products_id[]"
+                                                            class="form-select text-sm py-1 w-full" style="width: 100%;">
+                                                            <option selected value="">Pilih Sparepart</option>
+                                                            @foreach ($products as $item)
+                                                                <option value="{{ $item->id }}">{{ $item->product_name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div x-show="showDetails" class="mt-3">
+                                                        <label class="block text-sm font-medium mb-1" for="sales_id">Sales
+                                                            Sparepart</label>
+                                                        <select id="sales_id" name="sales_id[]"
+                                                            class="form-select text-sm py-1 w-full">
+                                                            <option selected value="1">Tidak ada Sales</option>
+                                                            @foreach ($sales as $user)
+                                                                <option value="{{ $user->id }}">{{ $user->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+        
+                                                    <div>
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="garansi">Garansi</label>
+                                                        <select name="garansi[]" class="form-select text-sm py-1 w-full">
+                                                            <option value="">Tidak Ada</option>
+                                                            <option value="1">1 Hari</option>
+                                                            <option value="2">2 Hari</option>
+                                                            <option value="3">3 Hari</option>
+                                                            <option value="4">4 Hari</option>
+                                                            <option value="5">5 Hari</option>
+                                                            <option value="6">6 Hari</option>
+                                                            <option value="7">1 Minggu</option>
+                                                            <option value="14">2 Minggu</option>
+                                                            <option value="21">3 Minggu</option>
+                                                            <option value="30">1 Bulan</option>
+                                                            <option value="60">2 Bulan</option>
+                                                            <option value="90">3 Bulan</option>
+                                                            <option value="120">4 Bulan</option>
+                                                            <option value="150">5 Bulan</option>
+                                                            <option value="180">6 Bulan</option>
+                                                            <option value="210">7 Bulan</option>
+                                                            <option value="240">8 Bulan</option>
+                                                            <option value="270">9 Bulan</option>
+                                                            <option value="300">10 Bulan</option>
+                                                            <option value="330">11 Bulan</option>
+                                                            <option value="365">1 Tahun</option>
+                                                            <option value="730">2 Tahun</option>
+                                                            <option value="1095">3 Tahun</option>
+                                                            <option value="1460">4 Tahun</option>
+                                                            <option value="1825">5 Tahun</option>
+                                                        </select>
+                                                    </div>
+        
+                                                    <div class="mt-3">
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="modal_sparepart">Modal Sparepart <span
+                                                                class="text-rose-500">*</span></label>
+                                                        <input class="form-input w-full px-2 py-1 modal_sparepart"
+                                                            type="number" name="modal_sparepart[]" :required="showDetails" />
+                                                    </div>
+        
+                                                    <div class="mt-3">
+                                                        <label class="block text-sm font-medium mb-1" for="biaya_servis">Biaya
+                                                            Servis <span class="text-rose-500">*</span></label>
+                                                        <input class="form-input w-full px-2 py-1 biaya_servis" type="number"
+                                                            name="biaya_servis[]" :required="showDetails" />
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                            <div x-show="caraPembayaran === 'Kredit'" class="mt-3">
+                                                <div id="servis-lain"></div>
+                                                {{-- Tombol tambah servis --}}
+                                                <div>
+                                                    <button type="button" class="rounded-lg px-4 py-1 bg-blue-600 text-white"
+                                                        id="tambah-servis">+ tambah
+                                                        tindakan servis</button>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium mb-1" for="qc_keluar">Pengecekan
+                                                        Fungsi Keluar <span class="text-rose-500">*</span></label>
+                                                    <input id="qc_keluar" name="qc_keluar"
+                                                        class="form-input w-full px-2 py-1" type="text"
+                                                        placeholder="Contoh: Tombol, Kamera, Speaker, dll" :required="showDetails" />
+                                                </div>
+        
                                                 <div>
                                                     <label class="block text-sm font-medium mb-1"
-                                                        for="pay">Jumlah Pembayaran <span
-                                                            class="text-rose-500">*</span></label>
-                                                    <input id="pay" name="pay"
-                                                        class="form-input w-full px-2 py-1" type="number" />
+                                                        for="total_modal_sparepart">Total
+                                                        Modal
+                                                        Sparepart <span class="text-rose-500">*</span></label>
+                                                    <input class="form-input w-full px-2 py-1" type="number"
+                                                        name="total_modal_sparepart" id="total_modal_sparepart" />
                                                 </div>
-                                                <div class="flex flex-wrap items-center -m-3 mt-0">
-                                                    <div class="m-3">
-                                                        <!-- Start -->
-                                                        <label class="flex items-center">
-                                                            <input name="tunai" type="checkbox"
-                                                                class="form-checkbox" />
-                                                            <span class="text-sm ml-2">Tunai</span>
-                                                        </label>
-                                                        <!-- End -->
+                                                <div>
+                                                    <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya
+                                                        Servis
+                                                        <span class="text-rose-500">*</span></label>
+                                                    <input class="form-input w-full px-2 py-1" type="number" name="biaya"
+                                                        id="biaya" />
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium mb-1"
+                                                        for="diskon">Diskon</label>
+                                                    <input id="diskon" name="diskon" class="form-input w-full px-2 py-1"
+                                                        type="text" placeholder="Kosongkan jika tidak ada diskon" />
+                                                </div>
+                                                <div x-data="{ caraPembayaran: 'Tunai' }">
+                                                    <label class="block text-sm font-medium mb-1" for="cara_pembayaran">Cara
+                                                        Pembayaran</label>
+                                                    <select id="cara_pembayaran" name="cara_pembayaran"
+                                                        class="form-select text-sm py-1 w-full" x-model="caraPembayaran">
+                                                        <option selected value="Tunai">Tunai</option>
+                                                        <option value="Transfer">Transfer</option>
+                                                        <option value="Kredit">Kredit</option>
+                                                        <option value="Tunai & Transfer">Tunai & Transfer</option>
+                                                    </select>
+        
+                                                    <div x-show="caraPembayaran === 'Tunai & Transfer'" class="mt-3">
+                                                        <label class="block text-sm font-medium text-indigo-500">Silahkan isi
+                                                            hanya pada salah satu input saja: Tunai / Transfer</label>
+                                                        <div class="flex flex-row gap-3">
+                                                            <div class="w-1/2 mb-3 md:mb-0">
+                                                                <label class="block text-sm font-medium mb-1"
+                                                                    for="tunai">Tunai</label>
+                                                                <input class="form-input w-full py-1" type="number"
+                                                                    name="tunai" id="tunai" value="0" />
+                                                            </div>
+                                                            <div class="w-1/2 mb-3 md:mb-0">
+                                                                <label class="block text-sm font-medium mb-1"
+                                                                    for="transfer">Transfer</label>
+                                                                <input class="form-input w-full py-1" type="number"
+                                                                    name="transfer" id="transfer" value="0" />
+                                                            </div>
+                                                        </div>
                                                     </div>
-
-                                                    <div class="m-3">
-                                                        <!-- Start -->
-                                                        <label class="flex items-center">
-                                                            <input name="transfer" type="checkbox"
-                                                                class="form-checkbox" />
-                                                            <span class="text-sm ml-2">Transfer</span>
-                                                        </label>
-                                                        <!-- End -->
+        
+                                                    <div x-show="caraPembayaran === 'Kredit'" class="mt-3">
+                                                        <div>
+                                                            <label class="block text-sm font-medium mb-1"
+                                                                for="pay">Jumlah Pembayaran <span
+                                                                    class="text-rose-500">*</span></label>
+                                                            <input id="pay" name="pay"
+                                                                class="form-input w-full px-2 py-1" type="number" />
+                                                        </div>
+                                                        <div class="flex flex-wrap items-center -m-3 mt-0">
+                                                            <div class="m-3">
+                                                                <!-- Start -->
+                                                                <label class="flex items-center">
+                                                                    <input name="tunai" type="checkbox"
+                                                                        class="form-checkbox" />
+                                                                    <span class="text-sm ml-2">Tunai</span>
+                                                                </label>
+                                                                <!-- End -->
+                                                            </div>
+        
+                                                            <div class="m-3">
+                                                                <!-- Start -->
+                                                                <label class="flex items-center">
+                                                                    <input name="transfer" type="checkbox"
+                                                                        class="form-checkbox" />
+                                                                    <span class="text-sm ml-2">Transfer</span>
+                                                                </label>
+                                                                <!-- End -->
+                                                            </div>
+                                                        </div>
+                                                        <label class="block text-sm font-medium mt-3" for="tempo">Waktu
+                                                            Tempo <span class="text-rose-500">*</span></label>
+                                                        <select id="tempo" name="tempo"
+                                                            class="block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md mt-1">
+                                                            <option value="">Pilih Waktu Tempo</option>
+                                                            <option value="1">Tempo 1 Hari</option>
+                                                            <option value="2">Tempo 2 Hari</option>
+                                                            <option value="3">Tempo 3 Hari</option>
+                                                            <option value="4">Tempo 4 Hari</option>
+                                                            <option value="5">Tempo 5 Hari</option>
+                                                            <option value="6">Tempo 6 Hari</option>
+                                                            <option value="7">Tempo 1 Minggu</option>
+                                                            <option value="14">Tempo 2 Minggu</option>
+                                                            <option value="21">Tempo 3 Minggu</option>
+                                                            <option value="30">Tempo 1 Bulan</option>
+                                                            <option value="60">Tempo 2 Bulan</option>
+                                                            <option value="90">Tempo 3 Bulan</option>
+                                                        </select>
                                                     </div>
                                                 </div>
-                                                <label class="block text-sm font-medium mt-3" for="tempo">Waktu
-                                                    Tempo <span class="text-rose-500">*</span></label>
-                                                <select id="tempo" name="tempo"
-                                                    class="block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md mt-1">
-                                                    <option value="">Pilih Waktu Tempo</option>
-                                                    <option value="1">Tempo 1 Hari</option>
-                                                    <option value="2">Tempo 2 Hari</option>
-                                                    <option value="3">Tempo 3 Hari</option>
-                                                    <option value="4">Tempo 4 Hari</option>
-                                                    <option value="5">Tempo 5 Hari</option>
-                                                    <option value="6">Tempo 6 Hari</option>
-                                                    <option value="7">Tempo 1 Minggu</option>
-                                                    <option value="14">Tempo 2 Minggu</option>
-                                                    <option value="21">Tempo 3 Minggu</option>
-                                                    <option value="30">Tempo 1 Bulan</option>
-                                                    <option value="60">Tempo 2 Bulan</option>
-                                                    <option value="90">Tempo 3 Bulan</option>
-                                                </select>
                                             </div>
                                         </div>
                                         <div>
