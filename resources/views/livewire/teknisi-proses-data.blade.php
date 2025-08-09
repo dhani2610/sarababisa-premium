@@ -195,7 +195,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="penerima">Penerima</label>
-                                            <input type="text" id="penerima" name="penerima" class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" value="{{ Auth::user()->worker->name }}" disabled>
+                                            <input type="text" id="penerima" name="penerima" class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" value="{{ optional(Auth::user()->worker)->name }}" disabled>
                                         </div>
                                     </div>
                                     <!-- Modal footer -->
@@ -286,7 +286,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="penerima">Penerima</label>
-                                            <input type="text" id="penerima" name="penerima" class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" value="{{ Auth::user()->worker->name }}" disabled>
+                                            <input type="text" id="penerima" name="penerima" class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" value="{{ optional(Auth::user()->worker)->name }}" disabled>
                                         </div>
                                         <div x-data="{ showInputManual: false }">
                                             <div class="flex justify-between items-center mb-1">
