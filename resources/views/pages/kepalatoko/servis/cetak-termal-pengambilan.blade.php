@@ -254,7 +254,14 @@
                 <p>Rek {{ $bank['bank'] }} {{ $bank['rekening'] }} <br> a.n. {{ $bank['pemilik'] }}</p>
             @endforeach
             <p>Cek status garansi:</p>
-            {!! QrCode::size(80)->generate(env('APP_URL') . '/tracking') !!}
+            @php
+                $qrCode = base64_encode(
+                    QrCode::format('png')
+                        ->size(80)
+                        ->generate(env('APP_URL') . '/tracking')
+                );
+            @endphp
+            <img src="data:image/png;base64,{{ $qrCode }}" alt="QR Code">
             <p>Terima kasih atas kepercayaan Anda telah melakukan Servis di {{ $users->nama_toko }}</p>
         </footer>
     </div>

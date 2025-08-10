@@ -148,7 +148,14 @@
 
 
             <p>Cek status servis:</p>
-            {!! QrCode::size(80)->generate(env('APP_URL') . '/tracking') !!}
+            @php
+                $qrCode = base64_encode(
+                    QrCode::format('png')
+                        ->size(80)
+                        ->generate(env('APP_URL') . '/tracking')
+                );
+            @endphp
+            <img src="data:image/png;base64,{{ $qrCode }}" alt="QR Code">
             <p>Silahkan bawa Nota Tanda Terima Servis ini pada saat pengambilan barang. Terima kasih.</p>
         </footer>
     </div>
