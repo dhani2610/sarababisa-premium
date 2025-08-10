@@ -253,7 +253,8 @@
             @foreach ($banks as $index => $bank)
                 <p>Rek {{ $bank['bank'] }} {{ $bank['rekening'] }} <br> a.n. {{ $bank['pemilik'] }}</p>
             @endforeach
-            <p>Cek status garansi {{ env('APP_URL') }}/tracking</p>
+            <p>Cek status garansi:</p>
+            {!! QrCode::size(80)->generate(env('APP_URL') . '/tracking') !!}
             <p>Terima kasih atas kepercayaan Anda telah melakukan Servis di {{ $users->nama_toko }}</p>
         </footer>
     </div>
