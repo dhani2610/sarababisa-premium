@@ -147,7 +147,8 @@
             @endforeach
 
 
-            <p>Cek status servis {{ env('APP_URL') }}/tracking</p>
+            <p>Cek status servis:</p>
+            {!! QrCode::size(80)->generate(env('APP_URL') . '/tracking') !!}
             <p>Silahkan bawa Nota Tanda Terima Servis ini pada saat pengambilan barang. Terima kasih.</p>
         </footer>
     </div>

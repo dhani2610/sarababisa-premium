@@ -21,6 +21,7 @@
         "livewire/livewire": "^2.5",
         "maatwebsite/excel": "^3.1",
         "realrashid/sweet-alert": "^7.0",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-activitylog": "^4.7",
         "wireui/wireui": "^1.17"
     },

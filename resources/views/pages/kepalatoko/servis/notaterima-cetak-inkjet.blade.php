@@ -159,7 +159,8 @@
                 <td id="data">: -</td>
                 @endif
                 <td id="data" colspan="2" style="border-left-style: solid;" class="text-center">
-                    {{ env('APP_URL') }}/tracking</td>
+                    {!! QrCode::size(80)->generate(env('APP_URL') . '/tracking') !!}
+                </td>
             </tr>
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Pengecekan Fungsi</th>
