@@ -648,8 +648,12 @@
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="flex space-x-1">
                                     @php
+                                    if (optional($process->customer)->nomor_hp == null) {
+                                        $nomor = '-';
+                                    }else{
                                         $nomor = $process->customer->nomor_hp;
                                         $nomorwa = preg_replace('/^08/', 628, $nomor);
+                                    }
                                     @endphp
                                     <!-- Start -->
                                     <div
@@ -760,31 +764,33 @@
                                         @mouseenter="open = true"
                                         @mouseleave="open = false"
                                     >
-                                        <a href="{{ route('teknisi-ubah-bisa-diambil-edit', $process->id) }}">
-                                            <button class="text-slate-400 hover:text-slate-500 rounded-full">
-                                                <span class="sr-only">Konfirmasi</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-                                                    <rect x="9" y="3" width="6" height="4" rx="2" />
-                                                    <path d="M9 14l2 2l4 -4" />
-                                                </svg>
-                                            </button>
-                                        </a>
-                                        <div class="z-10 absolute right-full top-1/2 -translate-y-1/2">
-                                            <div
-                                                class="bg-slate-800 p-2 rounded overflow-hidden mb-2"
-                                                x-show="open"
-                                                x-transition:enter="transition ease-out duration-200 transform"
-                                                x-transition:enter-start="opacity-0 translate-y-2"
-                                                x-transition:enter-end="opacity-100 translate-y-0"
-                                                x-transition:leave="transition ease-out duration-200"
-                                                x-transition:leave-start="opacity-100"
-                                                x-transition:leave-end="opacity-0"
-                                                x-cloak
-                                            >
-                                                <div class="text-xs text-slate-200 whitespace-nowrap">Ubah status menjadi bisa diambil</div>
-                                            </div>
+                                        @if ($process->status_servis == 'Belum cek')
+                                            <a href="{{ route('teknisi-ubah-bisa-diambil-edit', $process->id) }}">
+                                                <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                                                    <span class="sr-only">Konfirmasi</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                        <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+                                                        <rect x="9" y="3" width="6" height="4" rx="2" />
+                                                        <path d="M9 14l2 2l4 -4" />
+                                                    </svg>
+                                                </button>
+                                            </a>
+                                            <div class="z-10 absolute right-full top-1/2 -translate-y-1/2">
+                                                <div
+                                                    class="bg-slate-800 p-2 rounded overflow-hidden mb-2"
+                                                    x-show="open"
+                                                    x-transition:enter="transition ease-out duration-200 transform"
+                                                    x-transition:enter-start="opacity-0 translate-y-2"
+                                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                                    x-transition:leave="transition ease-out duration-200"
+                                                    x-transition:leave-start="opacity-100"
+                                                    x-transition:leave-end="opacity-0"
+                                                    x-cloak
+                                                >
+                                                    <div class="text-xs text-slate-200 whitespace-nowrap">Ubah status menjadi bisa diambil</div>
+                                                </div>
+                                        @endif
                                         </div>
                                     </div>
                                     <!-- End -->

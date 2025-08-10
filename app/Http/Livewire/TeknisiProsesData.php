@@ -33,7 +33,11 @@ class TeknisiProsesData extends Component
         'Sedang Tes',
         'Menunggu Konfirmasi',
         'Sedang Dikerjakan',
-        'Menunggu Sparepart'
+        'Menunggu Sparepart',
+        'Sudah jadi',
+        'Tidak bisa',
+        'Dibatalkan',
+        'Menunggu konfirmasi'
     ];
 
     public $queryString = [
@@ -68,10 +72,12 @@ class TeknisiProsesData extends Component
             $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')
                 ->orWhere('nomor_servis', 'like', '%' . $this->search . '%')
                 ->orWhere('nama_barang', 'like', '%' . $this->search . '%')
-                ->orWhere('imei', 'like', '%' . $this->search . '%');
+                ->orWhere('imei', 'like', '%' . $this->search . '%')
+                ->orWhere('status_servis', 'like', '%' . $this->search . '%');
         })->when($this->status, function ($q) {
-            $q->whereIn('status_servis', $this->status);
-        })->paginate($this->paginate);
+            // $q->whereIn('status_servis', $this->status);
+        })->orderBy('created_at','desc')->paginate($this->paginate);
+        // dd($this->status);
 
 
         // dd($service);
