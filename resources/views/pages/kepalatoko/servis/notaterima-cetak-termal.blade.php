@@ -147,7 +147,7 @@
             @endforeach
 
 
-            <p>Cek status servis {{ $users->link_toko }}/tracking</p>
+            <p>Cek status servis {{ env('APP_URL') }}/tracking</p>
             <p>Silahkan bawa Nota Tanda Terima Servis ini pada saat pengambilan barang. Terima kasih.</p>
         </footer>
     </div>

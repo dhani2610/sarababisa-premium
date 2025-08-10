@@ -159,7 +159,7 @@
                 <td id="data">: -</td>
                 @endif
                 <td id="data" colspan="2" style="border-left-style: solid;" class="text-center">
-                    {{ $users->link_toko }}/tracking</td>
+                    {{ env('APP_URL') }}/tracking</td>
             </tr>
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Pengecekan Fungsi</th>

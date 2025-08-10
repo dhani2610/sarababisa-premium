@@ -272,7 +272,7 @@
   </table>
   @if ($orderItem->first()->garansi != null)
     <div>
-      <p style="text-decoration: underline; font-size: 12px;">Cek status garansi di {{ $users->link_toko }}/garansi</p>
+      <p style="text-decoration: underline; font-size: 12px;">Cek status garansi di {{ env('APP_URL') }}/garansi</p>
     </div>
   @endif
 </body>

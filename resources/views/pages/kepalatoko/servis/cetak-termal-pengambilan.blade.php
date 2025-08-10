@@ -253,7 +253,7 @@
             @foreach ($banks as $index => $bank)
                 <p>Rek {{ $bank['bank'] }} {{ $bank['rekening'] }} <br> a.n. {{ $bank['pemilik'] }}</p>
             @endforeach
-            <p>Cek status garansi {{ $users->link_toko }}/tracking</p>
+            <p>Cek status garansi {{ env('APP_URL') }}/tracking</p>
             <p>Terima kasih atas kepercayaan Anda telah melakukan Servis di {{ $users->nama_toko }}</p>
         </footer>
     </div>
