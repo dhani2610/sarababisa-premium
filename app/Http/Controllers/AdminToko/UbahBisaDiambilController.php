@@ -95,6 +95,13 @@ class UbahBisaDiambilController extends Controller
         $profittransaksi = $biaya - $modalSparepart;
         $bagihasil = ($biaya - $modalSparepart) / 100;
 
+
+        if ($request->kondisi_servis == 'Dibatalkan') {
+            $finalModal = $request->total_modal_sparepart;
+        }else{
+            $finalModal = $modalSparepart;
+        }
+
         // Transaction create
         $item->update([
             'users_id' => $request->users_id,
@@ -104,7 +111,7 @@ class UbahBisaDiambilController extends Controller
             // 'service_actions_id' => $request->service_actions_id[0],
             'products_id' => $request->products_id[0] ?? null,
             'tindakan_servis' => count($tindakan_servis) > 0 ? json_encode($tindakan_servis) : null,
-            'modal_sparepart' => $modalSparepart,
+            'modal_sparepart' => $finalModal,
             'biaya' => $biaya,
             'catatan' => $request->catatan,
             'is_admin_toko' => $request->is_admin_toko,

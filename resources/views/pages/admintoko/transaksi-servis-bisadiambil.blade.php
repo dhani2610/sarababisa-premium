@@ -280,6 +280,13 @@
                                         </div>
                                     </div>
                                 </div>
+                                 <div id="total_modal_batal_wrapper" class="mt-4 space-y-3" style="display: none;">
+                                    <label class="block text-sm font-medium mb-1" for="total_modal_batal">
+                                        Total Modal
+                                        <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input class="form-input w-full px-2 py-1" type="number" name="total_modal_sparepart" id="total_modal_batal" />
+                                </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="catatan">Catatan
                                         <small>(Kosongkan jika tidak perlu)</small></label>
@@ -313,6 +320,31 @@
         <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
             crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <script>
+        $(document).ready(function () {
+                $('input[name="kondisi_servis"]').on('change', function () {
+                    const selectedValue = $(this).val();
+
+                    if (selectedValue === 'Dibatalkan') {
+                        $('#total_modal_batal_wrapper').show();                       // Tampilkan input
+                        $('#total_modal_batal').attr('required', true);              // Jadikan required
+
+                        $('#total_modal_sparepart').closest('.mt-3').hide();         // Sembunyikan sparepart
+                        $('#total_modal_sparepart').removeAttr('required');          // Hilangkan required dari sparepart
+                    } else {
+                        $('#total_modal_batal_wrapper').hide();                      // Sembunyikan input
+                        $('#total_modal_batal').removeAttr('required');              // Hilangkan required
+
+                        $('#total_modal_sparepart').closest('.mt-3').show();         // Tampilkan sparepart
+                        $('#total_modal_sparepart').attr('required', true);          // Tambahkan required ke sparepart
+                    }
+                });
+
+                // Trigger change on load (misalnya ketika form reload)
+                $('input[name="kondisi_servis"]:checked').trigger('change');
+            });
+
+        </script>
         <script type="text/javascript">
             $(document).ready(function() {
                 $('.selectAction').select2();
