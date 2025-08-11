@@ -1085,7 +1085,7 @@
                                         <!-- Start -->
                                         <div class="relative" x-data="{ open: false }" @mouseenter="open = true"
                                             @mouseleave="open = false">
-                                            <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Service*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Service%20:%20{{ $process->nomor_servis }}%0ANama%20user%20:%20*{{ $process->nama_pelanggan }}*%0AUnit%20:%20{{ $process->nama_barang }}%0ADiterima%20:%20{{ $process->penerima }}%0ATanggal%20:%20{{ \Carbon\Carbon::parse($process->created_at)->translatedFormat('d F Y h:i') }}%0AKerusakan%20:%20{{ $process->kerusakan }}%0A%0ALink%20tracking%20:%20{{ $toko->link_toko }}/tracking%0ATerimakasih"
+                                            <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Service*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Service%20:%20{{ $process->nomor_servis }}%0ANama%20user%20:%20*{{ $process->nama_pelanggan }}*%0AUnit%20:%20{{ $process->nama_barang }}%0ADiterima%20:%20{{ $process->penerima }}%0ATanggal%20:%20{{ \Carbon\Carbon::parse($process->created_at)->translatedFormat('d F Y h:i') }}%0AKerusakan%20:%20{{ $process->kerusakan }}%0A%0ALink%20tracking%20:%20{{ env('APP_URL') }}/tracking%0ATerimakasih"
                                                 target="__blank">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                     class="icon icon-tabler icon-tabler-file-invoice" width="20"
