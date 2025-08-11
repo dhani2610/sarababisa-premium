@@ -246,8 +246,16 @@
                     <td id="data" scope="row" style="border-left-style: solid;"></td>
                     <td id="data"></td>
                     <td id="data" scope="row" style="border-left-style: solid;">Sisa Pembayaran</td>
-                    <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka - $items->diskon) }}
+                    <td id="data">: Rp. 
+                        {{ number_format(
+                            $items->biaya 
+                            - ($items->kondisi_servis == 'Dibatalkan' ? 0 : $items->uang_muka) 
+                            - $items->diskon
+                        ) }}
                     </td>
+
+                    {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka - $items->diskon) }}
+                    </td> --}}
                 </tr>
             @elseif ($items->uang_muka != null && $items->diskon === null)
                 <tr style="border-right-style: solid;">
