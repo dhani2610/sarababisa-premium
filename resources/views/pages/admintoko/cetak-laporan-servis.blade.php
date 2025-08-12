@@ -243,7 +243,21 @@
                      </div>';
                                 }
                             @endphp
+                            @if ($item->kondisi_servis == 'Dibatalkan')
+                                @if ($item->uang_muka > 0)
+                                    <div>
+                                        <strong>Uang Muka:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka, 0, ',', '.') }}
+                                    </div>
+                                @elseif($item->modal_sparepart > 0)
+                                    <div>
+                                        <strong>Modal:</strong><br>
+                                        Rp.-{{ number_format(abs($item->modal_sparepart), 0, ',', '.') }}
+                                    </div>
+                                @endif
+                            @else
                             {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
+                            @endif
                         </td>
 
                     </tr>
@@ -310,7 +324,7 @@
 
 
                         @if ($toko->is_bonus === 1)
-                            <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}
+                            <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}111
                             </td>
                         @endif
                         <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td>
@@ -340,7 +354,21 @@
                      </div>';
                                 }
                             @endphp
+                            @if ($item->kondisi_servis == 'Dibatalkan')
+                                @if ($item->uang_muka > 0)
+                                    <div>
+                                        <strong>Uang Muka:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka, 0, ',', '.') }}
+                                    </div>
+                                @elseif($item->modal_sparepart > 0)
+                                    <div>
+                                        <strong>Modal:</strong><br>
+                                        Rp.-{{ number_format(abs($item->modal_sparepart), 0, ',', '.') }}
+                                    </div>
+                                @endif
+                            @else
                             {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
+                            @endif
                         </td>
                     </tr>
                 @endif
@@ -403,7 +431,21 @@
                      </div>';
                             }
                         @endphp
-                        {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
+                        @if ($item->kondisi_servis == 'Dibatalkan')
+                                @if ($item->uang_muka > 0)
+                                    <div>
+                                        <strong>Uang Muka:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka, 0, ',', '.') }}
+                                    </div>
+                                @elseif($item->modal_sparepart > 0)
+                                    <div>
+                                        <strong>Modal:</strong><br>
+                                        Rp.-{{ number_format(abs($item->modal_sparepart), 0, ',', '.') }}
+                                    </div>
+                                @endif
+                            @else
+                            {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
+                            @endif
 
                     </td> --}}
                 </tr>
