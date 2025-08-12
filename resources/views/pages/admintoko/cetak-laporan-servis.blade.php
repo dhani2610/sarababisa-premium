@@ -249,6 +249,11 @@
                                         <strong>Modal - DP:</strong><br>
                                         Rp.-{{ number_format($item->uang_muka - $item->modal_sparepart, 0, ',', '.') }}
                                     </div>
+                                @elseif ($item->uang_muka > 0 && $item->biaya > 0)
+                                    <div>
+                                        <strong>Modal - DP:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka - $item->biaya, 0, ',', '.') }}
+                                    </div>
                                 @elseif ($item->uang_muka > 0)
                                     <div>
                                         <strong>Uang Muka:</strong><br>
@@ -365,6 +370,11 @@
                                     <div>
                                         <strong>Modal - DP:</strong><br>
                                         Rp.-{{ number_format($item->uang_muka - $item->modal_sparepart, 0, ',', '.') }}
+                                    </div>
+                                @elseif ($item->uang_muka > 0 && $item->biaya > 0)
+                                    <div>
+                                        <strong>Modal - DP:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka - $item->biaya, 0, ',', '.') }}
                                     </div>
                                 @elseif ($item->uang_muka > 0)
                                     <div>
