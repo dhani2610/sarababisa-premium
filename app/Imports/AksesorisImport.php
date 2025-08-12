@@ -12,6 +12,15 @@ class AksesorisImport implements ToModel, WithHeadingRow, WithBatchInserts, With
 {
     public function model(array $row)
     {
+        $product = Product::where('product_name', $row['Nama Produk'])->first();
+
+        if ($product) {
+            $product->stok = $row['Stok'];
+            $product->save();
+
+            return null;
+        }
+        
         return new Product([
             'categories_id' => 3, // Nilai default untuk categories_id
             'category_name'     => "Aksesoris",
