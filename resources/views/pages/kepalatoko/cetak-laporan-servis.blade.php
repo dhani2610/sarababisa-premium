@@ -231,7 +231,7 @@
                             @if ($item->kondisi_servis == 'Dibatalkan')
                                 @if ($item->uang_muka > 0 && $item->modal_sparepart > 0)
                                 <div>
-                                    <strong>Uang Muka:</strong><br>
+                                    <strong>Modal - DP:</strong><br>
                                     Rp.-{{ number_format($item->uang_muka - $item->modal_sparepart, 0, ',', '.') }}
                                 </div>
                             @elseif ($item->uang_muka > 0)
@@ -346,21 +346,21 @@
                             @endphp
                             @if ($item->kondisi_servis == 'Dibatalkan')
                                 @if ($item->uang_muka > 0 && $item->modal_sparepart > 0)
-    <div>
-        <strong>Uang Muka:</strong><br>
-        Rp.-{{ number_format($item->uang_muka - $item->modal_sparepart, 0, ',', '.') }}
-    </div>
-@elseif ($item->uang_muka > 0)
-    <div>
-        <strong>Uang Muka:</strong><br>
-        Rp.-{{ number_format($item->uang_muka, 0, ',', '.') }}
-    </div>
-@elseif ($item->modal_sparepart > 0)
-    <div>
-        <strong>Modal:</strong><br>
-        Rp.-{{ number_format($item->modal_sparepart, 0, ',', '.') }}
-    </div>
-@endif
+                                    <div>
+                                        <strong>Modal - DP:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka - $item->modal_sparepart, 0, ',', '.') }}
+                                    </div>
+                                @elseif ($item->uang_muka > 0)
+                                    <div>
+                                        <strong>Uang Muka:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka, 0, ',', '.') }}
+                                    </div>
+                                @elseif ($item->modal_sparepart > 0)
+                                    <div>
+                                        <strong>Modal:</strong><br>
+                                        Rp.-{{ number_format($item->modal_sparepart, 0, ',', '.') }}
+                                    </div>
+                                @endif
 
                             @else
                             {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
@@ -429,21 +429,21 @@
                             @endphp
                             @if ($item->kondisi_servis == 'Dibatalkan')
                                 @if ($item->uang_muka > 0 && $item->modal_sparepart > 0)
-    <div>
-        <strong>Uang Muka:</strong><br>
-        Rp.-{{ number_format($item->uang_muka - $item->modal_sparepart, 0, ',', '.') }}
-    </div>
-@elseif ($item->uang_muka > 0)
-    <div>
-        <strong>Uang Muka:</strong><br>
-        Rp.-{{ number_format($item->uang_muka, 0, ',', '.') }}
-    </div>
-@elseif ($item->modal_sparepart > 0)
-    <div>
-        <strong>Modal:</strong><br>
-        Rp.-{{ number_format($item->modal_sparepart, 0, ',', '.') }}
-    </div>
-@endif
+                                    <div>
+                                        <strong>Modal - DP:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka - $item->modal_sparepart, 0, ',', '.') }}
+                                    </div>
+                                @elseif ($item->uang_muka > 0)
+                                    <div>
+                                        <strong>Uang Muka:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka, 0, ',', '.') }}
+                                    </div>
+                                @elseif ($item->modal_sparepart > 0)
+                                    <div>
+                                        <strong>Modal:</strong><br>
+                                        Rp.-{{ number_format($item->modal_sparepart, 0, ',', '.') }}
+                                    </div>
+                                @endif
 
                             @else
                             {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
