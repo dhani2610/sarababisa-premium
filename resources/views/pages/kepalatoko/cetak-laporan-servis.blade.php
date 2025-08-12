@@ -239,6 +239,11 @@
                                         <strong>Modal:</strong><br>
                                         Rp.-{{ number_format(abs($item->modal_sparepart), 0, ',', '.') }}
                                     </div>
+                                @elseif($item->modal_sparepart > 0 && $item->uang_muka > 0)
+                                    <div>
+                                        <strong>Uang Muka:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka -$item->modal_sparepart, 0, ',', '.') }}
+                                    </div>
                                 @endif
                             @else
                             {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
@@ -349,6 +354,11 @@
                                         <strong>Modal:</strong><br>
                                         Rp.-{{ number_format(abs($item->modal_sparepart), 0, ',', '.') }}
                                     </div>
+                                @elseif($item->modal_sparepart > 0 && $item->uang_muka > 0)
+                                    <div>
+                                        <strong>Uang Muka:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka -$item->modal_sparepart, 0, ',', '.') }}
+                                    </div>
                                 @endif
                             @else
                             {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
@@ -425,6 +435,11 @@
                                     <div>
                                         <strong>Modal:</strong><br>
                                         Rp.-{{ number_format(abs($item->modal_sparepart), 0, ',', '.') }}
+                                    </div>
+                                @elseif($item->modal_sparepart > 0 && $item->uang_muka > 0)
+                                    <div>
+                                        <strong>Uang Muka:</strong><br>
+                                        Rp.-{{ number_format($item->uang_muka -$item->modal_sparepart, 0, ',', '.') }}
                                     </div>
                                 @endif
                             @else
