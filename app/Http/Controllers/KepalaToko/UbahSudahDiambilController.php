@@ -115,15 +115,9 @@ class UbahSudahDiambilController extends Controller
         $bagihasil = ($request->biaya - $request->modal_sparepart - $request->diskon) / 100;
 
         // $garansi = Carbon::now();
-        $expired = [];
-        if (count($request->garansi) > 0) {
-            foreach ($request->garansi as $val) {
-                array_push($expired, Carbon::now()->addDays(
-                    $val
-                ));
-            }
-        } else {
-            $expired = null;
+        $garansiList = $request->garansi ?? [];
+        foreach ($garansiList as $val) {
+            $expired[] = Carbon::now()->addDays($val);
         }
 
         if ($item->user != null) {
