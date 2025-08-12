@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\KepalaToko\ProdukController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\DefaultController;
@@ -228,6 +229,8 @@ Route::delete('/target/delete', [KepalaTokoTargetController::class, 'deleteSelec
 Route::delete('/target-sales/delete', [KepalaTokoTargetSalesController::class, 'deleteSelected']);
 Route::delete('/target-teknisi/delete', [KepalaTokoTargetTeknisiController::class, 'deleteSelected']);
 
+Route::get('produk/item/{id}/download-barcode', [ProdukController::class, 'downloadBarcode'])->name('download-barcode');
+
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
     Route::get('/dashboard', [KepalaTokoDashboardController::class, 'index'])->name('kepalatoko-dashboard');
     Route::get('/json-data-servis', [DataServisController::class, 'getDataServis'])->name('json_data_servis');
@@ -288,6 +291,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('produk/sub-kategori', KepalaTokoSubKategoriController::class);
     Route::resource('produk/supplier', KepalaTokoSupplierController::class);
     Route::resource('produk/item', KepalaTokoProdukController::class);
+
     Route::resource('produk/handphone', KepalaTokoProdukHandphoneController::class);
     Route::resource('produk/sparepart', KepalaTokoProdukSparepartController::class);
     Route::resource('produk/aksesoris', KepalaTokoProdukAksesorisController::class);

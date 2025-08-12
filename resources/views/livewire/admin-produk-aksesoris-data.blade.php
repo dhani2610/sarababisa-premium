@@ -493,8 +493,18 @@
                                     </div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
-                                    @if ((int) ($toko->is_edit_produk ?? 0) == 1)
-                                        <div class="space-x-1 flex">
+                                    <div class="space-x-1 flex">
+                                        <a href="{{ route('download-barcode', $item->id) }}">
+                                            <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+                                                    <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+                                                    <rect x="7" y="13" width="10" height="8" rx="2" />
+                                                </svg>
+                                            </button>
+                                        </a>
+                                        @if ((int) ($toko->is_edit_produk ?? 0) == 1)
                                             <a href="{{ route('admin-aksesoris.edit', $item->id) }}">
                                                 <button class="text-slate-400 hover:text-slate-500 rounded-full">
                                                     <span class="sr-only">Edit</span>
@@ -563,10 +573,10 @@
                                                     <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
                                                 </svg>
                                             </button>
-                                        </div>
-                                    @else
-                                        -
-                                    @endif
+                                        @else
+                                            -
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

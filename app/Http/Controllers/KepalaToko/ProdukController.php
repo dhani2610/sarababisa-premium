@@ -14,6 +14,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class ProdukController extends Controller
 {
@@ -44,6 +45,29 @@ class ProdukController extends Controller
         Product::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data produk berhasil dihapus.']);
     }
+
+
+    public function downloadBarcode($id)
+    {
+        $product = Product::findOrFail($id);
+
+        if (!$product->product_code) {
+            return redirect()->back()->with('error', 'Produk ini belum memiliki kode produk.');
+        }
+
+        // Buat barcode PNG
+        $generator = new BarcodeGeneratorPNG();
+        $barcodeData = $generator->getBarcode($product->product_code, $generator::TYPE_CODE_128);
+
+        // Simpan ke file sementara
+        $fileName = 'barcode_' . $product->product_code .'-'.$product->product_name. '.png';
+        $filePath = storage_path('app/public/' . $fileName);
+        file_put_contents($filePath, $barcodeData);
+
+        // Download file
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+
 
     /**
      * Show the form for creating a new resource.
