@@ -991,105 +991,109 @@
                                     @endif
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
-                                    <div class="space-x-1 flex">
-                                        @if ($item->categories_id === 1)
-                                            <a href="{{ route('admin-handphone.edit', $item->id) }}">
-                                                <button class="text-slate-400 hover:text-slate-500 rounded-full">
-                                                    <span class="sr-only">Edit</span>
-                                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                                        <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
-                                                    </svg>
-                                                </button>
-                                            </a>
-                                        @elseif ($item->categories_id === 2)
-                                            <a href="{{ route('admin-sparepart.edit', $item->id) }}">
-                                                <button class="text-slate-400 hover:text-slate-500 rounded-full">
-                                                    <span class="sr-only">Edit</span>
-                                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                                        <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
-                                                    </svg>
-                                                </button>
-                                            </a>
-                                        @elseif ($item->categories_id === 3)
-                                            <a href="{{ route('admin-aksesoris.edit', $item->id) }}">
-                                                <button class="text-slate-400 hover:text-slate-500 rounded-full">
-                                                    <span class="sr-only">Edit</span>
-                                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                                        <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
-                                                    </svg>
-                                                </button>
-                                            </a>
-                                        @else
-                                            <a href="{{ route('admin-tool.edit', $item->id) }}">
-                                                <button class="text-slate-400 hover:text-slate-500 rounded-full">
-                                                    <span class="sr-only">Edit</span>
-                                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                                        <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
-                                                    </svg>
-                                                </button>
-                                            </a>
-                                        @endif
-                                        <!-- Start -->
-                                        <div x-data="{ showDelete: false, deleteId: null }" x-show = "showDelete" x-on:open-delete.window="showDelete = true; deleteId = $event.detail.id" x-on:close-delete.window = "showDelete = false" x-on:keydown.escape.window = "showDelete = false" class="fixed z-50 inset-0">
-                                            <!-- Modal backdrop -->
-                                            <div x-on:click="showDelete = false" class="fixed inset-0 bg-slate-900 bg-opacity-40" x-cloak></div>
-                                            <!-- Modal dialog -->
-                                            <div
-                                                id="danger-modal"
-                                                class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                                                role="dialog"
-                                                aria-modal="true"
-                                                x-show="showDelete"
-                                                x-cloak
-                                            >
-                                                <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
-                                                    <div class="p-5 flex space-x-4">
-                                                        <!-- Icon -->
-                                                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
-                                                            <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16">
-                                                                <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
-                                                            </svg>
-                                                        </div>
-                                                        <!-- Content -->
-                                                        <div>
-                                                            <!-- Modal header -->
-                                                            <div class="mb-2">
-                                                                <div class="text-lg font-semibold text-slate-800">Apakah anda sudah yakin ?</div>
+                                    @if ((int) ($tokoSetting->is_edit_produk ?? 0) == 1)
+                                        <div class="space-x-1 flex">
+                                            @if ($item->categories_id === 1)
+                                                <a href="{{ route('admin-handphone.edit', $item->id) }}">
+                                                    <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                                                        <span class="sr-only">Edit</span>
+                                                        <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                                                            <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
+                                                        </svg>
+                                                    </button>
+                                                </a>
+                                            @elseif ($item->categories_id === 2)
+                                                <a href="{{ route('admin-sparepart.edit', $item->id) }}">
+                                                    <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                                                        <span class="sr-only">Edit</span>
+                                                        <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                                                            <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
+                                                        </svg>
+                                                    </button>
+                                                </a>
+                                            @elseif ($item->categories_id === 3)
+                                                <a href="{{ route('admin-aksesoris.edit', $item->id) }}">
+                                                    <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                                                        <span class="sr-only">Edit</span>
+                                                        <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                                                            <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
+                                                        </svg>
+                                                    </button>
+                                                </a>
+                                            @else
+                                                <a href="{{ route('admin-tool.edit', $item->id) }}">
+                                                    <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                                                        <span class="sr-only">Edit</span>
+                                                        <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                                                            <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
+                                                        </svg>
+                                                    </button>
+                                                </a>
+                                            @endif
+                                            <!-- Start -->
+                                            <div x-data="{ showDelete: false, deleteId: null }" x-show = "showDelete" x-on:open-delete.window="showDelete = true; deleteId = $event.detail.id" x-on:close-delete.window = "showDelete = false" x-on:keydown.escape.window = "showDelete = false" class="fixed z-50 inset-0">
+                                                <!-- Modal backdrop -->
+                                                <div x-on:click="showDelete = false" class="fixed inset-0 bg-slate-900 bg-opacity-40" x-cloak></div>
+                                                <!-- Modal dialog -->
+                                                <div
+                                                    id="danger-modal"
+                                                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
+                                                    role="dialog"
+                                                    aria-modal="true"
+                                                    x-show="showDelete"
+                                                    x-cloak
+                                                >
+                                                    <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
+                                                        <div class="p-5 flex space-x-4">
+                                                            <!-- Icon -->
+                                                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
+                                                                <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16">
+                                                                    <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
+                                                                </svg>
                                                             </div>
-                                                            <!-- Modal content -->
-                                                            <div class="text-sm mb-10">
-                                                                <div class="space-y-2">
-                                                                    <p>Jika sudah terhapus, maka tidak bisa dikembalikan lagi.</p>
+                                                            <!-- Content -->
+                                                            <div>
+                                                                <!-- Modal header -->
+                                                                <div class="mb-2">
+                                                                    <div class="text-lg font-semibold text-slate-800">Apakah anda sudah yakin ?</div>
                                                                 </div>
-                                                            </div>
-                                                            <!-- Modal footer -->
-                                                            <div class="flex flex-wrap justify-end space-x-2">
-                                                                <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" x-on:click="$dispatch('close-delete')">Batal</button>
-                                                                <form x-bind:action="'{{ route('admin-item.destroy', '') }}/' + deleteId" method="post">
-                                                                    @method('delete')
-                                                                    @csrf
-                                                                    <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
-                                                                </form>
+                                                                <!-- Modal content -->
+                                                                <div class="text-sm mb-10">
+                                                                    <div class="space-y-2">
+                                                                        <p>Jika sudah terhapus, maka tidak bisa dikembalikan lagi.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Modal footer -->
+                                                                <div class="flex flex-wrap justify-end space-x-2">
+                                                                    <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" x-on:click="$dispatch('close-delete')">Batal</button>
+                                                                    <form x-bind:action="'{{ route('admin-item.destroy', '') }}/' + deleteId" method="post">
+                                                                        @method('delete')
+                                                                        @csrf
+                                                                        <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
+                                                                    </form>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </div>                                            
+                                                </div>                                            
+                                            </div>
+                                            <!-- End -->
+                                            
+                                            <button x-data x-on:click="$dispatch('open-delete', { id: {{ $item->id }} })" class="text-rose-500 hover:text-rose-600 rounded-full">
+                                                <span class="sr-only">Delete</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ff2825" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <line x1="4" y1="7" x2="20" y2="7" />
+                                                    <line x1="10" y1="11" x2="10" y2="17" />
+                                                    <line x1="14" y1="11" x2="14" y2="17" />
+                                                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                                </svg>
+                                            </button>
                                         </div>
-                                        <!-- End -->
-                                        
-                                        <button x-data x-on:click="$dispatch('open-delete', { id: {{ $item->id }} })" class="text-rose-500 hover:text-rose-600 rounded-full">
-                                            <span class="sr-only">Delete</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ff2825" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                <line x1="4" y1="7" x2="20" y2="7" />
-                                                <line x1="10" y1="11" x2="10" y2="17" />
-                                                <line x1="14" y1="11" x2="14" y2="17" />
-                                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                                            </svg>
-                                        </button>
-                                    </div>
+                                    @else
+                                        -
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

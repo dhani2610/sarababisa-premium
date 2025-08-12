@@ -493,6 +493,7 @@
                                     </div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                                    @if ((int) ($toko->is_edit_produk ?? 0) == 1)
                                     <div class="space-x-1 flex">
                                         <a href="{{ route('admin-sparepart.edit', $item->id) }}">
                                             <button class="text-slate-400 hover:text-slate-500 rounded-full">
@@ -563,6 +564,9 @@
                                             </svg>
                                         </button>
                                     </div>
+                                    @else
+                                    -
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
