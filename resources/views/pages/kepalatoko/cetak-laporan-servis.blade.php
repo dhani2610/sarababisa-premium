@@ -229,28 +229,29 @@
                                 }
                             @endphp
                             @if ($item->kondisi_servis == 'Dibatalkan')
-                                @if ($item->uang_muka > 0 && $item->modal_sparepart > 0)
-                                <div>
-                                    <strong>Modal - DP:</strong><br>
-                                    Rp.-{{ number_format($item->uang_muka - $item->modal_sparepart, 0, ',', '.') }}
-                                </div>
-                            @elseif ($item->uang_muka > 0 && $item->biaya > 0)
-                                <div>
-                                    <strong>Modal - DP:</strong><br>
-                                    Rp.-{{ number_format($item->uang_muka - $item->biaya, 0, ',', '.') }}
-                                </div>
-                            @elseif ($item->uang_muka > 0)
-                                <div>
-                                    <strong>Uang Muka:</strong><br>
-                                    Rp.-{{ number_format($item->uang_muka, 0, ',', '.') }}
-                                </div>
-                            @elseif ($item->modal_sparepart > 0)
-                                <div>
-                                    <strong>Modal:</strong><br>
-                                    Rp.-{{ number_format($item->modal_sparepart, 0, ',', '.') }}
-                                </div>
-                            @endif
+                                @php
+                                    if ($item->uang_muka > 0 && $item->modal_sparepart > 0) {
+                                        $label = 'Modal - DP';
+                                        $nilai = $item->uang_muka - $item->modal_sparepart;
+                                    } elseif ($item->uang_muka > 0 && $item->biaya > 0) {
+                                        $label = 'Modal - DP';
+                                        $nilai = $item->uang_muka - $item->biaya;
+                                    } elseif ($item->uang_muka > 0) {
+                                        $label = 'Uang Muka';
+                                        $nilai = $item->uang_muka;
+                                    } elseif ($item->modal_sparepart > 0) {
+                                        $label = 'Modal';
+                                        $nilai = $item->modal_sparepart;
+                                    } else {
+                                        $label = 'Tidak Ada Data';
+                                        $nilai = 0;
+                                    }
+                                @endphp
 
+                                <div>
+                                    <strong>{{ $label }}:</strong><br>
+                                    Rp.-{{ number_format($nilai, 0, ',', '.') }}
+                                </div>
                             @else
                             {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
                             @endif
@@ -350,27 +351,30 @@
                                 }
                             @endphp
                             @if ($item->kondisi_servis == 'Dibatalkan')
-                                @if ($item->uang_muka > 0 && $item->modal_sparepart > 0)
-                                    <div>
-                                        <strong>Modal - DP:</strong><br>
-                                        Rp.-{{ number_format($item->uang_muka - $item->modal_sparepart, 0, ',', '.') }}
-                                    </div>
-                                @elseif ($item->uang_muka > 0 && $item->biaya > 0)
-                                    <div>
-                                        <strong>Modal - DP:</strong><br>
-                                        Rp.-{{ number_format($item->uang_muka - $item->biaya, 0, ',', '.') }}
-                                    </div>
-                                @elseif ($item->uang_muka > 0)
-                                    <div>
-                                        <strong>Uang Muka:</strong><br>
-                                        Rp.-{{ number_format($item->uang_muka, 0, ',', '.') }}
-                                    </div>
-                                @elseif ($item->modal_sparepart > 0)
-                                    <div>
-                                        <strong>Modal:</strong><br>
-                                        Rp.-{{ number_format($item->modal_sparepart, 0, ',', '.') }}
-                                    </div>
-                                @endif
+                                @php
+                                    if ($item->uang_muka > 0 && $item->modal_sparepart > 0) {
+                                        $label = 'Modal - DP';
+                                        $nilai = $item->uang_muka - $item->modal_sparepart;
+                                    } elseif ($item->uang_muka > 0 && $item->biaya > 0) {
+                                        $label = 'Modal - DP';
+                                        $nilai = $item->uang_muka - $item->biaya;
+                                    } elseif ($item->uang_muka > 0) {
+                                        $label = 'Uang Muka';
+                                        $nilai = $item->uang_muka;
+                                    } elseif ($item->modal_sparepart > 0) {
+                                        $label = 'Modal';
+                                        $nilai = $item->modal_sparepart;
+                                    } else {
+                                        $label = 'Tidak Ada Data';
+                                        $nilai = 0;
+                                    }
+                                @endphp
+
+                                <div>
+                                    <strong>{{ $label }}:</strong><br>
+                                    Rp.-{{ number_format($nilai, 0, ',', '.') }}
+                                </div>
+
 
                             @else
                             {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
