@@ -257,7 +257,7 @@
             @php
                 $qrCode = base64_encode(
                     QrCode::format('png')
-                        ->size(80)
+                        ->size(50)
                         ->generate(env('APP_URL') . '/tracking')
                 );
             @endphp
