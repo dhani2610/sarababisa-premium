@@ -159,14 +159,7 @@
                 <td id="data">: -</td>
                 @endif
                 <td id="data" colspan="2" style="border-left-style: solid;" class="text-center">
-                    @php
-                $qrCode = base64_encode(
-                    QrCode::format('png')
-                        ->size(50)
-                        ->generate(env('APP_URL') . '/tracking')
-                );
-            @endphp
-            <img src="data:image/png;base64,{{ $qrCode }}" alt="QR Code">
+                    <p>{{ env('APP_URL') . '/tracking') }} </p>
                 </td>
             </tr>
             <tr style="border-right-style: solid;">

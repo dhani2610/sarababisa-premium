@@ -26,6 +26,7 @@ class SearchProduct extends Component
     public $showCount = 9;
 
     public $featured = false;
+    public $barcode;
 
     protected $queryString = [
         'query'       => ['except' => ''],
@@ -37,6 +38,24 @@ class SearchProduct extends Component
     {
         $this->showCount = (int)$this->showCount + 5;
     }
+
+    public function updatedBarcode($value)
+    {
+        $value = trim($value);
+        if (!$value) return;
+
+        // Cari produk berdasarkan barcode
+        $product = Product::where('product_code', $value)->first();
+
+        if ($product) {
+            // Panggil fungsi yang sama seperti klik manual
+            $this->selectProduct($product);
+        }
+
+        // Reset input untuk scan berikutnya
+        $this->barcode = '';
+    }
+
 
     public function selectProduct($product)
     {
