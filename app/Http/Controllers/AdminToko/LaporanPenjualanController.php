@@ -189,6 +189,7 @@ class LaporanPenjualanController extends Controller
         $toko = StoreSetting::find(1);
 
         $pdf = Pdf::loadView('pages.admintoko.cetak-laporan-penjualan', [
+        // $pdf = Pdf::loadView('pages.admintoko.cetak-laporan-penjualan', [
             'users' => $users,
             'toko' => $toko,
             'imagePath' => $imagePath,

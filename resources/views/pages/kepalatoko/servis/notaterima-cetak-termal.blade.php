@@ -147,15 +147,16 @@
             @endforeach
 
 
-            <p>Cek status servis:</p>
-            @php
-                $qrCode = base64_encode(
-                    QrCode::format('png')
-                        ->size(50)
-                        ->generate(env('APP_URL') . '/tracking')
-                );
-            @endphp
-            <img src="data:image/png;base64,{{ $qrCode }}" alt="QR Code">
+            <p style="
+                margin-top: 4px;
+                margin-bottom: 4px;
+                max-width: 100%;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+            ">
+                Cek status servis {{ env('APP_URL') }}/tracking
+            </p>
             <p>Silahkan bawa Nota Tanda Terima Servis ini pada saat pengambilan barang. Terima kasih.</p>
         </footer>
     </div>

@@ -9,7 +9,17 @@
         </div>
         
         <div class="flex flex-wrap -mx-2 mb-3">
+       
             
+            <div class="lg:w-1/2 md:w-1/2 sm:w-1/2 px-2 mb-2">
+                <label class="block text-sm font-medium mb-1">Scan Barcode</label>
+                <input type="text" 
+                    id="barcode_input" 
+                    wire:model="barcode"
+                    placeholder="Scan Barcode di sini..." 
+                    autofocus
+                    class="form-input w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+            </div>
             <div class="lg:w-1/2 md:w-1/2 sm:w-1/2 px-2 mb-2">
                 <label class="block text-sm font-medium mb-1">Kategori Produk</label>
                 <x-select-list :options="$this->categories" wire:model="categories_id" name="categories_id" id="categories_id" />
@@ -31,6 +41,7 @@
         </div>
     </div>
 
+    
     
     <div class="w-full px-2 mb-4 bg-white">
         <div class="flex flex-wrap w-full">
