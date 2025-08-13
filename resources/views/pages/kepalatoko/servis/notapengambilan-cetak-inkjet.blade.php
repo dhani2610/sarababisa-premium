@@ -178,22 +178,26 @@
                 <td id="data" class="capital">: {{ $items->kondisi_servis }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</th>
                 <td id="data" class="capital">: {{ $items->qc_keluar }}</td>
-                {{-- @if ($items->cara_pembayaran === 'Tunai & Transfer') --}}
-                @if ($items->cara_pembayaran === 'Tunai & Transfer')
+                @if ($items->kondisi_servis === 'Dibatalkan')
                     <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
-                    <td id="data">: Tunai Rp. {{ number_format($items->tunai) }} & Transfer Rp.
-                        {{ number_format($items->transfer) }} </td>
-                @elseif ($items->cara_pembayaran === 'Tunai')
-                    <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
-                    <td id="data">: Tunai Rp. {{ number_format($items->tunai) }}</td>
-                @elseif ($items->cara_pembayaran === 'Transfer')
-                    <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
-                    <td id="data">: Transfer Rp.
-                        {{ number_format($items->transfer) }} </td>
-                @elseif ($items->cara_pembayaran === 'Kredit')
-                    <td id="data" scope="row" style="border-left-style: solid;">Tempo</td>
-                    <td id="data">: Rp. {{ number_format($items->due) }}
-                        ({{ \Carbon\Carbon::parse($items->tempo)->locale('id')->translatedFormat('d F Y') }})</td>
+                            <td id="data">: - </td>
+                @else
+                    @if ($items->cara_pembayaran === 'Tunai & Transfer')
+                        <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
+                        <td id="data">: Tunai Rp. {{ number_format($items->tunai) }} & Transfer Rp.
+                            {{ number_format($items->transfer) }} </td>
+                    @elseif ($items->cara_pembayaran === 'Tunai')
+                        <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
+                        <td id="data">: Tunai Rp. {{ number_format($items->tunai) }}</td>
+                    @elseif ($items->cara_pembayaran === 'Transfer')
+                        <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
+                        <td id="data">: Transfer Rp.
+                            {{ number_format($items->transfer) }} </td>
+                    @elseif ($items->cara_pembayaran === 'Kredit')
+                        <td id="data" scope="row" style="border-left-style: solid;">Tempo</td>
+                        <td id="data">: Rp. {{ number_format($items->due) }}
+                            ({{ \Carbon\Carbon::parse($items->tempo)->locale('id')->translatedFormat('d F Y') }})</td>
+                    @endif
                 @endif
             </tr>
             @if ($items->uang_muka != null && $items->diskon != null)
@@ -224,11 +228,9 @@
                             @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
-                                        @if (isset($items->tindakan_servis[$key]))
-                                        {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
-                                        @else
-                                        -                                            
-                                        @endif
+                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key]) 
+                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya) 
+                                        : '-' }}
                                     </li>
                                 </ul>
                             @endforeach
@@ -279,11 +281,9 @@
                             @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
-                                        @if (isset($items->tindakan_servis[$key]))
-                                        {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
-                                        @else
-                                        -                                            
-                                        @endif
+                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key]) 
+                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya) 
+                                        : '-' }}
                                     </li>
                                 </ul>
                             @endforeach
@@ -322,11 +322,9 @@
                             @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
-                                        @if (isset($items->tindakan_servis[$key]))
-                                        {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
-                                        @else
-                                        -                                            
-                                        @endif
+                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key]) 
+                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya) 
+                                        : '-' }}
                                     </li>
                                 </ul>
                             @endforeach
@@ -365,11 +363,9 @@
                            @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
-                                        @if (isset($items->tindakan_servis[$key]))
-                                        {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
-                                        @else
-                                        -                                            
-                                        @endif
+                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key]) 
+                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya) 
+                                        : '-' }}
                                     </li>
                                 </ul>
                             @endforeach

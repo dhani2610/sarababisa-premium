@@ -106,6 +106,7 @@ class TransaksiProdukController extends Controller
         $namaPelanggan = $order->customer->nama;
 
         $pdf = PDF::loadView('pages.kepalatoko.produk.cetak-termal', [
+        // return View('pages.kepalatoko.produk.cetak-termal', [
             'order' => $order,
             'users' => $users,
             'orderItem' => $orderItem,
@@ -139,6 +140,7 @@ class TransaksiProdukController extends Controller
         $namaPelanggan = $order->customer->nama;
 
         $pdf = PDF::loadView('pages.kepalatoko.produk.lunas-cetak-inkjet', [
+        // return View('pages.kepalatoko.produk.lunas-cetak-inkjet', [
             'order' => $order,
             'users' => $users,
             'terms' => $terms,

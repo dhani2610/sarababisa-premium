@@ -44,7 +44,7 @@ class AdminProdukData extends Component
         $model_series = ModelSerie::all();
         $products_count = Product::all()->count();
         $toko = StoreSetting::find(1);
-
+        $tokoSetting = StoreSetting::find(1);
         return view('livewire.admin-produk-data', [
             'brands' => $brands,
             'capacities' => $capacities,
@@ -55,6 +55,7 @@ class AdminProdukData extends Component
             'spareparts' => $spareparts,
             'accessories' => $accessories,
             'tools' => $tools,
+            'tokoSetting' => $tokoSetting,
             'products_count' => $products_count,
             'products' => $this->search === null ?
                 Product::latest()->paginate($this->paginate) :

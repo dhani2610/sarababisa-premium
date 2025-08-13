@@ -253,15 +253,16 @@
             @foreach ($banks as $index => $bank)
                 <p>Rek {{ $bank['bank'] }} {{ $bank['rekening'] }} <br> a.n. {{ $bank['pemilik'] }}</p>
             @endforeach
-            <p>Cek status garansi:</p>
-            @php
-                $qrCode = base64_encode(
-                    QrCode::format('png')
-                        ->size(80)
-                        ->generate(env('APP_URL') . '/tracking')
-                );
-            @endphp
-            <img src="data:image/png;base64,{{ $qrCode }}" alt="QR Code">
+            <p style="
+                margin-top: 4px;
+                margin-bottom: 4px;
+                max-width: 100%;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+            ">
+                Cek status garansi {{ env('APP_URL') }}/garansi
+            </p>
             <p>Terima kasih atas kepercayaan Anda telah melakukan Servis di {{ $users->nama_toko }}</p>
         </footer>
     </div>

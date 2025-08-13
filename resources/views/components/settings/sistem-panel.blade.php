@@ -11,6 +11,7 @@
             <livewire:toggle-tax></livewire:toggle-tax>
             <livewire:toggle-bonus></livewire:toggle-bonus>
             <livewire:toggle-edit-transaksi></livewire:toggle-edit-transaksi>
+            <livewire:toggle-edit-produk></livewire:toggle-edit-produk>
         </div>
 
         <!-- Panel footer -->

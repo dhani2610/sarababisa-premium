@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Livewire;
 
+use App\Models\Product;
 use Livewire\Component;
 use App\Models\StoreSetting;
 use Gloudemans\Shoppingcart\Facades\Cart;
@@ -190,12 +191,18 @@ class ProductCart extends Component
 
     public function updateQuantity($row_id, $product_id)
     {
-        if ($this->cart_instance === 'sale' || $this->cart_instance === 'purchase_return') {
-            if ($this->check_quantity[$product_id] < $this->quantity[$product_id]) {
-                $this->alert('error', 'Nilai Jumlah lebih banyak dari stok yang tersedia!');
+        // if ($this->cart_instance === 'sale' || $this->cart_instance === 'purchase_return') {
+        //     if ($this->check_quantity[$product_id] < $this->quantity[$product_id]) {
+        //         $this->alert('error', 'Nilai Jumlah lebih banyak dari stok yang tersedia!');
 
-                return;
-            }
+        //         return;
+        //     }
+        // }
+
+        $prodCheckQty = Product::find($product_id);
+        if ($prodCheckQty && $prodCheckQty->stok < $this->quantity[$product_id]) {
+            $this->alert('error', 'Nilai Jumlah lebih banyak dari stok yang tersedia!');
+            return;
         }
 
         Cart::instance($this->cart_instance)->update($row_id, $this->quantity[$product_id]);

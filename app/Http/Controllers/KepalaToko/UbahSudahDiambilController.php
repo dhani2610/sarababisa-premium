@@ -115,15 +115,9 @@ class UbahSudahDiambilController extends Controller
         $bagihasil = ($request->biaya - $request->modal_sparepart - $request->diskon) / 100;
 
         // $garansi = Carbon::now();
-        $expired = [];
-        if (count($request->garansi) > 0) {
-            foreach ($request->garansi as $val) {
-                array_push($expired, Carbon::now()->addDays(
-                    $val
-                ));
-            }
-        } else {
-            $expired = null;
+        $garansiList = $request->garansi ?? [];
+        foreach ($garansiList as $val) {
+            $expired[] = Carbon::now()->addDays($val);
         }
 
         if ($item->user != null) {
@@ -193,9 +187,10 @@ class UbahSudahDiambilController extends Controller
             'qc_keluar' => $request->qc_keluar,
             'cara_pembayaran' => $request->cara_pembayaran,
             'diskon' => $request->diskon,
-            'garansi' => $request->garansi[0],
-            'exp_garansi' => $expired[0],
-            'exp_garansi_j' => json_encode($expired),
+            'garansi'       => !empty($request->garansi) && isset($request->garansi[0]) ? $request->garansi[0] : null,
+            'exp_garansi'   => !empty($expired) && isset($expired[0]) ? $expired[0] : null,
+            'exp_garansi_j' => json_encode($expired ?? []),
+
             'status_servis' => $request->status_servis,
             'is_approve' => 'Setuju',
             'tgl_disetujui' => $request->tgl_disetujui,

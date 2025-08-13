@@ -13,6 +13,7 @@
             </div>
         </div>
 
+
         <livewire:product-cart :cartInstance="'sale'" />
 
         <button
