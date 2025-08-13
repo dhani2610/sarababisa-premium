@@ -179,6 +179,9 @@
                 <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</th>
                 <td id="data" class="capital">: {{ $items->qc_keluar }}</td>
                 @if ($items->kondisi_servis === 'Dibatalkan')
+                    <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
+                            <td id="data">: - </td>
+                @else
                     @if ($items->cara_pembayaran === 'Tunai & Transfer')
                         <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
                         <td id="data">: Tunai Rp. {{ number_format($items->tunai) }} & Transfer Rp.
@@ -195,9 +198,6 @@
                         <td id="data">: Rp. {{ number_format($items->due) }}
                             ({{ \Carbon\Carbon::parse($items->tempo)->locale('id')->translatedFormat('d F Y') }})</td>
                     @endif
-                @else
-                    <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
-                            <td id="data">: - </td>
                 @endif
             </tr>
             @if ($items->uang_muka != null && $items->diskon != null)
