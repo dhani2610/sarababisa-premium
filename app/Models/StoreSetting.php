@@ -21,6 +21,7 @@ class StoreSetting extends Model
         'ppn',
         'is_bonus',
         'is_edit_transaksi',
+        'is_edit_produk',
     ];
     
 }
