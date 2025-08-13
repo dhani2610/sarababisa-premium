@@ -231,25 +231,25 @@
                             @if ($item->kondisi_servis == 'Dibatalkan')
                                 @php
                                     if ($item->uang_muka > 0 && $item->modal_sparepart > 0) {
-                                        $label = 'Modal - DP';
+                                        $label = 'Modal - DP:';
                                         $nilai = $item->uang_muka - $item->modal_sparepart;
                                     } elseif ($item->uang_muka > 0 && $item->biaya > 0) {
-                                        $label = 'Modal - DP';
+                                        $label = 'Modal - DP:';
                                         $nilai = $item->uang_muka - $item->biaya;
                                     } elseif ($item->uang_muka > 0) {
-                                        $label = 'Uang Muka';
+                                        $label = 'Uang Muka:';
                                         $nilai = $item->uang_muka;
                                     } elseif ($item->modal_sparepart > 0) {
-                                        $label = 'Modal';
+                                        $label = 'Modal:';
                                         $nilai = $item->modal_sparepart;
                                     } else {
-                                        $label = 'Tidak Ada Data';
+                                        $label = '';
                                         $nilai = 0;
                                     }
                                 @endphp
 
                                 <div>
-                                    <strong>{{ $label }}:</strong><br>
+                                    <strong>{{ $label }}</strong><br>
                                     Rp.-{{ number_format($nilai, 0, ',', '.') }}
                                 </div>
                             @else
@@ -353,25 +353,25 @@
                             @if ($item->kondisi_servis == 'Dibatalkan')
                                 @php
                                     if ($item->uang_muka > 0 && $item->modal_sparepart > 0) {
-                                        $label = 'Modal - DP';
+                                        $label = 'Modal - DP:';
                                         $nilai = $item->uang_muka - $item->modal_sparepart;
                                     } elseif ($item->uang_muka > 0 && $item->biaya > 0) {
-                                        $label = 'Modal - DP';
+                                        $label = 'Modal - DP:';
                                         $nilai = $item->uang_muka - $item->biaya;
                                     } elseif ($item->uang_muka > 0) {
-                                        $label = 'Uang Muka';
+                                        $label = 'Uang Muka:';
                                         $nilai = $item->uang_muka;
                                     } elseif ($item->modal_sparepart > 0) {
-                                        $label = 'Modal';
+                                        $label = 'Modal:';
                                         $nilai = $item->modal_sparepart;
                                     } else {
-                                        $label = 'Tidak Ada Data';
+                                        $label = '';
                                         $nilai = 0;
                                     }
                                 @endphp
 
                                 <div>
-                                    <strong>{{ $label }}:</strong><br>
+                                    <strong>{{ $label }}</strong><br>
                                     Rp.-{{ number_format($nilai, 0, ',', '.') }}
                                 </div>
 
