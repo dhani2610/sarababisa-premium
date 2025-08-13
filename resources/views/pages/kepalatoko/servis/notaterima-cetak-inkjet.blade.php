@@ -159,7 +159,7 @@
                 <td id="data">: -</td>
                 @endif
                 <td id="data" colspan="2" style="border-left-style: solid;" class="text-center">
-                    <p>{{ env('APP_URL') . '/tracking') }} </p>
+                    <p>{{ env('APP_URL') . '/tracking' }} </p>
                 </td>
             </tr>
             <tr style="border-right-style: solid;">
