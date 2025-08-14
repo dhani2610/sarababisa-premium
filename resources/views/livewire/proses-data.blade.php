@@ -1506,7 +1506,10 @@ $(document).ready(function () {
     function getTotal() {
         let biaya = parseInt($('#biaya').val()) || 0;
         let diskon = parseInt($('#diskon').val()) || 0;
-        return Math.max(biaya - diskon, 0);
+        let totalFinal = Math.max(biaya - diskon, 0);
+        console.log('totalFinal',totalFinal);
+        
+        return totalFinal;
     }
 
     $(document).ready(function() {

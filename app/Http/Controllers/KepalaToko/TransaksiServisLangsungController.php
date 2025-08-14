@@ -28,7 +28,6 @@ class TransaksiServisLangsungController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all()); 
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99')).rand(10,90);
         $nama_pelanggan = Customer::find($request->customers_id);
 
@@ -86,28 +85,38 @@ class TransaksiServisLangsungController extends Controller
         $profittransaksi = $biaya - $modalSparepart - $request->diskon;
         $bagihasil = ($biaya - $modalSparepart - $request->diskon) / 100;
 
+
         if ($request->cara_pembayaran === 'Tunai & Transfer') {
             $due = 0;
             if ($request->tunai != 0) {
-                $transfer = $request->biaya - $request->tunai;
+                $transfer = $request->transfer;
                 $pay = $request->biaya;
                 $tunai = $request->tunai;
             } else {
-                $tunai = $request->biaya - $request->transfer;
+                $tunai = $request->tunai;
                 $pay = $request->biaya;
                 $transfer = $request->transfer;
             }
         }
 
         if ($request->cara_pembayaran === 'Tunai') {
-            $tunai = $request->biaya;
+            if (!empty($request->diskon) && $request->diskon > 0) {
+                $tunai = $request->biaya - $request->diskon;
+            }else{
+                $tunai = $request->biaya;
+            }
             $transfer = 0;
             $due = 0;
             $pay = $request->biaya;
         }
 
         if ($request->cara_pembayaran === 'Transfer') {
-            $transfer = $request->biaya;
+            if (!empty($request->diskon) && $request->diskon > 0) {
+                $transfer = $request->biaya - $request->diskon;
+            }else{
+                $transfer = $request->biaya;
+            }
+
             $tunai = 0;
             $due = 0;
             $pay = $request->biaya;
@@ -150,6 +159,8 @@ class TransaksiServisLangsungController extends Controller
         }else{
             $finalModal = $modalSparepart;
         }
+        // dd($profittransaksi,$request->all()); 
+
 
         // Transaction create
         ServiceTransaction::create([
