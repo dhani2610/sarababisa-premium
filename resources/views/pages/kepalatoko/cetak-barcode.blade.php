@@ -24,7 +24,7 @@
 <body>
     @if ($product->categories_id == 1)
         <div class="product-name">
-            {{ $item->product_name }} {{ $item->kondisi }} {{ $item->warna }} {{ $item->ram }} / @if ($item->capacity != null)
+            {{ $product->product_name }} {{ $product->kondisi }} {{ $product->warna }} {{ $product->ram }} / @if ($product->capacity != null)
         </div>
     @else
         <div class="product-name">{{ $product->product_name }} {{ $product->kondisi }}</div>
