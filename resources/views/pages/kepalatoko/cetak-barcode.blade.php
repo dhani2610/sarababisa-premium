@@ -22,13 +22,19 @@
 </head>
 
 <body>
+   
+    <div class="product-name">
+
     @if ($product->categories_id == 1)
-        <div class="product-name">
-            {{ $product->product_name }} {{ $product->kondisi }} {{ $product->warna }} {{ $product->ram }} / @if ($product->capacity != null)
-        </div>
+        {{ $product->product_name }} {{ $product->kondisi }} {{ $product->warna }} {{ $product->ram }} / @if ($product->capacity != null)
+            {{ $product->capacity->name }}
+        @else
+            -
+        @endif (IMEI {{ $product->nomor_seri }})
     @else
-        <div class="product-name">{{ $product->product_name }} {{ $product->kondisi }}</div>
+        {{ $product->product_name }} {{ $product->nomor_seri }}
     @endif
+    </div>
     <img src="data:image/png;base64,{{ $barcodeData }}" alt="barcode">
     <div>{{ $product->product_code }}</div>
 </body>
