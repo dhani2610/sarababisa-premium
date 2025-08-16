@@ -20,6 +20,6 @@
 <body>
     <div class="product-name">{{ $product->product_name }}</div>
     <img src="data:image/png;base64,{{ $barcodeData }}" alt="barcode">
-    <div>{{ $product->product_code }}</div>
+    <div>{{ $product->product_code }} {{ $product->kondisi }}</div>
 </body>
 </html>
