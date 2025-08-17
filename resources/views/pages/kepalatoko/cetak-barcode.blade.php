@@ -7,7 +7,7 @@
         body {
             text-align: center;
             font-family: sans-serif;
-            font-size: 14px;
+            /* font-size: 14px; */
         }
 
         .product-name {
@@ -23,7 +23,7 @@
 
 <body>
    
-    <div class="product-name">
+    <div class="product-name" style="font-size: 5px;">
 
     @if ($product->categories_id == 1)
         {{ $product->product_name }} {{ $product->kondisi }} {{ $product->warna }} {{ $product->ram }} / @if ($product->capacity != null)
@@ -36,7 +36,7 @@
     @endif
     </div>
     <img src="data:image/png;base64,{{ $barcodeData }}" alt="barcode">
-    <div>{{ $product->product_code }}</div>
+    <div style="font-size: 5px;">{{ $product->product_code }}</div>
 </body>
 
 </html>
