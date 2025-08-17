@@ -171,7 +171,7 @@
                 <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Masuk)</th>
                 <td id="data" class="capital">: {{ $items->qc_masuk }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">Total Biaya Servis</td>
-                <td id="data">: Rp. {{ number_format($items->biaya) }}</td>
+                <td id="data">: Rp. {{ number_format($items->biaya - $items->diskon) }}</td>
             </tr>
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Kondisi Servis</th>
@@ -248,13 +248,23 @@
                     <td id="data" scope="row" style="border-left-style: solid;"></td>
                     <td id="data"></td>
                     <td id="data" scope="row" style="border-left-style: solid;">Sisa Pembayaran</td>
-                    <td id="data">: Rp. 
+                    {{-- <td id="data">: Rp. 
                         {{ number_format(
                             $items->biaya 
                             - ($items->kondisi_servis == 'Dibatalkan' ? 0 : $items->uang_muka) 
                             - $items->diskon
                         ) }}
+                    </td> --}}
+                    <td id="data">: Rp. 
+                        {{ number_format(
+                            max(0,
+                                $items->biaya 
+                                - $items->diskon 
+                                - ($items->kondisi_servis == 'Dibatalkan' ? 0 : $items->uang_muka)
+                            )
+                        ) }}
                     </td>
+
 
                     {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka - $items->diskon) }}
                     </td> --}}
