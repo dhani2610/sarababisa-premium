@@ -129,28 +129,37 @@ class UbahSudahDiambilController extends Controller
         if ($request->cara_pembayaran === 'Tunai & Transfer') {
             $due = 0;
             if ($request->tunai != 0) {
-                $transfer = $item->biaya - $request->tunai;
-                $pay = $item->biaya;
+                $transfer = $request->transfer;
+                $pay = $request->biaya;
                 $tunai = $request->tunai;
             } else {
-                $tunai = $item->biaya - $request->transfer;
-                $pay = $item->biaya;
+                $tunai = $request->tunai;
+                $pay = $request->biaya;
                 $transfer = $request->transfer;
             }
         }
 
         if ($request->cara_pembayaran === 'Tunai') {
-            $tunai = $item->biaya;
+            if (!empty($request->diskon) && $request->diskon > 0) {
+                $tunai = $request->biaya - $request->diskon;
+            }else{
+                $tunai = $request->biaya;
+            }
             $transfer = 0;
             $due = 0;
-            $pay = $item->biaya;
+            $pay = $request->biaya;
         }
 
         if ($request->cara_pembayaran === 'Transfer') {
-            $transfer = $item->biaya;
+            if (!empty($request->diskon) && $request->diskon > 0) {
+                $transfer = $request->biaya - $request->diskon;
+            }else{
+                $transfer = $request->biaya;
+            }
+
             $tunai = 0;
             $due = 0;
-            $pay = $item->biaya;
+            $pay = $request->biaya;
         }
 
         if ($request->cara_pembayaran === 'Kredit') {

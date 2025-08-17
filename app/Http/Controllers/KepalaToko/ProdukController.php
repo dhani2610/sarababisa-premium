@@ -47,6 +47,27 @@ class ProdukController extends Controller
     }
 
 
+    // public function downloadBarcode($id)
+    // {
+    //     $product = Product::findOrFail($id);
+
+    //     if (!$product->product_code) {
+    //         return redirect()->back()->with('error', 'Produk ini belum memiliki kode produk.');
+    //     }
+
+    //     // Buat barcode PNG
+    //     $generator = new BarcodeGeneratorPNG();
+    //     $barcodeData = $generator->getBarcode($product->product_code, $generator::TYPE_CODE_128);
+
+    //     // Simpan ke file sementara
+    //     $fileName = 'barcode_' . $product->product_code .'-'.$product->product_name. '.png';
+    //     $filePath = storage_path('app/public/' . $fileName);
+    //     file_put_contents($filePath, $barcodeData);
+
+    //     // Download file
+    //     return response()->download($filePath)->deleteFileAfterSend(true);
+    // }
+
     public function downloadBarcode($id)
     {
         $product = Product::findOrFail($id);
@@ -55,17 +76,20 @@ class ProdukController extends Controller
             return redirect()->back()->with('error', 'Produk ini belum memiliki kode produk.');
         }
 
-        // Buat barcode PNG
         $generator = new BarcodeGeneratorPNG();
-        $barcodeData = $generator->getBarcode($product->product_code, $generator::TYPE_CODE_128);
+        $barcodeData = base64_encode(
+            $generator->getBarcode($product->product_code, $generator::TYPE_CODE_128)
+        );
 
-        // Simpan ke file sementara
-        $fileName = 'barcode_' . $product->product_code .'-'.$product->product_name. '.png';
-        $filePath = storage_path('app/public/' . $fileName);
-        file_put_contents($filePath, $barcodeData);
+        // Buat PDF dengan view
+        $pdf = Pdf::loadView('pages.kepalatoko.cetak-barcode', [
+        // return view('pages.kepalatoko.cetak-barcode', [
+            'product' => $product,
+            'barcodeData' => $barcodeData
+        ])->setPaper([0, 0, 226.77, 141.73]); // ukuran kertas kecil (80x50mm)
+        
 
-        // Download file
-        return response()->download($filePath)->deleteFileAfterSend(true);
+        return $pdf->stream('barcode_' . $product->product_code . '.pdf');
     }
 
 

@@ -211,10 +211,10 @@
                             {{ number_format($item->omzet) }}</td> --}}
                         <td style="width: 60px; text-align: right;">Rp.
                             {{ number_format($biaya_j[0]) }}</td>
-                        <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
+                        <td style="width: 50px; text-align: right;" rowspan="{{ count($tindakan_servis) }}">Rp. {{ number_format($item->diskon) }}</td>
                         @if ($toko->is_bonus === 1)
                             <td style="width: 60px; text-align: right;">Rp.
-                                {{ number_format($biaya_j[0] - $modal_j[0]) }}
+                                {{ number_format($biaya_j[0] - $modal_j[0] - $item->diskon) }}
                             </td>
                             {{-- <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($item->profit) }}
@@ -292,7 +292,7 @@
                             @endif
                             <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($biaya_j[$i]) }}</td>
-                            <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
+                            {{-- <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td> --}}
 
                             @if ($toko->is_bonus === 1)
                                 <td style="width: 60px; text-align: right;">Rp.
