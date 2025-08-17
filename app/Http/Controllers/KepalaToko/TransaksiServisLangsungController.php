@@ -217,7 +217,7 @@ class TransaksiServisLangsungController extends Controller
 
             foreach ($request->products_id as $key => $product) {
                 if (!$product) continue;
-                $spareparts = Product::find($request->products_id);
+                $spareparts = Product::find($product);
                 $spareparts->stok -= 1;
                 $spareparts->save();
 
@@ -258,6 +258,7 @@ class TransaksiServisLangsungController extends Controller
                 $orderDetail->persen_sales = $persen_sales;
                 $orderDetail->profit_toko = ($spareparts->harga_jual - $spareparts->harga_modal) - ($spareparts->harga_jual - $spareparts->harga_modal) / 100 * $persen_sales;
                 $orderDetail->garansi = $expired[$key];
+                $orderDetail->product_discount_amount = 0;
                 $orderDetail->save();
             }
         }
