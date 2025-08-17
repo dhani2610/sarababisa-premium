@@ -215,7 +215,7 @@ class TransaksiServisLangsungController extends Controller
 
             foreach ($request->products_id as $key => $product) {
                 if (!$product) continue;
-                $spareparts = Product::find($request->products_id);
+                $spareparts = Product::find($product);
                 $spareparts->stok -= 1;
                 $spareparts->save();
 
