@@ -9,16 +9,22 @@ use Livewire\Component;
 use App\Models\Capacity;
 use App\Models\Category;
 use App\Models\ModelSerie;
+use App\Models\OrderDetail;
 use App\Models\StoreSetting;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class ProdukHandphoneData extends Component
 {
     use WithPagination;
+    use LivewireAlert;
 
     public $paginate = 10;
     public $search;
+
+    public $barcode;
+    public $modalOpen = false;
 
     protected $updatesQueryString = ['search'];
 
@@ -30,6 +36,31 @@ class ProdukHandphoneData extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function updatedBarcode($value)
+    {
+        if ($value) {
+            $this->tambahStok($value);
+            $this->barcode = ''; // reset input supaya bisa scan lagi
+        }
+    }
+
+    public function tambahStok($barcode)
+    {
+        $product = Product::where('product_code', $barcode)->first();
+        if ($product) {
+            $product->stok += 1;
+            $product->save();
+
+            $this->alert('success', 'Berhasil tambah 1 stok produk '.$product->product_name);
+        } else {
+            $this->alert('error', 'Produk tidak ditemukan!');
+
+            $this->dispatchBrowserEvent('stok-updated', [
+                'message' => "Produk dengan barcode $barcode tidak ditemukan!"
+            ]);
+        }
     }
 
     public function render()
@@ -47,7 +78,23 @@ class ProdukHandphoneData extends Component
         $handphonenominalterjual = Product::where('categories_id', 1)->where('stok', 0)->sum('harga_jual');
 
         $handphones_count = Product::where('categories_id', '=', '1')->count();
+
+        $topProducts = OrderDetail::select(
+            'order_details.products_id',
+            'products.product_name',
+            'products.harga_jual',
+            DB::raw('SUM(order_details.quantity) as total_terjual'),
+            DB::raw('SUM(order_details.quantity * products.harga_jual) as omzet')
+        )
+        ->join('products', 'products.id', '=', 'order_details.products_id')
+        ->groupBy('order_details.products_id', 'products.product_name', 'products.harga_jual')
+        ->where('products.categories_id', '=', '1')
+        ->orderByDesc('total_terjual')
+        ->limit(5)
+        ->get();
+
         return view('livewire.produk-handphone-data', [
+            'topProducts' => $topProducts,
             'toko' => $toko,
             'categories' => $categories,
             'brands' => $brands,
