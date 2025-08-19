@@ -219,7 +219,7 @@
                 <th></th>
             </tr>
             <tr>
-                <td></td>
+                {{-- <td></td> --}}
                 <td>
                     @if ($items->pin != null)
                         <th class="text-center">{{ $items->pin }}</th>
