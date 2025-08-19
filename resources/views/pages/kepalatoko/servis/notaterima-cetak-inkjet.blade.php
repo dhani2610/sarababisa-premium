@@ -222,7 +222,7 @@
                 <td></td>
                 <td>
                     @if ($items->pin != null)
-                        {{ $items->pin }}
+                        <th class="text-center">{{ $items->pin }}</th>
                     @else
                     <hr style="border-top: 1px dashed;">
                     @endif
