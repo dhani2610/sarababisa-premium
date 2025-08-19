@@ -29,6 +29,25 @@ class TransaksiServisController extends Controller
         return view('pages/admintoko/transaksi-servis');
     }
 
+    public function updatePinPola(Request $request, $id)
+    {
+        $request->validate([
+            'pin' => 'nullable|string|max:10',
+            'pola' => 'nullable|string',
+        ]);
+
+        $service = ServiceTransaction::findOrFail($id);
+        $service->pin = $request->pin;
+        $service->pola = $request->pola;
+        $service->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'PIN & Pola berhasil disimpan.'
+        ]);
+    }
+
+
     /**
      * Show the form for creating a new resource.
      *
@@ -110,6 +129,7 @@ class TransaksiServisController extends Controller
         $namaPelanggan = $items->customer->nama;
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
+        // return view('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
             'users' => $users,
             'items' => $items,
             'terms' => $terms,

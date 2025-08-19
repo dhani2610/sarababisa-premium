@@ -249,6 +249,9 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('pelanggan', KepalaTokoPelangganController::class);
     Route::post('pelanggan-broadcast', [KepalaTokoPelangganController::class,'broadcast'])->name('pelanggan.broadcast');
     Route::resource('servis/transaksi-servis', KepalaTokoTransaksiServisController::class);
+    Route::post('servis/transaksi-servis/{id}/update-pin-pola', [KepalaTokoTransaksiServisController::class, 'updatePinPola'])
+    ->name('transaksi-servis.update-pin-pola');
+
     Route::delete('/services/delete', [KepalaTokoTransaksiServisController::class, 'deleteSelected']);
     Route::patch('/services/update', [KepalaTokoSudahDiambilController::class, 'approveSelected']);
     Route::patch('/services/reject', [KepalaTokoSudahDiambilController::class, 'rejectSelected']);
@@ -405,6 +408,9 @@ Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(fun
     Route::post('admin-pelanggan-broadcast', [AdminTokoPelangganController::class,'broadcast'])->name('admin.pelanggan.broadcast');
 
     Route::resource('servis/admin-transaksi-servis', AdminTokoTransaksiServisController::class);
+    Route::post('servis/admin-transaksi-servis/{id}/update-pin-pola', [AdminTokoTransaksiServisController::class, 'updatePinPola'])
+    ->name('transaksi-servis.update-pin-pola');
+
     Route::post('/servis/admin-transaksi-servis-langsung', [AdminTokoTransaksiServisLangsungController::class, 'store'])->name('admin-servis-langsung');
     Route::resource('servis/admin-servis-bisa-diambil', AdminTokoBisaDiambilController::class);
     Route::resource('servis/admin-servis-sudah-diambil', AdminTokoSudahDiambilController::class);
