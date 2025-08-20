@@ -88,7 +88,7 @@ class ProdukSparepartData extends Component
         ->groupBy('order_details.products_id', 'products.product_name', 'products.harga_jual')
         ->orderByDesc('total_terjual')
         ->where('products.categories_id', 2)
-        ->limit(5)
+        
         ->get();
 
 

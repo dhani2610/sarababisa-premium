@@ -85,7 +85,7 @@ class ProdukAksesorisData extends Component
         ->groupBy('order_details.products_id', 'products.product_name', 'products.harga_jual')
         ->orderByDesc('total_terjual')
         ->where('products.categories_id', 3)
-        ->limit(5)
+        
         ->get();
         
         return view('livewire.produk-aksesoris-data', [

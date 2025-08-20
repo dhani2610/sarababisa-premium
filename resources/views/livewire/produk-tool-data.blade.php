@@ -407,7 +407,7 @@
     @endif
     <div class="bg-white shadow-lg rounded-lg mt-5">
         <div class="px-5 py-4 border-b border-slate-200">
-            <h2 class="font-semibold text-slate-800">Top Produk Terjual</h2>
+            <h2 class="font-semibold text-slate-800">Top Produk Terlaris</h2>
         </div>
         <div class="divide-y divide-slate-200">
             @php $rank = 1; @endphp
