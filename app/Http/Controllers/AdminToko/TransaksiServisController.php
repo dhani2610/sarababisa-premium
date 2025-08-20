@@ -154,6 +154,7 @@ class TransaksiServisController extends Controller
         $namaPelanggan = $items->customer->nama;
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.notaterima-cetak-termal', [
+        // return View('pages.kepalatoko.servis.notaterima-cetak-termal', [
             'users' => $users,
             'items' => $items,
             'imagePath' => $imagePath
