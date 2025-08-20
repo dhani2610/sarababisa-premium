@@ -496,13 +496,7 @@
                                                     <input type="hidden" name="prev_modal" value="0">
                                                     <input type="hidden" name="prev_biaya" value="0">
                                                 </div>
-                                                <div x-data="{ showDetails: false,modalSparepart: 0  }"  x-init="
-                                                    // hook ke event select2
-                                                    $('#selectjs6').on('select2:select', function (e) {
-                                                        let data = e.params.data.element.dataset.harga_modal;
-                                                        modalSparepart = data || 0;
-                                                    });
-                                                ">
+                                                <div x-data="{ showDetails: false }">
                                                     <label class="block text-sm font-medium mb-1"
                                                         for="modal_sparepart">Apakah menggunakan stok sparepart
                                                         toko?</label>
@@ -533,20 +527,14 @@
                                                             for="products_id">Sparepart Toko yg Digunakan</label>
                                                         <select id="selectjs6" name="products_id[]"
                                                             class="form-select text-sm py-1 w-full"
-                                                            style="width: 100%;"
-                                                            x-on:change="
-                                                                let selected = $el.options[$el.selectedIndex];
-                                                                modalSparepart = selected.dataset.hargaModal || 0;
-                                                            ">
+                                                            style="width: 100%;">
                                                             <option selected value="">Pilih Sparepart</option>
                                                             @foreach ($products as $item)
-                                                                <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">
-                                                                    {{ $item->product_name }}
-                                                                </option>
+                                                                <option value="{{ $item->id }}">
+                                                                    {{ $item->product_name }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
-
                                                     <div x-show="showDetails" class="mt-3">
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="sales_id">Sales Sparepart</label>
@@ -592,19 +580,12 @@
                                                             <option value="1825">5 Tahun</option>
                                                         </select>
                                                     </div>
-                                                    {{-- <div class="mt-3">
-                                                        <label class="block text-sm font-medium mb-1"
-                                                            for="modal_sparepart">Modal Sparepart <span
-                                                                class="text-rose-500">*</span></label>
-                                                        <input class="form-input w-full px-2 py-1 modal_sparepart"
-                                                            type="number" name="modal_sparepart[]" :required="showDetails" />
-                                                    </div> --}}
                                                     <div class="mt-3">
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="modal_sparepart">Modal Sparepart <span
                                                                 class="text-rose-500">*</span></label>
                                                         <input class="form-input w-full px-2 py-1 modal_sparepart"
-                                                            type="number" name="modal_sparepart[]" x-model="modalSparepart" :required="showDetails" />
+                                                            type="number" name="modal_sparepart[]" :required="showDetails" />
                                                     </div>
 
                                                     <div class="mt-3">
