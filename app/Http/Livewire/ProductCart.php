@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Livewire;
 
-use App\Models\Product;
 use Livewire\Component;
 use App\Models\StoreSetting;
 use Gloudemans\Shoppingcart\Facades\Cart;
@@ -80,7 +79,7 @@ class ProductCart extends Component
         }
 
         $cart = Cart::instance($this->cart_instance);
-        $exists = $cart->search(fn ($cartItem) => $cartItem->id === $product['id']);
+        $exists = $cart->search(fn($cartItem) => $cartItem->id === $product['id']);
 
         if ($exists->isNotEmpty()) {
             $this->alert('error', 'Produk sudah ditambahkan ke keranjang');
@@ -103,21 +102,9 @@ class ProductCart extends Component
     {
         $price = $product['harga_jual'];
         $unit_price = $price;
-        $product_tax = $product['ppn'];
         $sub_total = $price;
 
-        if ($product['ppn'] != null) {
-            $tax = $price * $product['ppn'] / 100;
-            $price += $tax;
-            $product_tax = $tax;
-            $sub_total = $price;
-        } else {
-            $tax = $price * $product['ppn'] / 100;
-            $unit_price -= $tax;
-            $product_tax = $tax;
-        }
-
-        return ['price' => $price, 'unit_price' => $unit_price, 'product_tax' => $product_tax, 'sub_total' => $sub_total];
+        return ['price' => $price, 'unit_price' => $unit_price, 'sub_total' => $sub_total];
     }
 
     private function updateQuantityAndCheckQuantity($productId, $quantity)
@@ -144,7 +131,6 @@ class ProductCart extends Component
                 'modal'                 => $product['harga_modal'],
                 'garansi'                 => $product['garansi'],
                 'garansi_imei'                 => $product['garansi_imei'],
-                'ppn'                 => $product['ppn'],
             ]),
         ];
     }
@@ -163,7 +149,6 @@ class ProductCart extends Component
                 'code'                  => $cart_item->options->code,
                 'stock'                 => $cart_item->options->stock,
                 'unit'                  => $cart_item->options->unit,
-                'product_tax'           => $cart_item->options->product_tax,
                 'unit_price'            => $cart_item->price,
                 'modal'      => $cart_item->options->modal,
                 'product_discount'      => $cart_item->options->product_discount,
@@ -191,18 +176,12 @@ class ProductCart extends Component
 
     public function updateQuantity($row_id, $product_id)
     {
-        // if ($this->cart_instance === 'sale' || $this->cart_instance === 'purchase_return') {
-        //     if ($this->check_quantity[$product_id] < $this->quantity[$product_id]) {
-        //         $this->alert('error', 'Nilai Jumlah lebih banyak dari stok yang tersedia!');
+        if ($this->cart_instance === 'sale' || $this->cart_instance === 'purchase_return') {
+            if ($this->check_quantity[$product_id] < $this->quantity[$product_id]) {
+                $this->alert('error', 'Nilai Jumlah lebih banyak dari stok yang tersedia!');
 
-        //         return;
-        //     }
-        // }
-
-        $prodCheckQty = Product::find($product_id);
-        if ($prodCheckQty && $prodCheckQty->stok < $this->quantity[$product_id]) {
-            $this->alert('error', 'Nilai Jumlah lebih banyak dari stok yang tersedia!');
-            return;
+                return;
+            }
         }
 
         Cart::instance($this->cart_instance)->update($row_id, $this->quantity[$product_id]);
@@ -215,7 +194,6 @@ class ProductCart extends Component
                 'code'                  => $cart_item->options->code,
                 'stock'                 => $cart_item->options->stock,
                 'unit'                  => $cart_item->options->unit,
-                'product_tax'           => $cart_item->options->product_tax,
                 'unit_price'            => $cart_item->options->unit_price,
                 'product_discount'      => $cart_item->options->product_discount,
                 'product_discount_type' => $cart_item->options->product_discount_type,
@@ -270,7 +248,6 @@ class ProductCart extends Component
                 'code'                  => $cart_item->options->code,
                 'stock'                 => $cart_item->options->stock,
                 'unit'                  => $cart_item->options->unit,
-                'product_tax'           => $cart_item->options->product_tax,
                 'unit_price'            => $cart_item->options->unit_price,
                 'product_discount'      => $discount_amount,
                 'product_discount_type' => $cart_item->options->product_discount_type,
