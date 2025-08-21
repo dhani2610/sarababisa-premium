@@ -99,7 +99,7 @@
 
                             <x-table.td>
                                 Rp. {{ number_format($cart_item->options->unit_price) }}
-                                @include('livewire.includes.product-cart-price')
+                                {{-- @include('livewire.includes.product-cart-price') --}}
                             </x-table.td>
 
                             <x-table.td>
@@ -146,12 +146,12 @@
         <div class="w-full">
             <div class="w-full py-2">
                 <x-table-responsive>
-                    {{-- @if ($toko->is_tax == 1)
+                    @if ($toko->is_tax == 1)
                     <x-table.tr>
                         <x-table.th>{{ __('Pajak') }} ({{ $global_tax }}%)</x-table.th>
                         <x-table.td>(+) Rp. {{ number_format(Cart::instance($cart_instance)->tax()) }}</x-table.td>
                     </x-table.tr>
-                    @endif --}}
+                    @endif
                     {{-- <x-table.tr>
                         <x-table.th>{{ __('Diskon') }} ({{ $global_discount }}%)</x-table.th>
                         <x-table.td>(-) Rp. {{ number_format(Cart::instance($cart_instance)->discount()) }}</x-table.td>
@@ -172,7 +172,7 @@
 
     <input type="hidden" name="total_amount" value="{{ $total_with_shipping }}">
 
-    {{-- <div class="flex flex-wrap my-2">
+    <div class="flex flex-wrap my-2">
         @if ($toko->is_tax == 1)
         <div class="w-full md:w-1/3 mb-4 md:mb-0">
             <div class="mb-4">
@@ -181,11 +181,11 @@
             </div>
         </div>
         @endif
-        <div class="w-full md:w-1/3 mb-4 md:mb-0">
+        {{-- <div class="w-full md:w-1/3 mb-4 md:mb-0">
             <div class="mb-4">
                 <label for="discount_percentage">{{ __('Diskon Global (%)') }}</label>
                 <x-input wire:model.lazy="global_discount" name="discount_percentage" value="{{ $global_discount }}" />
             </div>
-        </div>
-    </div> --}}
+        </div> --}}
+    </div>
 </div>
