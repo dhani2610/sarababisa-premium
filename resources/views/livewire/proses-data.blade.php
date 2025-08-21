@@ -1209,7 +1209,7 @@
                                                     <div>
                                                         <label class="text-sm font-medium text-gray-600">PIN</label> <br>
                                                         <input type="number" value="{{ $process->pin }}"  
-                                                            wire:model.defer="pin" 
+                                                            wire:model.defer="pin"  id="pinInput-{{ $process->id }}"
                                                             class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
                                                     </div>
 
@@ -1567,12 +1567,14 @@
         function saveCanvasAjax(id) {
             let canvas = document.getElementById(`sig-canvas-${id}`);
             let polaInput = document.getElementById(`polaInput-${id}`);
-            let pinInput = document.querySelector(`[wire\\:model\\.defer="pin"]`); 
+            let pinInput = document.getElementById(`pinInput-${id}`);
 
             if (canvas) {
                 let data = canvas.toDataURL();
                 polaInput.value = data;
             }
+
+            console.log('payload:', payload);
 
             let payload = {
                 pin: pinInput.value,
