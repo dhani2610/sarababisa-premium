@@ -1328,6 +1328,9 @@
                 pola: polaInput.value
             };
 
+            console.log('payload:', payload);
+            
+
             fetch(`/servis/admin-transaksi-servis/${id}/update-pin-pola`, {
                 method: "POST",
                 headers: {
