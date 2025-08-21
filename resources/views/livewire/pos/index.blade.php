@@ -167,7 +167,15 @@
                                             </span>
                                         </x-table.td>
                                     </x-table.tr>
-                                    {{-- @if ($toko->is_tax === 1)
+                                    <x-table.tr>
+                                        <x-table.th>
+                                            Sub Total
+                                        </x-table.th>
+                                        <x-table.td>
+                                            Rp. {{ number_format(Cart::instance($cart_instance)->subtotal()) }}
+                                        </x-table.td>
+                                    </x-table.tr>
+                                    @if ($toko->is_tax === 1)
                                         <x-table.tr>
                                             <x-table.th>
                                                 {{ __('PPN') }} ({{ $toko->ppn }}%)
@@ -176,7 +184,7 @@
                                                 (+) Rp. {{ number_format(Cart::instance($cart_instance)->tax()) }}
                                             </x-table.td>
                                         </x-table.tr>
-                                    @endif --}}
+                                    @endif
                                     {{-- <x-table.tr>
                                         <x-table.th>
                                             {{ __('Diskon') }} ({{ $global_discount }}%)
