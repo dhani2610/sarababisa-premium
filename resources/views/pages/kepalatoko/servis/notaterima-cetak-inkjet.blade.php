@@ -219,14 +219,16 @@
                 <th></th>
             </tr>
             <tr>
-                {{-- <td></td> --}}
+                @if ($items->pin != null)
                 <td>
-                    @if ($items->pin != null)
-                        <th class="text-center">{{ $items->pin }}</th>
-                    @else
-                    <hr style="border-top: 1px dashed;">
-                    @endif
+                      <th class="text-center">{{ $items->pin }}</th>
                 </td>
+                @else
+                <td></td>
+                <td>
+                    <hr style="border-top: 1px dashed;">
+                </td>
+                @endif
                 <td class="text-center"><img src="{{ $items->pola != null ? $items->pola : asset('images/pola.png') }}" alt=""
                         style="height: 40"></td>
                 <td class="text-center capital" style="padding-top: 36px;">{{ $items->customer->nama }}</td>
