@@ -84,6 +84,7 @@ class ProdukAksesorisData extends Component
         ->join('products', 'products.id', '=', 'order_details.products_id')
         ->groupBy('order_details.products_id', 'products.product_name', 'products.harga_jual')
         ->orderByDesc('total_terjual')
+->limit('5')
         ->where('products.categories_id', 3)
         
         ->get();

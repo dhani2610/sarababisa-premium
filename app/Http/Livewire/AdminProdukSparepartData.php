@@ -79,6 +79,7 @@ class AdminProdukSparepartData extends Component
         ->groupBy('order_details.products_id', 'products.product_name', 'products.harga_jual')
         ->where('products.categories_id', '=', '2')
         ->orderByDesc('total_terjual')
+->limit('5')
         
         ->get();
 
