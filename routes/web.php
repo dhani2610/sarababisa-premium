@@ -231,7 +231,10 @@ Route::delete('/target-teknisi/delete', [KepalaTokoTargetTeknisiController::clas
 
 Route::get('produk/item/{id}/download-barcode', [ProdukController::class, 'downloadBarcode'])->name('download-barcode');
 
+
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
+    Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
+
     Route::get('/dashboard', [KepalaTokoDashboardController::class, 'index'])->name('kepalatoko-dashboard');
     Route::get('/json-data-servis', [DataServisController::class, 'getDataServis'])->name('json_data_servis');
     Route::get('/json-data-penjualan', [DataPenjualanController::class, 'getDataPenjualan'])->name('json_data_penjualan');
@@ -249,6 +252,9 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('pelanggan', KepalaTokoPelangganController::class);
     Route::post('pelanggan-broadcast', [KepalaTokoPelangganController::class,'broadcast'])->name('pelanggan.broadcast');
     Route::resource('servis/transaksi-servis', KepalaTokoTransaksiServisController::class);
+    Route::post('servis/transaksi-servis/{id}/update-pin-pola', [KepalaTokoTransaksiServisController::class, 'updatePinPola'])
+    ->name('transaksi-servis.update-pin-pola');
+
     Route::delete('/services/delete', [KepalaTokoTransaksiServisController::class, 'deleteSelected']);
     Route::patch('/services/update', [KepalaTokoSudahDiambilController::class, 'approveSelected']);
     Route::patch('/services/reject', [KepalaTokoSudahDiambilController::class, 'rejectSelected']);
@@ -291,6 +297,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('produk/sub-kategori', KepalaTokoSubKategoriController::class);
     Route::resource('produk/supplier', KepalaTokoSupplierController::class);
     Route::resource('produk/item', KepalaTokoProdukController::class);
+    Route::get('top-produk', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk');
 
     Route::resource('produk/handphone', KepalaTokoProdukHandphoneController::class);
     Route::resource('produk/sparepart', KepalaTokoProdukSparepartController::class);
@@ -405,6 +412,9 @@ Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(fun
     Route::post('admin-pelanggan-broadcast', [AdminTokoPelangganController::class,'broadcast'])->name('admin.pelanggan.broadcast');
 
     Route::resource('servis/admin-transaksi-servis', AdminTokoTransaksiServisController::class);
+    Route::post('servis/admin-transaksi-servis/{id}/update-pin-pola', [AdminTokoTransaksiServisController::class, 'updatePinPola'])
+    ->name('transaksi-servis.update-pin-pola');
+
     Route::post('/servis/admin-transaksi-servis-langsung', [AdminTokoTransaksiServisLangsungController::class, 'store'])->name('admin-servis-langsung');
     Route::resource('servis/admin-servis-bisa-diambil', AdminTokoBisaDiambilController::class);
     Route::resource('servis/admin-servis-sudah-diambil', AdminTokoSudahDiambilController::class);
@@ -452,6 +462,8 @@ Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(fun
     Route::resource('produk/admin-kategori', AdminTokoKategoriController::class);
     Route::resource('produk/admin-sub-kategori', AdminTokoSubKategoriController::class);
     Route::resource('produk/admin-item', AdminTokoProdukController::class);
+    Route::get('top-produk', [AdminTokoProdukController::class, 'indexTop'])->name('top-produk');
+
     Route::resource('produk/admin-handphone', AdminTokoProdukHandphoneController::class);
     Route::resource('produk/admin-sparepart', AdminTokoProdukSparepartController::class);
     Route::resource('produk/admin-aksesoris', AdminTokoProdukAksesorisController::class);

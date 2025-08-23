@@ -44,6 +44,25 @@ class BisaDiambilData extends Component
         }
     }
 
+
+    
+    public $pin;
+    public $pola;
+
+    public function openPinModal($id)
+    {
+        $this->service_id = $id;
+        $service = ServiceTransaction::find($id);
+
+        $this->pin = $service->pin;
+        $this->pola = $service->pola;
+
+        // kirim event sesuai ID
+        $this->dispatchBrowserEvent('open-pin-modal-' . $id, [
+            'pola' => $this->pola,
+        ]);
+    }
+
     public function render()
     {
         $toko = User::find(1);

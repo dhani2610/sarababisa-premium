@@ -416,7 +416,13 @@
                                                     <input type="hidden" name="prev_modal" value="0">
                                                     <input type="hidden" name="prev_biaya" value="0">
                                                 </div>
-                                                <div x-data="{ showDetails: false }">
+                                                <div x-data="{ showDetails: false,modalSparepart : 0 }" x-init="
+                                                    // hook ke event select2
+                                                    $('#selectjs6').on('select2:select', function (e) {
+                                                        let data = e.params.data.element.dataset.harga_modal;
+                                                        modalSparepart = data || 0;
+                                                    });
+                                                ">
                                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Apakah
                                                         menggunakan stok sparepart toko?</label>
                                                     <div class="flex flex-wrap items-center -m-3">
@@ -446,7 +452,7 @@
                                                             class="form-select text-sm py-1 w-full" style="width: 100%;">
                                                             <option selected value="">Pilih Sparepart</option>
                                                             @foreach ($products as $item)
-                                                                <option value="{{ $item->id }}">{{ $item->product_name }}
+                                                                <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ $item->product_name }}
                                                                 </option>
                                                             @endforeach
                                                         </select>
@@ -502,7 +508,7 @@
                                                             for="modal_sparepart">Modal Sparepart <span
                                                                 class="text-rose-500">*</span></label>
                                                         <input class="form-input w-full px-2 py-1 modal_sparepart"
-                                                            type="number" name="modal_sparepart[]" :required="showDetails" />
+                                                            type="number" name="modal_sparepart[]" x-model="modalSparepart" :required="showDetails" />
                                                     </div>
         
                                                     <div class="mt-3">
@@ -997,6 +1003,67 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="space-x-1 flex">
+                                     <!-- Start PIN & Pola -->
+                                        <div>
+                                            <button wire:click="openPinModal({{ $process->id }})" class="text-indigo-500 hover:text-indigo-600 rounded-full">
+                                                <span class="sr-only">Service PIN & Pola</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-lock" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#6366f1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <rect x="5" y="11" width="14" height="10" rx="2" />
+                                                    <path d="M8 11v-4a4 4 0 0 1 8 0v4" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <!-- Modal PIN & Pola -->
+                                        <div x-data="{ open: false }" 
+                                            x-show="open"
+                                            @open-pin-modal-{{ $process->id }}.window="open = true" 
+                                            @close-pin-modal-{{ $process->id }}.window="open = false"
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                            x-cloak
+                                            @click.self="open = false">
+
+                                            <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+                                                <div class="flex justify-between items-center border-b pb-2 mb-4">
+                                                    <h2 class="text-lg font-semibold text-gray-700">Service PIN & Pola</h2>
+                                                    <button @click="open=false" type="button" class="text-gray-400 hover:text-gray-600">&times;</button>
+                                                </div>
+
+                                                <div class="space-y-4">
+                                                    <!-- PIN -->
+                                                    <div>
+                                                        <label class="text-sm font-medium text-gray-600">PIN</label> <br>
+                                                        <input type="number" value="{{ $process->pin }}"  
+                                                            wire:model.defer="pin" id="pinInput-{{ $process->id }}"
+                                                            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
+                                                    </div>
+
+                                                    <!-- Pola -->
+                                                    <div>
+                                                        <label class="text-sm font-medium text-gray-600">Pola</label>
+                                                        <canvas id="sig-canvas-{{ $process->id }}" class="sig-canvas border rounded w-full h-48 bg-gray-100"></canvas>
+                                                        <input type="hidden" id="polaInput-{{ $process->id }}" wire:model.defer="pola" class="polaInput">
+                                                        <small class="text-gray-400">Gambar pola (opsional)</small>
+                                                    </div>
+
+                                                    <button type="button" onclick="resetCanvas({{ $process->id }})"
+                                                        class="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600">
+                                                        Reset Pola
+                                                    </button>
+                                                </div>
+
+                                                <div class="mt-6 flex justify-end space-x-2">
+                                                    <button onclick="saveCanvasAjax({{ $process->id }})"
+                                                        class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+                                                        Simpan
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+
                                     <!-- Start -->
                                     <div class="relative" x-data="{ open: false }" @mouseenter="open = true"
                                         @mouseleave="open = false">
@@ -1174,6 +1241,174 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function getCanvas(processId) {
+        let canvas = document.getElementById('sig-canvas-' + processId);
+        if (canvas) {
+            // Pastikan width/height sesuai ukuran CSS
+            if (canvas.width !== canvas.offsetWidth || canvas.height !== canvas.offsetHeight) {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+        }
+        return canvas;
+    }
+
+    function resetCanvas(processId) {
+        let canvas = getCanvas(processId);
+        if (canvas) {
+            let ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // benar-benar bersihin
+        }
+
+        // Kosongkan hidden input juga
+        let polaInput = document.getElementById('polaInput-' + processId);
+        if (polaInput) polaInput.value = '';
+    }
+
+
+    window.requestAnimFrame = (function(){
+        return window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            function(callback){ window.setTimeout(callback, 1000/60); };
+    })();
+
+    document.querySelectorAll(".sig-canvas").forEach((canvas) => {
+        let ctx = canvas.getContext("2d");
+        ctx.strokeStyle = "#222222";
+        ctx.lineWidth = 4;
+
+        let drawing = false;
+        let mousePos = { x: 0, y: 0 };
+        let lastPos = mousePos;
+
+        function getMousePos(canvasDom, mouseEvent) {
+            let rect = canvasDom.getBoundingClientRect();
+            return { x: mouseEvent.clientX - rect.left, y: mouseEvent.clientY - rect.top };
+        }
+
+        function getTouchPos(canvasDom, touchEvent) {
+            let rect = canvasDom.getBoundingClientRect();
+            return { x: touchEvent.touches[0].clientX - rect.left, y: touchEvent.touches[0].clientY - rect.top };
+        }
+
+        function renderCanvas() {
+            if (drawing) {
+                ctx.beginPath();
+                ctx.moveTo(lastPos.x, lastPos.y);
+                ctx.lineTo(mousePos.x, mousePos.y);
+                ctx.stroke();
+                ctx.closePath();
+                lastPos = mousePos;
+            }
+        }
+
+        // Mouse
+        canvas.addEventListener("mousedown", function(e) {
+            drawing = true;
+            lastPos = getMousePos(canvas, e);
+        });
+        canvas.addEventListener("mouseup", function() { drawing = false; });
+        canvas.addEventListener("mousemove", function(e) { mousePos = getMousePos(canvas, e); });
+
+        // Touch
+        canvas.addEventListener("touchstart", function(e) {
+            mousePos = getTouchPos(canvas, e);
+            let touch = e.touches[0];
+            canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: touch.clientX, clientY: touch.clientY }));
+        });
+        canvas.addEventListener("touchmove", function(e) {
+            let touch = e.touches[0];
+            canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: touch.clientX, clientY: touch.clientY }));
+        });
+        canvas.addEventListener("touchend", function() {
+            canvas.dispatchEvent(new MouseEvent("mouseup", {}));
+        });
+
+        // Prevent scroll saat touch canvas
+        ["touchstart","touchend","touchmove"].forEach(evt => {
+            canvas.addEventListener(evt, function(e) { 
+                if (e.target === canvas) e.preventDefault(); 
+            }, { passive:false });
+        });
+
+        // Loop render
+        (function drawLoop() {
+            requestAnimFrame(drawLoop);
+            renderCanvas();
+        })();
+    });
+
+</script>
+
+    <script>
+        function saveCanvasAjax(id) {
+            let canvas = document.getElementById(`sig-canvas-${id}`);
+            let polaInput = document.getElementById(`polaInput-${id}`);
+            let pinInput = document.getElementById(`pinInput-${id}`);
+
+            if (canvas) {
+                let data = canvas.toDataURL();
+                polaInput.value = data;
+            }
+
+            let payload = {
+                pin: pinInput.value,
+                pola: polaInput.value
+            };
+
+            console.log('payload:', payload);
+            
+
+            fetch(`/servis/admin-transaksi-servis/${id}/update-pin-pola`, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    alert(res.message);
+                    window.dispatchEvent(new CustomEvent(`close-pin-modal-${id}`));
+                } else {
+                    alert("Gagal menyimpan data");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error saat menyimpan data");
+            });
+        }
+</script>
+
+<script>
+    // Saat modal dibuka, isi canvas kalau ada pola lama
+    document.addEventListener("open-pin-modal", (event) => {
+        let pola = event.detail.pola;
+        let canvas = document.querySelector(".sig-canvas");
+        let ctx = canvas.getContext("2d");
+        let polaInput = canvas.parentElement.querySelector(".polaInput");
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (pola) {
+            let img = new Image();
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+            img.src = pola;
+            polaInput.value = pola;
+        } else {
+            polaInput.value = "";
+        }
+    });
+</script>
+
+
 <script>
 $(document).ready(function () {
         $('input[name="kondisi_servis"]').on('change', function () {

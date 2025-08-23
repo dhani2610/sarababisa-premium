@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Customer;
 use App\Models\OrderDetail;
+use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Gloudemans\Shoppingcart\Facades\Cart;
@@ -27,8 +28,8 @@ class PosController extends Controller
     public function show($id)
     {
         $order = Order::with('customer', 'detailOrders')->where('id', $id)->first();
-
-        return view('pages/sales/pos/cetak', compact('order'));
+        $toko = StoreSetting::first();
+        return view('pages/sales/pos/cetak', compact('order', 'toko'));
     }
 
     public function addcart(Request $request)

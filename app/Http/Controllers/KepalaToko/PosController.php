@@ -6,10 +6,11 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Customer;
 use App\Models\OrderDetail;
+use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
 use Gloudemans\Shoppingcart\Facades\Cart;
 
 class PosController extends Controller
@@ -28,24 +29,10 @@ class PosController extends Controller
 
     public function show($id)
     {
-        $toko = User::find(1);
-        $order = Order::with('customer')->where('id', $id)->first();
+        $order = Order::with('customer', 'detailOrders')->where('id', $id)->first();
+        $toko = StoreSetting::first();
 
-        $orderItem = OrderDetail::with('product')->where('orders_id', $id)->orderBy('id', 'DESC')->get();
-
-        // Buat string detail produk
-        $produkDetails = '';
-        foreach ($orderItem as $item) {
-
-            // Tambahkan nomor seri jika kategori produk adalah 1
-            if ($item->product->categories_id === 1) {
-                $produkDetails .= $item->product_name . ' IMEI ' . $item->product->nomor_seri . ' (Rp ' . number_format($item->price, 0, ',', '.') . ' x ' . $item->quantity . ' pcs)%0A';
-            } else {
-                $produkDetails .= $item->product_name . ' (Rp ' . number_format($item->price, 0, ',', '.') . ' x ' . $item->quantity . ' pcs)%0A';
-            }
-        }
-
-        return view('pages/kepalatoko/pos/cetak', compact('order', 'toko', 'orderItem', 'produkDetails'));
+        return view('pages/kepalatoko/pos/cetak', compact('order', 'toko'));
     }
 
     public function addcart(Request $request)

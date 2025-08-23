@@ -222,21 +222,23 @@
         @else
           <td align="center">-</td>
         @endif
-        <td align="center">Rp. {{ number_format($item->price) }}</td>
+        <td align="center">Rp. {{ number_format($item->price + $item->product_discount_amount) }}</td>
         <td align="center">{{ $item->quantity }}</td>
-        <td align="center">Rp. {{ number_format($item->price * $item->quantity) }}</td>
-        @if ($item->sub_total === $item->total)
+        <td align="center">Rp. {{ number_format(($item->price + $item->product_discount_amount) * $item->quantity) }}</td>
+        {{-- Diskon per item --}}
+        @if ($item->product_discount_amount <= 0)
             <td align="center">-</td>
         @else
-            <td align="center">Rp. {{ number_format($item->sub_total - $item->total + $item->ppn) }}</td>
+            <td align="center">Rp. {{ number_format($item->product_discount_amount) }}</td>
         @endif
-          <td align="center">Rp. {{ number_format($item->total - $item->ppn) }}</td>
-            @if ($toko->is_tax === 1)
-              <td align="center">
-              @if ($item->ppn > 0)
-                  Rp. {{ number_format($item->ppn) }}
-              @else
-                  -
+        {{-- Subtotal per item sudah termasuk pajak --}}
+        <td align="center">Rp. {{ number_format($item->sub_total) }}</td>
+        @if ($toko->is_tax === 1)
+          <td align="center">
+            @if ($item->ppn > 0)
+                Rp. {{ number_format($item->ppn) }}
+            @else
+                -
             @endif
           </td>
         @endif
@@ -250,7 +252,15 @@
       <th class="text-center" style="vertical-align: top;">Penjual</th>
       <td align="right" >
           <h3 style="margin-bottom: 0;">
-            Total: Rp. {{ number_format($total) }} <br> <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;">( {{ terbilang($total) }} rupiah )</span>
+            {{-- Total sudah termasuk pajak --}}
+            Total: Rp. {{ number_format($total) }} <br>
+            @if ($toko->is_tax === 1)
+              <span style="font-size: 12px; font-weight: normal;">
+                Pajak (PPN): Rp. {{ number_format($orderItem->sum('ppn')) }}<br>
+                Subtotal (sebelum pajak): Rp. {{ number_format($total - $orderItem->sum('ppn')) }}
+              </span><br>
+            @endif
+            <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;">( {{ terbilang($total) }} rupiah )</span>
           </h3>
       </td>
     </tr>
@@ -272,7 +282,7 @@
   </table>
   @if ($orderItem->first()->garansi != null)
     <div>
-      <p style="text-decoration: underline; font-size: 12px;">Cek status garansi di {{ env('APP_URL') }}/garansi</p>
+      <p style="text-decoration: underline; font-size: 12px;">Cek status garansi di {{ $users->link_toko }}/garansi</p>
     </div>
   @endif
 </body>
