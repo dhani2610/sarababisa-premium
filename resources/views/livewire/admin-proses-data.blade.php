@@ -1046,6 +1046,11 @@
                                                         <input type="hidden" id="polaInput-{{ $process->id }}" wire:model.defer="pola" class="polaInput">
                                                         <small class="text-gray-400">Gambar pola (opsional)</small>
                                                     </div>
+
+                                                    <button type="button" onclick="resetCanvas({{ $process->id }})"
+                                                        class="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600">
+                                                        Reset Pola
+                                                    </button>
                                                 </div>
 
                                                 <div class="mt-6 flex justify-end space-x-2">
@@ -1237,6 +1242,31 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    function getCanvas(processId) {
+        let canvas = document.getElementById('sig-canvas-' + processId);
+        if (canvas) {
+            // Pastikan width/height sesuai ukuran CSS
+            if (canvas.width !== canvas.offsetWidth || canvas.height !== canvas.offsetHeight) {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+        }
+        return canvas;
+    }
+
+    function resetCanvas(processId) {
+        let canvas = getCanvas(processId);
+        if (canvas) {
+            let ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // benar-benar bersihin
+        }
+
+        // Kosongkan hidden input juga
+        let polaInput = document.getElementById('polaInput-' + processId);
+        if (polaInput) polaInput.value = '';
+    }
+
+
     window.requestAnimFrame = (function(){
         return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -1356,16 +1386,6 @@
 </script>
 
 <script>
-    function resetCanvas() {
-        let canvas = document.querySelector(".sig-canvas");
-        let ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // kosongin hidden input juga
-        let polaInput = canvas.parentElement.querySelector(".polaInput");
-        polaInput.value = "";
-    }
-
     // Saat modal dibuka, isi canvas kalau ada pola lama
     document.addEventListener("open-pin-modal", (event) => {
         let pola = event.detail.pola;
