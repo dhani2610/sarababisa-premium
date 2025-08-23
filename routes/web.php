@@ -230,6 +230,8 @@ Route::delete('/target-sales/delete', [KepalaTokoTargetSalesController::class, '
 Route::delete('/target-teknisi/delete', [KepalaTokoTargetTeknisiController::class, 'deleteSelected']);
 
 Route::get('produk/item/{id}/download-barcode', [ProdukController::class, 'downloadBarcode'])->name('download-barcode');
+Route::get('top-produk', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk');
+
 
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
     Route::get('/dashboard', [KepalaTokoDashboardController::class, 'index'])->name('kepalatoko-dashboard');
