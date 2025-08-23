@@ -83,12 +83,18 @@ class TopProduk extends Component
         ->groupBy('products.model_series_id', 'model_series.name')
         ->orderByDesc('total_terjual')
         ->when($this->categoryId, function ($query) {
-            $query->where('products.categories_id', $this->categoryId);
+            $query->whereExists(function ($sub) {
+                $sub->select(DB::raw(1))
+                    ->from('products as p2')
+                    ->whereColumn('p2.model_series_id', 'products.model_series_id')
+                    ->where('p2.categories_id', $this->categoryId);
+            });
         })
         ->when($this->search, function ($query) {
             $query->where('model_series.name', 'like', '%' . $this->search . '%');
         })
         ->paginate($this->paginate);
+
         $prod = Product::get();
         // dd($topProducts,Product::latest()->paginate($this->paginate) );
 
