@@ -415,7 +415,7 @@
         </div>
     @endif
 
-    <div class="bg-white shadow-lg rounded-lg mt-5 d-none">
+    <div class="bg-white shadow-lg rounded-lg mt-5 d-none" style="display:none!important">
         <div class="px-5 py-4 border-b border-slate-200">
             <h2 class="font-semibold text-slate-800">Top Produk Terlaris</h2>
         </div>

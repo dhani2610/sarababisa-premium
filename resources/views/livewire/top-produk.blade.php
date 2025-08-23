@@ -59,7 +59,10 @@
             <h2 class="font-semibold text-slate-800">Top Produk Terlaris</h2>
         </div>
         <div class="divide-y divide-slate-200">
-            @php $rank = 1; @endphp
+            @php
+                $rank = ($topProducts->currentPage() - 1) * $topProducts->perPage() + 1;
+            @endphp
+
             @foreach($topProducts as $itemtop)
                 <div class="flex justify-between items-center px-5 py-3">
                     <div class="flex items-center space-x-3">
