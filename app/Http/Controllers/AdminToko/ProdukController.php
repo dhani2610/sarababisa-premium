@@ -24,6 +24,10 @@ class ProdukController extends Controller
     {
         return view('pages/admintoko/produk/index');
     }
+    public function indexTop()
+    {
+        return view('pages/admintoko/produk/top');
+    }
 
     /**
      * Show the form for creating a new resource.

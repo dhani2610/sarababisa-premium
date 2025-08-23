@@ -230,10 +230,11 @@ Route::delete('/target-sales/delete', [KepalaTokoTargetSalesController::class, '
 Route::delete('/target-teknisi/delete', [KepalaTokoTargetTeknisiController::class, 'deleteSelected']);
 
 Route::get('produk/item/{id}/download-barcode', [ProdukController::class, 'downloadBarcode'])->name('download-barcode');
-Route::get('top-produk', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk');
 
 
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
+    Route::get('top-produk', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk');
+
     Route::get('/dashboard', [KepalaTokoDashboardController::class, 'index'])->name('kepalatoko-dashboard');
     Route::get('/json-data-servis', [DataServisController::class, 'getDataServis'])->name('json_data_servis');
     Route::get('/json-data-penjualan', [DataPenjualanController::class, 'getDataPenjualan'])->name('json_data_penjualan');
@@ -296,6 +297,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('produk/sub-kategori', KepalaTokoSubKategoriController::class);
     Route::resource('produk/supplier', KepalaTokoSupplierController::class);
     Route::resource('produk/item', KepalaTokoProdukController::class);
+    Route::get('top-produk', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk');
 
     Route::resource('produk/handphone', KepalaTokoProdukHandphoneController::class);
     Route::resource('produk/sparepart', KepalaTokoProdukSparepartController::class);
@@ -460,6 +462,8 @@ Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(fun
     Route::resource('produk/admin-kategori', AdminTokoKategoriController::class);
     Route::resource('produk/admin-sub-kategori', AdminTokoSubKategoriController::class);
     Route::resource('produk/admin-item', AdminTokoProdukController::class);
+    Route::get('top-produk', [AdminTokoProdukController::class, 'indexTop'])->name('top-produk');
+
     Route::resource('produk/admin-handphone', AdminTokoProdukHandphoneController::class);
     Route::resource('produk/admin-sparepart', AdminTokoProdukSparepartController::class);
     Route::resource('produk/admin-aksesoris', AdminTokoProdukAksesorisController::class);
