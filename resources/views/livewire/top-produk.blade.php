@@ -22,26 +22,39 @@
         <!-- Left side -->
         <div class="mb-4 sm:mb-0">
             <ul class="flex flex-wrap -m-1">
-                @php
-                    if (Auth::user()->role == 'Kepala Toko') {
-                        $route = route('top-produk-kepala-toko');
-                    }else{
-                        $route = route('top-produk');
-                    }
-                @endphp
-                 <li class="m-1">
-                    <a href="{{ $route }}">
-                        <button class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-transparent shadow-sm  bg-indigo-500 text-white duration-150 ease-in-out">Semua</button>
-                    </a>
-                </li>
-                @foreach ($categories as $cat)
+            @php
+                if (Auth::user()->role == 'Kepala Toko') {
+                    $route = route('top-produk-kepala-toko');
+                } else {
+                    $route = route('top-produk');
+                }
+            @endphp
+
+            {{-- Tombol Semua --}}
+            <li class="m-1">
+                <a href="{{ $route }}">
+                    <button
+                        class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 shadow-sm duration-150 ease-in-out 
+                        {{ empty($categoryId) ? 'bg-indigo-500 text-white' : 'bg-white text-slate-700 border' }}">
+                        Semua
+                    </button>
+                </a>
+            </li>
+
+            {{-- Tombol per kategori --}}
+            @foreach ($categories as $cat)
                 <li class="m-1">
                     <a href="{{ $route }}?id={{ $cat->id }}">
-                        <button class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-transparent shadow-sm  bg-indigo-500 text-white duration-150 ease-in-out">{{ $cat->category_name }}</button>
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 shadow-sm duration-150 ease-in-out
+                            {{ $categoryId == $cat->id ? 'bg-indigo-500 text-white' : 'bg-white text-slate-700 border' }}">
+                            {{ $cat->category_name }}
+                        </button>
                     </a>
                 </li>
-                @endforeach
-            </ul>
+            @endforeach
+        </ul>
+
         </div>
 
         <!-- Right side -->
