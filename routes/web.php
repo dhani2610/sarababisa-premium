@@ -233,7 +233,7 @@ Route::get('produk/item/{id}/download-barcode', [ProdukController::class, 'downl
 
 
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
-    Route::get('top-produk', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk');
+    Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
 
     Route::get('/dashboard', [KepalaTokoDashboardController::class, 'index'])->name('kepalatoko-dashboard');
     Route::get('/json-data-servis', [DataServisController::class, 'getDataServis'])->name('json_data_servis');

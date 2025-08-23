@@ -89,7 +89,8 @@ class TopProduk extends Component
             $query->where('model_series.name', 'like', '%' . $this->search . '%');
         })
         ->paginate($this->paginate);
-
+        $prod = Product::get();
+        // dd($topProducts,Product::latest()->paginate($this->paginate) );
 
         $productCategoty = Category::orderBy('created_at', 'asc')->get();
 
