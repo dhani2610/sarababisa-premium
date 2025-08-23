@@ -496,13 +496,7 @@
                                                     <input type="hidden" name="prev_modal" value="0">
                                                     <input type="hidden" name="prev_biaya" value="0">
                                                 </div>
-                                                <div x-data="{ showDetails: false,modalSparepart: 0  }"  x-init="
-                                                    // hook ke event select2
-                                                    $('#selectjs6').on('select2:select', function (e) {
-                                                        let data = e.params.data.element.dataset.harga_modal;
-                                                        modalSparepart = data || 0;
-                                                    });
-                                                ">
+                                                <div x-data="{ showDetails: false }">
                                                     <label class="block text-sm font-medium mb-1"
                                                         for="modal_sparepart">Apakah menggunakan stok sparepart
                                                         toko?</label>
@@ -533,20 +527,14 @@
                                                             for="products_id">Sparepart Toko yg Digunakan</label>
                                                         <select id="selectjs6" name="products_id[]"
                                                             class="form-select text-sm py-1 w-full"
-                                                            style="width: 100%;"
-                                                            x-on:change="
-                                                                let selected = $el.options[$el.selectedIndex];
-                                                                modalSparepart = selected.dataset.hargaModal || 0;
-                                                            ">
+                                                            style="width: 100%;">
                                                             <option selected value="">Pilih Sparepart</option>
                                                             @foreach ($products as $item)
-                                                                <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">
-                                                                    {{ $item->product_name }}
-                                                                </option>
+                                                                <option value="{{ $item->id }}">
+                                                                    {{ $item->product_name }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
-
                                                     <div x-show="showDetails" class="mt-3">
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="sales_id">Sales Sparepart</label>
@@ -592,19 +580,12 @@
                                                             <option value="1825">5 Tahun</option>
                                                         </select>
                                                     </div>
-                                                    {{-- <div class="mt-3">
-                                                        <label class="block text-sm font-medium mb-1"
-                                                            for="modal_sparepart">Modal Sparepart <span
-                                                                class="text-rose-500">*</span></label>
-                                                        <input class="form-input w-full px-2 py-1 modal_sparepart"
-                                                            type="number" name="modal_sparepart[]" :required="showDetails" />
-                                                    </div> --}}
                                                     <div class="mt-3">
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="modal_sparepart">Modal Sparepart <span
                                                                 class="text-rose-500">*</span></label>
                                                         <input class="form-input w-full px-2 py-1 modal_sparepart"
-                                                            type="number" name="modal_sparepart[]" x-model="modalSparepart" :required="showDetails" />
+                                                            type="number" name="modal_sparepart[]" :required="showDetails" />
                                                     </div>
 
                                                     <div class="mt-3">
@@ -1209,7 +1190,7 @@
                                                     <div>
                                                         <label class="text-sm font-medium text-gray-600">PIN</label> <br>
                                                         <input type="number" value="{{ $process->pin }}"  
-                                                            wire:model.defer="pin"  id="pinInput-{{ $process->id }}"
+                                                            wire:model.defer="pin" 
                                                             class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
                                                     </div>
 
@@ -1220,11 +1201,6 @@
                                                         <input type="hidden" id="polaInput-{{ $process->id }}" wire:model.defer="pola" class="polaInput">
                                                         <small class="text-gray-400">Gambar pola (opsional)</small>
                                                     </div>
-
-                                                    <button type="button" onclick="resetCanvas({{ $process->id }})"
-                                                        class="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600">
-                                                        Reset Pola
-                                                    </button>
                                                 </div>
 
                                                 <div class="mt-6 flex justify-end space-x-2">
@@ -1493,29 +1469,6 @@
         </div>
     </div>
 <script>
-    function getCanvas(processId) {
-        let canvas = document.getElementById('sig-canvas-' + processId);
-        if (canvas) {
-            // Pastikan width/height sesuai ukuran CSS
-            if (canvas.width !== canvas.offsetWidth || canvas.height !== canvas.offsetHeight) {
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
-            }
-        }
-        return canvas;
-    }
-
-    function resetCanvas(processId) {
-        let canvas = getCanvas(processId);
-        if (canvas) {
-            let ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // benar-benar bersihin
-        }
-
-        // Kosongkan hidden input juga
-        let polaInput = document.getElementById('polaInput-' + processId);
-        if (polaInput) polaInput.value = '';
-    }
     window.requestAnimFrame = (function(){
         return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -1595,14 +1548,12 @@
         function saveCanvasAjax(id) {
             let canvas = document.getElementById(`sig-canvas-${id}`);
             let polaInput = document.getElementById(`polaInput-${id}`);
-            let pinInput = document.getElementById(`pinInput-${id}`);
+            let pinInput = document.querySelector(`[wire\\:model\\.defer="pin"]`); 
 
             if (canvas) {
                 let data = canvas.toDataURL();
                 polaInput.value = data;
             }
-
-            console.log('payload:', payload);
 
             let payload = {
                 pin: pinInput.value,
@@ -1634,6 +1585,16 @@
 </script>
 
 <script>
+    function resetCanvas() {
+        let canvas = document.querySelector(".sig-canvas");
+        let ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // kosongin hidden input juga
+        let polaInput = canvas.parentElement.querySelector(".polaInput");
+        polaInput.value = "";
+    }
+
     // Saat modal dibuka, isi canvas kalau ada pola lama
     document.addEventListener("open-pin-modal", (event) => {
         let pola = event.detail.pola;

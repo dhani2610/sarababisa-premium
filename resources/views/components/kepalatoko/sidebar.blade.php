@@ -140,11 +140,11 @@
                         </a>
                         <div class="lg:hidden lg:sidebar-expanded:block 2xl:block">
                             <ul class="pl-9 mt-1 @if(!in_array(Request::segment(1), ['produk'])){{ 'hidden' }}@endif" :class="open ? '!block' : 'hidden'">
-                                <li class="mb-1 last:mb-0">
+                                {{-- <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('kategori.index', 'kategori.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('kategori.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Kategori Produk</span>
                                     </a>
-                                </li>
+                                </li> --}}
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('sub-kategori.index', 'sub-kategori.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('sub-kategori.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Sub Kategori Produk</span>
@@ -158,6 +158,11 @@
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('item.index', 'item.edit', 'handphone.index', 'handphone.edit', 'sparepart.index', 'sparepart.edit', 'aksesoris.index', 'aksesoris.edit', 'tool.index', 'tool.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('item.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Item Produk</span>
+                                    </a>
+                                </li>
+                                <li class="mb-1 last:mb-0">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('top-produk-kepala-toko')){{ '!text-indigo-500' }}@endif" href="{{ route('top-produk-kepala-toko') }}">
+                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Top Produk</span>
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">

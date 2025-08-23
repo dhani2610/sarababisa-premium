@@ -28,6 +28,25 @@ class AdminProsesData extends Component
         $this->type = Type::pluck('id')->toArray();
     }
 
+    
+    public $service_id;
+    public $pin;
+    public $pola;
+
+    public function openPinModal($id)
+    {
+        $this->service_id = $id;
+        $service = ServiceTransaction::find($id);
+
+        $this->pin = $service->pin;
+        $this->pola = $service->pola;
+
+        // kirim event sesuai ID
+        $this->dispatchBrowserEvent('open-pin-modal-' . $id, [
+            'pola' => $this->pola,
+        ]);
+    }
+
     public $status = [
         'Belum cek',
         'Sedang Tes',

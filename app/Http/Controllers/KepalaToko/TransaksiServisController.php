@@ -43,6 +43,25 @@ class TransaksiServisController extends Controller
         ));
     }
 
+    public function updatePinPola(Request $request, $id)
+    {
+        $request->validate([
+            'pin' => 'nullable|string|max:10',
+            'pola' => 'nullable|string',
+        ]);
+
+        $service = ServiceTransaction::findOrFail($id);
+        $service->pin = $request->pin;
+        $service->pola = $request->pola;
+        $service->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'PIN & Pola berhasil disimpan.'
+        ]);
+    }
+
+
     public function deleteSelected(Request $request)
     {
         $selectedIds  = $request->input('selectedIds');

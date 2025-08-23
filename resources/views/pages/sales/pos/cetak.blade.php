@@ -97,6 +97,9 @@
                                             <th>Jumlah</th>
                                             <th>Harga</th>
                                             <th>Sub Total</th>
+                                            @if ($toko->is_tax === 1)
+                                                <th>PPN {{ $toko->ppn }}%</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -104,8 +107,7 @@
                                             @foreach ($order->detailOrders as $item)
                                                 <tr>
                                                     <td>
-                                                        {{ $item->product_name }} <br>
-                                                        {{ $item->product_code }}
+                                                        {{ $item->product_name }}
                                                     </td>
                                                     <td>
                                                         {{ $item->quantity }}
@@ -116,6 +118,9 @@
                                                     <td>
                                                         Rp. {{ number_format($item->sub_total) }}
                                                     </td>
+                                                    @if ($toko->is_tax === 1)
+                                                        <td>Rp. {{ number_format($item->ppn) }}</td>
+                                                    @endif
                                                 </tr>
                                             @endforeach
                                         @endif

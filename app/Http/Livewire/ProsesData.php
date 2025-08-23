@@ -13,6 +13,7 @@ use App\Models\ModelSerie;
 use Livewire\WithPagination;
 use App\Models\ServiceAction;
 use App\Models\ServiceTransaction;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class ProsesData extends Component
 {
@@ -39,6 +40,9 @@ class ProsesData extends Component
         'search' => ['except' => ''],
     ];
 
+    use LivewireAlert;
+
+
     public function updatedStatus($value, $index)
     {
         if (!$value) {
@@ -46,6 +50,23 @@ class ProsesData extends Component
         }
     }
 
+    public $service_id;
+    public $pin;
+    public $pola;
+
+    public function openPinModal($id)
+    {
+        $this->service_id = $id;
+        $service = ServiceTransaction::find($id);
+
+        $this->pin = $service->pin;
+        $this->pola = $service->pola;
+
+        // kirim event sesuai ID
+        $this->dispatchBrowserEvent('open-pin-modal-' . $id, [
+            'pola' => $this->pola,
+        ]);
+    }
     public function render()
     {
         $toko = User::find(1);

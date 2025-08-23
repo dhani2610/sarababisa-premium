@@ -192,6 +192,9 @@ class SalesIndex extends Component
                 $tempo = null;
             }
 
+            $toko = StoreSetting::find(1);
+            $cartTax = Cart::instance($this->cart_instance)->tax(); // Pajak dari Cart
+
             $sale = Order::create([
                 'order_date'          => \Carbon\Carbon::today()->locale('id')->translatedFormat('d F Y'),
                 'customers_id'         => $this->customer_id,
@@ -242,13 +245,14 @@ class SalesIndex extends Component
                     'product_name'                    => $cart_item->name,
                     'quantity'                => $cart_item->qty,
                     'price'                   => $cart_item->price,
-                    'total'               => $cart_item->options->sub_total,
-                    'sub_total'               => $cart_item->options->unit_price * $cart_item->qty,
+                    'ppn'      => $cartTax, // Pajak dari Cart
+                    'sub_total'               => $cart_item->price * $cart_item->qty,
+                    'total'               => $cart_item->options->sub_total + $cartTax,
                     'product_discount_amount' => $cart_item->options->product_discount,
                     'modal'               => $cart_item->options->modal * $cart_item->qty,
                     'profit'               => $cart_item->options->sub_total - ($cart_item->options->modal * $cart_item->qty),
                     'profit_toko'               => ($cart_item->options->sub_total - ($cart_item->options->modal * $cart_item->qty)) - ($cart_item->options->sub_total - ($cart_item->options->modal * $cart_item->qty)) / 100 * $persen_sales,
-                    'ppn'      => $cart_item->options->product_tax,
+                    // 'ppn'      => $cart_item->options->product_tax, // Hapus pajak produk
                     'garansi'      => $expired,
                     'garansi_imei'      => $expired_imei,
                     'payment_method'      => $this->payment_method,

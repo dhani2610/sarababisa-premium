@@ -67,7 +67,9 @@ class ServiceTransaction extends Model
         'products',
         'exp_garansi_j',
         'biaya_j',
-        "modal_j"
+        "modal_j",
+        "pin",
+        "pola",
     ];
 
     public function getActivitylogOptions(): LogOptions

@@ -27,6 +27,10 @@ class ProdukController extends Controller
     {
         return view('pages/kepalatoko/produk/index');
     }
+    public function indexTop()
+    {
+        return view('pages/kepalatoko/produk/top');
+    }
 
     public function deleteSelected(Request $request)
     {

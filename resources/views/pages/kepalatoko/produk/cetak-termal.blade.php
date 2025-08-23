@@ -26,6 +26,7 @@
         margin-top: 5px;
         width: 155px;
         max-width: 155px;
+        /* margin-left: 3px; */
       }
 
       td,

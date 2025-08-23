@@ -9,10 +9,12 @@ use Livewire\Component;
 use App\Models\Capacity;
 use App\Models\Category;
 use App\Models\ModelSerie;
+use App\Models\OrderDetail;
 use App\Models\SubCategory;
 use App\Models\StoreSetting;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class ProdukData extends Component
 {
@@ -33,6 +35,36 @@ class ProdukData extends Component
         $this->resetPage();
     }
 
+
+    use LivewireAlert;
+    public $barcode;
+    public $modalOpen = false;
+
+     public function updatedBarcode($value)
+    {
+        if ($value) {
+            $this->tambahStok($value);
+            $this->barcode = ''; // reset input supaya bisa scan lagi
+        }
+    }
+
+    public function tambahStok($barcode)
+    {
+        $product = Product::where('product_code', $barcode)->first();
+        if ($product) {
+            $product->stok += 1;
+            $product->save();
+
+            $this->alert('success', 'Berhasil tambah 1 stok produk '.$product->product_name);
+        } else {
+            $this->alert('error', 'Produk tidak ditemukan!');
+
+            $this->dispatchBrowserEvent('stok-updated', [
+                'message' => "Produk dengan barcode $barcode tidak ditemukan!"
+            ]);
+        }
+    }
+
     public function render()
     {
         $categories = Category::all();
@@ -51,9 +83,24 @@ class ProdukData extends Component
         $stokhabis = Product::where('stok', 0)->count();
         $nominalterjual = Product::where('stok', 0)->sum('harga_jual');
 
+       $topProducts = OrderDetail::select(
+            'order_details.products_id',
+            'products.product_name',
+            'products.harga_jual',
+            DB::raw('SUM(order_details.quantity) as total_terjual'),
+            DB::raw('SUM(order_details.quantity * products.harga_jual) as omzet')
+        )
+        ->join('products', 'products.id', '=', 'order_details.products_id')
+        ->groupBy('order_details.products_id', 'products.product_name', 'products.harga_jual')
+        ->orderByDesc('total_terjual')
+->limit('5')
+        
+        ->get();
+
 
         $productCategoty = Category::orderBy('created_at','asc')->get();
         return view('livewire.produk-data', [
+            'topProducts' => $topProducts,
             'brands' => $brands,
             'capacities' => $capacities,
             'model_series' => $model_series,

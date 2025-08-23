@@ -17,6 +17,41 @@
             <!-- Search form -->
             <x-search-form placeholder="Masukkan nama produk" />
 
+            <!-- Wrapper Alpine -->
+            <div x-data="{ modalTambahStok: false }">
+
+                <!-- Tombol Tambah Stok -->
+                <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white"
+                        @click="modalTambahStok = true"
+                        aria-controls="tambah-stok-modal">
+                    <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
+                        <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1-1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
+                    </svg>
+                    <span class="hidden xs:block ml-2">Tambah Stok</span>
+                </button>
+
+                <!-- Modal Tambah Stok -->
+                <div x-show="modalTambahStok"
+                    x-cloak
+                    class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+                        <h2 class="text-lg font-bold mb-4">Scan Barcode Produk</h2>
+                        <input type="text"
+                            wire:model="barcode"
+                            id="barcode_input"
+                            placeholder="Scan Barcode di sini..."
+                            autofocus
+                            class="form-input w-full rounded-md border-gray-300 shadow-sm
+                                focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                        <div class="flex justify-end mt-4">
+                            <button class="px-4 py-2 bg-gray-300 rounded-lg mr-2"
+                                    @click="modalTambahStok = false">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true" aria-controls="tambah-modal">
@@ -529,6 +564,27 @@
             </div>
         </div>
     @endif
+
+    <div class="bg-white shadow-lg rounded-lg mt-5 d-none" style="display:none!important">
+        <div class="px-5 py-4 border-b border-slate-200">
+            <h2 class="font-semibold text-slate-800">Top Produk Terlaris</h2>
+        </div>
+        <div class="divide-y divide-slate-200">
+            @php $rank = 1; @endphp
+            @foreach($topProducts as $itemtop)
+                <div class="flex justify-between items-center px-5 py-3">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg font-bold text-slate-500">{{ $rank++ }}.</span>
+                        <span class="font-medium text-slate-800">{{ $itemtop->product_name }}</span>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm">Terjual: <span class="font-semibold">{{ $itemtop->total_terjual }}</span></p>
+                        <p class="text-sm text-emerald-600">Rp {{ number_format($itemtop->omzet, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
 
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
         <div x-data="handleSelect">

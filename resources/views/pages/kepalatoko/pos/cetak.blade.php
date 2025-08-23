@@ -2,7 +2,7 @@
     Point of Sales (POS)
 @endsection
 
-<x-toko-layout>
+<x-admin-layout>
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
         <!-- Page header -->
         <div class="sm:flex sm:justify-between sm:items-center mb-3">
@@ -19,7 +19,7 @@
                 <livewire:search-product />
             </div>
             <div class="flex flex-col col-span-full sm:col-span-6">
-                <livewire:pos.index :cartInstance="'sale'" />
+                <livewire:pos.admin-index :cartInstance="'sale'" />
             </div>
         </div>
         <!-- Start -->
@@ -56,7 +56,7 @@
                     <div class="p-6">
                         <div class="relative">
                             <!-- Close button -->
-                            <a href="{{ route('pos') }}">
+                            <a href="{{ route('admin-pos') }}">
                                 <button class="absolute top-0 right-0 text-slate-400 hover:text-slate-500" @click="modalOpen = false">
                                     <div class="sr-only">Close</div>
                                     <svg class="w-4 h-4 fill-current">
@@ -97,6 +97,9 @@
                                             <th>Jumlah</th>
                                             <th>Harga</th>
                                             <th>Sub Total</th>
+                                            @if ($toko->is_tax === 1)
+                                                <th>PPN {{ $toko->ppn }}%</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -104,8 +107,7 @@
                                             @foreach ($order->detailOrders as $item)
                                                 <tr>
                                                     <td>
-                                                        {{ $item->product_name }} <br>
-                                                        {{ $item->product_code }}
+                                                        {{ $item->product_name }}
                                                     </td>
                                                     <td>
                                                         {{ $item->quantity }}
@@ -116,6 +118,9 @@
                                                     <td>
                                                         Rp. {{ number_format($item->sub_total) }}
                                                     </td>
+                                                    @if ($toko->is_tax === 1)
+                                                        <td>Rp. {{ number_format($item->ppn) }}</td>
+                                                    @endif
                                                 </tr>
                                             @endforeach
                                         @endif
@@ -148,7 +153,7 @@
                             <div class="text-center">
                                 <!-- CTAs -->
                                 <div class="flex justify-center space-x-2">
-                                    <a href="{{ route('cetak-termal', $order->id) }}" target="__blank">
+                                    <a href="{{ route('admin-cetak-termal-produk', $order->id) }}" target="__blank">
                                         <button class="btn-sm bg-orange-500 hover:bg-orange-600 text-white">
                                             <span class="mr-1">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -161,7 +166,7 @@
                                             Printer Termal
                                         </button>
                                     </a>
-                                    <a href="{{ route('lunas-cetak-inkjet', $order->id) }}" target="__blank">
+                                    <a href="{{ route('admin-lunas-cetak-inkjet', $order->id) }}" target="__blank">
                                         <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
                                             <span class="mr-1">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -172,24 +177,6 @@
                                                 </svg>
                                             </span>
                                             Printer Inkjet
-                                        </button>
-                                    </a>
-                                    @php
-                                        if ($order->customer != null) {
-                                            $nomor = $order->customer->nomor_hp;
-                                            $nomorwa = preg_replace('/^08/', 628, $nomor);
-                                        }
-                                    @endphp
-                                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Penjualan*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Nota%20:%20{{ $order->invoice_no }}%0ANama%20pelanggan%20:%20*{{ $order->nama_pelanggan }}*%0AProduk%20:%0A{{ $produkDetails }}%0APembayaran%20:%20{{ $order->payment_method }}%0A%0ALink%20garansi%20:%20{{ $toko->link_toko }}/garansi%0A%0ATerimakasih" target="__blank">
-                                        <button class="btn-sm bg-emerald-500 hover:bg-emerald-600 text-white">
-                                            <span class="mr-1">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
-                                                    <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1" />
-                                                </svg>
-                                            </span>
-                                            Kirim Nota
                                         </button>
                                     </a>
                                 </div>
@@ -227,4 +214,4 @@
             text-align: left;
         }
     </style>
-</x-toko-layout>
+</x-admin-layout>
