@@ -77,6 +77,13 @@ class AdminBisaDiambilData extends Component
         $processes_count = ServiceTransaction::whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
         $jumlah_bisa_diambil = ServiceTransaction::where('status_servis', 'Bisa Diambil')->count();
         $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->count();
+        $bisadiambil = ServiceTransaction::when($this->search, function ($q) {
+                $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('tindakan_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('nama_barang', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('imei', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil');
+            })->when($this->type, function ($q) {
+                $q->whereIn('types_id', $this->type);
+            })->when($this->kondisi, function ($q) {
+                $q->whereIn('kondisi_servis', $this->kondisi)->where('status_servis', 'Bisa Diambil');
+            })->orderBy('created_at','desc')->paginate($this->paginate);
         return view('livewire.admin-bisa-diambil-data', [
             'users' => $users,
             'toko' => $toko,
@@ -91,14 +98,7 @@ class AdminBisaDiambilData extends Component
             'processes_count' => $processes_count,
             'jumlah_sudah_diambil' => $jumlah_sudah_diambil,
             'jumlah_bisa_diambil' => $jumlah_bisa_diambil,
-            'bisadiambil' =>
-            ServiceTransaction::when($this->search, function ($q) {
-                $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('tindakan_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('nama_barang', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('imei', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil');
-            })->when($this->type, function ($q) {
-                $q->whereIn('types_id', $this->type);
-            })->when($this->kondisi, function ($q) {
-                $q->whereIn('kondisi_servis', $this->kondisi)->where('status_servis', 'Bisa Diambil');
-            })->paginate($this->paginate),
+            'bisadiambil' =>$bisadiambil,
         ]);
     }
 }

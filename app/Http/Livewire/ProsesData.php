@@ -89,6 +89,13 @@ class ProsesData extends Component
         $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->count();
         $jumlah_belum_disetujui = ServiceTransaction::where('status_servis', 'Sudah Diambil')->where('is_approve', '=', null)->count();
 
+        $process = ServiceTransaction::when($this->search, function ($q) {
+                $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('nama_barang', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('imei', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil']);
+            })->when($this->type, function ($q) {
+                $q->whereIn('types_id', $this->type);
+            })->when($this->status, function ($q) {
+                $q->whereIn('status_servis', $this->status);
+            })->orderBy('created_at','desc')->paginate($this->paginate);
         return view('livewire.proses-data', [
             'toko' => $toko,
             'users' => $users,
@@ -105,13 +112,7 @@ class ProsesData extends Component
             'jumlah_bisa_diambil' => $jumlah_bisa_diambil,
             'jumlah_sudah_diambil' => $jumlah_sudah_diambil,
             'jumlah_belum_disetujui' => $jumlah_belum_disetujui,
-            'processes' => ServiceTransaction::when($this->search, function ($q) {
-                $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('nama_barang', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('imei', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil']);
-            })->when($this->type, function ($q) {
-                $q->whereIn('types_id', $this->type);
-            })->when($this->status, function ($q) {
-                $q->whereIn('status_servis', $this->status);
-            })->paginate($this->paginate),
+            'processes' => $process,
         ]);
     }
 }
