@@ -323,7 +323,7 @@
 </x-admin-layout>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+{{-- 
 <script>
     $(document).ready(function () {
         // Ambil total dari input yang disabled (karena kamu format pakai number_format)
@@ -352,4 +352,52 @@
             updateSisa('#transfer', '#tunai');
         });
     });
+</script> --}}
+@php
+    $ppn = 0;
+    $cekPPN = \App\Models\StoreSetting::find(1);
+    if (!empty($cekPPN)) {
+        if ($cekPPN->is_tax == 1 && $cekPPN->ppn != 0) {
+            $ppn = $cekPPN->ppn;
+        } else {
+            $ppn = 0;
+        }
+    }
+@endphp
+
+<script>
+$(document).ready(function () {
+    // Ambil total dari input yang disabled
+    let totalBiaya = parseInt($('#total_biaya').val()) || 0;
+
+    // Tambahkan PPN kalau ada
+    let ppn = {{ $ppn }};
+    if (ppn !== 0) {
+        totalBiaya = totalBiaya + Math.round((totalBiaya * ppn) / 100);
+    }
+
+    function updateSisa(from, to) {
+        let diskon = parseInt($('#diskon').val()) || 0;
+        let fromVal = parseInt($(from).val()) || 0;
+
+        let finalvalTotal = totalBiaya - diskon;
+
+        if (fromVal > finalvalTotal) {
+            fromVal = finalvalTotal;
+            $(from).val(fromVal);
+        }
+
+        // Hitung sisa dan masukkan ke input lawan
+        $(to).val(finalvalTotal - fromVal);
+    }
+
+    $('#tunai').on('input', function () {
+        updateSisa('#tunai', '#transfer');
+    });
+
+    $('#transfer').on('input', function () {
+        updateSisa('#transfer', '#tunai');
+    });
+});
 </script>
+

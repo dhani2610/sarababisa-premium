@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\KepalaToko;
 
+use App\Models\StoreSetting;
 use Carbon\Carbon;
 use App\Models\Type;
 use App\Models\User;
@@ -126,6 +127,32 @@ class UbahSudahDiambilController extends Controller
             $persen_teknisi = null;
         }
 
+      
+        $ppn = 0;
+        $cekppn = StoreSetting::find(1);
+        if (!empty($cekppn) && $cekppn->is_tax == 1) {
+            $ppn = $cekppn->ppn;
+        }
+
+        // Hitung dasar (pakai diskon kalau ada)
+        if (!empty($request->diskon) && $request->diskon > 0) {
+            $baseBiaya = $request->biaya - $request->diskon;
+        } else {
+            $baseBiaya = $request->biaya;
+        }
+
+        // Hitung total dengan PPN
+        $biayaFinal = $baseBiaya;
+        if ($ppn > 0) {
+            $biayaFinal += ($baseBiaya * $ppn / 100);
+        }
+
+        // Default
+        $tunai = 0;
+        $transfer = 0;
+        $due = 0;
+        $pay = 0;
+
         if ($request->cara_pembayaran === 'Tunai & Transfer') {
             $due = 0;
             if ($request->tunai != 0) {
@@ -138,29 +165,22 @@ class UbahSudahDiambilController extends Controller
                 $transfer = $request->transfer;
             }
         }
-
+        
+        // Cara pembayaran
         if ($request->cara_pembayaran === 'Tunai') {
-            if (!empty($request->diskon) && $request->diskon > 0) {
-                $tunai = $request->biaya - $request->diskon;
-            }else{
-                $tunai = $request->biaya;
-            }
+            $tunai = $biayaFinal;
             $transfer = 0;
             $due = 0;
-            $pay = $request->biaya;
+            $pay = $biayaFinal;
         }
 
         if ($request->cara_pembayaran === 'Transfer') {
-            if (!empty($request->diskon) && $request->diskon > 0) {
-                $transfer = $request->biaya - $request->diskon;
-            }else{
-                $transfer = $request->biaya;
-            }
-
+            $transfer = $biayaFinal;
             $tunai = 0;
             $due = 0;
-            $pay = $request->biaya;
+            $pay = $biayaFinal;
         }
+
 
         if ($request->cara_pembayaran === 'Kredit') {
             $pay = $request->pay;
@@ -190,6 +210,15 @@ class UbahSudahDiambilController extends Controller
             $transfer = 0;
             $tempo = null;
         }
+        $ppn = 0;
+        $cekppn = StoreSetting::find(1);
+        if (!empty($cekppn)) {
+            if ($cekppn->is_tax == 1) {
+                $ppn = $cekppn->ppn;
+            }else{
+                $ppn = 0;
+            }
+        }
 
         // Transaction create
         $item->update([
@@ -217,6 +246,7 @@ class UbahSudahDiambilController extends Controller
             'tempo' => $tempo,
             'tunai' => $tunai,
             'transfer' => $transfer,
+            'ppn' => $ppn,
         ]);
 
         return redirect()->route('transaksi-servis-sudah-diambil.index');

@@ -170,9 +170,29 @@
                 <td id="data" class="capital">: {{ $items->kerusakan }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Masuk)</th>
                 <td id="data" class="capital">: {{ $items->qc_masuk }}</td>
-                <td id="data" scope="row" style="border-left-style: solid;">Total Biaya Servis</td>
-                <td id="data">: Rp. {{ number_format($items->biaya - $items->diskon) }}</td>
+                <td id="data" scope="row" style="border-left-style: solid;">
+                    Total Biaya Servis
+                    @if (!empty($items->ppn))
+                    <br>
+                    <br>
+                    PPN ({{ $items->ppn }}%)
+                    @php
+                        $subtotal = $items->biaya - $items->diskon;
+                        $ppnValue = ($subtotal * $items->ppn) / 100;
+                        $totalWithPpn = $subtotal + $ppnValue;
+                    @endphp
+                    @endif
+                </td>
+                <td id="data">: Rp. {{ number_format($items->biaya - $items->diskon) }}
+                    @if (!empty($items->ppn))
+                    <br>
+                    <br>
+                    : Rp. {{ number_format($totalWithPpn) }}
+                    @endif
+                </td>
+               
             </tr>
+          
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Kondisi Servis</th>
                 <td id="data" class="capital">: {{ $items->kondisi_servis }}</td>
@@ -255,7 +275,7 @@
                             - $items->diskon
                         ) }}
                     </td> --}}
-                    <td id="data">: Rp. 
+                    {{-- <td id="data">: Rp. 
                         {{ number_format(
                             max(0,
                                 $items->biaya 
@@ -263,8 +283,23 @@
                                 - ($items->kondisi_servis == 'Dibatalkan' ? 0 : $items->uang_muka)
                             )
                         ) }}
-                    </td>
+                    </td> --}}
+                    @php
+                        // Hitung total dasar
+                        $totalDasar = $items->biaya - $items->diskon;
+                        if ($items->kondisi_servis != 'Dibatalkan') {
+                            $totalDasar -= $items->uang_muka;
+                        }
 
+                        // Tambahkan PPN jika ada
+                        if (!empty($items->ppn) && $items->ppn != 0) {
+                            $totalDasar += ($items->biaya * $items->ppn / 100);
+                        }
+
+                        $totalAkhir = max(0, $totalDasar);
+                    @endphp
+
+                    <td id="data">: Rp. {{ number_format($totalAkhir) }}</td>
 
                     {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka - $items->diskon) }}
                     </td> --}}
@@ -308,7 +343,17 @@
                     <td id="data" scope="row" style="border-left-style: solid;"></td>
                     <td id="data"></td>
                     <td id="data" scope="row" style="border-left-style: solid;">Sisa Pembayaran</td>
-                    <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka) }}</td>
+                    {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka) }}</td> --}}
+                    @php
+                        $subtotal = $items->biaya - $items->uang_muka;
+
+                        if (!empty($items->ppn) && $items->ppn != 0) {
+                            $subtotal += ($subtotal * $items->ppn / 100);
+                        }
+                    @endphp
+
+                    <td id="data">: Rp. {{ number_format($subtotal) }}</td>
+                        
                 </tr>
             @elseif ($items->diskon != null && $items->uang_muka === null)
                 <tr style="border-right-style: solid;">
@@ -349,7 +394,18 @@
                     <td id="data" scope="row" style="border-left-style: solid;"></td>
                     <td id="data"></td>
                     <td id="data" scope="row" style="border-left-style: solid;">Sisa Pembayaran</td>
-                    <td id="data">: Rp. {{ number_format($items->biaya - $items->diskon) }}</td>
+                    {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->diskon) }}</td> --}}
+                    @php
+                        $subtotal = $items->biaya - $items->diskon;
+
+                        // Kalau ada PPN, tambahkan
+                        if (!empty($items->ppn) && $items->ppn != 0) {
+                            $subtotal += ($subtotal * $items->ppn / 100);
+                        }
+                    @endphp
+
+                    <td id="data">: Rp. {{ number_format($subtotal) }}</td>
+
                 </tr>
             @elseif ($items->diskon === null && $items->uang_muka === null)
                 <tr style="border-right-style: solid; border-bottom-style: solid;">

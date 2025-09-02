@@ -1434,7 +1434,74 @@ $(document).ready(function () {
     });
 
 </script>
+
+@php
+    $ppn = 0;
+    $cekPPN = \App\Models\StoreSetting::find(1);
+    if (!empty($cekPPN)) {
+        if ($cekPPN->is_tax == 1 && $cekPPN->ppn != 0) {
+            $ppn = $cekPPN->ppn;
+        }
+    }
+@endphp
+
 <script>
+    // Ambil nilai ppn dari PHP
+    let ppn = {{ $ppn }};
+
+    function getTotal() {
+        let biaya = parseInt($('#biaya').val()) || 0;
+        let diskon = parseInt($('#diskon').val()) || 0;
+
+        // Hitung subtotal
+        let subtotal = Math.max(biaya - diskon, 0);
+
+        // Tambah PPN kalau ada
+        if (ppn > 0) {
+            subtotal += Math.round(subtotal * ppn / 100);
+        }
+
+        return subtotal;
+    }
+
+    $(document).ready(function () {
+        // Kalau user ubah tunai
+        $('#tunai').on('input', function () {
+            if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
+                let total = getTotal();
+                let tunai = parseInt($(this).val()) || 0;
+                let transfer = total - tunai;
+                $('#transfer').val(transfer >= 0 ? transfer : 0);
+            }
+        });
+
+        // Kalau user ubah transfer
+        $('#transfer').on('input', function () {
+            if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
+                let total = getTotal();
+                let transfer = parseInt($(this).val()) || 0;
+                let tunai = total - transfer;
+                $('#tunai').val(tunai >= 0 ? tunai : 0);
+            }
+        });
+
+        // Kalau biaya atau diskon berubah, reset ulang input tunai & transfer
+        $('#biaya, #diskon').on('input', function () {
+            $('#tunai').trigger('input');
+        });
+
+        // Saat cara pembayaran diganti
+        $('#cara_pembayaran').on('change', function () {
+            if ($(this).val() === 'Tunai & Transfer') {
+                $('#tunai').trigger('input');
+            } else {
+                $('#tunai, #transfer').val(0);
+            }
+        });
+    });
+</script>
+
+{{-- <script>
     function getTotal() {
         let biaya = parseInt($('#biaya').val()) || 0;
         let diskon = parseInt($('#diskon').val()) || 0;
@@ -1476,5 +1543,5 @@ $(document).ready(function () {
             }
         });
     });
-</script>
+</script> --}}
 

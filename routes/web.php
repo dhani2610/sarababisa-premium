@@ -345,9 +345,11 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::get('transaksi-produk-termal/{orders_id}', [KepalaTokoTransaksiProdukController::class, 'cetaktermal'])->name('cetak-termal');
 
     Route::get('laporan/laporan-servis', [KepalaTokoLaporanServisController::class, 'index'])->name('laporan-servis');
+    Route::get('laporan/laporan-pajak-servis', [KepalaTokoLaporanServisController::class, 'indexPajak'])->name('laporan-pajak-servis');
     Route::get('cetak-laporan-proses', [KepalaTokoTransaksiServisController::class, 'cetak'])->name('cetak-laporan-proses');
     Route::get('cetak-laporan-bisa-diambil', [KepalaTokoBisaDiambilController::class, 'cetak'])->name('cetak-laporan-bisa-diambil');
     Route::get('cetak-laporan-servis', [KepalaTokoLaporanServisController::class, 'cetak'])->name('cetak-laporan-servis');
+    Route::get('cetak-laporan-pajak-servis', [KepalaTokoLaporanServisController::class, 'cetakPajak'])->name('cetak-laporan-pajak-servis');
     Route::get('cetak-laporan-teknisi', [KepalaTokoLaporanTeknisiController::class, 'cetak'])->name('cetak-laporan-teknisi');
     Route::get('cetak-laporan-pengeluaran', [KepalaTokoExpenseController::class, 'cetak'])->name('cetak-laporan-pengeluaran');
     Route::get('laporan/laporan-teknisi', [KepalaTokoLaporanTeknisiController::class, 'index'])->name('laporan-teknisi');
