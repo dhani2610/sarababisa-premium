@@ -258,7 +258,7 @@ class SudahDiambilController extends Controller
         $namaPelanggan = $items->customer->nama;
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
-        return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
+        // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
             'users' => $users,
             'items' => $items,
             'terms' => $terms,
