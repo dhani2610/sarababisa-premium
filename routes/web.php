@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\KepalaToko\ProdukController;
+use App\Http\Controllers\PortalController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\DefaultController;
@@ -161,7 +162,8 @@ use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as Kep
 |
 */
 
-Route::redirect('/', 'login');
+Route::get('/', [PortalController::class, 'index'])->name('portal');
+Route::get('/detail-produk/{id}', [PortalController::class, 'index'])->name('portal.detail-produk');
 Route::get('/pembayaran', [PaymentController::class, 'index'])->name('payment');
 Route::get('/hak-akses', [HakAksesController::class, 'index'])->name('hak-akses');
 Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
