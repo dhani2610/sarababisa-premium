@@ -66,6 +66,7 @@ class LaporanServisController extends Controller
             ->whereYear('tgl_disetujui', $currentYear)
             ->whereMonth('tgl_disetujui', $currentMonth)
             ->whereDate('tgl_disetujui', today())
+            ->where('ppn','>',0)
             ->get()
             ->sum('omzet');
         $pajakhari = ServiceTransaction::with('serviceaction')
@@ -83,6 +84,7 @@ class LaporanServisController extends Controller
             ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', $currentYear)
             ->whereMonth('tgl_disetujui', $currentMonth)
+            ->where('ppn','>',0)
             ->get()
             ->sum('omzet');
         $pajakbulan = ServiceTransaction::with('serviceaction')
@@ -98,6 +100,7 @@ class LaporanServisController extends Controller
         $omzettahun = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', $currentYear)
+            ->where('ppn','>',0)
             ->get()
             ->sum('omzet');
         $pajaktahun = ServiceTransaction::with('serviceaction')
