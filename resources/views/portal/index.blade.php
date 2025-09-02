@@ -72,11 +72,14 @@
 
     <!-- Gallery Showcase Section -->
     <section id="gallery-showcase" class="gallery-showcase section">
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="container section-title" data-aos="fade-up">
+            <span class="description-title">Gallery</span>
+            <h2>Gallery</h2>
+        </div><!-- End Section Title -->
 
-        <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-            <div class="gallery-carousel swiper init-swiper" data-aos="fade-up" data-aos-delay="200">
-                <script type="application/json" class="swiper-config">
+        <div class="gallery-carousel swiper init-swiper" data-aos="fade-up" data-aos-delay="200">
+            <script type="application/json" class="swiper-config">
             {
               "loop": true,
               "speed": 600,
@@ -87,110 +90,36 @@
               "spaceBetween": 20,
               "centeredSlides": true,
               "breakpoints": {
-                "576": {
-                  "slidesPerView": 2,
-                  "centeredSlides": false
-                },
-                "768": {
-                  "slidesPerView": 3,
-                  "centeredSlides": false
-                },
-                "992": {
-                  "slidesPerView": 4,
-                  "centeredSlides": false
-                },
-                "1200": {
-                  "slidesPerView": 5,
-                  "centeredSlides": false
-                }
+                "576": { "slidesPerView": 2, "centeredSlides": false },
+                "768": { "slidesPerView": 3, "centeredSlides": false },
+                "992": { "slidesPerView": 4, "centeredSlides": false },
+                "1200": { "slidesPerView": 5, "centeredSlides": false }
               }
             }
-          </script>
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide">
-                        <div class="gallery-item">
-                            <img src="portal/assets/img/hotel/gallery-1.webp" alt="Luxurious Suite" class="img-fluid"
-                                loading="lazy">
-                            <a href="assets/img/hotel/gallery-1.webp" class="gallery-overlay glightbox">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="gallery-item">
-                            <img src="portal/assets/img/hotel/gallery-5.webp" alt="Modern Lobby" class="img-fluid"
-                                loading="lazy">
-                            <a href="assets/img/hotel/gallery-5.webp" class="gallery-overlay glightbox">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="gallery-item">
-                            <img src="portal/assets/img/hotel/gallery-12.webp" alt="Elegant Dining Area" class="img-fluid"
-                                loading="lazy">
-                            <a href="assets/img/hotel/gallery-12.webp" class="gallery-overlay glightbox">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="gallery-item">
-                            <img src="portal/assets/img/hotel/gallery-8.webp" alt="Grand Ballroom Setup" class="img-fluid"
-                                loading="lazy">
-                            <a href="assets/img/hotel/gallery-8.webp" class="gallery-overlay glightbox">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="gallery-item">
-                            <img src="portal/assets/img/hotel/gallery-15.webp" alt="Relaxing Poolside" class="img-fluid"
-                                loading="lazy">
-                            <a href="assets/img/hotel/gallery-15.webp" class="gallery-overlay glightbox">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="gallery-item">
-                            <img src="portal/assets/img/hotel/gallery-3.webp" alt="Cozy Guest Room" class="img-fluid"
-                                loading="lazy">
-                            <a href="assets/img/hotel/gallery-3.webp" class="gallery-overlay glightbox">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="gallery-item">
-                            <img src="portal/assets/img/hotel/gallery-18.webp" alt="Spa and Wellness Center"
-                                class="img-fluid" loading="lazy">
-                            <a href="assets/img/hotel/gallery-18.webp" class="gallery-overlay glightbox">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="gallery-item">
-                            <img src="portal/assets/img/hotel/gallery-7.webp" alt="Conference Facilities"
-                                class="img-fluid" loading="lazy">
-                            <a href="assets/img/hotel/gallery-7.webp" class="gallery-overlay glightbox">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </script>
 
-            <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="300">
-                <a href="gallery.html" class="btn btn-gallery">
-                    <i class="bi bi-collection me-2"></i>Lihat Semua Gallery
-                </a>
+            <div class="swiper-wrapper">
+                @foreach ($galleries as $item)
+                    <div class="swiper-slide">
+                        <div class="gallery-item">
+                            <img src="{{ asset('storage/' . $item->foto) }}"
+                                 alt="{{ $item->title }}"
+                                 class="img-fluid"
+                                 loading="lazy">
+                            <a href="{{ asset('storage/' . $item->foto) }}"
+                               class="gallery-overlay glightbox"
+                               data-gallery="gallery-showcase">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
             </div>
-
         </div>
 
-    </section><!-- /Gallery Showcase Section -->
+    </div>
+</section>
+
 
     <section id="rooms-2" class="rooms-2 section">
         <div class="container section-title" data-aos="fade-up">

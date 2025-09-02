@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\Gallery;
 use App\Models\Product;
 use App\Models\StoreSetting;
 use Illuminate\Http\Request;
@@ -25,6 +26,8 @@ class PortalController extends Controller
 
         $data['toko_setting'] = StoreSetting::find(1);
         $data['pelanggan'] = Customer::count();
+        $data['galleries'] = Gallery::orderBy('created_at', 'desc')->get(); // pagination
+        // dd($data['gallery']);
 
         return view('portal.index', $data);
     }
