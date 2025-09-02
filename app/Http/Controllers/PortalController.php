@@ -21,6 +21,7 @@ class PortalController extends Controller
         }
 
         $data['products'] = $query->paginate(6); // pagination
+        $data['total_products'] = Product::orderBy('created_at', 'desc')->get(); // pagination
 
         $data['toko_setting'] = StoreSetting::find(1);
         $data['pelanggan'] = Customer::count();

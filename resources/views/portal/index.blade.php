@@ -46,7 +46,7 @@
 
             <div class="hero-stats" data-aos="fade-up">
                 <div class="row text-center">
-                    <div class="col-md-3 col-6">
+                    <div class="col-md-6 col-6">
                         <div class="stat-item">
                             <span class="stat-number purecounter" data-purecounter-start="0"
                                 data-purecounter-end="{{ $pelanggan }}"
@@ -54,11 +54,11 @@
                             <span class="stat-label">Pelanggan</span>
                         </div>
                     </div>
-                    <div class="col-md-3 col-6">
+                    <div class="col-md-6 col-6">
                         <div class="stat-item">
                             <span class="stat-number purecounter" data-purecounter-start="0"
-                                data-purecounter-end="{{ count($products) }}"
-                                data-purecounter-duration="1">{{ count($products) }}</span>
+                                data-purecounter-end="{{ count($total_products) }}"
+                                data-purecounter-duration="1">{{ count($total_products) }}</span>
                             <span class="stat-label">Produk</span>
                         </div>
                     </div>
@@ -196,7 +196,6 @@
         <div class="container section-title" data-aos="fade-up">
             <span class="description-title">Produk</span>
             <h2>Produk</h2>
-            <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
         </div><!-- End Section Title -->
 
         <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -204,7 +203,7 @@
             <div class="room-filters" data-aos="fade-up" data-aos-delay="200">
                 <form method="GET" action="{{ route('portal') }}">
                     <div class="row g-3 align-items-center">
-                        <div class="col-lg-3 col-md-6">
+                        <div class="col-lg-12 col-md-12">
                             <label class="form-label">Category</label>
                             <select class="form-select" name="category" onchange="this.form.submit()">
                                 <option value="">Semua Category</option>
