@@ -375,7 +375,7 @@ class LaporanPenjualanController extends Controller
             ->whereDate('created_at', '<=', $end_date)
             ->sum('due');
 
-        $pdf = Pdf::loadView('pages.kepalatoko.cetak-laporan-penjualan', [
+        $pdf = Pdf::loadView('pages.kepalatoko.cetak-laporan-penjualan-pajak', [
         // return View('pages.kepalatoko.cetak-laporan-penjualan-pajak', [
             'users' => $users,
             'imagePath' => $imagePath,
