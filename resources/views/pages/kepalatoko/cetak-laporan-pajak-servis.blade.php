@@ -104,6 +104,8 @@
             <tr>
                 <th>Total Pajak</th>
                 <th>: Rp. {{ number_format($pajak) }}</th>
+                <th></th>
+				<th></th>
             </tr>
         </tbody>
     </table>
