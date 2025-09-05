@@ -448,15 +448,14 @@ class LaporanServisController extends Controller
         ->where('is_approve', 'Setuju')
         ->whereDate('tgl_ambil', '>=', $start_date)
         ->whereDate('tgl_ambil', '<=', $end_date)
-        ->whereDate('tgl_disetujui', today())
         ->get()
         ->sum(function ($trx) {
             $ppn = !empty($trx->ppn) ? $trx->ppn : 0;
             return $trx->biaya * $ppn / 100; // hanya ambil nilai PPN
         });
-            // return response()->json($services);
-        $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-pajak-servis', [
-        // return view('pages.kepalatoko.cetak-laporan-pajak-servis', [
+            // return response()->json([$services,$pajak]);
+        // $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-pajak-servis', [
+        return view('pages.kepalatoko.cetak-laporan-pajak-servis', [
             'users' => $users,
             'imagePath' => $imagePath,
             'services' => $services,
