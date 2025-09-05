@@ -10,7 +10,7 @@
 
             <nav id="navmenu" class="navmenu">
                 <ul>
-                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="{{ url('/') }}" class="active">Home</a></li>
                     <li>
                         <a href="https://wa.me/{{ $toko_setting->nomor_hp_toko }}" target="_blank">
                             Contact

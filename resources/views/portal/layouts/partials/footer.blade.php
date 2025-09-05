@@ -16,8 +16,8 @@
           <div class="col-lg-6 col-md-6 footer-links">
             <h4>Useful Links</h4>
             <ul>
-              <li><a href="#">Home</a></li>
-              <li><a href="">Contact</a></li>
+              <li><a href="{{ url('/') }}">Home</a></li>
+              <li><a href="https://wa.me/{{ $toko_setting->nomor_hp_toko }}">Contact</a></li>
             </ul>
           </div>
         </div>
