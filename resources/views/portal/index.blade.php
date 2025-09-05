@@ -13,7 +13,7 @@
                         <h1>{{ $toko_setting->nama_toko }}</h1>
                         <p class="lead">{{ $toko_setting->deskripsi_toko }} </p>
                         <div class="hero-buttons">
-                            <a href="wa.me/{{ $toko_setting->nomor_hp_toko }}" class="btn btn-primary">Hubungi Kami</a>
+                            <a href="https://wa.me/{{ $toko_setting->nomor_hp_toko }}" class="btn btn-primary">Hubungi Kami</a>
                         </div>
                     </div>
                 </div>
@@ -33,9 +33,9 @@
                                 <p>
                                     Layanan perbaikan cepat dan bergaransi, serta sparepart original untuk berbagai merek.
                                 </p>
-                                <div class="guest-info">
+                                {{-- <div class="guest-info">
                                     <span>Mulai dari Rp 150.000</span>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
 
@@ -183,7 +183,7 @@
                                                 Rp {{ number_format($product->harga_jual, 0, ',', '.') }}
                                             </span>
                                         </div>
-                                        <a href="wa.me/{{ $toko_setting->nomor_hp_toko }}" class="btn-room-details">Pesan Sekarang</a>
+                                        <a href="https://wa.me/{{ $toko_setting->nomor_hp_toko }}" class="btn-room-details">Pesan Sekarang</a>
                                     </div>
                                 </div>
                             </div>
