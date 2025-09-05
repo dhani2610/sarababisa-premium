@@ -454,8 +454,8 @@ class LaporanServisController extends Controller
             return $trx->biaya * $ppn / 100; // hanya ambil nilai PPN
         });
             // return response()->json([$services,$pajak]);
-        // $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-pajak-servis', [
-        return view('pages.kepalatoko.cetak-laporan-pajak-servis', [
+        $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-pajak-servis', [
+        // return view('pages.kepalatoko.cetak-laporan-pajak-servis', [
             'users' => $users,
             'imagePath' => $imagePath,
             'services' => $services,
