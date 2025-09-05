@@ -16,6 +16,8 @@
                             Contact
                         </a>
                     </li>
+                    <li><a href="{{ url('/login') }}" class="active">Login</a></li>
+
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
