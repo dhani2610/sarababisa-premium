@@ -181,10 +181,16 @@
                         $ppnValue = ($subtotal * $items->ppn) / 100;
                         $totalWithPpn = $subtotal + $ppnValue;
                     @endphp
+                    <br>
+                    <br>
+                    Total 
                     @endif
                 </td>
                 <td id="data">: Rp. {{ number_format($items->biaya - $items->diskon) }}
                     @if (!empty($items->ppn))
+                    <br>
+                    <br>
+                    : Rp. {{ number_format($ppnValue) }}
                     <br>
                     <br>
                     : Rp. {{ number_format($totalWithPpn) }}
