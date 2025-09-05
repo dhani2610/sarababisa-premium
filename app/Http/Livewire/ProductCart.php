@@ -44,6 +44,9 @@ class ProductCart extends Component
         $this->cart_instance = $cartInstance;
         $this->discount_type = [];
         $this->item_discount = [];
+        $this->global_tax = optional(StoreSetting::find(1))->is_tax
+        ? StoreSetting::find(1)->ppn
+        : 0;
 
         if ($data) {
             $this->data = $data;
@@ -95,6 +98,7 @@ class ProductCart extends Component
 
     public function calculate($product): array
     {
+        $this->updatedGlobalTax();
         return $this->calculatePrices($product);
     }
 
