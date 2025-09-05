@@ -199,6 +199,7 @@ class LaporanPenjualanController extends Controller
 
         $rumusomzettahun = Order::whereHas('detailOrders', function ($query) {
             $query->where('is_approve', 'Setuju')
+                ->where('ppn', '!=','0')
                 ->whereYear('tgl_disetujui', now()->year);
         })
             ->with(['detailOrders' => function ($query) {
