@@ -13,7 +13,8 @@
                         <h1>{{ $kepala_toko_setting->nama_toko }}</h1>
                         <p class="lead">{{ $kepala_toko_setting->deskripsi_toko }} </p>
                         <div class="hero-buttons">
-                            <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" class="btn btn-primary">Hubungi Kami</a>
+                            <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}"
+                                class="btn btn-primary">Hubungi Kami</a>
                         </div>
                     </div>
                 </div>
@@ -57,8 +58,8 @@
                     <div class="col-md-6 col-6">
                         <div class="stat-item">
                             <span class="stat-number purecounter" data-purecounter-start="0"
-                                data-purecounter-end="{{ count($total_products) }}"
-                                data-purecounter-duration="1">{{ count($total_products) }}</span>
+                                data-purecounter-end="{{ $total_products }}"
+                                data-purecounter-duration="1">{{ $total_products }}</span>
                             <span class="stat-label">Produk</span>
                         </div>
                     </div>
@@ -72,14 +73,14 @@
 
     <!-- Gallery Showcase Section -->
     <section id="gallery-showcase" class="gallery-showcase section">
-    <div class="container" data-aos="fade-up" data-aos-delay="100">
-        <div class="container section-title" data-aos="fade-up">
-            <span class="description-title">Gallery</span>
-            <h2>Gallery</h2>
-        </div><!-- End Section Title -->
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="container section-title" data-aos="fade-up">
+                <span class="description-title">Gallery</span>
+                <h2>Gallery</h2>
+            </div><!-- End Section Title -->
 
-        <div class="gallery-carousel swiper init-swiper" data-aos="fade-up" data-aos-delay="200">
-            <script type="application/json" class="swiper-config">
+            <div class="gallery-carousel swiper init-swiper" data-aos="fade-up" data-aos-delay="200">
+                <script type="application/json" class="swiper-config">
             {
               "loop": true,
               "speed": 600,
@@ -98,27 +99,24 @@
             }
             </script>
 
-            <div class="swiper-wrapper">
-                @foreach ($galleries as $item)
-                    <div class="swiper-slide">
-                        <div class="gallery-item">
-                            <img src="{{ asset('storage/' . $item->foto) }}"
-                                 alt="{{ $item->title }}"
-                                 class="img-fluid"
-                                 loading="lazy">
-                            <a href="{{ asset('storage/' . $item->foto) }}"
-                               class="gallery-overlay glightbox"
-                               data-gallery="gallery-showcase">
-                                <i class="bi bi-eye"></i>
-                            </a>
+                <div class="swiper-wrapper">
+                    @foreach ($galleries as $item)
+                        <div class="swiper-slide">
+                            <div class="gallery-item">
+                                <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->title }}" class="img-fluid"
+                                    loading="lazy">
+                                <a href="{{ asset('storage/' . $item->foto) }}" class="gallery-overlay glightbox"
+                                    data-gallery="gallery-showcase">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
-        </div>
 
-    </div>
-</section>
+        </div>
+    </section>
 
 
     <section id="rooms-2" class="rooms-2 section">
@@ -131,8 +129,9 @@
 
             <div class="room-filters" data-aos="fade-up" data-aos-delay="200">
                 <form method="GET" action="{{ route('portal') }}">
-                    <div class="row g-3 align-items-center">
-                        <div class="col-lg-12 col-md-12">
+                    <div class="row g-3 align-items-end">
+                        {{-- Category --}}
+                        <div class="col-lg-4 col-md-6">
                             <label class="form-label">Category</label>
                             <select class="form-select" name="category" onchange="this.form.submit()">
                                 <option value="">Semua Category</option>
@@ -144,9 +143,35 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        {{-- Search --}}
+                        <div class="col-lg-4 col-md-6">
+                            <label class="form-label">Search Produk</label>
+                            <input type="text" name="search" class="form-control" value="{{ request('search') }}"
+                                placeholder="Cari nama produk...">
+                        </div>
+
+                        {{-- Show per page --}}
+                        <div class="col-lg-2 col-md-6">
+                            <label class="form-label">Show</label>
+                            <select class="form-select" name="show" onchange="this.form.submit()">
+                                @foreach ([10, 20, 50, 100] as $limit)
+                                    <option value="{{ $limit }}"
+                                        {{ request('show', 10) == $limit ? 'selected' : '' }}>
+                                        {{ $limit }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Tombol submit (kalau mau manual search) --}}
+                        <div class="col-lg-2 col-md-6">
+                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                        </div>
                     </div>
                 </form>
             </div>
+
 
             <div class="rooms-grid" data-aos="fade-up" data-aos-delay="300">
                 <div class="row g-4">
@@ -161,7 +186,8 @@
                                     <div class="room-header">
                                         <h3>
                                             @if ($product->categories_id == 1)
-                                                {{ $product->product_name }} {{ $product->kondisi }} {{ $product->warna }} {{ $product->ram }} / @if ($product->capacity != null)
+                                                {{ $product->product_name }} {{ $product->kondisi }}
+                                                {{ $product->warna }} {{ $product->ram }} / @if ($product->capacity != null)
                                                     {{ $product->capacity->name }}
                                                 @else
                                                     -
@@ -183,7 +209,8 @@
                                                 Rp {{ number_format($product->harga_jual, 0, ',', '.') }}
                                             </span>
                                         </div>
-                                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" class="btn-room-details">Pesan Sekarang</a>
+                                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}"
+                                            class="btn-room-details">Pesan Sekarang</a>
                                     </div>
                                 </div>
                             </div>
