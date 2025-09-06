@@ -14,9 +14,9 @@ class PortalController extends Controller
 {
     public function index(Request $request)
     {
-        $data['productCategory'] = Category::orderBy('created_at', 'asc')->get();
+        $data['productCategory'] = Category::where('show_portal',1)->orderBy('created_at', 'asc')->get();
 
-        $query = Product::orderBy('created_at', 'desc');
+        $query = Product::whereIn('categories_id',$data['productCategory']->pluck('id'))->orderBy('created_at', 'desc');
 
         if ($request->has('category') && $request->category != '') {
             $query->where('categories_id', $request->category);

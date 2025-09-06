@@ -26,6 +26,7 @@ class KategoriController extends Controller
 
         Category::create([
             'category_name' => $request->category_name,
+            'show_portal' => $request->show_portal,
         ]);
 
         return redirect()->route('kategori.index')->with('success', 'Kategori berhasil ditambahkan.');
@@ -40,6 +41,7 @@ class KategoriController extends Controller
         $category = Category::findOrFail($id);
         $category->update([
             'category_name' => $request->category_name,
+            'show_portal' => $request->show_portal,
         ]);
 
         return redirect()->route('kategori.index')->with('success', 'Kategori berhasil diperbarui.');
