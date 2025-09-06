@@ -9,7 +9,7 @@
             </a>
             <div class="footer-contact pt-3">
               <p>{{ $kepala_toko_setting->alamat_toko }}</p>
-              <p><strong>Telepon:</strong> <span>{{ $kepala_toko_setting->nomor_hp_toko }}</span></p>
+              <p><strong>Telepon:</strong> <span style="color: white!important">{{ $kepala_toko_setting->nomor_hp_toko }}</span></p>
             </div>
           </div>
 
