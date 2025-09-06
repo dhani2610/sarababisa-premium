@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('foto_portal')->nullable();
+            $table->string('color_portal')->nullable();
         });
     }
 
@@ -27,6 +28,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('foto_portal');
+            $table->dropColumn('color_portal');
         });
     }
 };

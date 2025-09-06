@@ -51,6 +51,7 @@ class User extends Authenticatable
         'phones',   
         'banks',     
         'foto_portal',     
+        'color_portal',     
     ];
 
     /**

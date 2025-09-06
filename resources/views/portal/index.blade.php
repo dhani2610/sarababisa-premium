@@ -2,6 +2,7 @@
 
 @section('content')
     <!-- Hotel Hero Section -->
+   
     <section id="hotel-hero" class="hotel-hero section">
 
         <div class="container" data-aos="fade-up" data-aos-delay="100">

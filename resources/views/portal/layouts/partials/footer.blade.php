@@ -1,6 +1,6 @@
-<footer id="footer" class="footer position-relative dark-background">
+<footer id="footer" class="footer main-layout-setting position-relative dark-background">
 
-    <div class="footer-top">
+    <div class="footer-top main-layout-setting">
       <div class="container">
         <div class="row gy-4">
           <div class="col-lg-6 col-md-6 footer-about">
@@ -31,8 +31,8 @@
           <div>
             © Copyright <strong><span>Sarababisa</span></strong>. All Rights Reserved
           </div>
-          <div class="credits">
-            Designed by <a href="https://saraba-bisa.com">Sarababisa.com</a>
+          <div class="credits" style="color:white!important">
+            Designed by <a href="https://saraba-bisa.com" style="color:white!important">Sarababisa.com</a>
           </div>
         </div>
 

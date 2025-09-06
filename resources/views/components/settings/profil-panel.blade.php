@@ -27,6 +27,12 @@
                     <input type="file" name="foto_portal" id="foto_portal" accept="image/*"
                         class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
                 </div>
+
+                <div class="sm:w-1/2">
+                    <label class="block text-sm font-medium mb-1" for="owner">Warna Portal</label>
+                    <input name="color_portal" id="color_portal" class="form-input w-full" type="color"
+                        value="{{ Auth::user()->color_portal }}" />
+                </div>
             </section>
 
             <!-- Business Profile -->

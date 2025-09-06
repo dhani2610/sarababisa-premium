@@ -1,4 +1,4 @@
-<header id="header" class="header sticky-top">
+<header id="header" class="header sticky-top main-layout-setting">
     <div class="branding d-flex align-items-cente">
 
         <div class="container position-relative d-flex align-items-center justify-content-between">
@@ -12,7 +12,7 @@
                 <ul>
                     <li><a href="{{ url('/') }}" class="active">Home</a></li>
                     <li>
-                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" target="_blank">
+                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" class="active" target="_blank">
                             Contact
                         </a>
                     </li>
