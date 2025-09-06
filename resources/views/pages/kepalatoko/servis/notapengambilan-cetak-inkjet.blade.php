@@ -234,7 +234,12 @@
                             @foreach (json_decode($items->tindakan_servis) as $key => $tindakan)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">{{ $tindakan }}
-                                        (<strong>{{ Carbon\Carbon::make(json_decode($items->exp_garansi_j)[$key])->format('Y-m-d') ? 'Garansi ' . Carbon\Carbon::make(json_decode($items->exp_garansi_j)[$key])->format('Y-m-d') : 'Garansi tidak ada' }}</strong>)
+                                        {{-- (<strong>{{ Carbon\Carbon::make(json_decode($items->exp_garansi_j)[$key])->format('Y-m-d') ? 'Garansi ' . Carbon\Carbon::make(json_decode($items->exp_garansi_j)[$key])->format('Y-m-d') : 'Garansi tidak ada' }}</strong>) --}}
+                                         @if (!empty($garansi) && isset($garansi[$key]) && !empty($garansi[$key]))
+                                            Garansi {{ \Carbon\Carbon::make($garansi[$key])->format('Y-m-d') }}
+                                        @else
+                                            Garansi tidak ada
+                                        @endif
                                     </li>
                                 </ul>
                             @endforeach
