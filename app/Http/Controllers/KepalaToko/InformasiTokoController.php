@@ -35,6 +35,18 @@ class InformasiTokoController extends Controller
 
             $data['profile_photo_path'] = $request->file('profile_photo_path')->store('assets/user', 'public');
         }
+        if ($request->hasFile('foto_portal')) {
+            $validator = Validator::make($request->all(), [
+                'foto_portal' => 'file|mimes:jpeg,jpg,png',
+            ]);
+
+            if ($validator->fails()) {
+                toast('Gambar Logo harus menggunakan format PNG atau JPG.', 'error');
+                return redirect()->back();
+            }
+
+            $data['foto_portal'] = $request->file('foto_portal')->store('assets/user', 'public');
+        }
 
         // ✅ Filter phones yang tidak kosong
         $filteredPhones = collect($request->phones ?? [])->filter(function ($item) {

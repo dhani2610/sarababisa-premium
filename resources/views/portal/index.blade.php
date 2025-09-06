@@ -22,7 +22,11 @@
                 <div class="col-lg-6" data-aos="fade-left" data-aos-delay="300">
                     <div class="hero-images">
                         <div class="main-image">
-                            <img src="{{ asset('images/bg-auth.jpg') }}" alt="Luxury Hotel" class="img-fluid">
+                            @if (empty($kepala_toko_setting->foto_portal))
+                            <img src="{{ asset('images/bg-auth.jpg') }}" alt="Portal foto" class="img-fluid">
+                            @else
+                            <img src="{{  Storage::url($kepala_toko_setting->foto_portal) }}" alt="Portal foto" class="img-fluid">
+                            @endif
                         </div>
                         <div class="floating-card" data-aos="zoom-in" data-aos-delay="400">
                             <div class="card-content">
