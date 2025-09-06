@@ -10,10 +10,10 @@
 
                 <div class="col-lg-6" data-aos="fade-right" data-aos-delay="200">
                     <div class="hero-content">
-                        <h1>{{ $toko_setting->nama_toko }}</h1>
-                        <p class="lead">{{ $toko_setting->deskripsi_toko }} </p>
+                        <h1>{{ $kepala_toko_setting->nama_toko }}</h1>
+                        <p class="lead">{{ $kepala_toko_setting->deskripsi_toko }} </p>
                         <div class="hero-buttons">
-                            <a href="https://wa.me/{{ $toko_setting->nomor_hp_toko }}" class="btn btn-primary">Hubungi Kami</a>
+                            <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" class="btn btn-primary">Hubungi Kami</a>
                         </div>
                     </div>
                 </div>
@@ -183,7 +183,7 @@
                                                 Rp {{ number_format($product->harga_jual, 0, ',', '.') }}
                                             </span>
                                         </div>
-                                        <a href="https://wa.me/{{ $toko_setting->nomor_hp_toko }}" class="btn-room-details">Pesan Sekarang</a>
+                                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" class="btn-room-details">Pesan Sekarang</a>
                                     </div>
                                 </div>
                             </div>

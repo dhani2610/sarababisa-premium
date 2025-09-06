@@ -5,11 +5,11 @@
         <div class="row gy-4">
           <div class="col-lg-6 col-md-6 footer-about">
             <a href="index.html" class="logo d-flex align-items-center">
-              <span class="sitename">{{ $toko_setting->nama_toko }}</span>
+              <span class="sitename">{{ $kepala_toko_setting->nama_toko }}</span>
             </a>
             <div class="footer-contact pt-3">
-              <p>{{ $toko_setting->alamat_toko }}</p>
-              <p><strong>Telepon:</strong> <span>{{ $toko_setting->nomor_hp_toko }}</span></p>
+              <p>{{ $kepala_toko_setting->alamat_toko }}</p>
+              <p><strong>Telepon:</strong> <span>{{ $kepala_toko_setting->nomor_hp_toko }}</span></p>
             </div>
           </div>
 
@@ -17,7 +17,7 @@
             <h4>Useful Links</h4>
             <ul>
               <li><a href="{{ url('/') }}">Home</a></li>
-              <li><a href="https://wa.me/{{ $toko_setting->nomor_hp_toko }}">Contact</a></li>
+              <li><a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}">Contact</a></li>
             </ul>
           </div>
         </div>

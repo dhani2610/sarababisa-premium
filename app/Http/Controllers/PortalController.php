@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Gallery;
 use App\Models\Product;
 use App\Models\StoreSetting;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PortalController extends Controller
@@ -25,6 +26,7 @@ class PortalController extends Controller
         $data['total_products'] = Product::orderBy('created_at', 'desc')->get(); // pagination
 
         $data['toko_setting'] = StoreSetting::find(1);
+        $data['kepala_toko_setting'] = User::find(1);
         $data['pelanggan'] = Customer::count();
         $data['galleries'] = Gallery::orderBy('created_at', 'desc')->get(); // pagination
         // dd($data['gallery']);

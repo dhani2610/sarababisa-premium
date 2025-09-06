@@ -5,14 +5,14 @@
             <a href="{{ url('/') }}" class="logo d-flex align-items-center">
                 <!-- Uncomment the line below if you also wish to use an image logo -->
                 {{-- <img src="portal/assets/img/logo.webp" alt=""> --}}
-                <h1 class="sitename">{{ $toko_setting->nama_toko }}</h1>
+                <h1 class="sitename">{{ $kepala_toko_setting->nama_toko }}</h1>
             </a>
 
             <nav id="navmenu" class="navmenu">
                 <ul>
                     <li><a href="{{ url('/') }}" class="active">Home</a></li>
                     <li>
-                        <a href="https://wa.me/{{ $toko_setting->nomor_hp_toko }}" target="_blank">
+                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" target="_blank">
                             Contact
                         </a>
                     </li>
