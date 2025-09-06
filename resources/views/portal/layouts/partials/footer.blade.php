@@ -32,7 +32,7 @@
             © Copyright <strong><span>Sarababisa</span></strong>. All Rights Reserved
           </div>
           <div class="credits" style="color:white!important">
-            Designed by <a href="https://saraba-bisa.com" style="color:white!important">Sarababisa.com</a>
+            Designed by <a href="https://saraba-bisa.com" style="color:white!important">saraba-bisa.com</a>
           </div>
         </div>
 
