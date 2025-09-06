@@ -155,9 +155,9 @@
                         <div class="col-lg-2 col-md-6">
                             <label class="form-label">Show</label>
                             <select class="form-select" name="show" onchange="this.form.submit()">
-                                @foreach ([10, 20, 50, 100] as $limit)
+                                @foreach ([3, 5, 10, 20] as $limit)
                                     <option value="{{ $limit }}"
-                                        {{ request('show', 10) == $limit ? 'selected' : '' }}>
+                                        {{ request('show', 3) == $limit ? 'selected' : '' }}>
                                         {{ $limit }}
                                     </option>
                                 @endforeach

@@ -31,8 +31,8 @@ class PortalController extends Controller
             $query->where('product_name', 'LIKE', '%' . $request->search . '%');
         }
 
-        // Pilihan Show (default 10)
-        $perPage = $request->input('show', 10);
+        // Pilihan Show (default 3)
+        $perPage = $request->input('show', 3);
         $data['products'] = $query->paginate($perPage)->appends($request->all());
 
         $data['total_products'] = Product::count();
