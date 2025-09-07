@@ -70,6 +70,7 @@ class ServiceTransaction extends Model
         "modal_j",
         "pin",
         "pola",
+        "ppn",
     ];
 
     public function getActivitylogOptions(): LogOptions

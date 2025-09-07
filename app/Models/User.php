@@ -49,7 +49,9 @@ class User extends Authenticatable
         'workers_id',
         'exp_date',
         'phones',   
-        'banks'     
+        'banks',     
+        'foto_portal',     
+        'color_portal',     
     ];
 
     /**

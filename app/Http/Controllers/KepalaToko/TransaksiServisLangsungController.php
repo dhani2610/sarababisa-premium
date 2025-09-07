@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\KepalaToko;
 
+use App\Models\StoreSetting;
 use Carbon\Carbon;
 use App\Models\Type;
 use App\Models\User;
@@ -86,6 +87,31 @@ class TransaksiServisLangsungController extends Controller
         $bagihasil = ($biaya - $modalSparepart - $request->diskon) / 100;
 
 
+        $ppn = 0;
+        $cekppn = StoreSetting::find(1);
+        if (!empty($cekppn) && $cekppn->is_tax == 1) {
+            $ppn = $cekppn->ppn;
+        }
+
+        // Hitung dasar (pakai diskon kalau ada)
+        if (!empty($request->diskon) && $request->diskon > 0) {
+            $baseBiaya = $request->biaya - $request->diskon;
+        } else {
+            $baseBiaya = $request->biaya;
+        }
+
+        // Hitung total dengan PPN
+        $biayaFinal = $baseBiaya;
+        if ($ppn > 0) {
+            $biayaFinal += ($baseBiaya * $ppn / 100);
+        }
+
+        // Default
+        $tunai = 0;
+        $transfer = 0;
+        $due = 0;
+        $pay = 0;
+
         if ($request->cara_pembayaran === 'Tunai & Transfer') {
             $due = 0;
             if ($request->tunai != 0) {
@@ -98,28 +124,20 @@ class TransaksiServisLangsungController extends Controller
                 $transfer = $request->transfer;
             }
         }
-
+        
+        // Cara pembayaran
         if ($request->cara_pembayaran === 'Tunai') {
-            if (!empty($request->diskon) && $request->diskon > 0) {
-                $tunai = $request->biaya - $request->diskon;
-            }else{
-                $tunai = $request->biaya;
-            }
+            $tunai = $biayaFinal;
             $transfer = 0;
             $due = 0;
-            $pay = $request->biaya;
+            $pay = $biayaFinal;
         }
 
         if ($request->cara_pembayaran === 'Transfer') {
-            if (!empty($request->diskon) && $request->diskon > 0) {
-                $transfer = $request->biaya - $request->diskon;
-            }else{
-                $transfer = $request->biaya;
-            }
-
+            $transfer = $biayaFinal;
             $tunai = 0;
             $due = 0;
-            $pay = $request->biaya;
+            $pay = $biayaFinal;
         }
 
         if ($request->cara_pembayaran === 'Kredit') {
@@ -160,8 +178,15 @@ class TransaksiServisLangsungController extends Controller
             $finalModal = $modalSparepart;
         }
         // dd($profittransaksi,$request->all()); 
-
-
+        $ppn = 0;
+        $cekppn = StoreSetting::find(1);
+        if (!empty($cekppn)) {
+            if ($cekppn->is_tax == 1) {
+                $ppn = $cekppn->ppn;
+            }else{
+                $ppn = 0;
+            }
+        }
         // Transaction create
         ServiceTransaction::create([
             'nomor_servis' => $nomor_servis,
@@ -207,6 +232,7 @@ class TransaksiServisLangsungController extends Controller
             'tempo' => $tempo,
             'tunai' => $tunai,
             'transfer' => $transfer,
+            'ppn' => $ppn ?? 0,
             'service_actions' => json_encode($request->service_actions_id),
             'products' => json_encode($request->products_id),
             'biaya_j' => json_encode($request->biaya_servis),
