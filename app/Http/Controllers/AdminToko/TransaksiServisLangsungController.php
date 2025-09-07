@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Models\ServiceAction;
 use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
+use App\Models\StoreSetting;
 use Illuminate\Support\Facades\Auth;
 
 class TransaksiServisLangsungController extends Controller
@@ -85,6 +86,67 @@ class TransaksiServisLangsungController extends Controller
         $profittransaksi = $biaya - $modalSparepart - $request->diskon;
         $bagihasil = ($biaya - $modalSparepart - $request->diskon) / 100;
 
+
+         
+        // $ppn = 0;
+        // $cekppn = StoreSetting::find(1);
+        // if (!empty($cekppn)) {
+        //     if ($cekppn->is_tax == 1) {
+        //         $ppn = $cekppn->ppn;
+        //     }else{
+        //         $ppn = 0;
+        //     }
+        // }
+        
+        // if ($request->cara_pembayaran === 'Tunai') {
+        //     if (!empty($request->diskon) && $request->diskon > 0) {
+        //         $tunai = $request->biaya - $request->diskon;
+        //     }else{
+        //         $tunai = $request->biaya;
+        //     }
+        //     $transfer = 0;
+        //     $due = 0;
+        //     $pay = $request->biaya;
+        // }
+
+       
+        // if ($request->cara_pembayaran === 'Transfer') {
+        //     if (!empty($request->diskon) && $request->diskon > 0) {
+        //         $transfer = $request->biaya - $request->diskon;
+        //     }else{
+        //         $transfer = $request->biaya;
+        //     }
+
+        //     $tunai = 0;
+        //     $due = 0;
+        //     $pay = $request->biaya;
+        // }
+
+        $ppn = 0;
+        $cekppn = StoreSetting::find(1);
+        if (!empty($cekppn) && $cekppn->is_tax == 1) {
+            $ppn = $cekppn->ppn;
+        }
+
+        // Hitung dasar (pakai diskon kalau ada)
+        if (!empty($request->diskon) && $request->diskon > 0) {
+            $baseBiaya = $request->biaya - $request->diskon;
+        } else {
+            $baseBiaya = $request->biaya;
+        }
+
+        // Hitung total dengan PPN
+        $biayaFinal = $baseBiaya;
+        if ($ppn > 0) {
+            $biayaFinal += ($baseBiaya * $ppn / 100);
+        }
+
+        // Default
+        $tunai = 0;
+        $transfer = 0;
+        $due = 0;
+        $pay = 0;
+
         if ($request->cara_pembayaran === 'Tunai & Transfer') {
             $due = 0;
             if ($request->tunai != 0) {
@@ -98,27 +160,20 @@ class TransaksiServisLangsungController extends Controller
             }
         }
 
+
+        // Cara pembayaran
         if ($request->cara_pembayaran === 'Tunai') {
-            if (!empty($request->diskon) && $request->diskon > 0) {
-                $tunai = $request->biaya - $request->diskon;
-            }else{
-                $tunai = $request->biaya;
-            }
+            $tunai = $biayaFinal;
             $transfer = 0;
             $due = 0;
-            $pay = $request->biaya;
+            $pay = $biayaFinal;
         }
 
         if ($request->cara_pembayaran === 'Transfer') {
-            if (!empty($request->diskon) && $request->diskon > 0) {
-                $transfer = $request->biaya - $request->diskon;
-            }else{
-                $transfer = $request->biaya;
-            }
-
+            $transfer = $biayaFinal;
             $tunai = 0;
             $due = 0;
-            $pay = $request->biaya;
+            $pay = $biayaFinal;
         }
 
         if ($request->cara_pembayaran === 'Kredit') {
@@ -132,6 +187,8 @@ class TransaksiServisLangsungController extends Controller
                 $tunai = 0;
             }
         }
+
+
 
         $waktu = Carbon::today();
         if ($request->tempo != null) {
@@ -205,6 +262,7 @@ class TransaksiServisLangsungController extends Controller
             'tempo' => $tempo,
             'tunai' => $tunai,
             'transfer' => $transfer,
+            'ppn' => $ppn,
             'service_actions' => json_encode($request->service_actions_id),
             'products' => json_encode($request->products_id),
             'biaya_j' => json_encode($request->biaya_servis),

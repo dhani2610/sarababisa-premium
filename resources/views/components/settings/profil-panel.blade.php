@@ -17,6 +17,23 @@
                         class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
                 </div>
             </section>
+            <section>
+                <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Foto Portal</h3>
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <img class="w-20 h-20 " src="{{ Storage::url(Auth::user()->foto_portal) }}"
+                            width="80" height="80" alt="Logo Toko" />
+                    </div>
+                    <input type="file" name="foto_portal" id="foto_portal" accept="image/*"
+                        class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
+                </div>
+
+                <div class="sm:w-1/2">
+                    <label class="block text-sm font-medium mb-1" for="owner">Warna Portal</label>
+                    <input name="color_portal" id="color_portal" class="form-input w-full" type="color"
+                        value="{{ Auth::user()->color_portal }}" />
+                </div>
+            </section>
 
             <!-- Business Profile -->
             <section>

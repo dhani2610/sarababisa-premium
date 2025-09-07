@@ -2,20 +2,19 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Product;
-use Livewire\Component;
-use App\Models\Category;
 use App\Models\StoreSetting;
-use Livewire\WithPagination;
+use Livewire\Component;
 
 class ToggleTax extends Component
 {
     public $taxApplied = false;
+    public $ppn; 
 
     public function mount()
     {
-        $storeSettings = StoreSetting::find(1); // Ganti 1 dengan ID yang sesuai
+        $storeSettings = StoreSetting::find(1); 
         $this->taxApplied = $storeSettings->is_tax;
+        $this->ppn = $storeSettings->ppn; // ambil dari kolom ppn
     }
 
     public function render()
@@ -25,9 +24,17 @@ class ToggleTax extends Component
 
     public function updatedTaxApplied()
     {
-        $storeSettings = StoreSetting::find(1); // Ganti 1 dengan ID yang sesuai
+        $storeSettings = StoreSetting::find(1); 
         $storeSettings->update([
             'is_tax' => $this->taxApplied,
+        ]);
+    }
+
+    public function updatedPpn()
+    {
+        $storeSettings = StoreSetting::find(1);
+        $storeSettings->update([
+            'ppn' => $this->ppn, // simpan ke kolom ppn
         ]);
     }
 }

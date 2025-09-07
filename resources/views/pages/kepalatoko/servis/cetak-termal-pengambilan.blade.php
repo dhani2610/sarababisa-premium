@@ -191,14 +191,37 @@
                     <td class="title">Biaya Servis</td>
                     <td class="value">: Rp. {{ number_format($items->biaya) }}</td>
                 </tr>
+                @php
+                    $dibayarkan = $items->biaya - $items->diskon;
+                    $ppn = 0;
+
+                    if (!empty($items->ppn) && $items->ppn != 0) {
+                        $ppn = ($dibayarkan * $items->ppn / 100);
+                    }
+
+                    $totalDenganPPN = $dibayarkan + $ppn;
+                @endphp
                 @if ($items->diskon != null)
                     <tr>
                         <td class="title">Diskon</td>
                         <td class="value">: Rp. {{ number_format($items->diskon) }}</td>
                     </tr>
+                    @if ($ppn == 0)
                     <tr>
                         <td class="title">Dibayarkan</td>
                         <td class="value">: Rp. {{ number_format($items->biaya - $items->diskon) }}</td>
+                    </tr>
+                    @endif
+                @endif
+               
+                @if ($ppn > 0)
+                    <tr>
+                        <td class="title">PPN ({{ $items->ppn }}%)</td>
+                        <td class="value">: Rp. {{ number_format($ppn) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="title">Dibayarkan</td>
+                        <td class="value">: Rp. {{ number_format($totalDenganPPN) }}</td>
                     </tr>
                 @endif
                 <tr>

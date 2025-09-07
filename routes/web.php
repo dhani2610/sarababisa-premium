@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\KepalaToko\ProdukController;
+use App\Http\Controllers\PortalController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\DefaultController;
@@ -145,6 +146,7 @@ use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiController as KepalaToko
 use App\Http\Controllers\AdminToko\UbahStatusProsesServisController as AdminTokoUbahStatusProsesServisController;
 use App\Http\Controllers\KepalaToko\TargetBulanSebelumnyaController as KepalaTokoTargetBulanSebelumnyaController;
 use App\Http\Controllers\AdminToko\TransaksiServisLangsungController as AdminTokoTransaksiServisLangsungController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\KepalaToko\UbahStatusProsesServisController as KepalaTokoUbahStatusProsesServisController;
 use App\Http\Controllers\KepalaToko\TransaksiServisLangsungController as KepalaTokoTransaksiServisLangsungController;
 use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTransaksiServisLangsungController;
@@ -161,7 +163,8 @@ use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as Kep
 |
 */
 
-Route::redirect('/', 'login');
+Route::get('/', [PortalController::class, 'index'])->name('portal');
+Route::get('/detail-produk/{id}', [PortalController::class, 'index'])->name('portal.detail-produk');
 Route::get('/pembayaran', [PaymentController::class, 'index'])->name('payment');
 Route::get('/hak-akses', [HakAksesController::class, 'index'])->name('hak-akses');
 Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
@@ -268,6 +271,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
 
     Route::resource('master/master-jenis-barang', KepalaTokoMasterJenisBarangController::class);
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
+    Route::resource('master/master-gallery', GalleryController::class);
     Route::resource('master/master-merek', KepalaTokoMasterMerekController::class);
     Route::resource('master/master-kapasitas', KepalaTokoMasterKapasitasController::class);
     Route::resource('master/master-model-seri', KepalaTokoMasterModelSeriController::class);
@@ -345,14 +349,18 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::get('transaksi-produk-termal/{orders_id}', [KepalaTokoTransaksiProdukController::class, 'cetaktermal'])->name('cetak-termal');
 
     Route::get('laporan/laporan-servis', [KepalaTokoLaporanServisController::class, 'index'])->name('laporan-servis');
+    Route::get('laporan/laporan-pajak-servis', [KepalaTokoLaporanServisController::class, 'indexPajak'])->name('laporan-pajak-servis');
     Route::get('cetak-laporan-proses', [KepalaTokoTransaksiServisController::class, 'cetak'])->name('cetak-laporan-proses');
     Route::get('cetak-laporan-bisa-diambil', [KepalaTokoBisaDiambilController::class, 'cetak'])->name('cetak-laporan-bisa-diambil');
     Route::get('cetak-laporan-servis', [KepalaTokoLaporanServisController::class, 'cetak'])->name('cetak-laporan-servis');
+    Route::get('cetak-laporan-pajak-servis', [KepalaTokoLaporanServisController::class, 'cetakPajak'])->name('cetak-laporan-pajak-servis');
     Route::get('cetak-laporan-teknisi', [KepalaTokoLaporanTeknisiController::class, 'cetak'])->name('cetak-laporan-teknisi');
     Route::get('cetak-laporan-pengeluaran', [KepalaTokoExpenseController::class, 'cetak'])->name('cetak-laporan-pengeluaran');
     Route::get('laporan/laporan-teknisi', [KepalaTokoLaporanTeknisiController::class, 'index'])->name('laporan-teknisi');
     Route::get('laporan/laporan-penjualan', [KepalaTokoLaporanPenjualanController::class, 'index'])->name('laporan-penjualan');
+    Route::get('laporan/laporan-pajak-penjualan', [KepalaTokoLaporanPenjualanController::class, 'indexPajak'])->name('laporan-pajak-penjualan');
     Route::get('cetak-laporan-penjualan', [KepalaTokoLaporanPenjualanController::class, 'cetak'])->name('cetak-laporan-penjualan');
+    Route::get('cetak-laporan-pajak-penjualan', [KepalaTokoLaporanPenjualanController::class, 'cetakPajak'])->name('cetak-laporan-pajak-penjualan');
     Route::get('cetak-laporan-sales', [KepalaTokoLaporanSalesController::class, 'cetak'])->name('cetak-laporan-sales');
     Route::get('laporan/laporan-sales', [KepalaTokoLaporanSalesController::class, 'index'])->name('laporan-sales');
     Route::get('laporan/laporan-admin', [KepalaTokoLaporanAdminController::class, 'index'])->name('laporan-admin');

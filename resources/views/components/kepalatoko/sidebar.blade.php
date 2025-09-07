@@ -140,11 +140,11 @@
                         </a>
                         <div class="lg:hidden lg:sidebar-expanded:block 2xl:block">
                             <ul class="pl-9 mt-1 @if(!in_array(Request::segment(1), ['produk'])){{ 'hidden' }}@endif" :class="open ? '!block' : 'hidden'">
-                                {{-- <li class="mb-1 last:mb-0">
+                                <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('kategori.index', 'kategori.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('kategori.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Kategori Produk</span>
                                     </a>
-                                </li> --}}
+                                </li>
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('sub-kategori.index', 'sub-kategori.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('sub-kategori.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Sub Kategori Produk</span>
@@ -231,6 +231,11 @@
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Warna</span>
                                     </a>
                                 </li>
+                                <li class="mb-1 last:mb-0">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-gallery.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-gallery.index') }}">
+                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Gallery</span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </li>
@@ -262,6 +267,11 @@
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('laporan-pajak-servis')){{ '!text-indigo-500' }}@endif" href="{{ route('laporan-pajak-servis') }}">
+                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Laporan Pajak Servis</span>
+                                    </a>
+                                </li>
+                                <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('laporan-teknisi')){{ '!text-indigo-500' }}@endif" href="{{ route('laporan-teknisi') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Laporan Teknisi</span>
                                     </a>
@@ -269,6 +279,11 @@
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('laporan-penjualan')){{ '!text-indigo-500' }}@endif" href="{{ route('laporan-penjualan') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Laporan Penjualan</span>
+                                    </a>
+                                </li>
+                                <li class="mb-1 last:mb-0">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('laporan-pajak-penjualan')){{ '!text-indigo-500' }}@endif" href="{{ route('laporan-pajak-penjualan') }}">
+                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Laporan Pajak Penjualan</span>
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">

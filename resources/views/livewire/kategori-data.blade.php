@@ -24,6 +24,11 @@
                             <label class="block text-sm font-medium mb-1" for="category_name">Nama Kategori</label>
                             <input type="text" name="category_name" id="category_name" class="form-input w-full"
                                 required>
+                            <label class="block text-sm font-medium mb-1" for="show_portal">Show Portal</label>
+                            <select name="show_portal" id="" class="form-input w-full">
+                                <option value="1">Active</option>
+                                <option value="0">Non Active</option>
+                            </select>
                         </div>
                         <div class="px-5 py-4 border-t flex justify-end gap-2">
                             <button type="button" class="btn-sm border" @click="modalOpen = false">Batal</button>
@@ -84,6 +89,9 @@
                             <div class="font-semibold text-left">Nama Kategori</div>
                         </th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            <div class="font-semibold text-left">Show Portal</div>
+                        </th>
+                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Aksi</div>
                         </th>
                     </tr>
@@ -101,6 +109,9 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ $item->category_name }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-medium">{{ $item->show_portal == 1 ? 'Active' : 'Non Active' }}</div>
                             </td>
                             <td class="px-2 py-3">
                                 <div class="flex space-x-2">
@@ -123,8 +134,7 @@
                                             x-show="modalOpen" x-cloak>
                                             <div class="bg-white rounded shadow-lg w-full max-w-md"
                                                 @click.outside="modalOpen = false">
-                                                <form method="POST"
-                                                    action="{{ route('kategori.update', $item->id) }}">
+                                                <form method="POST" action="{{ route('kategori.update', $item->id) }}">
                                                     @csrf
                                                     @method('PUT')
                                                     <div class="px-5 py-4 border-b">
@@ -138,6 +148,14 @@
                                                             id="edit_category_{{ $item->id }}"
                                                             value="{{ $item->category_name }}" class="form-input w-full"
                                                             required>
+
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="show_portal">Show Portal</label>
+                                                        <select name="show_portal" id=""
+                                                            class="form-input w-full">
+                                                            <option value="1"{{ $item->category_name == 1 ? 'selected' : '' }} >Active</option>
+                                                            <option value="0"{{ $item->category_name == 0 ? 'selected' : '' }} >Non Active</option>
+                                                        </select>
                                                     </div>
                                                     <div class="px-5 py-4 border-t flex justify-end gap-2">
                                                         <button type="button" class="btn-sm border"
@@ -209,8 +227,7 @@
                                                             <button
                                                                 class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600"
                                                                 @click="modalOpen = false">Batal</button>
-                                                            <form
-                                                                action="{{ route('kategori.destroy', $item->id) }}"
+                                                            <form action="{{ route('kategori.destroy', $item->id) }}"
                                                                 method="post">
                                                                 @method('delete')
                                                                 @csrf
