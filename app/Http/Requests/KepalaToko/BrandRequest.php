@@ -24,7 +24,19 @@ class BrandRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'max:100|required|unique:brands,name',
+            'name' => [
+                'required',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    $existing = \App\Models\Brand::withTrashed()
+                        ->where('name', $value)
+                        ->first();
+
+                    if ($existing && $existing->deleted_at === null) {
+                        $fail('Mohon maaf, merek dengan nama ini sudah tersedia.');
+                    }
+                }
+            ],
         ];
     }
 

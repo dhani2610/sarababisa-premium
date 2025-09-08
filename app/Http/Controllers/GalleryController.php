@@ -15,19 +15,33 @@ class GalleryController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'foto'  => 'required|image|mimes:png,jpg,jpeg,webp|max:1024',
+        ], [
+            'title.required' => 'Judul wajib diisi.',
+            'title.string'   => 'Judul harus berupa teks.',
+            'title.max'      => 'Judul maksimal 255 karakter.',
+            'foto.required'  => 'Foto produk wajib diunggah.',
+            'foto.image'     => 'File yang diunggah harus berupa gambar.',
+            'foto.mimes'     => 'Format foto harus PNG, JPG, JPEG, atau WEBP.',
+            'foto.max'       => 'Ukuran foto maksimal 1 MB.',
+        ]);
+
         try {
             $path = $request->file('foto')->store('galleries', 'public');
-    
+
             Gallery::create([
                 'title' => $request->title,
-                'foto' => $path,
+                'foto'  => $path,
             ]);
-    
+
             return redirect()->route('master-gallery.index')->with('success', 'Foto berhasil ditambahkan');
         } catch (\Throwable $th) {
             return redirect()->route('master-gallery.index')->with('failed', 'Foto gagal ditambahkan');
         }
     }
+
 
     public function destroy($id)
     {

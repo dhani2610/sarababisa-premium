@@ -24,12 +24,23 @@ class ModelSerieRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'max:100|required|unique:model_series,name',
-            'brands_id' => [
-                'exists:brands,id'
+            'name' => [
+                'required',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    $existing = \App\Models\ModelSerie::withTrashed()
+                        ->where('name', $value)
+                        ->first();
+
+                    if ($existing && $existing->deleted_at === null) {
+                        $fail('Mohon maaf, inputan tidak dapat diproses karena model seri dengan nama ini sudah tersedia.');
+                    }
+                }
             ],
+            'brands_id' => 'exists:brands,id',
         ];
     }
+
 
     public function messages()
     {

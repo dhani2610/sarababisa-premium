@@ -498,8 +498,6 @@ Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(fun
     Route::post('produk/admin-complete-order', [AdminTokoPosController::class, 'CompleteOrder']);
     Route::get('produk/admin-pos/{id}', [AdminTokoPosController::class, 'show'])->name('admin-show-print-order');
 
-    Route::get('admin-transaksi-produk-inkjet/{orders_id}', [AdminTokoTransaksiProdukController::class, 'cetakinkjet'])->name('admin-lunas-cetak-inkjet');
-    Route::get('admin-transaksi-produk-termal/{orders_id}', [AdminTokoTransaksiProdukController::class, 'cetaktermal'])->name('admin-cetak-termal-produk');
 
     Route::post('/admin-import-produk', [AdminTokoProdukController::class, 'import'])->name('admin-import-produk');
     Route::get('admin-export-produk', [AdminTokoProdukController::class, 'export'])->name('admin-produk-export');
@@ -571,6 +569,10 @@ Route::middleware(['ensureSalesRole:Sales', 'checkSubscription'])->group(
         Route::resource('sales-kasbon', SalesKasbonController::class);
     }
 );
+
+Route::get('admin-transaksi-produk-inkjet/{orders_id}', [AdminTokoTransaksiProdukController::class, 'cetakinkjet'])->name('admin-lunas-cetak-inkjet');
+Route::get('admin-transaksi-produk-termal/{orders_id}', [AdminTokoTransaksiProdukController::class, 'cetaktermal'])->name('admin-cetak-termal-produk');
+
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/old-dashboard', [DashboardController::class, 'index'])->name('dashboard');

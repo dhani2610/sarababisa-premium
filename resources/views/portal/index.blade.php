@@ -184,8 +184,13 @@
                         <div class="col-xl-4 col-lg-6">
                             <div class="room-card">
                                 <div class="room-image">
+                                    @if (!empty($product->foto))
+                                    <img src="{{ Storage::url($product->foto) }}"
+                                    alt="{{ $product->product_name }}" class="img-fluid">
+                                    @else
                                     <img src="{{ asset('images/logo-saraba-bisa.png') }}"
                                         alt="{{ $product->product_name }}" class="img-fluid">
+                                    @endif
                                 </div>
                                 <div class="room-content">
                                     <div class="room-header">

@@ -13,6 +13,44 @@
             <!-- Search form -->
             <x-search-form placeholder="Masukkan nama produk" />
 
+             <!-- Modal Upload Foto -->
+            <div 
+                    x-data="{ open: @entangle('showFotoModal') }" 
+                    x-show="open" 
+                    x-cloak
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+
+                <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Upload Foto Produk</h2>
+
+                    <!-- Preview -->
+                    @if ($fotoProduk)
+                        <img src="{{ $fotoProduk->temporaryUrl() }}" 
+                            class="w-32 h-32 object-cover rounded-lg mx-auto mb-3 border">
+                    @elseif ($produkId && \App\Models\Product::find($produkId)?->foto)
+                        <img src="{{ Storage::url(\App\Models\Product::find($produkId)->foto) }}" 
+                            class="w-32 h-32 object-cover rounded-lg mx-auto mb-3 border">
+                    @endif
+                    <input type="file" wire:model="fotoProduk" accept=".png,.jpg,.jpeg,.webp"
+                        class="block w-full text-sm text-gray-500
+                            file:mr-4 file:py-2 file:px-4
+                            file:rounded-md file:border-0
+                            file:text-sm file:font-semibold
+                            file:bg-blue-50 file:text-blue-700
+                            hover:file:bg-blue-100" />
+
+                    @error('fotoProduk') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+
+                    <div class="mt-5 flex justify-end space-x-2">
+                        <button @click="open = false" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md">Batal</button>
+                        <button wire:click="saveFoto" wire:loading.attr="disabled"
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+                            Simpan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
                         <!-- Wrapper Alpine -->
             <div x-data="{ modalTambahStok: false }">
 
@@ -536,8 +574,17 @@
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="space-x-1 flex">
+                                        <button wire:click="openFotoModal({{ $item->id }})" class="text-blue-500 hover:text-blue-700 rounded-full">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-photo" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#1d4ed8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <line x1="15" y1="8" x2="15.01" y2="8" />
+                                                <rect x="4" y="4" width="16" height="16" rx="3" />
+                                                <path d="M4 15l4 -4a3 5 0 0 1 3 0l5 5" />
+                                                <path d="M14 14l1 -1a3 5 0 0 1 3 0l2 2" />
+                                            </svg>
+                                        </button>
                                         <a href="{{ route('download-barcode', $item->id) }}">
-                                            <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                                            <button class="text-slate-400 hover:text-slate-500 mt-2 rounded-full">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                     <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
