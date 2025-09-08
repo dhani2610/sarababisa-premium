@@ -27,11 +27,15 @@ class InformasiTokoController extends Controller
             'profile_photo_path' => 'nullable|file|mimes:jpeg,jpg,png|max:1024',
             'foto_portal'        => 'nullable|file|mimes:jpeg,jpg,png|max:1024',
         ], [
-            'profile_photo_path.mimes' => 'Foto profil harus menggunakan format JPG atau PNG.',
-            'profile_photo_path.max'   => 'Ukuran foto profil maksimal 1 MB.',
-            'foto_portal.mimes'        => 'Foto portal harus menggunakan format JPG atau PNG.',
-            'foto_portal.max'          => 'Ukuran foto portal maksimal 1 MB.',
+            'profile_photo_path.uploaded' => 'Upload foto profil gagal. Pastikan ukuran tidak lebih dari 1 MB.',
+            'profile_photo_path.mimes'    => 'Foto profil harus menggunakan format JPG atau PNG.',
+            'profile_photo_path.max'      => 'Ukuran foto profil maksimal 1 MB.',
+
+            'foto_portal.uploaded' => 'Upload foto portal gagal. Pastikan ukuran tidak lebih dari 1 MB.',
+            'foto_portal.mimes'    => 'Foto portal harus menggunakan format JPG atau PNG.',
+            'foto_portal.max'      => 'Ukuran foto portal maksimal 1 MB.',
         ]);
+
 
         $data = $request->all();
 
