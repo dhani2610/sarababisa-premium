@@ -2,7 +2,7 @@
 
 @section('content')
     <!-- Hotel Hero Section -->
-   
+
     <section id="hotel-hero" class="hotel-hero section">
 
         <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -24,9 +24,10 @@
                     <div class="hero-images">
                         <div class="main-image">
                             @if (empty($kepala_toko_setting->foto_portal))
-                            <img src="{{ asset('images/bg-auth.jpg') }}" alt="Portal foto" class="img-fluid">
+                                <img src="{{ asset('images/bg-auth.jpg') }}" alt="Portal foto" class="img-fluid">
                             @else
-                            <img src="{{  Storage::url($kepala_toko_setting->foto_portal) }}" alt="Portal foto" class="img-fluid">
+                                <img src="{{ Storage::url($kepala_toko_setting->foto_portal) }}" alt="Portal foto"
+                                    class="img-fluid">
                             @endif
                         </div>
                         <div class="floating-card" data-aos="zoom-in" data-aos-delay="400">
@@ -108,16 +109,24 @@
                     @foreach ($galleries as $item)
                         <div class="swiper-slide">
                             <div class="gallery-item">
-                                <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->title }}" class="img-fluid"
-                                    loading="lazy">
+                                <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->title }}"
+                                    class="img-fluid" loading="lazy">
                                 <a href="{{ asset('storage/' . $item->foto) }}" class="gallery-overlay glightbox"
                                     data-gallery="gallery-showcase">
                                     <i class="bi bi-eye"></i>
                                 </a>
                             </div>
+                            <!-- Judul 1 baris saja -->
+                            <p class="text-xs text-center mt-1"
+                                style="max-width: 100%; margin: 0 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                title="{{ $item->title }}">
+                                {{ $item->title }}
+                            </p>
                         </div>
                     @endforeach
                 </div>
+
+
             </div>
 
         </div>
@@ -137,9 +146,9 @@
                     <div class="row g-3 align-items-end">
                         {{-- Category --}}
                         <div class="col-lg-4 col-md-6">
-                            <label class="form-label">Category</label>
+                            <label class="form-label">Kategori</label>
                             <select class="form-select" name="category" onchange="this.form.submit()">
-                                <option value="">Semua Category</option>
+                                <option value="">Semua Kategori</option>
                                 @foreach ($productCategory as $item)
                                     <option value="{{ $item->id }}"
                                         {{ request('category') == $item->id ? 'selected' : '' }}>
@@ -151,7 +160,7 @@
 
                         {{-- Search --}}
                         <div class="col-lg-4 col-md-6">
-                            <label class="form-label">Search Produk</label>
+                            <label class="form-label">Cari Produk</label>
                             <input type="text" name="search" class="form-control" value="{{ request('search') }}"
                                 placeholder="Cari nama produk...">
                         </div>
@@ -185,11 +194,11 @@
                             <div class="room-card">
                                 <div class="room-image">
                                     @if (!empty($product->foto))
-                                    <img src="{{ Storage::url($product->foto) }}"
-                                    alt="{{ $product->product_name }}" class="img-fluid">
+                                        <img src="{{ Storage::url($product->foto) }}" alt="{{ $product->product_name }}"
+                                            class="img-fluid">
                                     @else
-                                    <img src="{{ asset('images/logo-saraba-bisa.png') }}"
-                                        alt="{{ $product->product_name }}" class="img-fluid">
+                                        <img src="{{ asset('images/logo-saraba-bisa.png') }}"
+                                            alt="{{ $product->product_name }}" class="img-fluid">
                                     @endif
                                 </div>
                                 <div class="room-content">
