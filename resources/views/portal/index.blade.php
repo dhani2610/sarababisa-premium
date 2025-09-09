@@ -81,8 +81,8 @@
     <section id="gallery-showcase" class="gallery-showcase section">
         <div class="container" data-aos="fade-up" data-aos-delay="100">
             <div class="container section-title" data-aos="fade-up">
-                <span class="description-title">Galeri</span>
-                <h2>Galeri</h2>
+                <span class="description-title">Foto</span>
+                <h2>Foto</h2>
             </div><!-- End Section Title -->
 
             <div class="gallery-carousel swiper init-swiper" data-aos="fade-up" data-aos-delay="200">
