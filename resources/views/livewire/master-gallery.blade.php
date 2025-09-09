@@ -58,18 +58,7 @@
                                     </p>
                                 </div>
 
-                                <script>
-                                    function checkFotoSize(input) {
-                                        const file = input.files[0];
-                                        const alertEl = document.getElementById('foto_alert');
-                                        if (file && file.size > 1024 * 1024) {
-                                            alertEl.classList.remove('hidden');
-                                            input.value = ''; // reset input
-                                        } else {
-                                            alertEl.classList.add('hidden');
-                                        }
-                                    }
-                                </script>
+
 
                             </div>
                             <!-- Modal footer -->
@@ -156,12 +145,94 @@
                                     </td>
                                     <td class="px-2 py-3 text-center">{{ $i++ }}</td>
                                     <td class="px-2 py-3 text-center">
-                                        <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->title }}"
-                                            style="max-width: 200px" class="rounded">
+                                        <center>
+                                            <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->title }}"
+                                                style="max-width: 200px" class="rounded">
+                                        </center>
                                     </td>
                                     <td class="px-2 py-3 text-center">{{ $item->title }}</td>
                                     <td class="px-2 py-3 text-center">
-                                        <form action="{{ route('master-gallery.destroy', $item->id) }}" method="POST"
+                                        <!-- Tombol Edit -->
+                                        <div x-data="{ editModalOpen: false }" class="inline-block">
+                                            <button class="btn-sm bg-amber-500 hover:bg-amber-600 text-white"
+                                                @click.prevent="editModalOpen = true">
+                                                Edit
+                                            </button>
+
+                                            <!-- Modal backdrop -->
+                                            <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
+                                                x-show="editModalOpen" x-transition aria-hidden="true" x-cloak></div>
+
+                                            <!-- Modal edit -->
+                                            <div class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
+                                                role="dialog" aria-modal="true" x-show="editModalOpen" x-transition
+                                                x-cloak>
+                                                <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full"
+                                                    @click.outside="editModalOpen = false"
+                                                    @keydown.escape.window="editModalOpen = false">
+
+                                                    <!-- Header -->
+                                                    <div
+                                                        class="px-5 py-3 border-b border-slate-200 flex justify-between items-center">
+                                                        <div class="font-semibold text-slate-800">Edit Foto</div>
+                                                        <button class="text-slate-400 hover:text-slate-500"
+                                                            @click="editModalOpen = false">✕</button>
+                                                    </div>
+
+                                                    <!-- Form Edit -->
+                                                    <form action="{{ route('master-gallery.update', $item->id) }}"
+                                                        method="POST" enctype="multipart/form-data">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="px-5 py-4 space-y-3">
+                                                            <div>
+                                                                <label class="block text-sm font-medium mb-1"
+                                                                    for="title" style="float:left">Judul <span
+                                                                        class="text-rose-500">*</span></label>
+                                                                <input id="title" name="title"
+                                                                    class="form-input w-full" type="text"
+                                                                    value="{{ $item->title }}" required />
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-sm font-medium mb-1"
+                                                                    for="foto" style="float:left">Ganti
+                                                                    Foto</label>
+                                                                <!-- Input file di modal Edit -->
+                                                                <input id="foto-{{ $item->id }}" name="foto"
+                                                                    class="form-input w-full" type="file"
+                                                                    accept="image/*"
+                                                                    onchange="checkFotoSizeEdit(this, 'foto_alert_{{ $item->id }}')" />
+
+                                                                <p class="text-gray-500 text-xs mt-1"
+                                                                    style="float: left">Kosongkan jika
+                                                                    tidak ingin mengganti foto.</p>
+                                                                <br>
+                                                                <br>
+                                                                <p id="foto_alert_{{ $item->id }}"
+                                                                    style="float: left"
+                                                                    class="text-red-500 text-xs mt-1 hidden">
+                                                                    Ukuran foto maksimal 1 MB!
+                                                                </p>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Footer -->
+                                                        <div
+                                                            class="px-5 py-4 border-t border-slate-200 flex justify-end space-x-2">
+                                                            <button type="button" class="btn-sm border-slate-200"
+                                                                @click="editModalOpen = false">Batal</button>
+                                                            <button type="submit"
+                                                                class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Update</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Tombol Hapus -->
+                                        <form action="{{ route('master-gallery.destroy', $item->id) }}"
+                                            method="POST" class="inline-block"
                                             onsubmit="return confirm('Yakin hapus foto ini?')">
                                             @csrf
                                             @method('DELETE')
@@ -169,6 +240,7 @@
                                                 class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Hapus</button>
                                         </form>
                                     </td>
+
                                 </tr>
                             @endforeach
                         </tbody>
@@ -184,6 +256,31 @@
         {{ $galleries->links() }}
     </div>
 </div>
+<script>
+    function checkFotoSize(input) {
+        const file = input.files[0];
+        const alertEl = document.getElementById('foto_alert');
+        if (file && file.size > 1024 * 1024) {
+            alertEl.classList.remove('hidden');
+            input.value = ''; // reset input
+        } else {
+            alertEl.classList.add('hidden');
+        }
+    }
+</script>
+<script>
+    function checkFotoSizeEdit(input, alertId) {
+        const file = input.files[0];
+        const alertEl = document.getElementById(alertId);
+        if (file && file.size > 1024 * 1024) {
+            alertEl.classList.remove('hidden');
+            input.value = ''; // reset input
+        } else {
+            alertEl.classList.add('hidden');
+        }
+    }
+</script>
+
 <script>
     document.addEventListener("alpine:init", () => {
         Alpine.data("handleSelect", () => ({
