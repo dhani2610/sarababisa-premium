@@ -924,13 +924,24 @@
                             <img src="{{ Storage::url(\App\Models\Product::find($produkId)->foto) }}" 
                                 class="w-32 h-32 object-cover rounded-lg mx-auto mb-3 border">
                         @endif
-                        <input type="file" wire:model="fotoProduk" accept=".png,.jpg,.jpeg,.webp"
+                        <input 
+                            type="file" 
+                            wire:model="fotoProduk" 
+                            accept=".png,.jpg,.jpeg,.webp"
+                            x-on:change="
+                                if ($event.target.files[0].size > 1024 * 1024) {
+                                    alert('Ukuran foto maksimal 1 MB!');
+                                    $event.target.value = ''; // reset input
+                                }
+                            "
                             class="block w-full text-sm text-gray-500
                                 file:mr-4 file:py-2 file:px-4
                                 file:rounded-md file:border-0
                                 file:text-sm file:font-semibold
                                 file:bg-blue-50 file:text-blue-700
-                                hover:file:bg-blue-100" />
+                                hover:file:bg-blue-100" 
+                        />
+
 
                         @error('fotoProduk') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
 

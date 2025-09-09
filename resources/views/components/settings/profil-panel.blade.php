@@ -48,8 +48,36 @@
                         <img class="w-20 h-20 " src="{{ Storage::url(Auth::user()->foto_portal) }}"
                             width="80" height="80" alt="Logo Toko" />
                     </div>
-                    <input type="file" name="foto_portal" id="foto_portal" accept="image/*"
-                        class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
+                    <div>
+                    <input 
+                        type="file" 
+                        name="foto_portal" 
+                        id="foto_portal" 
+                        accept="image/*"
+                        class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white"
+                        onchange="checkFileSize(this)"
+                    >
+                    <p id="foto_portal_alert" class="text-red-500 text-xs mt-1 hidden">
+                        Ukuran foto maksimal 1 MB!
+                    </p>
+                    <p class="text-gray-500 text-xs mt-1">
+                        Maksimal ukuran file: 1 MB
+                    </p>
+                </div>
+
+                <script>
+                function checkFileSize(input) {
+                    const file = input.files[0];
+                    const alertEl = document.getElementById('foto_portal_alert');
+                    if (file && file.size > 1024 * 1024) {
+                        alertEl.classList.remove('hidden');
+                        input.value = ''; // reset input
+                    } else {
+                        alertEl.classList.add('hidden');
+                    }
+                }
+                </script>
+
                 </div>
 
                 <div class="sm:w-1/2">

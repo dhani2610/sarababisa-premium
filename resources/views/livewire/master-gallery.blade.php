@@ -43,11 +43,34 @@
                                         required />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-1" for="foto">Foto <span
-                                            class="text-rose-500">*</span></label>
+                                    <label class="block text-sm font-medium mb-1" for="foto">
+                                        Foto <span class="text-rose-500">*</span>
+                                    </label>
+
                                     <input id="foto" name="foto" class="form-input w-full" type="file"
-                                        accept="image/*" required />
+                                        accept="image/*" required onchange="checkFotoSize(this)" />
+
+                                    <p id="foto_alert" class="text-red-500 text-xs mt-1 hidden">
+                                        Ukuran foto maksimal 1 MB!
+                                    </p>
+                                    <p class="text-gray-500 text-xs mt-1">
+                                        Maksimal ukuran file: 1 MB
+                                    </p>
                                 </div>
+
+                                <script>
+                                    function checkFotoSize(input) {
+                                        const file = input.files[0];
+                                        const alertEl = document.getElementById('foto_alert');
+                                        if (file && file.size > 1024 * 1024) {
+                                            alertEl.classList.remove('hidden');
+                                            input.value = ''; // reset input
+                                        } else {
+                                            alertEl.classList.add('hidden');
+                                        }
+                                    }
+                                </script>
+
                             </div>
                             <!-- Modal footer -->
                             <div class="px-5 py-4 border-t border-slate-200 flex justify-end space-x-2">
@@ -163,51 +186,52 @@
 </div>
 <script>
     document.addEventListener("alpine:init", () => {
-    Alpine.data("handleSelect", () => ({
-        selected: [],
-        toggleAll(e) {
-            this.selected = [];
-            document.querySelectorAll(".table-item").forEach((el) => {
-                el.checked = e.target.checked;
-                if (el.checked) this.selected.push(el.value);
-            });
-            this.updateAction();
-        },
-        toggleItem(e) {
-            const id = e.target.value;
-            if (e.target.checked) {
-                if (!this.selected.includes(id)) this.selected.push(id);
-            } else {
-                this.selected = this.selected.filter(item => item !== id);
-            }
-            this.updateAction();
-        },
-        updateAction() {
-            const actionBox = document.querySelector(".table-items-action");
-            const countBox = document.querySelector(".table-items-count");
-            if (this.selected.length > 0) {
-                actionBox.classList.remove("hidden");
-                countBox.innerText = this.selected.length;
-            } else {
-                actionBox.classList.add("hidden");
-            }
-        },
-        deleteSelected() {
-            if (this.selected.length === 0) return;
-            if (!confirm("Yakin hapus foto yang dipilih?")) return;
+        Alpine.data("handleSelect", () => ({
+            selected: [],
+            toggleAll(e) {
+                this.selected = [];
+                document.querySelectorAll(".table-item").forEach((el) => {
+                    el.checked = e.target.checked;
+                    if (el.checked) this.selected.push(el.value);
+                });
+                this.updateAction();
+            },
+            toggleItem(e) {
+                const id = e.target.value;
+                if (e.target.checked) {
+                    if (!this.selected.includes(id)) this.selected.push(id);
+                } else {
+                    this.selected = this.selected.filter(item => item !== id);
+                }
+                this.updateAction();
+            },
+            updateAction() {
+                const actionBox = document.querySelector(".table-items-action");
+                const countBox = document.querySelector(".table-items-count");
+                if (this.selected.length > 0) {
+                    actionBox.classList.remove("hidden");
+                    countBox.innerText = this.selected.length;
+                } else {
+                    actionBox.classList.add("hidden");
+                }
+            },
+            deleteSelected() {
+                if (this.selected.length === 0) return;
+                if (!confirm("Yakin hapus foto yang dipilih?")) return;
 
-            fetch("{{ route('master-gallery.deleteSelected') }}", {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                },
-                body: JSON.stringify({ selectedIds: this.selected })
-            })
-            .then(res => res.json())
-            .then(() => location.reload());
-        }
-    }));
-});
-
+                fetch("{{ route('master-gallery.deleteSelected') }}", {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            selectedIds: this.selected
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(() => location.reload());
+            }
+        }));
+    });
 </script>
