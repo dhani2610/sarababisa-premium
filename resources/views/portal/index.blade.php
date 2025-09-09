@@ -15,7 +15,7 @@
                         <p class="lead">{{ $kepala_toko_setting->deskripsi_toko }} </p>
                         <div class="hero-buttons">
                             <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}"
-                                class="btn btn-primary">Hubungi Kami</a>
+                                class="btn btn-primary main-layout-setting">Hubungi Kami</a>
                         </div>
                     </div>
                 </div>
@@ -54,7 +54,7 @@
                 <div class="row text-center">
                     <div class="col-md-6 col-6">
                         <div class="stat-item">
-                            <span class="stat-number purecounter" data-purecounter-start="0"
+                            <span class="stat-number purecounter main-color-text-layout-setting" data-purecounter-start="0"
                                 data-purecounter-end="{{ $pelanggan }}"
                                 data-purecounter-duration="1">{{ $pelanggan }}</span>
                             <span class="stat-label">Pelanggan</span>
@@ -62,7 +62,7 @@
                     </div>
                     <div class="col-md-6 col-6">
                         <div class="stat-item">
-                            <span class="stat-number purecounter" data-purecounter-start="0"
+                            <span class="stat-number purecounter main-color-text-layout-setting" data-purecounter-start="0"
                                 data-purecounter-end="{{ $total_products }}"
                                 data-purecounter-duration="1">{{ $total_products }}</span>
                             <span class="stat-label">Produk</span>
@@ -80,8 +80,8 @@
     <section id="gallery-showcase" class="gallery-showcase section">
         <div class="container" data-aos="fade-up" data-aos-delay="100">
             <div class="container section-title" data-aos="fade-up">
-                <span class="description-title">Gallery</span>
-                <h2>Gallery</h2>
+                <span class="description-title">Galeri</span>
+                <h2>Galeri</h2>
             </div><!-- End Section Title -->
 
             <div class="gallery-carousel swiper init-swiper" data-aos="fade-up" data-aos-delay="200">
@@ -171,7 +171,7 @@
 
                         {{-- Tombol submit (kalau mau manual search) --}}
                         <div class="col-lg-2 col-md-6">
-                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                            <button type="submit" class="btn btn-primary main-layout-setting w-100">Cari</button>
                         </div>
                     </div>
                 </form>
@@ -215,12 +215,12 @@
                                     </p>
                                     <div class="room-footer">
                                         <div class="room-price">
-                                            <span class="price-amount">
+                                            <span class="price-amount main-color-text-layout-setting">
                                                 Rp {{ number_format($product->harga_jual, 0, ',', '.') }}
                                             </span>
                                         </div>
-                                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}"
-                                            class="btn-room-details">Pesan Sekarang</a>
+                                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" target="_blank"
+                                            class="btn-room-details main-layout-setting">Pesan Sekarang</a>
                                     </div>
                                 </div>
                             </div>

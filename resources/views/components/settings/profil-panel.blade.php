@@ -61,6 +61,25 @@
 
             <!-- Business Profile -->
             <section>
+                <h3 class="text-xl leading-snug text-slate-800 font-bold mb-1">Social Media Portal</h3>
+                <div class="sm:w-1/2">
+                    <label class="block text-sm font-medium mt-3" for="owner">Instagram (Link Url)</label>
+                    <input name="ig" id="ig" class="form-input w-full" type="text" placeholder="https://www.instagram.com/yourusername"
+                        value="{{ Auth::user()->ig }}" />
+                </div>
+                <div class="sm:w-1/2">
+                    <label class="block text-sm font-medium mt-3" for="owner">Tiktok (Link Url)</label>
+                    <input name="tiktok" id="tiktok" class="form-input w-full" type="text" placeholder="http://tiktok.com/@yourusername"
+                        value="{{ Auth::user()->tiktok }}" />
+                </div>
+                <div class="sm:w-1/2">
+                    <label class="block text-sm font-medium mt-3" for="owner">Facebook (Link Url)</label>
+                    <input name="fb" id="fb" class="form-input w-full" type="text" placeholder="http://facebook.com/yourusername"
+                        value="{{ Auth::user()->fb }}" />
+                </div>
+               
+            </section>
+            <section>
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-1">Profil Toko</h3>
                 <div class="text-sm">Informasi ini akan terlihat pada halaman web dan nota transaksi.</div>
                 <div class="sm:flex sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-5">

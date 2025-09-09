@@ -26,6 +26,7 @@ class GalleryController extends Controller
             'foto.image'     => 'File yang diunggah harus berupa gambar.',
             'foto.mimes'     => 'Format foto harus PNG, JPG, JPEG, atau WEBP.',
             'foto.max'       => 'Ukuran foto maksimal 1 MB.',
+            'foto.uploaded'       => 'Upload foto gagal. Pastikan ukuran tidak lebih dari 1 MB.',
         ]);
 
         try {
@@ -40,6 +41,26 @@ class GalleryController extends Controller
         } catch (\Throwable $th) {
             return redirect()->route('master-gallery.index')->with('failed', 'Foto gagal ditambahkan');
         }
+    }
+
+    public function deleteSelected(Request $request)
+    {
+        $selectedIds = $request->input('selectedIds', []);
+
+        if (!empty($selectedIds)) {
+            $galleries = Gallery::whereIn('id', $selectedIds)->get();
+
+            foreach ($galleries as $gallery) {
+                if ($gallery->foto && file_exists(storage_path('app/public/' . $gallery->foto))) {
+                    unlink(storage_path('app/public/' . $gallery->foto));
+                }
+                $gallery->delete();
+            }
+
+            return response()->json(['message' => 'Foto berhasil dihapus.']);
+        }
+
+        return response()->json(['message' => 'Tidak ada foto yang dipilih.'], 400);
     }
 
 

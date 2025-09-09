@@ -33,6 +33,8 @@ class AdminProdukAksesorisData extends Component
         'fotoProduk.image'    => 'File yang diunggah harus berupa gambar.',
         'fotoProduk.mimes'    => 'Format foto harus PNG, JPG, JPEG, atau WEBP.',
         'fotoProduk.max'      => 'Ukuran foto maksimal 1 MB.',
+'fotoProduk.uploaded' => 'Upload foto produk gagal. Pastikan ukuran tidak lebih dari 1 MB.',
+
     ];
 
 

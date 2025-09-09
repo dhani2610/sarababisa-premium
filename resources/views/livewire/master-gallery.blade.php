@@ -4,7 +4,7 @@
         <div class="mb-4 sm:mb-0">
             <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Gallery 📷</h1>
         </div>
-       
+
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
             <x-search-form placeholder="Cari foto berdasarkan judul" />
             {{-- Alert sukses / gagal --}}
@@ -65,7 +65,7 @@
 
     <!-- Table -->
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5">
-         @if ($errors->any())
+        @if ($errors->any())
             <div x-show="open" x-data="{ open: true }">
                 <div class="px-4 py-2 rounded-sm text-sm bg-rose-500 text-white">
                     <div class="flex w-full justify-between items-start">
@@ -90,40 +90,69 @@
             </div>
         @endif
         <div class="overflow-x-auto">
-            <table class="table-auto w-full">
-                <thead
-                    class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
-                    <tr>
-                        <th class="px-2 py-3 text-center" width="10%">No</th>
-                        <th class="px-2 py-3 text-center" width="30%">Preview</th>
-                        <th class="px-2 py-3 text-center" width="20%">Judul</th>
-                        <th class="px-2 py-3 text-center" width="10%">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm divide-y divide-slate-200">
-                    @php $i = 1; @endphp
-                    @foreach ($galleries as $item)
-                        <tr>
-                            <td class="px-2 py-3 text-center">{{ $i++ }}</td>
-                            <td class="px-2 py-3 text-center">
-                                <center>
-                                    <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->title }}"
-                                        style="max-width: 200px" class=" rounded">
-                                </center>
-                            </td>
-                            <td class="px-2 py-3 text-center">{{ $item->title }}</td>
-                            <td class="px-2 py-3 text-center">
-                                <form action="{{ route('master-gallery.destroy', $item->id) }}" method="POST"
-                                    onsubmit="return confirm('Yakin hapus foto ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Hapus</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <div x-data="handleSelect">
+                <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
+                    <h2 class="font-semibold text-slate-800">Semua Foto <span
+                            class="text-slate-400 font-medium">{{ $galleries->total() }}</span></h2>
+                    <div class="relative inline-flex">
+                        <div class="table-items-action hidden">
+                            <div class="flex items-center">
+                                <div class="text-sm italic mr-2 whitespace-nowrap"><span
+                                        class="table-items-count"></span> item dipilih</div>
+                                <button
+                                    class="btn bg-white border-slate-200 hover:border-slate-300 text-rose-500 hover:text-rose-600"
+                                    @click="deleteSelected">Hapus</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto">
+                    <table class="table-auto w-full">
+                        <thead
+                            class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
+                            <tr>
+                                <th class="px-2 py-3 text-center w-px">
+                                    <input type="checkbox" class="form-checkbox" @click="toggleAll">
+                                </th>
+                                <th class="px-2 py-3 text-center">No</th>
+                                <th class="px-2 py-3 text-center">Preview</th>
+                                <th class="px-2 py-3 text-center">Judul</th>
+                                <th class="px-2 py-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-200">
+                            @php $i = 1; @endphp
+                            @foreach ($galleries as $item)
+                                <tr>
+                                    <td class="px-2 py-3 text-center">
+                                        <input type="checkbox" class="form-checkbox table-item"
+                                            value="{{ $item->id }}" @change="toggleItem($event)">
+
+                                    </td>
+                                    <td class="px-2 py-3 text-center">{{ $i++ }}</td>
+                                    <td class="px-2 py-3 text-center">
+                                        <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->title }}"
+                                            style="max-width: 200px" class="rounded">
+                                    </td>
+                                    <td class="px-2 py-3 text-center">{{ $item->title }}</td>
+                                    <td class="px-2 py-3 text-center">
+                                        <form action="{{ route('master-gallery.destroy', $item->id) }}" method="POST"
+                                            onsubmit="return confirm('Yakin hapus foto ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button
+                                                class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Hapus</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -132,3 +161,53 @@
         {{ $galleries->links() }}
     </div>
 </div>
+<script>
+    document.addEventListener("alpine:init", () => {
+    Alpine.data("handleSelect", () => ({
+        selected: [],
+        toggleAll(e) {
+            this.selected = [];
+            document.querySelectorAll(".table-item").forEach((el) => {
+                el.checked = e.target.checked;
+                if (el.checked) this.selected.push(el.value);
+            });
+            this.updateAction();
+        },
+        toggleItem(e) {
+            const id = e.target.value;
+            if (e.target.checked) {
+                if (!this.selected.includes(id)) this.selected.push(id);
+            } else {
+                this.selected = this.selected.filter(item => item !== id);
+            }
+            this.updateAction();
+        },
+        updateAction() {
+            const actionBox = document.querySelector(".table-items-action");
+            const countBox = document.querySelector(".table-items-count");
+            if (this.selected.length > 0) {
+                actionBox.classList.remove("hidden");
+                countBox.innerText = this.selected.length;
+            } else {
+                actionBox.classList.add("hidden");
+            }
+        },
+        deleteSelected() {
+            if (this.selected.length === 0) return;
+            if (!confirm("Yakin hapus foto yang dipilih?")) return;
+
+            fetch("{{ route('master-gallery.deleteSelected') }}", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ selectedIds: this.selected })
+            })
+            .then(res => res.json())
+            .then(() => location.reload());
+        }
+    }));
+});
+
+</script>
