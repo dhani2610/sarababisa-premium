@@ -233,7 +233,8 @@ Route::delete('/target-sales/delete', [KepalaTokoTargetSalesController::class, '
 Route::delete('/target-teknisi/delete', [KepalaTokoTargetTeknisiController::class, 'deleteSelected']);
 
 Route::get('produk/item/{id}/download-barcode', [ProdukController::class, 'downloadBarcode'])->name('download-barcode');
-
+Route::delete('master/master-gallery/delete-selected', [GalleryController::class, 'deleteSelected'])
+        ->name('master-gallery.deleteSelected');
 
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
@@ -272,6 +273,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('master/master-jenis-barang', KepalaTokoMasterJenisBarangController::class);
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
     Route::resource('master/master-gallery', GalleryController::class);
+    
+
     Route::resource('master/master-merek', KepalaTokoMasterMerekController::class);
     Route::resource('master/master-kapasitas', KepalaTokoMasterKapasitasController::class);
     Route::resource('master/master-model-seri', KepalaTokoMasterModelSeriController::class);
@@ -498,8 +501,6 @@ Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(fun
     Route::post('produk/admin-complete-order', [AdminTokoPosController::class, 'CompleteOrder']);
     Route::get('produk/admin-pos/{id}', [AdminTokoPosController::class, 'show'])->name('admin-show-print-order');
 
-    Route::get('admin-transaksi-produk-inkjet/{orders_id}', [AdminTokoTransaksiProdukController::class, 'cetakinkjet'])->name('admin-lunas-cetak-inkjet');
-    Route::get('admin-transaksi-produk-termal/{orders_id}', [AdminTokoTransaksiProdukController::class, 'cetaktermal'])->name('admin-cetak-termal-produk');
 
     Route::post('/admin-import-produk', [AdminTokoProdukController::class, 'import'])->name('admin-import-produk');
     Route::get('admin-export-produk', [AdminTokoProdukController::class, 'export'])->name('admin-produk-export');
@@ -571,6 +572,10 @@ Route::middleware(['ensureSalesRole:Sales', 'checkSubscription'])->group(
         Route::resource('sales-kasbon', SalesKasbonController::class);
     }
 );
+
+Route::get('admin-transaksi-produk-inkjet/{orders_id}', [AdminTokoTransaksiProdukController::class, 'cetakinkjet'])->name('admin-lunas-cetak-inkjet');
+Route::get('admin-transaksi-produk-termal/{orders_id}', [AdminTokoTransaksiProdukController::class, 'cetaktermal'])->name('admin-cetak-termal-produk');
+
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/old-dashboard', [DashboardController::class, 'index'])->name('dashboard');

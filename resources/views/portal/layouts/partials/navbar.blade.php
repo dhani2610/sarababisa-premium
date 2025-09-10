@@ -10,10 +10,10 @@
 
             <nav id="navmenu" class="navmenu">
                 <ul>
-                    <li><a href="{{ url('/') }}" class="active">Home</a></li>
+                    <li><a href="{{ url('/') }}" class="active">Beranda</a></li>
                     <li>
                         <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" class="active" target="_blank">
-                            Contact
+                            Kontak
                         </a>
                     </li>
                     <li><a href="{{ url('/login') }}" class="active">Login</a></li>

@@ -60,11 +60,26 @@ class MasterMerekController extends Controller
      */
     public function store(BrandRequest $request)
     {
-        $data = $request->all();
+        $data = $request->validated();
 
+        $existing = Brand::withTrashed()
+            ->where('name', $data['name'])
+            ->first();
+
+        if ($existing && $existing->trashed()) {
+            // Kalau ada merek dengan nama sama tapi soft delete → restore
+            $existing->restore();
+            $existing->update($data);
+
+            return redirect()->route('master-merek.index')
+                ->with('success', 'Merek berhasil dipulihkan & diperbarui.');
+        }
+
+        // Kalau belum ada → buat baru
         Brand::create($data);
 
-        return redirect()->route('master-merek.index');
+        return redirect()->route('master-merek.index')
+            ->with('success', 'Merek berhasil ditambahkan.');
     }
 
     public function import(Request $request)

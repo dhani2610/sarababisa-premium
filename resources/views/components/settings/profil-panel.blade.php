@@ -5,6 +5,30 @@
         @csrf
         <div class="p-6 space-y-6" x-data="formData()">
 
+            @if ($errors->any())
+                <div x-show="open" x-data="{ open: true }">
+                    <div class="px-4 py-2 rounded-sm text-sm bg-rose-500 text-white">
+                        <div class="flex w-full justify-between items-start">
+                            <div class="flex">
+                                <svg class="w-4 h-4 shrink-0 fill-current opacity-80 mt-[3px] mr-3" viewBox="0 0 16 16">
+                                    <path
+                                        d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm1 12H7V7h2v5zM8 6c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z" />
+                                </svg>
+                                @foreach ($errors->all() as $error)
+                                    <div class="font-medium">{{ $error }}</div>
+                                @endforeach
+                            </div>
+                            <button class="opacity-70 hover:opacity-80 ml-3 mt-[3px]" @click="open = false">
+                                <div class="sr-only">Close</div>
+                                <svg class="w-4 h-4 fill-current">
+                                    <path
+                                        d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
             <!-- Picture -->
             <section>
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Logo Toko</h3>
@@ -24,8 +48,36 @@
                         <img class="w-20 h-20 " src="{{ Storage::url(Auth::user()->foto_portal) }}"
                             width="80" height="80" alt="Logo Toko" />
                     </div>
-                    <input type="file" name="foto_portal" id="foto_portal" accept="image/*"
-                        class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
+                    <div>
+                    <input 
+                        type="file" 
+                        name="foto_portal" 
+                        id="foto_portal" 
+                        accept="image/*"
+                        class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white"
+                        onchange="checkFileSize(this)"
+                    >
+                    <p id="foto_portal_alert" class="text-red-500 text-xs mt-1 hidden">
+                        Ukuran foto maksimal 1 MB!
+                    </p>
+                    <p class="text-gray-500 text-xs mt-1">
+                        Maksimal ukuran file: 1 MB
+                    </p>
+                </div>
+
+                <script>
+                function checkFileSize(input) {
+                    const file = input.files[0];
+                    const alertEl = document.getElementById('foto_portal_alert');
+                    if (file && file.size > 1024 * 1024) {
+                        alertEl.classList.remove('hidden');
+                        input.value = ''; // reset input
+                    } else {
+                        alertEl.classList.add('hidden');
+                    }
+                }
+                </script>
+
                 </div>
 
                 <div class="sm:w-1/2">
@@ -36,6 +88,25 @@
             </section>
 
             <!-- Business Profile -->
+            <section>
+                <h3 class="text-xl leading-snug text-slate-800 font-bold mb-1">Social Media Portal</h3>
+                <div class="sm:w-1/2">
+                    <label class="block text-sm font-medium mt-3" for="owner">Instagram (Link Url)</label>
+                    <input name="ig" id="ig" class="form-input w-full" type="text" placeholder="https://www.instagram.com/yourusername"
+                        value="{{ Auth::user()->ig }}" />
+                </div>
+                <div class="sm:w-1/2">
+                    <label class="block text-sm font-medium mt-3" for="owner">Tiktok (Link Url)</label>
+                    <input name="tiktok" id="tiktok" class="form-input w-full" type="text" placeholder="http://tiktok.com/@yourusername"
+                        value="{{ Auth::user()->tiktok }}" />
+                </div>
+                <div class="sm:w-1/2">
+                    <label class="block text-sm font-medium mt-3" for="owner">Facebook (Link Url)</label>
+                    <input name="fb" id="fb" class="form-input w-full" type="text" placeholder="http://facebook.com/yourusername"
+                        value="{{ Auth::user()->fb }}" />
+                </div>
+               
+            </section>
             <section>
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-1">Profil Toko</h3>
                 <div class="text-sm">Informasi ini akan terlihat pada halaman web dan nota transaksi.</div>

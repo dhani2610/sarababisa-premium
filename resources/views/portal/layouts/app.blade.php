@@ -13,6 +13,46 @@
         .main-layout-setting {
             background: var(--main-bg) !important;
         }
+
+        .main-color-text-layout-setting {
+            color: var(--main-bg) !important;
+        }
+
+        .active>.page-link,
+        .page-link.active {
+            z-index: 3;
+            color: white !important;
+            background-color: var(--main-bg) !important;
+            border-color: var(--main-bg) !important;
+        }
+
+        .page-link {
+            color: var(--main-bg) !important;
+        }
+
+        .scroll-top {
+            background: var(--main-bg) !important;
+        }
+
+        .footer .social-links a {
+            font-size: 18px;
+            display: inline-block;
+            background:
+                white;
+            color: var(--main-bg);
+            line-height: 1;
+            padding: 8px 0;
+            margin-right: 4px;
+            border-radius: 4px;
+            text-align: center;
+            width: 36px;
+            height: 36px;
+            transition: 0.3s;
+        }
+        .footer .social-links a:hover {
+            background:
+                black!important;
+        }
     </style>
 
 
