@@ -77,7 +77,7 @@ class ServiceTransaction extends Model
     {
         return LogOptions::defaults()
             ->useLogName('Transaksi Servis')
-            ->logOnly(['modal_sparepart', 'biaya', 'uang_muka', 'imei', 'kerusakan', 'qc_masuk', 'tindakan_servis', 'kelengkapan', 'created_at', 'penerima', 'nama_pelanggan', 'status_servis', 'kondisi_servis', 'users_id'])
+            ->logOnly(['modal_sparepart', 'biaya', 'uang_muka','payment_method','tunai','transfer','ppn','diskon', 'imei', 'kerusakan', 'qc_masuk', 'tindakan_servis', 'kelengkapan', 'created_at', 'penerima', 'nama_pelanggan', 'status_servis', 'kondisi_servis', 'users_id'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
         // Chain fluent methods for configuration options

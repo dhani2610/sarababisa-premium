@@ -2,11 +2,31 @@
     <header class="px-5 py-4">
         <h2 class="font-semibold text-slate-800">Semua Riwayat Aktivitas</h2>
     </header>
+    <!-- Filter -->
+    <div class="mb-4 ml-4">
+        <form method="GET" action="{{ route('log-servis') }}" class="flex items-center space-x-2">
+            <input type="text" name="nomor_servis" value="{{ request('nomor_servis') }}"
+                placeholder="Cari Nomor Servis..."
+                class="form-input rounded border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
+
+            <button type="submit" class="btn bg-indigo-500 hover:bg-indigo-600 text-white">
+                Filter
+            </button>
+
+            @if (request('nomor_servis'))
+                <a href="{{ route('log-servis') }}" class="btn bg-slate-200 hover:bg-slate-300 text-slate-700">
+                    Reset
+                </a>
+            @endif
+        </form>
+    </div>
+
     <!-- Table -->
     <div class="overflow-x-auto">
         <table class="table-auto w-full">
             <!-- Table header -->
-            <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
+            <thead
+                class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                 <tr>
                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                         <div class="font-semibold text-left">No.</div>
@@ -41,9 +61,9 @@
             <tbody class="text-sm divide-y divide-slate-200">
                 <!-- Row -->
                 @php
-                    $i = 1
+                    $i = 1;
                 @endphp
-                @foreach($activities as $item)                  
+                @foreach ($activities as $item)
                     <tr>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-medium">{{ $i++ }}</div>
@@ -90,7 +110,8 @@
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             @if ($item->subject)
                                 @if ($item->subject->exists())
-                                    <div class="font-medium">{{ $item->subject->type->name }} {{ $item->subject->brand->name }} {{ $item->subject->modelserie->name }}</div>
+                                    <div class="font-medium">{{ $item->subject->type->name }}
+                                        {{ $item->subject->brand->name }} {{ $item->subject->modelserie->name }}</div>
                                 @else
                                     <div class="font-medium text-rose-600">Data servis telah dihapus</div>
                                 @endif

@@ -23,28 +23,29 @@ class InformasiTokoController extends Controller
         $item = Auth::user();
 
         // Validasi dan simpan logo jika ada
+        $validated = $request->validate([
+            'profile_photo_path' => 'nullable|file|mimes:jpeg,jpg,png|max:1024',
+            'foto_portal'        => 'nullable|file|mimes:jpeg,jpg,png|max:1024',
+        ], [
+            'profile_photo_path.uploaded' => 'Upload foto profil gagal. Pastikan ukuran tidak lebih dari 1 MB.',
+            'profile_photo_path.mimes'    => 'Foto profil harus menggunakan format JPG atau PNG.',
+            'profile_photo_path.max'      => 'Ukuran foto profil maksimal 1 MB.',
+
+            'foto_portal.uploaded' => 'Upload foto portal gagal. Pastikan ukuran tidak lebih dari 1 MB.',
+            'foto_portal.mimes'    => 'Foto portal harus menggunakan format JPG atau PNG.',
+            'foto_portal.max'      => 'Ukuran foto portal maksimal 1 MB.',
+        ]);
+
+
+        $data = $request->all();
+
+        // ✅ Upload foto profil
         if ($request->hasFile('profile_photo_path')) {
-            $validator = Validator::make($request->all(), [
-                'profile_photo_path' => 'file|mimes:jpeg,jpg,png',
-            ]);
-
-            if ($validator->fails()) {
-                toast('Gambar Logo harus menggunakan format PNG atau JPG.', 'error');
-                return redirect()->back();
-            }
-
             $data['profile_photo_path'] = $request->file('profile_photo_path')->store('assets/user', 'public');
         }
+
+        // ✅ Upload foto portal
         if ($request->hasFile('foto_portal')) {
-            $validator = Validator::make($request->all(), [
-                'foto_portal' => 'file|mimes:jpeg,jpg,png',
-            ]);
-
-            if ($validator->fails()) {
-                toast('Gambar Logo harus menggunakan format PNG atau JPG.', 'error');
-                return redirect()->back();
-            }
-
             $data['foto_portal'] = $request->file('foto_portal')->store('assets/user', 'public');
         }
 

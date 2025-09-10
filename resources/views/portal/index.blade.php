@@ -2,7 +2,7 @@
 
 @section('content')
     <!-- Hotel Hero Section -->
-   
+
     <section id="hotel-hero" class="hotel-hero section">
 
         <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -15,7 +15,7 @@
                         <p class="lead">{{ $kepala_toko_setting->deskripsi_toko }} </p>
                         <div class="hero-buttons">
                             <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}"
-                                class="btn btn-primary">Hubungi Kami</a>
+                                class="btn btn-primary main-layout-setting">Hubungi Kami</a>
                         </div>
                     </div>
                 </div>
@@ -24,9 +24,10 @@
                     <div class="hero-images">
                         <div class="main-image">
                             @if (empty($kepala_toko_setting->foto_portal))
-                            <img src="{{ asset('images/bg-auth.jpg') }}" alt="Portal foto" class="img-fluid">
+                                <img src="{{ asset('images/bg-auth.jpg') }}" alt="Portal foto" class="img-fluid">
                             @else
-                            <img src="{{  Storage::url($kepala_toko_setting->foto_portal) }}" alt="Portal foto" class="img-fluid">
+                                <img src="{{ Storage::url($kepala_toko_setting->foto_portal) }}" alt="Portal foto"
+                                    class="img-fluid">
                             @endif
                         </div>
                         <div class="floating-card" data-aos="zoom-in" data-aos-delay="400">
@@ -54,7 +55,7 @@
                 <div class="row text-center">
                     <div class="col-md-6 col-6">
                         <div class="stat-item">
-                            <span class="stat-number purecounter" data-purecounter-start="0"
+                            <span class="stat-number purecounter main-color-text-layout-setting" data-purecounter-start="0"
                                 data-purecounter-end="{{ $pelanggan }}"
                                 data-purecounter-duration="1">{{ $pelanggan }}</span>
                             <span class="stat-label">Pelanggan</span>
@@ -62,7 +63,7 @@
                     </div>
                     <div class="col-md-6 col-6">
                         <div class="stat-item">
-                            <span class="stat-number purecounter" data-purecounter-start="0"
+                            <span class="stat-number purecounter main-color-text-layout-setting" data-purecounter-start="0"
                                 data-purecounter-end="{{ $total_products }}"
                                 data-purecounter-duration="1">{{ $total_products }}</span>
                             <span class="stat-label">Produk</span>
@@ -80,8 +81,8 @@
     <section id="gallery-showcase" class="gallery-showcase section">
         <div class="container" data-aos="fade-up" data-aos-delay="100">
             <div class="container section-title" data-aos="fade-up">
-                <span class="description-title">Gallery</span>
-                <h2>Gallery</h2>
+                <span class="description-title">Foto</span>
+                <h2>Foto</h2>
             </div><!-- End Section Title -->
 
             <div class="gallery-carousel swiper init-swiper" data-aos="fade-up" data-aos-delay="200">
@@ -108,16 +109,24 @@
                     @foreach ($galleries as $item)
                         <div class="swiper-slide">
                             <div class="gallery-item">
-                                <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->title }}" class="img-fluid"
-                                    loading="lazy">
+                                <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->title }}"
+                                    class="img-fluid" loading="lazy">
                                 <a href="{{ asset('storage/' . $item->foto) }}" class="gallery-overlay glightbox"
                                     data-gallery="gallery-showcase">
                                     <i class="bi bi-eye"></i>
                                 </a>
                             </div>
+                            <!-- Judul 1 baris saja -->
+                            <p class="text-xs text-center mt-1"
+                                style="max-width: 100%; margin: 0 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                title="{{ $item->title }}">
+                                {{ $item->title }}
+                            </p>
                         </div>
                     @endforeach
                 </div>
+
+
             </div>
 
         </div>
@@ -137,9 +146,9 @@
                     <div class="row g-3 align-items-end">
                         {{-- Category --}}
                         <div class="col-lg-4 col-md-6">
-                            <label class="form-label">Category</label>
+                            <label class="form-label">Kategori</label>
                             <select class="form-select" name="category" onchange="this.form.submit()">
-                                <option value="">Semua Category</option>
+                                <option value="">Semua Kategori</option>
                                 @foreach ($productCategory as $item)
                                     <option value="{{ $item->id }}"
                                         {{ request('category') == $item->id ? 'selected' : '' }}>
@@ -151,7 +160,7 @@
 
                         {{-- Search --}}
                         <div class="col-lg-4 col-md-6">
-                            <label class="form-label">Search Produk</label>
+                            <label class="form-label">Cari Produk</label>
                             <input type="text" name="search" class="form-control" value="{{ request('search') }}"
                                 placeholder="Cari nama produk...">
                         </div>
@@ -171,7 +180,7 @@
 
                         {{-- Tombol submit (kalau mau manual search) --}}
                         <div class="col-lg-2 col-md-6">
-                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                            <button type="submit" class="btn btn-primary main-layout-setting w-100">Cari</button>
                         </div>
                     </div>
                 </form>
@@ -184,8 +193,13 @@
                         <div class="col-xl-4 col-lg-6">
                             <div class="room-card">
                                 <div class="room-image">
-                                    <img src="{{ asset('images/logo-saraba-bisa.png') }}"
-                                        alt="{{ $product->product_name }}" class="img-fluid">
+                                    @if (!empty($product->foto))
+                                        <img src="{{ Storage::url($product->foto) }}" alt="{{ $product->product_name }}"
+                                            class="img-fluid">
+                                    @else
+                                        <img src="{{ asset('images/logo-saraba-bisa.png') }}"
+                                            alt="{{ $product->product_name }}" class="img-fluid">
+                                    @endif
                                 </div>
                                 <div class="room-content">
                                     <div class="room-header">
@@ -210,12 +224,12 @@
                                     </p>
                                     <div class="room-footer">
                                         <div class="room-price">
-                                            <span class="price-amount">
+                                            <span class="price-amount main-color-text-layout-setting">
                                                 Rp {{ number_format($product->harga_jual, 0, ',', '.') }}
                                             </span>
                                         </div>
-                                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}"
-                                            class="btn-room-details">Pesan Sekarang</a>
+                                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" target="_blank"
+                                            class="btn-room-details main-layout-setting">Pesan Sekarang</a>
                                     </div>
                                 </div>
                             </div>

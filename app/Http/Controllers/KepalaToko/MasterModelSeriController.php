@@ -57,14 +57,37 @@ class MasterModelSeriController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    // public function store(ModelSerieRequest $request)
+    // {
+    //     $data = $request->all();
+
+    //     ModelSerie::create($data);
+
+    //     return redirect()->route('master-model-seri.index');
+    // }
+
     public function store(ModelSerieRequest $request)
     {
-        $data = $request->all();
+        $data = $request->validated();
 
-        ModelSerie::create($data);
+        $existing = \App\Models\ModelSerie::withTrashed()
+            ->where('name', $data['name'])
+            ->first();
 
-        return redirect()->route('master-model-seri.index');
+        if ($existing && $existing->trashed()) {
+            // Kalau ada yang soft delete → restore
+            $existing->restore();
+            $existing->update($data);
+
+            return redirect()->back()->with('success', 'Model seri berhasil dipulihkan & diperbarui.');
+        }
+
+        // Kalau belum ada → buat baru
+        \App\Models\ModelSerie::create($data);
+
+        return redirect()->back()->with('success', 'Model seri berhasil ditambahkan.');
     }
+
 
     public function import(Request $request)
     {

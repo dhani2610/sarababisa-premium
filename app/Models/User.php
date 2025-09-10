@@ -52,6 +52,9 @@ class User extends Authenticatable
         'banks',     
         'foto_portal',     
         'color_portal',     
+        'ig',     
+        'fb',     
+        'tiktok',     
     ];
 
     /**
