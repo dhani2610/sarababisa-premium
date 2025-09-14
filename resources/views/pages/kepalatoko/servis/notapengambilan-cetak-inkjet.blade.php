@@ -172,15 +172,20 @@
                 <td id="data" class="capital">: {{ $items->qc_masuk }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">
                     Total Biaya Servis
+                    @php
+                        if (!empty($items->ppn)) {
+                            $subtotal = $items->biaya - $items->diskon;
+                            $ppnValue = ($subtotal * $items->ppn) / 100;
+                            $totalWithPpn = $subtotal + $ppnValue;
+                        }else{
+                            $totalWithPpn = $items->biaya - $items->diskon;
+                        }
+                    @endphp
                     @if (!empty($items->ppn))
                     <br>
                     <br>
                     PPN ({{ $items->ppn }}%)
-                    @php
-                        $subtotal = $items->biaya - $items->diskon;
-                        $ppnValue = ($subtotal * $items->ppn) / 100;
-                        $totalWithPpn = $subtotal + $ppnValue;
-                    @endphp
+                    
                     <br>
                     <br>
                     Total 
@@ -310,7 +315,7 @@
                         $totalAkhir = max(0, $totalDasar);
                     @endphp
 
-                    <td id="data">: Rp. {{ number_format($totalAkhir) }}</td>
+                    <td id="data">: Rp. {{ number_format($totalAkhir) }}11</td>
 
                     {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka - $items->diskon) }}
                     </td> --}}
@@ -472,12 +477,51 @@
     <table class="w-100">
         <tbody>
             <tr>
+                @php
+                function penyebut($nilai) {
+                    $nilai = abs($nilai);
+                    $huruf = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+                    $temp = "";
+                    if ($nilai < 12) {
+                        $temp = " ". $huruf[$nilai];
+                    } else if ($nilai <20) {
+                        $temp = penyebut($nilai - 10). " belas";
+                    } else if ($nilai < 100) {
+                        $temp = penyebut($nilai/10)." puluh". penyebut($nilai % 10);
+                    } else if ($nilai < 200) {
+                        $temp = " seratus" . penyebut($nilai - 100);
+                    } else if ($nilai < 1000) {
+                        $temp = penyebut($nilai/100) . " ratus" . penyebut($nilai % 100);
+                    } else if ($nilai < 2000) {
+                        $temp = " seribu" . penyebut($nilai - 1000);
+                    } else if ($nilai < 1000000) {
+                        $temp = penyebut($nilai/1000) . " ribu" . penyebut($nilai % 1000);
+                    } else if ($nilai < 1000000000) {
+                        $temp = penyebut($nilai/1000000) . " juta" . penyebut($nilai % 1000000);
+                    }
+                    return $temp;
+                }
+            
+                function terbilang($nilai) {
+                    if($nilai<0) {
+                        $hasil = "minus ". trim(penyebut($nilai));
+                    } else {
+                        $hasil = trim(penyebut($nilai));
+                    }     		
+                    return $hasil;
+                }
+                @endphp
+                <th class="text-left w-75">Terbilang : {{ terbilang($totalWithPpn) }}</th>
+            </tr>
+            <tr>
                 @if ($items->catatan != null)
                     <td colspan="4">
                         <strong>Catatan</strong> : {{ $items->catatan }}
                     </td>
                 @endif
             </tr>
+            
+            <tr>
             <tr>
                 <th class="text-left w-75">Syarat & Ketentuan</th>
                 @if ($items->exp_garansi === null)
