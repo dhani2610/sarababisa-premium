@@ -304,6 +304,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('produk/sub-kategori', KepalaTokoSubKategoriController::class);
     Route::resource('produk/supplier', KepalaTokoSupplierController::class);
     Route::resource('produk/item', KepalaTokoProdukController::class);
+    Route::post('/products/update-portal', [KepalaTokoProdukController::class, 'updatePortal'])->name('products.updatePortal');
     Route::get('top-produk', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk');
 
     Route::resource('produk/handphone', KepalaTokoProdukHandphoneController::class);
@@ -473,6 +474,9 @@ Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(fun
     Route::resource('produk/admin-kategori', AdminTokoKategoriController::class);
     Route::resource('produk/admin-sub-kategori', AdminTokoSubKategoriController::class);
     Route::resource('produk/admin-item', AdminTokoProdukController::class);
+
+    Route::post('/admin-products/update-portal', [AdminTokoProdukController::class, 'updatePortal'])->name('admin.products.updatePortal');
+
     Route::get('top-produk', [AdminTokoProdukController::class, 'indexTop'])->name('top-produk');
 
     Route::resource('produk/admin-handphone', AdminTokoProdukHandphoneController::class);

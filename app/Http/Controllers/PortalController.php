@@ -18,7 +18,7 @@ class PortalController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $query = Product::whereIn('categories_id', $data['productCategory']->pluck('id'))
+        $query = Product::where('is_portal',1)->whereIn('categories_id', $data['productCategory']->pluck('id'))
             ->orderBy('created_at', 'desc');
 
         // Filter Category
@@ -35,7 +35,7 @@ class PortalController extends Controller
         $perPage = $request->input('show', 3);
         $data['products'] = $query->paginate($perPage)->appends($request->all());
 
-        $data['total_products'] = Product::count();
+        $data['total_products'] = Product::where('is_portal',1)->whereIn('categories_id', $data['productCategory']->pluck('id'))->count();
         $data['toko_setting'] = StoreSetting::find(1);
         $data['kepala_toko_setting'] = User::find(1);
         $data['pelanggan'] = Customer::count();
