@@ -93,13 +93,13 @@
                         </a>
                     </li>
                     <!-- Transaksi Servis -->
-                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['teknisi-transaksi-servis', 'teknisi-servis-bisa-diambil', 'teknisi-servis-sudah-diambil'])){{ 'bg-slate-900' }}@endif">
-                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['teknisi-transaksi-servis', 'teknisi-servis-bisa-diambil', 'teknisi-servis-sudah-diambil'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('teknisi-transaksi-servis.index') }}">
+                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['admin-transaksi-servis.index', 'admin-servis-bisa-diambil.index', 'admin-servis-bisa-diambil.edit', 'admin-servis-sudah-diambil.index', 'admin-servis-sudah-diambil.edit', 'admin-transaksi-servis.edit', 'admin-transaksi-servis.show'])){{ 'bg-slate-900' }}@endif">
+                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['admin-transaksi-servis.index', 'admin-servis-bisa-diambil.index', 'admin-servis-bisa-diambil.edit', 'admin-servis-sudah-diambil.index', 'admin-servis-sudah-diambil.edit', 'admin-transaksi-servis.edit', 'admin-transaksi-servis.show'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('admin-transaksi-servis.index') }}">
                             <div class="flex items-center">
                                 <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['teknisi-transaksi-servis'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M8 1v2H3v19h18V3h-5V1h7v23H1V1z" />
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['teknisi-transaksi-servis'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M1 1h22v23H1z" />
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['teknisi-transaksi-servis'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M15 10.586L16.414 12 11 17.414 7.586 14 9 12.586l2 2zM5 0h14v4H5z" />
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['admin-transaksi-servis'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M8 1v2H3v19h18V3h-5V1h7v23H1V1z" />
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['admin-transaksi-servis'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M1 1h22v23H1z" />
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['admin-transaksi-servis'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M15 10.586L16.414 12 11 17.414 7.586 14 9 12.586l2 2zM5 0h14v4H5z" />
                                 </svg>
                                 <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Transaksi Servis</span>
                             </div>
