@@ -511,7 +511,15 @@
                     return $hasil;
                 }
                 @endphp
-                <th class="text-left w-75">Terbilang : {{ terbilang($totalWithPpn) }}</th>
+              
+                <th class="text-right w-75">
+                    {{-- <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">Terbilang : {{ terbilang($totalWithPpn) }}</span> --}}
+                </th>
+                <th class="text-right w-75">
+                    <i>
+                        <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">Terbilang : {{ terbilang($totalWithPpn) }}</span>
+                    </i>
+                </th>
             </tr>
             <tr>
                 @if ($items->catatan != null)
