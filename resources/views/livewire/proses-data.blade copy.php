@@ -66,7 +66,7 @@
                             </div>
                         </div>
                         <!-- Modal content -->
-                        <form action="{{ route('cetak-laporan-proses') }}" method="get"  target="_blank">
+                        <form action="{{ route('cetak-laporan-proses') }}" method="get"  hidetargetblank>
                             @csrf
                             <div class="px-5 py-4">
                                 <div class="space-y-3">
@@ -889,7 +889,7 @@
                                             @mouseenter="open = true"
                                             @mouseleave="open = false"
                                         >
-                                            <a href="https://api.whatsapp.com/send?phone={{$nomorwa}}&text="  target="_blank">
+                                            <a href="https://api.whatsapp.com/send?phone={{$nomorwa}}&text="  hidetargetblank>
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                     <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
@@ -921,7 +921,7 @@
                                             @mouseenter="open = true"
                                             @mouseleave="open = false"
                                         >
-                                            <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Service*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Service%20:%20{{ $process->nomor_servis }}%0ANama%20user%20:%20*{{ $process->nama_pelanggan }}*%0AUnit%20:%20{{ $process->nama_barang }}%0ADiterima%20:%20{{ $process->penerima }}%0ATanggal%20:%20{{ \Carbon\Carbon::parse($process->created_at)->translatedFormat('d F Y h:i') }}%0AKerusakan%20:%20{{ $process->kerusakan }}%0A%0ALink%20tracking%20:%20{{ env('APP_URL') }}/tracking%0ATerimakasih"  target="_blank">
+                                            <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Service*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Service%20:%20{{ $process->nomor_servis }}%0ANama%20user%20:%20*{{ $process->nama_pelanggan }}*%0AUnit%20:%20{{ $process->nama_barang }}%0ADiterima%20:%20{{ $process->penerima }}%0ATanggal%20:%20{{ \Carbon\Carbon::parse($process->created_at)->translatedFormat('d F Y h:i') }}%0AKerusakan%20:%20{{ $process->kerusakan }}%0A%0ALink%20tracking%20:%20{{ env('APP_URL') }}/tracking%0ATerimakasih"  hidetargetblank>
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                 <path d="M14 3v4a1 1 0 0 0 1 1h4" />
@@ -1085,7 +1085,7 @@
                                                         <div class="px-5 py-4">
                                                             <div class="flex flex-wrap justify-end space-x-2">
                                                                 <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" @click="modalOpen = false">Batal</button>
-                                                                <a href="{{ route('kepalatoko-cetak-termal', $process->id) }}"  target="_blank">
+                                                                <a href="{{ route('kepalatoko-cetak-termal', $process->id) }}"  hidetargetblank>
                                                                     <button class="btn-sm bg-orange-500 hover:bg-orange-600 text-white">
                                                                         <span class="mr-1">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -1098,7 +1098,7 @@
                                                                         Printer Termal
                                                                     </button>
                                                                 </a>
-                                                                <a href="{{ route('kepalatoko-cetak-inkjet', $process->id) }}"  target="_blank">
+                                                                <a href="{{ route('kepalatoko-cetak-inkjet', $process->id) }}"  hidetargetblank>
                                                                     <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
                                                                         <span class="mr-1">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">

@@ -76,7 +76,7 @@
                                 </div>
                             </div>
                             <!-- Modal content -->
-                            <form action="{{ route('cetak-laporan-sales') }}" method="get"  target="_blank">
+                            <form action="{{ route('cetak-laporan-sales') }}" method="get"  hidetargetblank>
                                 @csrf
                                 <div class="px-5 py-4">
                                     <div class="space-y-3">

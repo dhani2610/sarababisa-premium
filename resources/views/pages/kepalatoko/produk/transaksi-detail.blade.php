@@ -230,7 +230,7 @@
                                     <div class="px-5 py-4">
                                         <div class="flex flex-wrap justify-end space-x-2">
                                             <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" @click="modalOpen = false">Batal</button>
-                                            <a href="{{ route('cetak-termal', $order->id) }}"  target="_blank">
+                                            <a href="{{ route('cetak-termal', $order->id) }}"  hidetargetblank>
                                                 <button class="btn-sm bg-orange-500 hover:bg-orange-600 text-white">
                                                     <span class="mr-1">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -243,7 +243,7 @@
                                                     Printer Termal
                                                 </button>
                                             </a>
-                                            <a href="{{ route('lunas-cetak-inkjet', $order->id) }}"  target="_blank">
+                                            <a href="{{ route('lunas-cetak-inkjet', $order->id) }}"  hidetargetblank>
                                                 <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
                                                     <span class="mr-1">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -267,7 +267,7 @@
                             $nomorwa = preg_replace('/^08/', 628, $nomor);
                         }
                     @endphp
-                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Penjualan*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Nota%20:%20{{ $order->invoice_no }}%0ANama%20pelanggan%20:%20*{{ $order->nama_pelanggan }}*%0AProduk%20:%0A{{ $produkDetails }}%0APembayaran%20:%20{{ $order->payment_method }}%0A%0ALink%20garansi%20:%20{{ $toko->link_toko }}/garansi%0A%0ATerimakasih"  target="_blank">
+                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Penjualan*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Nota%20:%20{{ $order->invoice_no }}%0ANama%20pelanggan%20:%20*{{ $order->nama_pelanggan }}*%0AProduk%20:%0A{{ $produkDetails }}%0APembayaran%20:%20{{ $order->payment_method }}%0A%0ALink%20garansi%20:%20{{ $toko->link_toko }}/garansi%0A%0ATerimakasih"  hidetargetblank>
                         <button class="btn w-full bg-emerald-500 hover:bg-emerald-600 text-white mt-3">
                             <span class="mr-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">

@@ -153,7 +153,7 @@
                             <div class="text-center">
                                 <!-- CTAs -->
                                 <div class="flex justify-center space-x-2">
-                                    <a href="{{ route('admin-cetak-termal-produk', $order->id) }}"  target="_blank">
+                                    <a href="{{ route('admin-cetak-termal-produk', $order->id) }}"  hidetargetblank>
                                         <button class="btn-sm bg-orange-500 hover:bg-orange-600 text-white">
                                             <span class="mr-1">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -166,7 +166,7 @@
                                             Printer Termal
                                         </button>
                                     </a>
-                                    <a href="{{ route('admin-lunas-cetak-inkjet', $order->id) }}"  target="_blank">
+                                    <a href="{{ route('admin-lunas-cetak-inkjet', $order->id) }}"  hidetargetblank>
                                         <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
                                             <span class="mr-1">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">

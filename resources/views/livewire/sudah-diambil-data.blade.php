@@ -497,7 +497,7 @@
                                                 @mouseenter="open = true"
                                                 @mouseleave="open = false"
                                             >
-                                                <a href="https://api.whatsapp.com/send?phone={{$nomorwa}}&text="  target="_blank">
+                                                <a href="https://api.whatsapp.com/send?phone={{$nomorwa}}&text="  hidetargetblank>
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                         <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
@@ -531,7 +531,7 @@
                                                 @mouseleave="open = false"
                                             >
                                                 @if ($transaction->exp_garansi != null)
-                                                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Service*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Service%20:%20{{ $transaction->nomor_servis }}%0ANama%20user%20:%20*{{ $transaction->nama_pelanggan }}*%0AUnit%20:%20{{ $transaction->nama_barang }}%0ADiambil%20:%20{{ $transaction->pengambil }}%0ATanggal%20:%20{{ \Carbon\Carbon::parse($transaction->tgl_ambil)->translatedFormat('d F Y (H:i)') }}%0AStatus%20:%20{{ $transaction->kondisi_servis }}%0AGaransi%20sampai%20:%20{{ \Carbon\Carbon::parse($transaction->exp_garansi)->translatedFormat('d F Y') }}%0APembayaran%20:%20{{ $transaction->cara_pembayaran }}%0A%0ALink%20tracking%20:%20{{ env('APP_URL') }}/tracking%0A%0ATerimakasih"  target="_blank">
+                                                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Service*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Service%20:%20{{ $transaction->nomor_servis }}%0ANama%20user%20:%20*{{ $transaction->nama_pelanggan }}*%0AUnit%20:%20{{ $transaction->nama_barang }}%0ADiambil%20:%20{{ $transaction->pengambil }}%0ATanggal%20:%20{{ \Carbon\Carbon::parse($transaction->tgl_ambil)->translatedFormat('d F Y (H:i)') }}%0AStatus%20:%20{{ $transaction->kondisi_servis }}%0AGaransi%20sampai%20:%20{{ \Carbon\Carbon::parse($transaction->exp_garansi)->translatedFormat('d F Y') }}%0APembayaran%20:%20{{ $transaction->cara_pembayaran }}%0A%0ALink%20tracking%20:%20{{ env('APP_URL') }}/tracking%0A%0ATerimakasih"  hidetargetblank>
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                         <path d="M14 3v4a1 1 0 0 0 1 1h4" />
@@ -542,7 +542,7 @@
                                                         </svg>
                                                     </a>
                                                 @else
-                                                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Service*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Service%20:%20{{ $transaction->nomor_servis }}%0ANama%20user%20:%20*{{ $transaction->nama_pelanggan }}*%0AUnit%20:%20{{ $transaction->nama_barang }}%0ADiambil%20:%20{{ $transaction->pengambil }}%0ATanggal%20:%20{{ \Carbon\Carbon::parse($transaction->tgl_ambil)->translatedFormat('d F Y (H:i)') }}%0AStatus%20:%20{{ $transaction->kondisi_servis }}%0AGaransi%20sampai%20:%20Tidak%20ada%20garansi%0APembayaran%20:%20{{ $transaction->cara_pembayaran }}%0A%0ALink%20tracking%20:%20{{ env('APP_URL') }}/tracking%0A%0ATerimakasih"  target="_blank">
+                                                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Service*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Service%20:%20{{ $transaction->nomor_servis }}%0ANama%20user%20:%20*{{ $transaction->nama_pelanggan }}*%0AUnit%20:%20{{ $transaction->nama_barang }}%0ADiambil%20:%20{{ $transaction->pengambil }}%0ATanggal%20:%20{{ \Carbon\Carbon::parse($transaction->tgl_ambil)->translatedFormat('d F Y (H:i)') }}%0AStatus%20:%20{{ $transaction->kondisi_servis }}%0AGaransi%20sampai%20:%20Tidak%20ada%20garansi%0APembayaran%20:%20{{ $transaction->cara_pembayaran }}%0A%0ALink%20tracking%20:%20{{ env('APP_URL') }}/tracking%0A%0ATerimakasih"  hidetargetblank>
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                         <path d="M14 3v4a1 1 0 0 0 1 1h4" />
@@ -744,7 +744,7 @@
                                                         <!-- Modal footer -->
                                                         <div class="px-5 py-4">
                                                             <div class="flex flex-wrap justify-end space-x-2">
-                                                                <a x-bind:href="'{{ route('kepalatoko-nota-pengambilan-termal', '') }}/' + printId"  target="_blank">
+                                                                <a x-bind:href="'{{ route('kepalatoko-nota-pengambilan-termal', '') }}/' + printId"  hidetargetblank>
                                                                     <button class="btn-sm bg-orange-500 hover:bg-orange-600 text-white">
                                                                         <span class="mr-1">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -757,7 +757,7 @@
                                                                         Printer Termal
                                                                     </button>
                                                                 </a>
-                                                                <a x-bind:href="'{{ route('kepalatoko-pengambilan-cetak-inkjet', '') }}/' + printId"  target="_blank">
+                                                                <a x-bind:href="'{{ route('kepalatoko-pengambilan-cetak-inkjet', '') }}/' + printId"  hidetargetblank>
                                                                     <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
                                                                         <span class="mr-1">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
