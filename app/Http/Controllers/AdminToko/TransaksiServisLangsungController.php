@@ -285,7 +285,7 @@ class TransaksiServisLangsungController extends Controller
                 $order->order_date = Carbon::today()->locale('id')->translatedFormat('d F Y');
                 $order->total_products = 1;
                 $order->sub_total = $spareparts->harga_jual;
-                $order->invoice_no = '' . mt_rand(date('Ymd00'), date('Ymd99'));
+                $order->invoice_no = '' . mt_rand(date('Ymd00'), date('Ymd99')).rand(10,90);
                 $order->nama_pelanggan = $nama_pelanggan;
                 $order->payment_method = "Tunai";
                 $order->pay = $spareparts->harga_jual;

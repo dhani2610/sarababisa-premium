@@ -21,6 +21,6 @@ class EnsureTeknisiRole
             return $next($request);
         }
 
-        return redirect('/');
+        return redirect('/hak-akses');
     }
 }
