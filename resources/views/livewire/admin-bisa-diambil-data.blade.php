@@ -440,7 +440,7 @@
                                         @mouseenter="open = true"
                                         @mouseleave="open = false"
                                     >
-                                        <a href="https://api.whatsapp.com/send?phone={{$nomorwa}}&text=" target="__blank">
+                                        <a href="https://api.whatsapp.com/send?phone={{$nomorwa}}&text="  target="_blank">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                 <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
@@ -472,7 +472,7 @@
                                         @mouseenter="open = true"
                                         @mouseleave="open = false"
                                     >
-                                        <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20|%20{{ $toko->nama_toko }}*%20Barang%20Servis%20*{{ $transaction->nama_barang }}*%20dengan%20No.%20Servis%20*{{ $transaction->nomor_servis }}*%20kondisinya%20*{{ $transaction->kondisi_servis }}*%20pada%20tanggal%20{{ \Carbon\Carbon::parse($transaction->tgl_selesai)->translatedFormat('d F Y') }}%20dan%20*{{ $transaction->status_servis }}*%20dengan%20biaya%20Rp.%20{{ number_format($transaction->biaya) }}.%20Terima%20Kasih." target="__blank">
+                                        <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20|%20{{ $toko->nama_toko }}*%20Barang%20Servis%20*{{ $transaction->nama_barang }}*%20dengan%20No.%20Servis%20*{{ $transaction->nomor_servis }}*%20kondisinya%20*{{ $transaction->kondisi_servis }}*%20pada%20tanggal%20{{ \Carbon\Carbon::parse($transaction->tgl_selesai)->translatedFormat('d F Y') }}%20dan%20*{{ $transaction->status_servis }}*%20dengan%20biaya%20Rp.%20{{ number_format($transaction->biaya) }}.%20Terima%20Kasih."  target="_blank">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                             <path d="M14 3v4a1 1 0 0 0 1 1h4" />

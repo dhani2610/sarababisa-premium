@@ -66,7 +66,7 @@
                                             <li>✅ 1.000 pesan/bulan</li>
                                         </ul>
                                         <a href="https://wa.me/62811801799?text=Saya ingin berlangganan broadcast paket Free (Rp 0)"
-                                            target="_blank" style="background: green;"
+                                             target="_blank" style="background: green;"
                                             class="block text-center text-white py-2 rounded hover:bg-indigo-800">
                                             Rp 0
                                         </a>
@@ -84,7 +84,7 @@
                                             <li>✅ 1.000 pesan/bulan</li>
                                         </ul>
                                         <a href="https://wa.me/62811801799?text=Saya ingin berlangganan broadcast paket Lite (Rp 25.000)"
-                                            target="_blank" style="background: green;"
+                                             target="_blank" style="background: green;"
                                             class="block text-center text-white py-2 rounded hover:bg-indigo-800">
                                             Rp 25.000
                                         </a>
@@ -102,7 +102,7 @@
                                             <li>✅ 10.000 pesan/bulan</li>
                                         </ul>
                                         <a href="https://wa.me/62811801799?text=Saya ingin berlangganan broadcast paket Regular (Rp 66.000)"
-                                            target="_blank" style="background: green;"
+                                             target="_blank" style="background: green;"
                                             class="block text-center text-white py-2 rounded hover:bg-indigo-800">
                                             Rp 66.000
                                         </a>

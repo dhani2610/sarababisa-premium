@@ -228,7 +228,7 @@
                                                 Rp {{ number_format($product->harga_jual, 0, ',', '.') }}
                                             </span>
                                         </div>
-                                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" target="_blank"
+                                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}"  target="_blank"
                                             class="btn-room-details main-layout-setting">Pesan Sekarang</a>
                                     </div>
                                 </div>

@@ -67,22 +67,34 @@ class AdminBisaDiambilData extends Component
         $customers = Customer::all();
         $tokoSetting = StoreSetting::find(1);
         $toko = User::find(1);
-        $users = User::where('role', 'Teknisi')->get();
-        $workers = User::all();
+        $users = User::where('role', 'Teknisi')->when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('id',auth()->user()->id);
+        })->get();
+        $workers = User::when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('id',auth()->user()->id);
+        })->get();
         $types = Type::all();
         $brands = Brand::all();
         $capacities = Capacity::all();
         $model_series = ModelSerie::all();
         $actions = ServiceAction::all();
-        $processes_count = ServiceTransaction::whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
-        $jumlah_bisa_diambil = ServiceTransaction::where('status_servis', 'Bisa Diambil')->count();
-        $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->count();
+        $processes_count = ServiceTransaction::whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('penerima',auth()->user()->name);
+        })->count();
+        $jumlah_bisa_diambil = ServiceTransaction::where('status_servis', 'Bisa Diambil')->when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('penerima',auth()->user()->name);
+        })->count();
+        $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('penerima',auth()->user()->name);
+        })->count();
         $bisadiambil = ServiceTransaction::when($this->search, function ($q) {
                 $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('tindakan_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('nama_barang', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('imei', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil');
             })->when($this->type, function ($q) {
                 $q->whereIn('types_id', $this->type);
             })->when($this->kondisi, function ($q) {
                 $q->whereIn('kondisi_servis', $this->kondisi)->where('status_servis', 'Bisa Diambil');
+            })->when(auth()->user()->role === 'Teknisi', function ($q) {
+                $q->where('penerima',auth()->user()->name);
             })->orderBy('created_at','desc')->paginate($this->paginate);
         return view('livewire.admin-bisa-diambil-data', [
             'users' => $users,

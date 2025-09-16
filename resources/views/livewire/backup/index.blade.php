@@ -5,7 +5,7 @@
         </x-button>
         <x-button primary wire:click="backupToDrive">
             {{ __('Backup to Google Drive') }}</x-button>
-        <a href="https://drive.google.com/drive/folders/{{ env('GOOGLE_DRIVE_FOLDER_ID') }}" target="_blank">
+        <a href="https://drive.google.com/drive/folders/{{ env('GOOGLE_DRIVE_FOLDER_ID') }}"  target="_blank">
             {{ __('Open backup folder in Google Drive') }}
         </a>
         <x-button primary type="button" wire:click="cleanBackups">
