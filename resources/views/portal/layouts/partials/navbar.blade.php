@@ -20,6 +20,7 @@
                    
                     <li><a href="{{ url('/login') }}" class="active">Login</a></li>
                     <li><a id="installApp" style="display:none;" class="active">Install App</a></li>
+                    <li><a href="{{ url('install-app-ios') }}" style="" class="active">Install App IOS</a></li>
 
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

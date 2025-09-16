@@ -165,6 +165,7 @@ use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as Kep
 
 Route::get('/', [PortalController::class, 'index'])->name('portal');
 Route::get('/detail-produk/{id}', [PortalController::class, 'index'])->name('portal.detail-produk');
+Route::get('/install-app-ios', [PortalController::class, 'installAppIOS'])->name('portal.install-app-ios');
 Route::get('/pembayaran', [PaymentController::class, 'index'])->name('payment');
 Route::get('/hak-akses', [HakAksesController::class, 'index'])->name('hak-akses');
 Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
