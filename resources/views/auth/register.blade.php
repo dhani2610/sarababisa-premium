@@ -41,8 +41,8 @@
                         <input type="checkbox" class="form-checkbox mt-1" name="terms" id="terms" />
                         <span class="text-sm ml-2">
                             {!! __('I agree to the :terms_of_service and :privacy_policy', [
-                                'terms_of_service' => '<a target="_blank" href="'.route('terms.show').'" class="text-sm underline hover:no-underline">'.__('Terms of Service').'</a>',
-                                'privacy_policy' => '<a target="_blank" href="'.route('policy.show').'" class="text-sm underline hover:no-underline">'.__('Privacy Policy').'</a>',
+                                'terms_of_service' => '<a  target="_blank" href="'.route('terms.show').'" class="text-sm underline hover:no-underline">'.__('Terms of Service').'</a>',
+                                'privacy_policy' => '<a  target="_blank" href="'.route('policy.show').'" class="text-sm underline hover:no-underline">'.__('Privacy Policy').'</a>',
                             ]) !!}                        
                         </span>
                     </label>

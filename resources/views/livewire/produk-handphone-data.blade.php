@@ -407,7 +407,7 @@
                             </div>
                         </div>
                         <!-- Modal content -->
-                        <form action="{{ route('cetak-laporan-produk-handphone') }}" method="get" target="__blank">
+                        <form action="{{ route('cetak-laporan-produk-handphone') }}" method="get"  target="_blank">
                             @csrf
                             <div class="px-5 py-4">
                                 <div class="space-y-3">
@@ -622,6 +622,8 @@
                         <div class="flex items-center">
                             <div class="text-sm italic mr-2 whitespace-nowrap"><span class="table-items-count"></span> item yang dipilih</div>
                             <button class="btn bg-white border-slate-200 hover:border-slate-300 text-rose-500 hover:text-rose-600" @click="deleteSelected">Hapus</button>
+                            <button class="btn bg-green-500 hover:bg-green-600 text-white mr-2 ml-2" @click="updatePortalStatus('show')"> Show Portal</button>
+                            <button class="btn bg-yellow-500 hover:bg-yellow-600 text-white mr-2 " @click="updatePortalStatus('hide')">Hide Portal</button>
                         </div>
                     </div>
                 </div>
@@ -681,6 +683,9 @@
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Garansi IMEI</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Show Portal</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Aksi</div>
@@ -774,6 +779,9 @@
                                             -
                                         @endif
                                     </div>
+                                </td>
+                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    <div class="font-medium">{{ $item->is_portal == 1 ? 'Show' : 'Not Show' }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="space-x-1 flex">
@@ -925,6 +933,27 @@
                     })
                     .catch(error => {
                         console.error('Gagal menghapus data:', error);
+                    });
+                },
+                updatePortalStatus(action) {
+                    const checkboxes = document.querySelectorAll('input.table-item:checked');
+                    const selectedIds = [...checkboxes].map((checkbox) => checkbox.value);
+
+                    fetch('/products/update-portal', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        body: JSON.stringify({ selectedIds, action }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Gagal update portal:', error);
                     });
                 },
             }))

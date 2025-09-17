@@ -172,15 +172,20 @@
                 <td id="data" class="capital">: {{ $items->qc_masuk }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">
                     Total Biaya Servis
+                    @php
+                        if (!empty($items->ppn)) {
+                            $subtotal = $items->biaya - $items->diskon;
+                            $ppnValue = ($subtotal * $items->ppn) / 100;
+                            $totalWithPpn = $subtotal + $ppnValue;
+                        }else{
+                            $totalWithPpn = $items->biaya - $items->diskon;
+                        }
+                    @endphp
                     @if (!empty($items->ppn))
                     <br>
                     <br>
                     PPN ({{ $items->ppn }}%)
-                    @php
-                        $subtotal = $items->biaya - $items->diskon;
-                        $ppnValue = ($subtotal * $items->ppn) / 100;
-                        $totalWithPpn = $subtotal + $ppnValue;
-                    @endphp
+                    
                     <br>
                     <br>
                     Total 
@@ -310,7 +315,7 @@
                         $totalAkhir = max(0, $totalDasar);
                     @endphp
 
-                    <td id="data">: Rp. {{ number_format($totalAkhir) }}</td>
+                    <td id="data">: Rp. {{ number_format($totalAkhir) }}11</td>
 
                     {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka - $items->diskon) }}
                     </td> --}}
@@ -472,12 +477,59 @@
     <table class="w-100">
         <tbody>
             <tr>
+                @php
+                function penyebut($nilai) {
+                    $nilai = abs($nilai);
+                    $huruf = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
+                    $temp = "";
+                    if ($nilai < 12) {
+                        $temp = " ". $huruf[$nilai];
+                    } else if ($nilai <20) {
+                        $temp = penyebut($nilai - 10). " Belas";
+                    } else if ($nilai < 100) {
+                        $temp = penyebut($nilai/10)." Puluh". penyebut($nilai % 10);
+                    } else if ($nilai < 200) {
+                        $temp = " Seratus" . penyebut($nilai - 100);
+                    } else if ($nilai < 1000) {
+                        $temp = penyebut($nilai/100) . " Ratus" . penyebut($nilai % 100);
+                    } else if ($nilai < 2000) {
+                        $temp = " Seribu" . penyebut($nilai - 1000);
+                    } else if ($nilai < 1000000) {
+                        $temp = penyebut($nilai/1000) . " Ribu" . penyebut($nilai % 1000);
+                    } else if ($nilai < 1000000000) {
+                        $temp = penyebut($nilai/1000000) . " Juta" . penyebut($nilai % 1000000);
+                    }
+                    return $temp;
+                }
+            
+                function terbilang($nilai) {
+                    if($nilai<0) {
+                        $hasil = "Minus ". trim(penyebut($nilai));
+                    } else {
+                        $hasil = trim(penyebut($nilai));
+                    }     		
+                    return $hasil;
+                }
+                @endphp
+              
+                <th class="text-right w-75">
+                    {{-- <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">Terbilang : {{ terbilang($totalWithPpn) }}</span> --}}
+                </th>
+                <th class="text-right w-75">
+                    <i>
+                        <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">Terbilang : {{ terbilang($totalWithPpn) }}</span>
+                    </i>
+                </th>
+            </tr>
+            <tr>
                 @if ($items->catatan != null)
                     <td colspan="4">
                         <strong>Catatan</strong> : {{ $items->catatan }}
                     </td>
                 @endif
             </tr>
+            
+            <tr>
             <tr>
                 <th class="text-left w-75">Syarat & Ketentuan</th>
                 @if ($items->exp_garansi === null)

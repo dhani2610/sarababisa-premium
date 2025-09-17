@@ -12,11 +12,15 @@
                 <ul>
                     <li><a href="{{ url('/') }}" class="active">Beranda</a></li>
                     <li>
-                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" class="active" target="_blank">
+                        <a href="https://wa.me/{{ $kepala_toko_setting->nomor_hp_toko }}" class="active"
+                            target="_blank">
                             Kontak
                         </a>
                     </li>
+                   
                     <li><a href="{{ url('/login') }}" class="active">Login</a></li>
+                    <li><a id="installApp" style="display:none;" class="active">Install App</a></li>
+                    <li><a href="{{ url('install-app-ios') }}" style="" class="active">Install App IOS</a></li>
 
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

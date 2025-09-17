@@ -2,6 +2,7 @@
 
 namespace App\View\Components;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Component;
 
 class AdminLayout extends Component
@@ -13,6 +14,11 @@ class AdminLayout extends Component
      */
     public function render()
     {
+        $role = Auth::user()->role ?? 'guest';
+        if ($role == 'Teknisi') {
+            return view('layouts.teknisi');
+        }
+
         return view('layouts.admin');
     }
 }

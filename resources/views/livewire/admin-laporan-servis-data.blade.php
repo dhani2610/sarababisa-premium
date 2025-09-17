@@ -108,7 +108,7 @@
                             </div>
                         </div>
                         <!-- Modal content -->
-                        <form action="{{ route('admin-cetak-laporan-servis') }}" method="get" target="__blank">
+                        <form action="{{ route('admin-cetak-laporan-servis') }}" method="get"  target="_blank">
                             @csrf
                             <div class="px-5 py-4">
                                 <div class="space-y-3">

@@ -28,7 +28,7 @@ class AdminProsesData extends Component
         $this->type = Type::pluck('id')->toArray();
     }
 
-    
+
     public $service_id;
     public $pin;
     public $pola;
@@ -69,11 +69,17 @@ class AdminProsesData extends Component
     public function render()
     {
         $toko = User::find(1);
-        $processes_count = ServiceTransaction::whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
-        $users = User::where('role', 'Teknisi')->get();
+        $processes_count = ServiceTransaction::whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('penerima',auth()->user()->name);
+        })->count();
+        $users = User::where('role', 'Teknisi')->when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('id',auth()->user()->id);
+        })->get();
         $sales = User::where('role', 'Sales')->get();
         $tokoSetting = StoreSetting::find(1);
-        $penerima = User::all();
+        $penerima = User::when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('id',auth()->user()->id);
+        })->get();
         $customers = Customer::all();
         $types = Type::all();
         $brands = Brand::all();
@@ -85,21 +91,28 @@ class AdminProsesData extends Component
                 $subQuery->where('category_name', 'Sparepart');
             });
         })->where('stok', '>=', 1)->get();
-        $jumlah_bisa_diambil = ServiceTransaction::where('status_servis', 'Bisa Diambil')->count();
-        $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->count();
+        $jumlah_bisa_diambil = ServiceTransaction::where('status_servis', 'Bisa Diambil')->when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('penerima',auth()->user()->name);
+        })->count();
+        $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('penerima',auth()->user()->name);
+        })->count();
 
 
         $prosess = ServiceTransaction::when(
-                $this->search,
-                function ($q) {
-                    $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('nama_barang', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('imei', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil']);
-                }
-            )->when($this->type, function ($q) {
-                $q->whereIn('types_id', $this->type);
-            })->when($this->status, function ($q) {
-                $q->whereIn('status_servis', $this->status);
-            })->orderBy('created_at','desc')->paginate($this->paginate);
-            
+            $this->search,
+            function ($q) {
+                $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('nama_barang', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('imei', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil']);
+            }
+        )->when($this->type, function ($q) {
+            $q->whereIn('types_id', $this->type);
+        })->when($this->status, function ($q) {
+            $q->whereIn('status_servis', $this->status);
+        })->when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('penerima',auth()->user()->name);
+        })
+            ->orderBy('created_at', 'desc')->paginate($this->paginate);
+
         return view('livewire.admin-proses-data', [
             'toko' => $toko,
             'tokoSetting' => $tokoSetting,

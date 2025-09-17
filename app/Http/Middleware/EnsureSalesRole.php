@@ -21,6 +21,6 @@ class EnsureSalesRole
             return $next($request);
         }
 
-        return redirect('/');
+        return redirect('/hak-akses');
     }
 }
