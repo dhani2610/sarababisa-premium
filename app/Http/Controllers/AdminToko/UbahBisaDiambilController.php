@@ -19,7 +19,9 @@ class UbahBisaDiambilController extends Controller
     public function edit($id)
     {
         $item = ServiceTransaction::findOrFail($id);
-        $users = User::where('role', 'Teknisi')->get();
+        $users = User::where('role', 'Teknisi')->when(auth()->user()->role === 'Teknisi', function ($q) {
+            $q->where('id',auth()->user()->id);
+        })->get();
         $sales = User::where('role', 'Sales')->get();
         $service_actions = ServiceAction::all();
         $products = Product::whereHas('subCategory', function ($query) {

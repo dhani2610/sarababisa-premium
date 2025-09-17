@@ -106,7 +106,7 @@
                             </div>
                         </div>
                         <!-- Modal content -->
-                        <form action="{{ route('cetak-laporan-tukar-tambah') }}" method="get" target="__blank">
+                        <form action="{{ route('cetak-laporan-tukar-tambah') }}" method="get"  target="_blank">
                             @csrf
                             <div class="px-5 py-4">
                                 <div class="space-y-3">
@@ -214,7 +214,7 @@
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="space-x-1 flex">
-                                        <a href="{{ route('nota-tukar-tambah', $item->reference_number) }}" target="__blank">
+                                        <a href="{{ route('nota-tukar-tambah', $item->reference_number) }}"  target="_blank">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                 <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />

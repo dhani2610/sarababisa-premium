@@ -165,6 +165,7 @@ use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as Kep
 
 Route::get('/', [PortalController::class, 'index'])->name('portal');
 Route::get('/detail-produk/{id}', [PortalController::class, 'index'])->name('portal.detail-produk');
+Route::get('/install-app-ios', [PortalController::class, 'installAppIOS'])->name('portal.install-app-ios');
 Route::get('/pembayaran', [PaymentController::class, 'index'])->name('payment');
 Route::get('/hak-akses', [HakAksesController::class, 'index'])->name('hak-akses');
 Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
@@ -304,6 +305,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('produk/sub-kategori', KepalaTokoSubKategoriController::class);
     Route::resource('produk/supplier', KepalaTokoSupplierController::class);
     Route::resource('produk/item', KepalaTokoProdukController::class);
+    Route::post('/products/update-portal', [KepalaTokoProdukController::class, 'updatePortal'])->name('products.updatePortal');
     Route::get('top-produk', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk');
 
     Route::resource('produk/handphone', KepalaTokoProdukHandphoneController::class);
@@ -416,19 +418,26 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('/impor-tool', [KepalaTokoProdukToolController::class, 'import'])->name('impor-tool');
 });
 
+Route::resource('servis/admin-transaksi-servis', AdminTokoTransaksiServisController::class);
+Route::resource('servis/admin-servis-bisa-diambil', AdminTokoBisaDiambilController::class);
+Route::resource('servis/admin-servis-sudah-diambil', AdminTokoSudahDiambilController::class);
+Route::post('servis/admin-transaksi-servis/{id}/update-pin-pola', [AdminTokoTransaksiServisController::class, 'updatePinPola'])
+    ->name('transaksi-servis.update-pin-pola');
+Route::post('/servis/admin-transaksi-servis-langsung', [AdminTokoTransaksiServisLangsungController::class, 'store'])->name('admin-servis-langsung');
+
 Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(function () {
     Route::get('/admin-dashboard', [AdminTokoDashboardController::class, 'index'])->name('admintoko-dashboard');
     Route::resource('servis/admin-tindakan-servis', AdminTokoTindakanServisController::class);
     Route::resource('admin-pelanggan', AdminTokoPelangganController::class);
     Route::post('admin-pelanggan-broadcast', [AdminTokoPelangganController::class,'broadcast'])->name('admin.pelanggan.broadcast');
 
-    Route::resource('servis/admin-transaksi-servis', AdminTokoTransaksiServisController::class);
-    Route::post('servis/admin-transaksi-servis/{id}/update-pin-pola', [AdminTokoTransaksiServisController::class, 'updatePinPola'])
-    ->name('transaksi-servis.update-pin-pola');
+    // Route::resource('servis/admin-transaksi-servis', AdminTokoTransaksiServisController::class);
+    // Route::post('servis/admin-transaksi-servis/{id}/update-pin-pola', [AdminTokoTransaksiServisController::class, 'updatePinPola'])
+    // ->name('transaksi-servis.update-pin-pola');
 
-    Route::post('/servis/admin-transaksi-servis-langsung', [AdminTokoTransaksiServisLangsungController::class, 'store'])->name('admin-servis-langsung');
-    Route::resource('servis/admin-servis-bisa-diambil', AdminTokoBisaDiambilController::class);
-    Route::resource('servis/admin-servis-sudah-diambil', AdminTokoSudahDiambilController::class);
+    // Route::post('/servis/admin-transaksi-servis-langsung', [AdminTokoTransaksiServisLangsungController::class, 'store'])->name('admin-servis-langsung');
+    // Route::resource('servis/admin-servis-bisa-diambil', AdminTokoBisaDiambilController::class);
+    // Route::resource('servis/admin-servis-sudah-diambil', AdminTokoSudahDiambilController::class);
     Route::resource('master/admin-master-jenis-barang', AdminTokoMasterJenisBarangController::class);
     Route::resource('master/admin-master-merek', AdminTokoMasterMerekController::class);
     Route::resource('master/admin-master-kapasitas', AdminTokoMasterKapasitasController::class);
@@ -473,6 +482,9 @@ Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(fun
     Route::resource('produk/admin-kategori', AdminTokoKategoriController::class);
     Route::resource('produk/admin-sub-kategori', AdminTokoSubKategoriController::class);
     Route::resource('produk/admin-item', AdminTokoProdukController::class);
+
+    Route::post('/admin-products/update-portal', [AdminTokoProdukController::class, 'updatePortal'])->name('admin.products.updatePortal');
+
     Route::get('top-produk', [AdminTokoProdukController::class, 'indexTop'])->name('top-produk');
 
     Route::resource('produk/admin-handphone', AdminTokoProdukHandphoneController::class);

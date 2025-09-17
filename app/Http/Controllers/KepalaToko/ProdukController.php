@@ -49,6 +49,22 @@ class ProdukController extends Controller
         Product::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data produk berhasil dihapus.']);
     }
+    public function updatePortal(Request $request)
+    {
+        $selectedIds = $request->input('selectedIds');
+        $action = $request->input('action');
+
+        if ($action === 'show') {
+            Product::whereIn('id', $selectedIds)->update(['is_portal' => 1]);
+            return response()->json(['message' => 'Produk berhasil ditampilkan di portal.']);
+        } elseif ($action === 'hide') {
+            Product::whereIn('id', $selectedIds)->update(['is_portal' => 0]);
+            return response()->json(['message' => 'Produk berhasil disembunyikan dari portal.']);
+        }
+
+        return response()->json(['message' => 'Aksi tidak valid.'], 400);
+    }
+
 
 
     // public function downloadBarcode($id)
