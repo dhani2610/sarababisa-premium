@@ -63,8 +63,8 @@ class LaporanTeknisiController extends Controller
         // Menghitung total bonus
         $total_bonus = $total_profit / 100 * $teknisi->persen;
 
-        // $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-teknisi', [
-        return View('pages.kepalatoko.cetak-laporan-teknisi', [
+        $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-teknisi', [
+        // return View('pages.kepalatoko.cetak-laporan-teknisi', [
             'users' => $users,
             'teknisi' => $teknisi,
             'imagePath' => $imagePath,
