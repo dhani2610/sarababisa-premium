@@ -51,6 +51,7 @@ class LaporanTeknisiController extends Controller
         $total_profit = ServiceTransaction::where('users_id', $request->users_id)->where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
+            ->where('is_approve', 'Setuju')
             ->sum('profit');
 
         // Menghitung total tindakan
@@ -62,7 +63,8 @@ class LaporanTeknisiController extends Controller
         // Menghitung total bonus
         $total_bonus = $total_profit / 100 * $teknisi->persen;
 
-        $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-teknisi', [
+        // $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-teknisi', [
+        return View('pages.kepalatoko.cetak-laporan-teknisi', [
             'users' => $users,
             'teknisi' => $teknisi,
             'imagePath' => $imagePath,
