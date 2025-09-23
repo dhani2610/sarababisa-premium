@@ -44,7 +44,7 @@ class BisaDiambilController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function stores(Request $request)
     {
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99'));
         Auth::user();
@@ -134,7 +134,7 @@ class BisaDiambilController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function updates(Request $request, $id)
     {
         $item = ServiceTransaction::findOrFail($id);
 
