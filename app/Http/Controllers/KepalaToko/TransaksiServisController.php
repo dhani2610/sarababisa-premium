@@ -85,7 +85,7 @@ class TransaksiServisController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function stores(Request $request)
+    public function store(Request $request)
     {
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99'));
         $nama_pelanggan = Customer::find($request->customers_id);
