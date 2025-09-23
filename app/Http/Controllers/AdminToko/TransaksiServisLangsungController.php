@@ -28,7 +28,7 @@ class TransaksiServisLangsungController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function stores(Request $request)
+    public function store(Request $request)
     {
         // dd($request->all());
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99')).rand(10,90);
