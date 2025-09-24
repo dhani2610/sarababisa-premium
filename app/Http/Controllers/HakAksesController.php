@@ -9,6 +9,9 @@ class HakAksesController extends Controller
 {
     public function index()
     {
+        if (auth()->check()) {
+            return redirect('/login')->with('error', 'silahkan login kembali,session anda telah habis.');
+        }
         return view('pages/hak-akses');
     }
 }
