@@ -40,6 +40,7 @@ class HandphoneExport implements FromCollection, WithMapping, WithHeadings, Shou
             $product->garansi,
             $product->garansi_imei,
             $product->ppn,
+            $product->created_at,
         ];
     }
 
@@ -63,6 +64,7 @@ class HandphoneExport implements FromCollection, WithMapping, WithHeadings, Shou
             'Garansi Produk (Hari)',
             'Garansi IMEI (Hari)',
             'PPN 11%',
+            'Tgl Masuk',
         ];
     }
 
