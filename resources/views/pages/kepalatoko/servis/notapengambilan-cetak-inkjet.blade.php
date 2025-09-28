@@ -315,7 +315,7 @@
                         $totalAkhir = max(0, $totalDasar);
                     @endphp
 
-                    <td id="data">: Rp. {{ number_format($totalAkhir) }}11</td>
+                    <td id="data">: Rp. {{ number_format($totalAkhir) }}</td>
 
                     {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka - $items->diskon) }}
                     </td> --}}
