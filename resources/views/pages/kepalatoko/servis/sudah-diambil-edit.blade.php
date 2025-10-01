@@ -337,6 +337,34 @@
             // update realtime kalau ada perubahan
             modalJInput.addEventListener("input", calculateModal);
         });
+        document.addEventListener("DOMContentLoaded", function () {
+            const biayaJInput = document.getElementById("biaya_j");
+            const biayaSparepartInput = document.getElementById("biaya");
+
+            function calculatebiaya() {
+                try {
+                    // ambil nilai input, parse JSON (["225000","115000","30000"])
+                    let values = JSON.parse(biayaJInput.value);
+
+                    // pastikan array angka
+                    let numbers = values.map(v => parseInt(v) || 0);
+
+                    // jumlahkan
+                    let total = numbers.reduce((a, b) => a + b, 0);
+
+                    // taruh ke input biaya_sparepart
+                    biayaSparepartInput.value = total;
+                } catch (e) {
+                    biayaSparepartInput.value = 0; // kalau format salah
+                }
+            }
+
+            // hitung pertama kali
+            calculatebiaya();
+
+            // update realtime kalau ada perubahan
+            biayaJInput.addEventListener("input", calculatebiaya);
+        });
         </script>
     @endpush
 </x-admin-layout>
