@@ -510,8 +510,8 @@
                 <th>Tgl Pengeluaran</th>
                 <th>Nama</th>
                 <th>Item Pengeluaran</th>
-                <th>Biaya</th>
                 <th>Status</th>
+                <th>Biaya</th>
             </tr>
         </thead>
         <tbody>
@@ -530,7 +530,6 @@
                         @endif
                     </td>
                     <td>{{ $item->name }}</td>
-                    <td>Rp. {{ number_format($item->price) }}</td>
                     <td>
                         @if ($item->is_approve === null)
                             Belum Disetujui
@@ -540,8 +539,13 @@
                             Ditolak
                         @endif
                     </td>
+                    <td>Rp. {{ number_format($item->price) }}</td>
                 </tr>
             @endforeach
+            <tr>
+				<th colspan="5">Total Biaya</th>
+				<td style="text-align: right;">Rp. {{ number_format($total_pengeluaran) }}</td>
+			</tr>
         </tbody>
     </table>
 
