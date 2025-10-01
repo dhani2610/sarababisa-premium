@@ -139,6 +139,7 @@
             </tr>
         </tbody>
     </table>
+    <br>
     
     <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
         Detail Transaksi
