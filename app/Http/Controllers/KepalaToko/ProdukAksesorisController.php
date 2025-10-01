@@ -81,7 +81,9 @@ class ProdukAksesorisController extends Controller
             'ppn' => $request->ppn
         ]);
 
-        return redirect()->route('aksesoris.index');
+        // return redirect()->route('aksesoris.index');
+        return redirect()->back();
+
     }
 
     /**

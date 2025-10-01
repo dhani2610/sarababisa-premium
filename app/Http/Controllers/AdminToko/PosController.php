@@ -12,6 +12,11 @@ use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use App\Models\Brand;
+use App\Models\Capacity;
+use App\Models\Color;
+use App\Models\ModelSerie;
+use App\Models\SubCategory;
 
 class PosController extends Controller
 {
@@ -22,7 +27,17 @@ class PosController extends Controller
      */
     public function index()
     {
-        return view('pages/admintoko/pos/index');
+
+         $toko = StoreSetting::find(1);
+        $brands = Brand::all();
+        $capacities = Capacity::all();
+        $model_series = ModelSerie::all();
+        $colors = Color::all();
+        $spareparts = SubCategory::where('categories_id', '=', '2')->get();
+        $accessories = SubCategory::where('categories_id', '=', '3')->get();
+        $tools = SubCategory::where('categories_id', '=', '4')->get();
+
+        return view('pages/admintoko/pos/index',compact('brands','capacities','model_series','colors','toko','spareparts','accessories','tools'));
     }
 
     public function show($id)
