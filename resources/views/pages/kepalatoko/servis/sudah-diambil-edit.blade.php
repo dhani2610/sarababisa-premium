@@ -214,11 +214,11 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Modal Sparepart </label>
-                                    <input id="modal_sparepart" name="modal_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->modal_j }}"/>
+                                    <input id="modal_j" name="modal_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->modal_j }}"/>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Pengerjaan Sparepart </label>
-                                    <input id="modal_sparepart" name="biaya_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->biaya_j }}"/>
+                                    <input id="biaya_j" name="biaya_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->biaya_j }}"/>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Modal Sparepart </label>
@@ -306,6 +306,37 @@
                 $('#selectjs3').select2();
                 $('#selectjs4').select2();
             });
+        </script>
+                
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modalJInput = document.getElementById("modal_j");
+            const modalSparepartInput = document.getElementById("modal_sparepart");
+
+            function calculateModal() {
+                try {
+                    // ambil nilai input, parse JSON (["225000","115000","30000"])
+                    let values = JSON.parse(modalJInput.value);
+
+                    // pastikan array angka
+                    let numbers = values.map(v => parseInt(v) || 0);
+
+                    // jumlahkan
+                    let total = numbers.reduce((a, b) => a + b, 0);
+
+                    // taruh ke input modal_sparepart
+                    modalSparepartInput.value = total;
+                } catch (e) {
+                    modalSparepartInput.value = 0; // kalau format salah
+                }
+            }
+
+            // hitung pertama kali
+            calculateModal();
+
+            // update realtime kalau ada perubahan
+            modalJInput.addEventListener("input", calculateModal);
+        });
         </script>
     @endpush
 </x-admin-layout>
