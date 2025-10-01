@@ -28,16 +28,25 @@ class KaryawanData extends Component
 
     public function render()
     {
-        $workers = Worker::all();
+        if (auth()->user()->role == 'Kepala Toko') {
+            $query = Worker::query();
+        } else {
+            $query = Worker::where('name', auth()->user()->name);
+        }
+
+        if ($this->search !== null) {
+            $query->where('name', 'like', '%' . $this->search . '%');
+        }
+
+        $workers = $query->latest()->paginate($this->paginate);
+
         $budgets = Budget::all();
-        $workers_count = Worker::all()->count();
+        $workers_count = Worker::count();
+
         return view('livewire.karyawan-data', [
             'budgets' => $budgets,
             'workers' => $workers,
             'workers_count' => $workers_count,
-            'workers' => $this->search === null ?
-                Worker::latest()->paginate($this->paginate) :
-                Worker::latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }
