@@ -9,6 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ServiceTransaction;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\Expense;
 
 class LaporanServisController extends Controller
 {
@@ -176,6 +177,16 @@ class LaporanServisController extends Controller
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('uang_muka');
 
+        // Menghitung total pengeluaran
+        $total_pengeluaran = Expense::whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->sum('price');
+        $total_servis = $services->count();
+        $saldo_akhir = $total_profit - $total_pengeluaran;
+
+        $pengeluaran_data = Expense::whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get();
         // return response()->json($services);
         $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
     //    return View('pages.admintoko.cetak-laporan-servis', [
@@ -197,6 +208,9 @@ class LaporanServisController extends Controller
             'total_tunai' => $total_tunai,
             'total_transfer' => $total_transfer,
             'total_dp' => $total_dp,
+            'saldo_akhir' => $saldo_akhir,
+            'pengeluaran_data' => $pengeluaran_data,
+            'total_pengeluaran' => $total_pengeluaran,
             'total_kredit' => $total_kredit
         ]);
 

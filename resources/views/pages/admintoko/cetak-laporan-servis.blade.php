@@ -98,6 +98,7 @@
     <h4 style="margin-bottom: 6px; text-decoration: underline;">
         Ringkasan
     </h4>
+    <br>
 
     <table id="ringkasan">
         <tbody>
@@ -126,15 +127,24 @@
                 <th>: Rp. {{ number_format($total_profit) }}</th>
             </tr>
             <tr>
-                <th>Total DP</th>
+                <th>Total Uang Muka</th>
                 <th>: Rp. {{ number_format($total_dp) }}</th>
+                <th>Total Pengeluaran</th>
+                <th>: Rp. {{ number_format($total_pengeluaran) }}</th>
+            </tr>
+            <tr>
+                <th>Saldo Akhir</th>
+                <th>: Rp. {{ number_format($saldo_akhir) }}</th>
             </tr>
         </tbody>
     </table>
+    <br>
 
     <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
         Detail Transaksi
     </h4>
+    <br>
+
 
     <table id="detail">
         <thead>
@@ -486,6 +496,55 @@
             @endforeach
         </tbody>
     </table>
+
+    
+    <hr>
+    <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
+        Pengeluaran
+    </h4>
+    
+    <table id="detail">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Tgl Pengeluaran</th>
+                <th>Nama</th>
+                <th>Item Pengeluaran</th>
+                <th>Biaya</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $i = 1;
+            @endphp
+            @foreach ($pengeluaran_data as $item)
+                <tr>
+                    <td style="width: 10px;">{{ $loop->iteration }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</td>
+                    <td>
+                        @if ($item->user)
+                            {{ $item->user->name }}
+                        @else
+                            Akun sudah dihapus
+                        @endif
+                    </td>
+                    <td>{{ $item->name }}</td>
+                    <td>Rp. {{ number_format($item->price) }}</td>
+                    <td>
+                        @if ($item->is_approve === null)
+                            Belum Disetujui
+                        @elseif ($item->is_approve === 'Setuju')
+                            Sudah Disetujui
+                        @else
+                            Ditolak
+                        @endif
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
 </body>
 
 </html>
