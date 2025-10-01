@@ -447,6 +447,7 @@ class SudahDiambilController extends Controller
             'tindakan_servis' => $tindakan_servis,
             'modal_sparepart' => $request->modal_sparepart,
             'biaya_j' => $request->biaya_j,
+            'modal_j' => $request->modal_j,
             'biaya' => $request->biaya,
             'uang_muka' => $request->uang_muka,
             'diskon' => $request->diskon,

@@ -214,6 +214,10 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Modal Sparepart </label>
+                                    <input id="modal_sparepart" name="modal_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->modal_j }}"/>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Pengerjaan Sparepart </label>
                                     <input id="modal_sparepart" name="biaya_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->biaya_j }}"/>
                                 </div>
                                 <div>
