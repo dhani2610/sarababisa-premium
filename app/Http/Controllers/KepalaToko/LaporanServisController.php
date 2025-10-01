@@ -143,11 +143,11 @@ class LaporanServisController extends Controller
             ->orderBy('tgl_ambil', 'asc')
             ->get();
 
-        $total_servis = 0;
-        foreach ($daftar_servis as $v) {
-            $json = json_decode($v['tindakan_servis']) ? json_decode($v['tindakan_servis']) : [];
-            $total_servis += count($json) == 0 ? 1 : count($json);
-        }
+        // $total_servis = 0;
+        // foreach ($daftar_servis as $v) {
+        //     $json = json_decode($v['tindakan_servis']) ? json_decode($v['tindakan_servis']) : [];
+        //     $total_servis += count($json) == 0 ? 1 : count($json);
+        // }
 
         // Menghitung total pembayaran tunai
         $total_tunai = ServiceTransaction::where('status_servis', 'Sudah Diambil')
@@ -263,9 +263,10 @@ class LaporanServisController extends Controller
             ->orderBy('tgl_ambil', 'asc')
             ->get();
 
+        $total_servis = $services->count();
         // return response()->json($services->count());
-        $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
-        // return view('pages.kepalatoko.cetak-laporan-servis', [
+        // $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
+        return view('pages.kepalatoko.cetak-laporan-servis', [
             'users' => $users,
             'imagePath' => $imagePath,
             'services' => $services,
