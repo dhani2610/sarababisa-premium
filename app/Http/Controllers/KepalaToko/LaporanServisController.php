@@ -263,7 +263,7 @@ class LaporanServisController extends Controller
             ->orderBy('tgl_ambil', 'asc')
             ->get();
 
-            // return response()->json($services);
+        // return response()->json($services->count());
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
         // return view('pages.kepalatoko.cetak-laporan-servis', [
             'users' => $users,
