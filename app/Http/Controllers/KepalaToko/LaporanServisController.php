@@ -151,27 +151,23 @@ class LaporanServisController extends Controller
 
         // Menghitung total pembayaran tunai
         $total_tunai = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('tunai');
 
         $total_dp = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('uang_muka');
 
         // Menghitung total pembayaran transfer
         $total_transfer = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('transfer');
 
         // Menghitung total pembayaran kredit
         $total_kredit = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('due');
@@ -226,14 +222,12 @@ class LaporanServisController extends Controller
 
         // Menghitung total modal
         $total_modal = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('modal_sparepart');
 
         // Menghitung total biaya
         $total_biaya = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('biaya');
@@ -247,7 +241,6 @@ class LaporanServisController extends Controller
 
         // Menghitung total profit
         $total_profit = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('profit');
