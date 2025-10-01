@@ -265,8 +265,8 @@ class LaporanServisController extends Controller
 
         $total_servis = $services->count();
         // return response()->json($services->count());
-        // $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
-        return view('pages.kepalatoko.cetak-laporan-servis', [
+        $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
+        // return view('pages.kepalatoko.cetak-laporan-servis', [
             'users' => $users,
             'imagePath' => $imagePath,
             'services' => $services,
