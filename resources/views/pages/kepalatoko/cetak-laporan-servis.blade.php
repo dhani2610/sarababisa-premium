@@ -141,6 +141,8 @@
     <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
         Detail Transaksi
     </h4>
+    <br>
+    <br>
 
     <table id="detail">
         <thead>
