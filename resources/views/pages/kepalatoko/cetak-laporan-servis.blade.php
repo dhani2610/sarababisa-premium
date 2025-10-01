@@ -138,8 +138,7 @@
             </tr>
         </tbody>
     </table>
-
-    <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
+    <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
         Detail Transaksi
     </h4>
 
@@ -426,55 +425,58 @@
                     <td>{{ $item->kerusakan }}</td>
                     <td>Rp. {{ number_format($item->estimasi_biaya) }}</td>
                     <td>Rp. {{ number_format($item->uang_muka) }}</td>
-                    {{-- <td class="" style="text-align: left; width: 80px;">
-                            @php
-                                $metode = [];
-                                if ($item->tunai > 0) {
-                                    $metode[] =
-                                        '<div>
-                        <strong>Tunai:</strong><br>
-                        Rp.' .
-                                        number_format($item->tunai, 0, ',', '.') .
-                                        '
-                     </div>';
-                                }
-                                if ($item->transfer > 0) {
-                                    $metode[] =
-                                        '<div>
-                        <strong>Transfer:</strong><br>
-                        Rp.' .
-                                        number_format($item->transfer, 0, ',', '.') .
-                                        '
-                     </div>';
-                                }
-                            @endphp
-                            @if ($item->kondisi_servis == 'Dibatalkan')
-                                @if ($item->uang_muka > 0 && $item->modal_sparepart > 0)
-                                    <div>
-                                        <strong>Modal - DP:</strong><br>
-                                        Rp.-{{ number_format($item->uang_muka - $item->modal_sparepart, 0, ',', '.') }}
-                                    </div>
-                                @elseif ($item->uang_muka > 0)
-                                    <div>
-                                        <strong>Uang Muka:</strong><br>
-                                        Rp.-{{ number_format($item->uang_muka, 0, ',', '.') }}
-                                    </div>
-                                @elseif ($item->modal_sparepart > 0)
-                                    <div>
-                                        <strong>Modal:</strong><br>
-                                        Rp.-{{ number_format($item->modal_sparepart, 0, ',', '.') }}
-                                    </div>
-                                @endif
-
-                            @else
-                            {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
-                            @endif
-
-                        </td> --}}
                 </tr>
             @endforeach
         </tbody>
     </table>
+
+    <hr>
+    <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
+        Pengeluaran
+    </h4>
+    
+    <table id="detail">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Tgl Pengeluaran</th>
+                <th>Nama</th>
+                <th>Item Pengeluaran</th>
+                <th>Biaya</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $i = 1;
+            @endphp
+            @foreach ($pengeluaran_data as $item)
+                <tr>
+                    <td style="width: 10px;">{{ $loop->iteration }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</td>
+                    <td>
+                        @if ($item->user)
+                            {{ $item->user->name }}
+                        @else
+                            Akun sudah dihapus
+                        @endif
+                    </td>
+                    <td>{{ $item->name }}</td>
+                    <td>Rp. {{ number_format($item->price) }}</td>
+                    <td>
+                        @if ($item->is_approve === null)
+                            Belum Disetujui
+                        @elseif ($item->is_approve === 'Setuju')
+                            Sudah Disetujui
+                        @else
+                            Ditolak
+                        @endif
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
 </body>
 
 </html>
