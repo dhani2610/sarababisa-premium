@@ -188,8 +188,8 @@ class LaporanServisController extends Controller
             ->whereDate('created_at', '<=', $end_date)
             ->get();
         // return response()->json($services);
-        // $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
-       return View('pages.admintoko.cetak-laporan-servis', [
+        $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
+    //    return View('pages.admintoko.cetak-laporan-servis', [
             'users' => $users,
             'toko' => $toko,
             'imagePath' => $imagePath,

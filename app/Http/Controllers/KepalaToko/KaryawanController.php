@@ -23,6 +23,7 @@ class KaryawanController extends Controller
      */
     public function index()
     {
+        // dd(auth()->user());
         $workers = Worker::with('worker_users', 'user');
         $debts = Worker::with('debt')->get();
         return view('pages/kepalatoko/karyawan/index', compact('workers', 'debts'));

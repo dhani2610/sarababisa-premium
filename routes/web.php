@@ -237,6 +237,8 @@ Route::get('produk/item/{id}/download-barcode', [ProdukController::class, 'downl
 Route::delete('master/master-gallery/delete-selected', [GalleryController::class, 'deleteSelected'])
         ->name('master-gallery.deleteSelected');
 
+Route::resource('gaji/karyawan', KepalaTokoKaryawanController::class);
+
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
 
@@ -289,7 +291,6 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('manajemen/kasbon', KepalaTokoKasbonController::class);
     Route::patch('/debts/update', [KepalaTokoKasbonController::class, 'approveSelected']);
     Route::patch('/debts/reject', [KepalaTokoKasbonController::class, 'rejectSelected']);
-    Route::resource('gaji/karyawan', KepalaTokoKaryawanController::class);
     Route::delete('/workers/delete', [KepalaTokoKaryawanController::class, 'deleteSelected']);
     Route::resource('gaji/bonus', KepalaTokoGajiController::class);
     Route::delete('/bonus/delete', [KepalaTokoGajiController::class, 'deleteSelected']);
