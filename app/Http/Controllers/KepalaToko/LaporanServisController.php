@@ -264,6 +264,7 @@ class LaporanServisController extends Controller
             ->get();
 
         $total_servis = $services->count();
+        $saldo_akhir = $total_profit - $total_pengeluaran;
         // return response()->json($services->count());
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
         // return view('pages.kepalatoko.cetak-laporan-servis', [
@@ -288,6 +289,7 @@ class LaporanServisController extends Controller
             'total_tunai' => $total_tunai,
             'total_transfer' => $total_transfer,
             'total_kredit' => $total_kredit,
+            'saldo_akhir' => $saldo_akhir,
             'total_dp' => $total_dp
         ]);
 

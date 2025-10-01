@@ -128,6 +128,13 @@
             <tr>
                 <th>Total Uang Muka</th>
                 <th>: Rp. {{ number_format($total_dp) }}</th>
+                <th>Total Pengeluaran</th>
+                <th>: Rp. {{ number_format($total_pengeluaran) }}</th>
+            </tr>
+            <tr>
+                
+                <th>Saldo Akhir</th>
+                <th>: Rp. {{ number_format($saldo_akhir) }}</th>
             </tr>
         </tbody>
     </table>
