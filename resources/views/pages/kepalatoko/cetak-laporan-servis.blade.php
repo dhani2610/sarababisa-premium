@@ -98,6 +98,8 @@
     <h4 style="margin-bottom: 6px; text-decoration: underline;">
         Ringkasan
     </h4>
+    <br>
+    <br>
 
     <table id="ringkasan">
         <tbody>
@@ -138,6 +140,7 @@
             </tr>
         </tbody>
     </table>
+    
     <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
         Detail Transaksi
     </h4>
