@@ -17,6 +17,7 @@ use App\Models\ServiceAction;
 use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
 use App\Models\StoreSetting;
+use App\Models\TipeOs;
 use Illuminate\Support\Facades\Auth;
 
 class TransaksiServisLangsungController extends Controller
@@ -43,6 +44,7 @@ class TransaksiServisLangsungController extends Controller
             $persen_teknisi = null;
         }
 
+       
         // --- BLOK LOGIKA YANG DIPERBAIKI ---
         $tindakan_servis = []; // 1. Inisialisasi sebagai array kosong
 
@@ -216,6 +218,23 @@ class TransaksiServisLangsungController extends Controller
             $finalModal = $modalSparepart;
         }
 
+        $cekTeknisi = User::find($request->users_id);
+        if ($cekTeknisi->bagian_teknisi == 'Teknisi Interface') {
+            if (!empty($nama_model->id_tipe_os)) {
+                $tipeOS = TipeOs::find($nama_model->id_tipe_os);
+                if (!empty($tipeOS)) {
+                    $bonus_interface = $tipeOS->nominal_bonus; 
+                }else{
+                    $bonus_interface = 0; 
+                }
+            }else{
+               $bonus_interface = 0; 
+            }
+        }else{
+            $bonus_interface = 0; 
+        }
+
+
         // Transaction create
         ServiceTransaction::create([
             'nomor_servis' => $nomor_servis,
@@ -224,6 +243,7 @@ class TransaksiServisLangsungController extends Controller
             'types_id' => $request->types_id,
             'brands_id' => $request->brands_id,
             'model_series_id' => $request->model_series_id,
+            'bonus_interface' => $bonus_interface,
             'nama_barang' => $nama_barang,
             'kerusakan' => $request->kerusakan,
             'imei' => $request->imei,

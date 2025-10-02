@@ -107,6 +107,14 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="brands_id">Tipe OS</label>
+                                    <select id="id_tipe_os" name="id_tipe_os" class="form-select text-sm w-full">
+                                        @foreach ($tipe as $tp)
+                                            <option value="{{ $tp->id }}" {{ $item->id_tipe_os == $tp->id ? 'selected' : '' }}>{{ $tp->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <!-- Modal footer -->

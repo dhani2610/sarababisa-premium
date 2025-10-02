@@ -151,6 +151,7 @@ use App\Http\Controllers\KepalaToko\UbahStatusProsesServisController as KepalaTo
 use App\Http\Controllers\KepalaToko\TransaksiServisLangsungController as KepalaTokoTransaksiServisLangsungController;
 use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTransaksiServisLangsungController;
 use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as KepalaTokoServisBelumDisetujuiApproveController;
+use App\Http\Controllers\TipeOsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -276,6 +277,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
 
     Route::resource('master/master-jenis-barang', KepalaTokoMasterJenisBarangController::class);
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
+    Route::resource('master/master-tipe-os', TipeOsController::class);
     Route::resource('master/master-gallery', GalleryController::class);
     
 

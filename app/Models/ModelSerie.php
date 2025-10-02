@@ -12,7 +12,8 @@ class ModelSerie extends Model
 
     protected $fillable = [
         'name',
-        'brands_id'
+        'brands_id',
+        'id_tipe_os',
     ];
 
     public function brand()

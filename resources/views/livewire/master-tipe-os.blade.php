@@ -4,14 +4,14 @@
 
         <!-- Left: Title -->
         <div class="mb-4 sm:mb-0">
-            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Model Seri ✨</h1>
+            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Tipe OS ✨</h1>
         </div>
 
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Masukkan nama model seri" />
+            <x-search-form placeholder="Cari berdasarkan nama Tipe OS" />
 
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
@@ -19,7 +19,7 @@
                     <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
                         <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                     </svg>
-                    <span class="hidden xs:block ml-2">Tambah Model Seri</span>
+                    <span class="hidden xs:block ml-2">Tambah Tipe OS</span>
                 </button>
                 <!-- Modal backdrop -->
                 <div
@@ -53,7 +53,7 @@
                         <!-- Modal header -->
                         <div class="px-5 py-3 border-b border-slate-200">
                             <div class="flex justify-between items-center">
-                                <div class="font-semibold text-slate-800">Tambah Model Seri</div>
+                                <div class="font-semibold text-slate-800">Tambah Tipe OS</div>
                                 <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false">
                                     <div class="sr-only">Close</div>
                                     <svg class="w-4 h-4 fill-current">
@@ -63,32 +63,17 @@
                             </div>
                         </div>
                         <!-- Modal content -->
-                        <form action="{{ route('master-model-seri.store') }}" method="post">
+                        <form action="{{ route('master-tipe-os.store') }}" method="post">
                             @csrf
                             <div class="px-5 py-4">
                                 <div class="space-y-3">
                                     <div>
-                                        <label class="block text-sm font-medium mb-1" for="name">Nama Model Seri <span class="text-rose-500">*</span></label>
-                                        <input id="name" name="name" class="form-input w-full px-2 py-1" type="text" required />
+                                        <label class="block text-sm font-medium mb-1" for="name">Tipe OS <span class="text-rose-500">*</span></label>
+                                        <input id="name" name="nama" class="form-input w-full px-2 py-1" type="text" required />
                                     </div>
-                                    <!-- Select -->
                                     <div>
-                                        <label class="block text-sm font-medium mb-1" for="brands_id">Merek</label>
-                                        <select id="brands_id" name="brands_id" class="form-select text-sm w-full">
-                                            <option>Pilih Merek</option>
-                                            @foreach ($brands as $brand)
-                                                <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="brands_id">Tipe OS</label>
-                                        <select id="id_tipe_os" name="id_tipe_os" class="form-select text-sm w-full">
-                                            @foreach ($tipe as $tp)
-                                                <option value="{{ $tp->id }}">{{ $tp->nama }}</option>
-                                            @endforeach
-                                        </select>
+                                        <label class="block text-sm font-medium mb-1" for="name">Nominal Bonus <span class="text-rose-500">*</span></label>
+                                        <input id="name" name="nominal_bonus" class="form-input w-full px-2 py-1" type="number" required />
                                     </div>
                                 </div>
                             </div>
@@ -119,119 +104,6 @@
                 <option value="100">100</option>
             </select>
         </div>
-
-        <!-- Right side -->
-        <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-            <!-- Start Export Excel -->
-            <a href="{{ route('modelseri-export') }}">
-                <button class="btn bg-white border-blue-200 hover:border-blue-300 text-blue-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-export" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2563eb" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                    <path d="M11.5 21h-4.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v5m-5 6h7m-3 -3l3 3l-3 3" />
-                    </svg>
-                    <span class="hidden xs:block ml-2">Ekspor Data</span>
-                </button>
-            </a>
-            <!-- End Export Excel-->
-
-            <!-- Start Import Excel -->
-            <div x-data="{ modalOpen: false }">
-                <button class="btn bg-white border-emerald-200 hover:border-emerald-300 text-emerald-700" @click.prevent="modalOpen = true" aria-controls="tambah-modal">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-import" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="#047857" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                    <path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3" />
-                    </svg>
-                    <span class="hidden xs:block ml-2">Impor Data</span>
-                </button>
-                <!-- Modal backdrop -->
-                <div
-                    class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
-                    x-show="modalOpen"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="opacity-100"
-                    x-transition:leave="transition ease-out duration-100"
-                    x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0"
-                    aria-hidden="true"
-                    x-cloak
-                ></div>
-                <!-- Modal dialog -->
-                <div
-                    id="basic-modal"
-                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                    role="dialog"
-                    aria-modal="true"
-                    x-show="modalOpen"
-                    x-transition:enter="transition ease-in-out duration-200"
-                    x-transition:enter-start="opacity-0 translate-y-4"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    x-transition:leave="transition ease-in-out duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0"
-                    x-transition:leave-end="opacity-0 translate-y-4"
-                    x-cloak
-                >
-                    <div class="bg-white rounded shadow-lg overflow-auto max-w-xl w-full max-h-full" @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
-                        <form action="{{ route('impor-model') }}" method="post" enctype="multipart/form-data">
-                        @csrf
-                            <!-- Modal header -->
-                            <div class="px-5 py-3 border-b border-slate-200">
-                                <div class="flex justify-between items-center">
-                                    <div class="font-semibold text-slate-800">Impor Data Model Seri</div>
-                                    <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false">
-                                        <div class="sr-only">Close</div>
-                                        <svg class="w-4 h-4 fill-current">
-                                            <path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <!-- Modal content -->
-                            <div class="px-5 pt-4 pb-1">
-                                <div class="text-sm">
-                                    <div class="space-y-2">
-                                        <p>Silahkan download terlebih dahulu formatnya, kemudian isi datanya dan upload.</p>
-                                            <input type="file" name="file" id="file" class="btn-sm bg-slate-100 w-full" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Modal footer -->
-                            <div class="px-5 py-4">
-                                <div class="flex flex-wrap justify-end space-x-2">
-                                    <a href="{{ asset('storage/assets/format_model_seri.xlsx') }}" class="btn-sm bg-orange-500 hover:bg-orange-600 text-white">
-                                        <span class="mr-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-download" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                            <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                            <line x1="12" y1="11" x2="12" y2="17" />
-                                            <polyline points="9 14 12 17 15 14" />
-                                            </svg>
-                                        </span>
-                                        Download Format
-                                    </a>
-                                    <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
-                                        <span class="mr-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-upload" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                            <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                            <line x1="12" y1="11" x2="12" y2="17" />
-                                            <polyline points="9 14 12 11 15 14" />
-                                            </svg>
-                                        </span>
-                                        Upload File
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>                                            
-            </div>
-            <!-- End Import Excel-->
-        </div>
     </div>
 
     @if ($errors->any())
@@ -261,8 +133,7 @@
         <div x-data="handleSelect">
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 {{-- Left side --}}
-                <h2 class="font-semibold text-slate-800">Semua Model Seri <span class="text-slate-400 font-medium">{{ $model_series_count }}</span></h2>
-                {{-- Right side --}}
+                <h2 class="font-semibold text-slate-800">Semua Tipe OS <span class="text-slate-400 font-medium">{{ $count }}</span></h2>
                 <div class="relative inline-flex">
                     <div class="table-items-action hidden">
                         <div class="flex items-center">
@@ -278,25 +149,22 @@
                     <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
-                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                            {{-- <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="flex items-center">
                                     <label class="inline-flex">
                                         <span class="sr-only">Select all</span>
                                         <input id="parent-checkbox" class="form-checkbox" type="checkbox" @click="toggleAll" />
                                     </label>
                                 </div>
-                            </th>
+                            </th> --}}
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-semibold text-left">ID</div>
-                            </th>
-                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-semibold text-left">Nama Model Seri</div>
-                            </th>
-                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-semibold text-left">Nama Merek</div>
+                                <div class="font-semibold text-left">No.</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Tipe OS</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Nominal Bonus</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Aksi</div>
@@ -309,50 +177,28 @@
                         @php
                             $i = 1
                         @endphp
-                        @foreach($model_series as $model)                  
+                        @foreach($TipeOs as $item)                  
                             <tr>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                                {{-- <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
                                         <label class="inline-flex">
                                             <span class="sr-only">Select</span>
-                                            <input class="table-item form-checkbox" type="checkbox" value="{{ $model->id }}" @click="uncheckParent" />
+                                            <input class="table-item form-checkbox" type="checkbox" value="{{ $item->id }}" @click="uncheckParent" />
                                         </label>
                                     </div>
+                                </td> --}}
+                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    <div class="font-medium">{{ $i++ }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $model->id }}</div>
+                                    <div class="font-medium">{{ $item->nama }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $model->name }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    @if ($model->brand)
-                                        @if ($model->brand->exists())
-                                            <div class="font-medium">{{ $model->brand->name }}</div>
-                                        @else
-                                            <div class="font-medium text-rose-600">Data merek telah dihapus</div>
-                                        @endif
-                                    @else
-                                        <div class="font-medium text-rose-600">Data merek telah dihapus</div>
-                                    @endif
-                                </td>
-                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    @php
-                                        if (!empty($model->id_tipe_os)) {
-                                            $cek = \App\Models\TipeOs::where('id',$model->id_tipe_os)->first();
-                                            if (!empty($cek)) {
-                                                $tipe = $cek->nama;
-                                            }
-                                        } else {
-                                            $tipe = '-';
-                                        }
-                                        
-                                    @endphp
-                                    <div class="font-medium">{{ $tipe }}</div>
+                                    <div class="font-medium">Rp. {{ number_format($item->nominal_bonus) }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="space-x-1 flex">
-                                        <a href="{{ route('master-model-seri.edit', $model->id) }}">
+                                        <a href="{{ route('master-tipe-os.edit', $item->id) }}">
                                             <button class="text-slate-400 hover:text-slate-500 rounded-full">
                                                 <span class="sr-only">Edit</span>
                                                 <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -420,7 +266,7 @@
                                                             <!-- Modal footer -->
                                                             <div class="flex flex-wrap justify-end space-x-2">
                                                                 <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" @click="modalOpen = false">Batal</button>
-                                                                <form action="{{ route('master-model-seri.destroy', $model->id) }}" method="post">
+                                                                <form action="{{ route('master-tipe-os.destroy', $item->id) }}" method="post">
                                                                     @method('delete')
                                                                     @csrf
                                                                     <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
@@ -438,6 +284,7 @@
                         @endforeach
                     </tbody>
                 </table>
+
             </div>
         </div>
     </div>
@@ -475,7 +322,7 @@
                     const selectedIds = [...checkboxes].map((checkbox) => checkbox.value);
 
                     // Kirim permintaan penghapusan ke server
-                    fetch('/model-series/delete', {
+                    fetch('/tipe-os/delete', {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -499,6 +346,6 @@
     
     <!-- Pagination -->
     <div class="mt-8">
-        {{ $model_series->links() }}
+        {{ $TipeOs->links() }}
     </div>
 </div>

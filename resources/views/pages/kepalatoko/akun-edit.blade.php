@@ -110,6 +110,14 @@
                                         <option value="Sales">Sales</option>
                                     </select>
                                 </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="role">Teknisi Bagian? <span class="text-rose-500">tidak perlu di isi jika bukan teknisi*</span></label>
+                                    <select id="bagian_teknisi" name="bagian_teknisi" class="form-select text-sm py-1 w-full">
+                                        <option value="">Pilih</option>
+                                        <option value="Teknisi Interface" {{ $item->bagian_teknisi == 'Teknisi Interface' ? 'selected' : '' }} >Teknisi Interface</option>
+                                        <option value="Teknisi Hardware" {{ $item->bagian_teknisi == 'Teknisi Hardware' ? 'selected' : '' }} >Teknisi Hardware</option>
+                                    </select>
+                                </div>
                                 <div x-data="{ showDetails: false }">
                                     <label class="block text-sm font-medium mb-1" for="types_id">Jika teknisi, apakah memiliki spesialisisasi jenis barang?</label>
                                     <div class="flex flex-wrap items-center -m-3">

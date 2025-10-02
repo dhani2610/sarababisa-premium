@@ -22,12 +22,14 @@ class LaporanTeknisiController extends Controller
             ->where('users_id', Auth::user()->id)
             ->whereDate('tgl_disetujui', today())
             ->count();
+        $column = auth()->user()->bagian_teknisi == 'Teknisi Interface' ? 'bonus_interface' : 'profit';
+
         $profithari = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->where('users_id', Auth::user()->id)
             ->whereDate('tgl_disetujui', today())
             ->get()
-            ->sum('profit');
+            ->sum($column);
         $servisbulan = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->where('users_id', Auth::user()->id)
@@ -38,7 +40,7 @@ class LaporanTeknisiController extends Controller
             ->where('users_id', Auth::user()->id)
             ->whereMonth('tgl_disetujui', $currentMonth)
             ->get()
-            ->sum('profit');
+            ->sum($column);
         $servistahun = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->where('users_id', Auth::user()->id)
@@ -49,7 +51,7 @@ class LaporanTeknisiController extends Controller
             ->where('users_id', Auth::user()->id)
             ->whereYear('tgl_disetujui', $currentYear)
             ->get()
-            ->sum('profit');
+            ->sum($column);
 
         $toko = StoreSetting::find(1);
         return view('pages/teknisi/laporan-teknisi', compact('services', 'services_count', 'servishari', 'profithari', 'servisbulan', 'profitbulan', 'servistahun', 'profittahun', 'toko'));

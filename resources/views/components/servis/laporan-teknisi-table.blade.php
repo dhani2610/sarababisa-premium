@@ -30,8 +30,12 @@
                 <!-- Row -->
                 @foreach($users as $item)
                     @php
-                        $bonus = $item->servicetransaction->sum('profit')/100;
-                        $bonus *= $item->persen;
+                        if ($item->bagian_teknisi == 'Teknisi Interface') {
+                            $bonus = $item->servicetransaction->sum('bonus_interface');
+                        }else{
+                            $bonus = $item->servicetransaction->sum('profit')/100;
+                            $bonus *= $item->persen;
+                        }
                     @endphp                  
                     <tr>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
