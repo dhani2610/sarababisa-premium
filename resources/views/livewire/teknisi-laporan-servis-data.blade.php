@@ -91,7 +91,7 @@
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">
                                     @php
-                                        if (auth()->user()->bagian_teknisi == 'Teknisi Interface') {
+                                        if ($item->tipe == 'Interface') {
                                             $bonus = $item->bonus_interface;
                                         }else{
                                             $bonus = $item->profit/100;
