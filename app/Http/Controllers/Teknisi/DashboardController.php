@@ -32,26 +32,25 @@ class DashboardController extends Controller
             ->get()
             ->count();
 
-        if (auth()->user()->bagian_teknisi == 'Teknisi Interface') {
-            $bonusservis = ServiceTransaction::with('serviceaction')
-                ->where('is_approve', 'Setuju')
-                ->where('users_id', Auth::user()->id)
-                ->whereYear('tgl_disetujui', $currentYear)
-                ->whereMonth('tgl_disetujui', $currentMonth)
-                ->get()
-                ->sum('bonus_interface');
-        }else{
-            $profitservis = ServiceTransaction::with('serviceaction')
-                ->where('is_approve', 'Setuju')
-                ->where('users_id', Auth::user()->id)
-                ->whereYear('tgl_disetujui', $currentYear)
-                ->whereMonth('tgl_disetujui', $currentMonth)
-                ->get()
-                ->sum('profit');
-            $bonusservis = ($profitservis / 100) * Auth::user()->persen;
+        $bonusServisInterface = ServiceTransaction::with('serviceaction')
+            ->where('tipe', 'Interface')
+            ->where('is_approve', 'Setuju')
+            ->where('users_id', Auth::user()->id)
+            ->whereYear('tgl_disetujui', $currentYear)
+            ->whereMonth('tgl_disetujui', $currentMonth)
+            ->get()
+            ->sum('bonus_interface');
+        $profitservis = ServiceTransaction::with('serviceaction')
+            ->where('tipe', 'Hardware')
+            ->where('is_approve', 'Setuju')
+            ->where('users_id', Auth::user()->id)
+            ->whereYear('tgl_disetujui', $currentYear)
+            ->whereMonth('tgl_disetujui', $currentMonth)
+            ->get()
+            ->sum('profit');
+        $bonusservis = ($profitservis / 100) * Auth::user()->persen;
 
-        }
-        $totalbonus = $bonusservis;
+        $totalbonus = $bonusservis + $bonusServisInterface;
 
         // Ambil data transaksi servis yang memiliki status "Belum cek"
         $transactions = ServiceTransaction::where('status_servis', 'Belum cek')->get();

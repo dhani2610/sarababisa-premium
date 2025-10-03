@@ -142,7 +142,7 @@
 					<td style="width: 60px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
 					<td style="width: 70px; text-align: right;">
-						@if ($teknisi->bagian_teknisi == 'Teknisi Interface')
+						@if ($item->tipe == 'Interface')
 						Rp. {{ number_format($item->bonus_interface) }}
 						@else
 						Rp. {{ number_format($item->profit / 100 * $item->persen_teknisi) }}

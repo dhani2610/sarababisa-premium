@@ -191,19 +191,19 @@ class TransaksiServisLangsungController extends Controller
 
         $cekTeknisi = User::find($request->users_id);
         if ($cekTeknisi->bagian_teknisi == 'Teknisi Interface') {
-            if (!empty($nama_model->id_tipe_os)) {
-                $tipeOS = TipeOs::find($nama_model->id_tipe_os);
-                if (!empty($tipeOS)) {
-                    $bonus_interface = $tipeOS->nominal_bonus; 
+            if ($request->tipe == 'Interface') {
+                if (!empty($nama_model)) {
+                    $bonus_interface = $nama_model->nominal_bonus; 
                 }else{
-                    $bonus_interface = 0; 
+                $bonus_interface = 0; 
                 }
             }else{
-               $bonus_interface = 0; 
+                $bonus_interface = 0; 
             }
         }else{
             $bonus_interface = 0; 
         }
+
 
         // Transaction create
         ServiceTransaction::create([
@@ -214,6 +214,7 @@ class TransaksiServisLangsungController extends Controller
             'brands_id' => $request->brands_id,
             'model_series_id' => $request->model_series_id,
             'bonus_interface' => $bonus_interface,
+            'tipe' => $request->tipe,
             'nama_barang' => $nama_barang,
             'kerusakan' => $request->kerusakan,
             'imei' => $request->imei,

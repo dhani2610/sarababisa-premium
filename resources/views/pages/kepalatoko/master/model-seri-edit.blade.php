@@ -115,6 +115,10 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="nominal_bonus">Nominal Bonus <span class="text-rose-500">*</span></label>
+                                    <input id="nominal_bonus" name="nominal_bonus" class="form-input w-full px-2 py-1" value="{{ $item->nominal_bonus }}" type="text" required />
+                                </div>
                             </div>
                         </div>
                         <!-- Modal footer -->

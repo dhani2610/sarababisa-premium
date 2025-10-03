@@ -56,23 +56,22 @@ class LaporanTeknisiController extends Controller
             ->count();;
 
         // Menghitung total bonus
-        if ($teknisi->bagian_teknisi == 'Teknisi Interface') {
-            $total_profit = ServiceTransaction::where('users_id', $request->users_id)->where('status_servis', 'Sudah Diambil')
+            $total_profit_interface = ServiceTransaction::where('users_id', $request->users_id)->where('status_servis', 'Sudah Diambil')
                 ->whereDate('tgl_ambil', '>=', $start_date)
                 ->whereDate('tgl_ambil', '<=', $end_date)
+                ->where('tipe', 'Interface')
                 ->where('is_approve', 'Setuju')
                 ->sum('bonus_interface');
-            $total_bonus = $total_profit;
-        }else{
             // Menghitung total profit
             $total_profit = ServiceTransaction::where('users_id', $request->users_id)->where('status_servis', 'Sudah Diambil')
                 ->whereDate('tgl_ambil', '>=', $start_date)
                 ->whereDate('tgl_ambil', '<=', $end_date)
                 ->where('is_approve', 'Setuju')
+                ->where('tipe', 'Hardware')
                 ->sum('profit');
-            $total_bonus = $total_profit / 100 * $teknisi->persen;
-        }
-        // dd($total_bonus,$teknisi->bagian_teknisi);
+
+        $total_bonus_prof = $total_profit / 100 * $teknisi->persen;
+        $total_bonus = $total_bonus_prof + $total_profit_interface;
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-teknisi', [
         // return View('pages.kepalatoko.cetak-laporan-teknisi', [
             'users' => $users,
