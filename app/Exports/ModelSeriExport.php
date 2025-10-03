@@ -26,6 +26,8 @@ class ModelSeriExport implements FromCollection, WithMapping, WithHeadings, Shou
             $modelserie->id,
             $modelserie->name,
             $modelserie->brands_id,
+            $modelserie->id_tipe_os,
+            $modelserie->nominal_bonus,
         ];
     }
 
@@ -34,7 +36,9 @@ class ModelSeriExport implements FromCollection, WithMapping, WithHeadings, Shou
         return [
             'ID Model Seri',
             'Nama Model Seri',
-            'ID Merek'
+            'ID Merek',
+            'ID TIPE OS',
+            'Nominal Bonus Interface',
         ];
     }
 

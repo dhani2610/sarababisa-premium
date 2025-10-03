@@ -50,6 +50,8 @@ class DashboardController extends Controller
             ->sum('profit');
         $bonusservis = ($profitservis / 100) * Auth::user()->persen;
 
+        $totalbonusHardware = $bonusservis;
+        $totalbonusInterface = $bonusServisInterface;
         $totalbonus = $bonusservis + $bonusServisInterface;
 
         // Ambil data transaksi servis yang memiliki status "Belum cek"
@@ -73,6 +75,8 @@ class DashboardController extends Controller
         return view('pages/teknisi/dashboard', compact(
             'totalbonus',
             'reminders',
+            'totalbonusHardware',
+            'totalbonusInterface',
             'target',
             'result',
             'reward',
