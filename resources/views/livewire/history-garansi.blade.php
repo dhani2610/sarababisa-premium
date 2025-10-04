@@ -257,19 +257,25 @@
                                 <td class="px-2 py-3">Rp{{ number_format($item->total_biaya, 0, ',', '.') }}</td>
                                 <td class="px-2 py-3">{{ $item->catatan }}</td>
                                 <td class="px-2 py-3">
-                                    @if ($item->status == 1)
-                                        Diproses
-                                    @elseif ($item->status == 2)
-                                        Selesai
-                                    @elseif ($item->status == 3)
-                                        Dibatalkan
-                                    @endif
+                                    <button
+                                        class="toggle-status px-2 py-1 rounded 
+            {{ $item->status == 1 ? 'bg-yellow-100 text-yellow-700' : ($item->status == 2 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') }}"
+                                        data-id="{{ $item->id }}">
+                                        @if ($item->status == 1)
+                                            Diproses
+                                        @elseif ($item->status == 2)
+                                            Selesai
+                                        @elseif ($item->status == 3)
+                                            Dibatalkan
+                                        @endif
+                                    </button>
                                 </td>
+
 
                                 {{-- Aksi (popup hapus tetap) --}}
                                 <td class="px-2 py-3">
                                     <div class="flex space-x-2">
-                                         {{-- <a href="{{ route('history-garansi.edit', $item->id) }}">
+                                        {{-- <a href="{{ route('history-garansi.edit', $item->id) }}">
                                             <button class="text-slate-400 hover:text-slate-500 rounded-full">
                                                 <span class="sr-only">Edit</span>
                                                 <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -442,6 +448,41 @@
                 },
             }))
         })
+    </script>
+
+    <script>
+        $(document).on('click', '.toggle-status', function() {
+            let id = $(this).data('id');
+            let btn = $(this);
+
+            $.ajax({
+                url: `/history-garansi/${id}/toggle-status`,
+                method: "PATCH",
+                data: {
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    if (res.success) {
+                        btn.text(res.label);
+
+                        btn.removeClass(
+                            'bg-yellow-100 text-yellow-700 bg-green-100 text-green-700 bg-red-100 text-red-700'
+                            );
+
+                        if (res.status == 1) {
+                            btn.addClass('bg-yellow-100 text-yellow-700');
+                        } else if (res.status == 2) {
+                            btn.addClass('bg-green-100 text-green-700');
+                        } else {
+                            btn.addClass('bg-red-100 text-red-700');
+                        }
+                    }
+                },
+                error: function() {
+                    alert('Gagal update status!');
+                }
+            });
+        });
     </script>
 
     <script>

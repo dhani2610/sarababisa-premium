@@ -243,6 +243,9 @@ Route::resource('gaji/karyawan', KepalaTokoKaryawanController::class);
 Route::get('slip-gaji/{id}', [KepalaTokoKaryawanController::class, 'cetak'])->name('cetak-slip-gaji');
 
 Route::resource('history-garansi', HistoryGaransiController::class);
+Route::patch('/history-garansi/{id}/toggle-status', [HistoryGaransiController::class, 'toggleStatus'])
+    ->name('history-garansi.toggleStatus');
+
 // routes/web.php
 Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'show'])->name('service.show');
 

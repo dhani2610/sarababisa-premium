@@ -91,6 +91,29 @@ class HistoryGaransiController extends Controller
         return redirect()->route('history-garansi.index')->with('success', 'Data berhasil disimpan');
     }
 
+    public function toggleStatus($id)
+    {
+        $item = HistoryGaransi::findOrFail($id);
+
+        // Logic toggle (misalnya siklus 1 -> 2 -> 3 -> balik ke 1)
+        if ($item->status == 1) {
+            $item->status = 2; // dari Diproses ke Selesai
+        } elseif ($item->status == 2) {
+            $item->status = 3; // dari Selesai ke Dibatalkan
+        } else {
+            $item->status = 1; // dari Dibatalkan ke Diproses
+        }
+
+        $item->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $item->status,
+            'label' => $item->status == 1 ? 'Diproses' : ($item->status == 2 ? 'Selesai' : 'Dibatalkan')
+        ]);
+    }
+
+
     public function update(Request $request, $id)
     {
         $request->validate([
