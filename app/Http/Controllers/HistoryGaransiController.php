@@ -17,18 +17,9 @@ class HistoryGaransiController extends Controller
 {
     public function index()
     {
-        $serviceTransactions = ServiceTransaction::all();
-        $products = Product::whereHas('subCategory.category', function ($q) {
-            $q->where('category_name', 'Sparepart');
-        })->where('stok', '>=', 1)->get();
-
-        $serviceActions = ServiceAction::all();
         $users = User::all();
 
         return view('pages.kepalatoko.history.garansi', compact(
-            'serviceTransactions',
-            'products',
-            'serviceActions',
             'users'
         ));
     }

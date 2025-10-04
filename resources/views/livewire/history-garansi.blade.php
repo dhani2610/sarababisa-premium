@@ -119,9 +119,15 @@
                                     </table>
                                 </div>
 
+                                <!-- Checkbox sebelum sparepart -->
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="useSparepartCheckbox">
+                                    <label class="form-check-label" for="useSparepartCheckbox">
+                                        Apakah menggunakan stok sparepart toko?
+                                    </label>
+                                </div>
                                 <!-- Sparepart Dynamic -->
-                                <!-- Sparepart Dynamic -->
-                                <div id="sparepart_wrapper">
+                                <div id="sparepart_wrapper" style="display:none;">
                                     <label class="block text-sm font-medium mb-1">Sparepart</label>
                                     <button type="button" id="addSparepartRow" class="btn-sm bg-indigo-500 text-white">
                                         + Tambah Sparepart
@@ -133,7 +139,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Total Biaya<span
                                             class="text-rose-500">*</span></label>
-                                    <input type="number" name="total_biaya" id="total_biaya" class="form-input w-full">
+                                    <input type="number" name="total_biaya" id="total_biaya" value="0" class="form-input w-full">
                                 </div>
 
                                 <!-- Catatan -->
@@ -548,16 +554,33 @@
                 let container = document.getElementById("rowContainer");
 
                 let div = document.createElement("div");
-                div.classList.add("flex", "space-x-2", "mb-2");
-                div.innerHTML = `
-            <select name="sparepart[${rowId}][id]" class="form-select w-1/2 sparepartSelect select2" required>
-                <option value="">-- Pilih Sparepart --</option>
-                ${products.map(p => `<option value="${p.id}" data-harga="${p.harga_modal}">${p.product_name}</option>`).join("")}
-            </select>
-            <input type="number" name="sparepart[${rowId}][harga]" class="form-input w-1/4 harga" placeholder="Harga" required>
-            <input type="number" name="sparepart[${rowId}][qty]" class="form-input w-1/4 qty" placeholder="Qty" value="1" min="1" required>
-            <button type="button" class="btn-sm bg-rose-500 text-white removeRow">✕</button>
-        `;
+                    div.classList.add(
+                        "grid", 
+                        "grid-cols-1",   // default 1 kolom (mobile)
+                        "md:grid-cols-4", // di desktop jadi 4 kolom
+                        "gap-2", 
+                        "items-center", 
+                        "mb-2"
+                    );
+
+                    div.innerHTML = `
+                        <select name="sparepart[${rowId}][id]" 
+                                class="form-select sparepartSelect select2 w-full" required>
+                            <option value="">-- Pilih Sparepart --</option>
+                            ${products.map(p => `<option value="${p.id}" data-harga="${p.harga_modal}">${p.product_name}</option>`).join("")}
+                        </select>
+
+                        <input type="number" name="sparepart[${rowId}][harga]" 
+                            class="form-input harga w-full" placeholder="Harga" required>
+
+                        <input type="number" name="sparepart[${rowId}][qty]" 
+                            class="form-input qty w-full" placeholder="Qty" value="1" min="1" required>
+
+                        <button type="button" 
+                                class="btn-sm bg-rose-500 text-white w-full md:w-auto removeRow">
+                            ✕
+                        </button>
+                    `;
 
                 container.appendChild(div);
 
@@ -582,6 +605,38 @@
                 document.querySelectorAll("#rowContainer > div").forEach(row => {
                     let harga = parseFloat(row.querySelector(".harga").value || 0);
                     let qty = parseInt(row.querySelector(".qty").value || 0);
+                    total += harga * qty;
+                });
+                document.getElementById("total_biaya").value = total;
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const sparepartCheckbox = document.getElementById("useSparepartCheckbox");
+            const sparepartWrapper = document.getElementById("sparepart_wrapper");
+            const rowContainer = document.getElementById("rowContainer");
+
+            sparepartCheckbox.addEventListener("change", function() {
+                if (this.checked) {
+                    sparepartWrapper.style.display = "block";
+                    // semua input sparepart wajib diisi (required)
+                    rowContainer.querySelectorAll("select, input").forEach(el => el.required = true);
+                } else {
+                    sparepartWrapper.style.display = "none";
+                    // reset value dan hilangkan semua row sparepart
+                    rowContainer.innerHTML = "";
+                    // hilangkan required
+                    rowContainer.querySelectorAll("select, input").forEach(el => el.required = false);
+                    // reset total biaya sparepart (biar ga ikut ngitung)
+                    calculateTotal();
+                }
+            });
+
+            // fungsi hitung total (sama kayak sebelumnya)
+            function calculateTotal() {
+                let total = 0;
+                document.querySelectorAll("#rowContainer > div").forEach(row => {
+                    let harga = parseFloat(row.querySelector(".harga")?.value || 0);
+                    let qty = parseInt(row.querySelector(".qty")?.value || 0);
                     total += harga * qty;
                 });
                 document.getElementById("total_biaya").value = total;
