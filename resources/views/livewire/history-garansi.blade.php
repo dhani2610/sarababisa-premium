@@ -277,7 +277,7 @@
                                             @foreach ($spareparts as $sp)
                                                 @php $prd = \App\Models\Product::find($sp['id']); @endphp
                                                 <li>
-                                                    {{ $prd->name ?? 'Produk ID ' . $sp['id'] }}
+                                                    {{ $prd->product_name ?? 'Produk ID ' . $sp['id'] }}
                                                     (x{{ $sp['qty'] }})
                                                     - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
                                                 </li>
