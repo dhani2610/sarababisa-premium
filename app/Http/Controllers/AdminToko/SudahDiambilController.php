@@ -16,6 +16,8 @@ use App\Models\ServiceAction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
+use App\Models\StoreSetting;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class SudahDiambilController extends Controller
@@ -213,6 +215,76 @@ class SudahDiambilController extends Controller
         $bagihasil = ($request->biaya - $request->modal_sparepart - $request->diskon) / 100;
         $nama_pelanggan = Customer::find($request->customers_id);
 
+        $ppn = 0;
+        $cekppn = StoreSetting::find(1);
+        if (!empty($cekppn) && $cekppn->is_tax == 1) {
+            $ppn = $cekppn->ppn;
+        }
+         if (!empty($request->diskon) && $request->diskon > 0) {
+            $baseBiaya = $request->biaya - $request->diskon;
+        } else {
+            $baseBiaya = $request->biaya;
+        }
+
+        $biayaFinal = $baseBiaya;
+        // Default
+        $tunai = 0;
+        $transfer = 0;
+        $due = 0;
+        $pay = 0;
+        if ($ppn > 0) {
+            $biayaFinal += ($baseBiaya * $item->ppn / 100);
+        }
+
+        if ($request->cara_pembayaran === 'Tunai & Transfer') {
+            $due = 0;
+            if ($request->tunai != 0) {
+                $transfer = $request->transfer;
+                $pay = $request->biaya;
+                $tunai = $request->tunai;
+            } else {
+                $tunai = $request->tunai;
+                $pay = $request->biaya;
+                $transfer = $request->transfer;
+            }
+        }
+        
+        // Cara pembayaran
+        if ($request->cara_pembayaran === 'Tunai') {
+            $tunai = $biayaFinal;
+            $transfer = 0;
+            $due = 0;
+            $pay = $biayaFinal;
+        }
+
+        if ($request->cara_pembayaran === 'Transfer') {
+            $transfer = $biayaFinal;
+            $tunai = 0;
+            $due = 0;
+            $pay = $biayaFinal;
+        }
+
+        if ($request->cara_pembayaran === 'Kredit') {
+            $pay = $request->pay;
+            $due = $request->biaya - $request->pay;
+            if ($request->tunai) {
+                $tunai = $request->pay;
+                $transfer = 0;
+            } elseif ($request->transfer) {
+                $transfer = $request->pay;
+                $tunai = 0;
+            }
+        }
+
+        $waktu = Carbon::today();
+        if ($request->tempo != null) {
+            $tempo = $waktu->addDays(
+                $request->tempo
+            );
+        } else {
+            $tempo = null;
+        }
+
         // Transaction create
         $item->update([
             'created_at' => $request->created_at,
@@ -242,6 +314,12 @@ class SudahDiambilController extends Controller
             'persen_teknisi' => $persen_teknisi,
             'omzet' => $request->biaya - $request->diskon,
             'profit' => $profittransaksi,
+            'pay' => $pay,
+            'due' => $due,
+            'tempo' => $tempo,
+            'tunai' => $tunai,
+            'transfer' => $transfer,
+            'ppn' => $ppn ?? 0,
             'profittoko' => $profittransaksi - ($bagihasil *= $request->persen_admin + $persen_teknisi)
         ]);
 

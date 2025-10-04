@@ -242,89 +242,89 @@
                                     @endif
                                     />
                                 </div>
-                                <div>
-                                  <div x-data="{ caraPembayaran: @js($item->cara_pembayaran ?? 'Tunai') }">
-                                    <label class="block text-sm font-medium mb-1" for="cara_pembayaran">Cara Pembayaran</label>
+                                    <div>
+                                    <div x-data="{ caraPembayaran: @js($item->cara_pembayaran ?? 'Tunai') }">
+                                        <label class="block text-sm font-medium mb-1" for="cara_pembayaran">Cara Pembayaran</label>
 
-                                    <select id="cara_pembayaran" name="cara_pembayaran"
-                                        class="form-select text-sm py-1 w-full"
-                                        x-model="caraPembayaran">
-                                        <option value="Tunai">Tunai</option>
-                                        <option value="Transfer">Transfer</option>
-                                        <option value="Kredit">Kredit</option>
-                                        <option value="Tunai & Transfer">Tunai & Transfer</option>
-                                    </select>
-
-                                    <!-- Tunai & Transfer -->
-                                    <div x-show="caraPembayaran === 'Tunai & Transfer'" class="mt-3">
-                                        <label class="block text-sm font-medium text-indigo-500">
-                                            Silahkan isi hanya pada salah satu input saja: Tunai / Transfer
-                                        </label>
-                                        <div class="flex flex-row gap-3">
-                                            <div class="w-1/2">
-                                                <label class="block text-sm font-medium mb-1" for="tunai">Tunai</label>
-                                                <input class="form-input w-full py-1" type="number"
-                                                    name="tunai" id="tunai"
-                                                    value="{{ $item->tunai ?? 0 }}" />
-                                            </div>
-                                            <div class="w-1/2">
-                                                <label class="block text-sm font-medium mb-1" for="transfer">Transfer</label>
-                                                <input class="form-input w-full py-1" type="number"
-                                                    name="transfer" id="transfer"
-                                                    value="{{ $item->transfer ?? 0 }}" />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Kredit -->
-                                    <div x-show="caraPembayaran === 'Kredit'" class="mt-3">
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="pay">
-                                                Jumlah Pembayaran <span class="text-rose-500">*</span>
-                                            </label>
-                                            <input id="pay" name="pay"
-                                                class="form-input w-full px-2 py-1"
-                                                type="number"
-                                                value="{{ old('pay') }}" />
-                                        </div>
-
-                                        <div class="flex items-center gap-5 mt-3">
-                                            <label class="flex items-center">
-                                                <input name="tunai_check" type="checkbox" value="1"
-                                                    class="form-checkbox"
-                                                    {{ $item->tunai ? 'checked' : '' }}/>
-                                                <span class="text-sm ml-2">Tunai</span>
-                                            </label>
-
-                                            <label class="flex items-center">
-                                                <input name="transfer_check" type="checkbox" value="1"
-                                                    class="form-checkbox"
-                                                    {{ $item->transfer ? 'checked' : '' }}/>
-                                                <span class="text-sm ml-2">Transfer</span>
-                                            </label>
-                                        </div>
-
-                                        <label class="block text-sm font-medium mt-3" for="tempo">
-                                            Waktu Tempo <span class="text-rose-500">*</span>
-                                        </label>
-                                        <select id="tempo" name="tempo"
-                                            class="form-select w-full mt-1">
-                                            <option value="">Pilih Waktu Tempo</option>
-                                            <option value="1">Tempo 1 Hari</option>
-                                            <option value="2">Tempo 2 Hari</option>
-                                            <option value="3">Tempo 3 Hari</option>
-                                            <option value="4">Tempo 4 Hari</option>
-                                            <option value="5">Tempo 5 Hari</option>
-                                            <option value="6">Tempo 6 Hari</option>
-                                            <option value="7">Tempo 1 Minggu</option>
-                                            <option value="14">Tempo 2 Minggu</option>
-                                            <option value="21">Tempo 3 Minggu</option>
-                                            <option value="30">Tempo 1 Bulan</option>
-                                            <option value="60">Tempo 2 Bulan</option>
-                                            <option value="90">Tempo 3 Bulan</option>
+                                        <select id="cara_pembayaran" name="cara_pembayaran"
+                                            class="form-select text-sm py-1 w-full"
+                                            x-model="caraPembayaran">
+                                            <option value="Tunai">Tunai</option>
+                                            <option value="Transfer">Transfer</option>
+                                            <option value="Kredit">Kredit</option>
+                                            <option value="Tunai & Transfer">Tunai & Transfer</option>
                                         </select>
+
+                                        <!-- Tunai & Transfer -->
+                                        <div x-show="caraPembayaran === 'Tunai & Transfer'" class="mt-3">
+                                            <label class="block text-sm font-medium text-indigo-500">
+                                                Silahkan isi hanya pada salah satu input saja: Tunai / Transfer
+                                            </label>
+                                            <div class="flex flex-row gap-3">
+                                                <div class="w-1/2">
+                                                    <label class="block text-sm font-medium mb-1" for="tunai">Tunai</label>
+                                                    <input class="form-input w-full py-1" type="number"
+                                                        name="tunai" id="tunai"
+                                                        value="{{ $item->tunai ?? 0 }}" />
+                                                </div>
+                                                <div class="w-1/2">
+                                                    <label class="block text-sm font-medium mb-1" for="transfer">Transfer</label>
+                                                    <input class="form-input w-full py-1" type="number"
+                                                        name="transfer" id="transfer"
+                                                        value="{{ $item->transfer ?? 0 }}" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Kredit -->
+                                        <div x-show="caraPembayaran === 'Kredit'" class="mt-3">
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1" for="pay">
+                                                    Jumlah Pembayaran <span class="text-rose-500">*</span>
+                                                </label>
+                                                <input id="pay" name="pay"
+                                                    class="form-input w-full px-2 py-1"
+                                                    type="number"
+                                                    value="{{ old('pay') }}" />
+                                            </div>
+
+                                            <div class="flex items-center gap-5 mt-3">
+                                                <label class="flex items-center">
+                                                    <input name="tunai_check" type="checkbox" value="1"
+                                                        class="form-checkbox"
+                                                        {{ $item->tunai ? 'checked' : '' }}/>
+                                                    <span class="text-sm ml-2">Tunai</span>
+                                                </label>
+
+                                                <label class="flex items-center">
+                                                    <input name="transfer_check" type="checkbox" value="1"
+                                                        class="form-checkbox"
+                                                        {{ $item->transfer ? 'checked' : '' }}/>
+                                                    <span class="text-sm ml-2">Transfer</span>
+                                                </label>
+                                            </div>
+
+                                            <label class="block text-sm font-medium mt-3" for="tempo">
+                                                Waktu Tempo <span class="text-rose-500">*</span>
+                                            </label>
+                                            <select id="tempo" name="tempo"
+                                                class="form-select w-full mt-1">
+                                                <option value="">Pilih Waktu Tempo</option>
+                                                <option value="1">Tempo 1 Hari</option>
+                                                <option value="2">Tempo 2 Hari</option>
+                                                <option value="3">Tempo 3 Hari</option>
+                                                <option value="4">Tempo 4 Hari</option>
+                                                <option value="5">Tempo 5 Hari</option>
+                                                <option value="6">Tempo 6 Hari</option>
+                                                <option value="7">Tempo 1 Minggu</option>
+                                                <option value="14">Tempo 2 Minggu</option>
+                                                <option value="21">Tempo 3 Minggu</option>
+                                                <option value="30">Tempo 1 Bulan</option>
+                                                <option value="60">Tempo 2 Bulan</option>
+                                                <option value="90">Tempo 3 Bulan</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
 
                                 </div>
                               
