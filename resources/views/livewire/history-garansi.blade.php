@@ -38,14 +38,16 @@
 
                                 <!-- Penerima -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Tanggal</label>
+                                    <label class="block text-sm font-medium mb-1">Tanggal <span
+                                            class="text-rose-500">*</span></label>
                                     <input type="date" name="date" id="date" class="form-input w-full"
                                         required>
                                 </div>
 
                                 <!-- Pilih Service -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Nomor Service</label>
+                                    <label class="block text-sm font-medium mb-1">Nomor Service <span
+                                            class="text-rose-500">*</span></label>
                                     <select name="service_id" id="service_id" class="form-select select2 w-full"
                                         required>
                                         <option value="">-- Pilih Nomor Service --</option>
@@ -64,8 +66,9 @@
 
                                 <!-- Penerima -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Penerima</label>
-                                    <select name="penerima_id" class="form-select w-full select2    " required>
+                                    <label class="block text-sm font-medium mb-1">Penerima <span
+                                            class="text-rose-500">*</span></label>
+                                    <select name="penerima_id" class="form-select w-full select2" required>
                                         <option value="">-- Pilih Penerima --</option>
                                         @foreach ($users as $u)
                                             <option value="{{ $u->id }}">{{ $u->name }}</option>
@@ -75,7 +78,8 @@
 
                                 <!-- Teknisi -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Teknisi</label>
+                                    <label class="block text-sm font-medium mb-1">Teknisi<span
+                                            class="text-rose-500">*</span></label>
                                     <select name="teknisi_id" class="form-select w-full select2" required>
                                         <option value="">-- Pilih Teknisi --</option>
                                         @foreach ($users as $u)
@@ -85,35 +89,58 @@
                                 </div>
 
                                 <!-- Tindakan -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Tindakan</label>
-                                    <select name="tindakan[]" class="form-select w-full select2" multiple>
+                                <div class="mb-3">
+                                    <label for="tindakan">Tindakan</label>
+                                    <select id="tindakan" name="tindakan[]" class="form-control select2" multiple>
                                         @foreach ($serviceActions as $action)
                                             <option value="{{ $action->id }}">{{ $action->nama_tindakan }}</option>
                                         @endforeach
                                     </select>
                                 </div>
 
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="manualTindakanCheckbox">
+                                    <label class="form-check-label" for="manualTindakanCheckbox">
+                                        Tambah Tindakan Manual
+                                    </label>
+                                </div>
+
+                                <!-- Dynamic input manual tindakan -->
+                                <div id="manualTindakanContainer" style="display: none;">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Tindakan Manual</th>
+                                                <th><button type="button" id="addManualRow"
+                                                        class="btn btn-sm btn-success bg-danger">+</button></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="manualTindakanBody"></tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Sparepart Dynamic -->
                                 <!-- Sparepart Dynamic -->
                                 <div id="sparepart_wrapper">
                                     <label class="block text-sm font-medium mb-1">Sparepart</label>
-                                    <button type="button" id="addRow" class="btn-sm bg-indigo-500 text-white">+
-                                        Tambah Sparepart</button>
-
+                                    <button type="button" id="addSparepartRow" class="btn-sm bg-indigo-500 text-white">
+                                        + Tambah Sparepart
+                                    </button>
                                     <div class="mt-2" id="rowContainer"></div>
                                 </div>
 
                                 <!-- Total Biaya -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Total Biaya</label>
-                                    <input type="number" name="total_biaya" id="total_biaya" class="form-input w-full"
-                                        readonly>
+                                    <label class="block text-sm font-medium mb-1">Total Biaya<span
+                                            class="text-rose-500">*</span></label>
+                                    <input type="number" name="total_biaya" id="total_biaya" class="form-input w-full">
                                 </div>
 
                                 <!-- Catatan -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Catatan</label>
-                                    <textarea name="catatan" class="form-input w-full"></textarea>
+                                    <label class="block text-sm font-medium mb-1">Catatan<span
+                                            class="text-rose-500">*</span></label>
+                                    <textarea name="catatan" class="form-input w-full" required></textarea>
                                 </div>
 
                             </div>
@@ -222,17 +249,18 @@
 
                                 {{-- Tindakan --}}
                                 <td class="px-2 py-3">
-                                    @php $tindakan = json_decode($item->tindakan, true); @endphp
-                                    @if ($tindakan)
-                                        <ul class="list-disc ml-4">
-                                            @foreach ($tindakan as $t)
-                                                <li>{{ \App\Models\ServiceAction::find($t)->nama_tindakan ?? 'ID ' . $t }}
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    @else
-                                        -
-                                    @endif
+                                    @php
+                                        $tindakans = json_decode($item->tindakan, true) ?? [];
+                                    @endphp
+
+                                    <ul class="list-disc ml-4">
+                                        @foreach ($tindakans as $t)
+                                            @php
+                                                $action = \App\Models\ServiceAction::find($t);
+                                            @endphp
+                                            <li>{{ $action ? $action->nama_tindakan : $t }}</li>
+                                        @endforeach
+                                    </ul>
                                 </td>
 
                                 {{-- Sparepart --}}
@@ -391,6 +419,31 @@
                 $('#exp_garansi').text(selected.data('expired'));
             });
         });
+        document.addEventListener("DOMContentLoaded", function() {
+            const checkbox = document.getElementById("manualTindakanCheckbox");
+            const container = document.getElementById("manualTindakanContainer");
+            const body = document.getElementById("manualTindakanBody");
+            const addManualBtn = document.getElementById("addManualRow");
+
+            checkbox.addEventListener("change", function() {
+                container.style.display = this.checked ? "block" : "none";
+            });
+
+            addManualBtn.addEventListener("click", function() {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+            <td><input type="text" name="tindakan[]" class="form-control" placeholder="Tindakan manual"></td>
+            <td><button type="button" class="btn btn-sm btn-danger removeRow">x</button></td>
+        `;
+                body.appendChild(row);
+            });
+
+            body.addEventListener("click", function(e) {
+                if (e.target.classList.contains("removeRow")) {
+                    e.target.closest("tr").remove();
+                }
+            });
+        });
     </script>
 
     <script>
@@ -467,7 +520,7 @@
 
                         btn.removeClass(
                             'bg-yellow-100 text-yellow-700 bg-green-100 text-green-700 bg-red-100 text-red-700'
-                            );
+                        );
 
                         if (res.status == 1) {
                             btn.addClass('bg-yellow-100 text-yellow-700');
@@ -490,31 +543,25 @@
             let products = @json($products);
             let rowId = 0;
 
-            document.getElementById("service_id").addEventListener("change", function() {
-                let selected = this.options[this.selectedIndex];
-                document.getElementById("prev_teknisi").textContent = selected.dataset.teknisi;
-                document.getElementById("exp_garansi").textContent = selected.dataset.expired;
-            });
-
-            document.getElementById("addRow").addEventListener("click", function() {
+            document.getElementById("addSparepartRow").addEventListener("click", function() {
                 rowId++;
                 let container = document.getElementById("rowContainer");
 
                 let div = document.createElement("div");
                 div.classList.add("flex", "space-x-2", "mb-2");
                 div.innerHTML = `
-                    <select name="sparepart[${rowId}][id]" class="form-select w-1/2 sparepartSelect select2">
-                        <option value="">-- Pilih Sparepart --</option>
-                        ${products.map(p => `<option value="${p.id}" data-harga="${p.harga_modal}">${p.product_name}</option>`).join("")}
-                    </select>
-                    <input type="number" name="sparepart[${rowId}][harga]" class="form-input w-1/4 harga" placeholder="Harga">
-                    <input type="number" name="sparepart[${rowId}][qty]" class="form-input w-1/4 qty" placeholder="Qty" value="1" min="1">
-                    <button type="button" class="btn-sm bg-rose-500 text-white removeRow">✕</button>
-                `;
+            <select name="sparepart[${rowId}][id]" class="form-select w-1/2 sparepartSelect select2">
+                <option value="">-- Pilih Sparepart --</option>
+                ${products.map(p => `<option value="${p.id}" data-harga="${p.harga_modal}">${p.product_name}</option>`).join("")}
+            </select>
+            <input type="number" name="sparepart[${rowId}][harga]" class="form-input w-1/4 harga" placeholder="Harga">
+            <input type="number" name="sparepart[${rowId}][qty]" class="form-input w-1/4 qty" placeholder="Qty" value="1" min="1">
+            <button type="button" class="btn-sm bg-rose-500 text-white removeRow">✕</button>
+        `;
 
                 container.appendChild(div);
 
-                // event listener harga
+                // update harga otomatis
                 div.querySelector(".sparepartSelect").addEventListener("change", function() {
                     let harga = this.options[this.selectedIndex].dataset.harga || 0;
                     div.querySelector(".harga").value = harga;
@@ -524,12 +571,10 @@
                 div.querySelector(".harga").addEventListener("input", calculateTotal);
                 div.querySelector(".qty").addEventListener("input", calculateTotal);
 
-                // tombol hapus row
                 div.querySelector(".removeRow").addEventListener("click", function() {
                     div.remove();
                     calculateTotal();
                 });
-
             });
 
             function calculateTotal() {
