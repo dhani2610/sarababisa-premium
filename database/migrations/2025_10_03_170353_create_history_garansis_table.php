@@ -16,12 +16,14 @@ return new class extends Migration
         Schema::create('history_garansis', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->string('penerima_id');
-            $table->string('teknisi_id');
-            $table->json('sparepart');
-            $table->json('biaya');
+            $table->integer('service_id');
+            $table->integer('penerima_id');
+            $table->integer('teknisi_id');
+            $table->json('tindakan');
+            $table->json('sparepart')->nullable();
             $table->integer('total_biaya');
             $table->text('catatan');
+            $table->integer('status');
             $table->timestamps();
         });
     }

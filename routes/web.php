@@ -147,6 +147,7 @@ use App\Http\Controllers\AdminToko\UbahStatusProsesServisController as AdminToko
 use App\Http\Controllers\KepalaToko\TargetBulanSebelumnyaController as KepalaTokoTargetBulanSebelumnyaController;
 use App\Http\Controllers\AdminToko\TransaksiServisLangsungController as AdminTokoTransaksiServisLangsungController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\HistoryGaransiController;
 use App\Http\Controllers\KepalaToko\UbahStatusProsesServisController as KepalaTokoUbahStatusProsesServisController;
 use App\Http\Controllers\KepalaToko\TransaksiServisLangsungController as KepalaTokoTransaksiServisLangsungController;
 use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTransaksiServisLangsungController;
@@ -240,6 +241,10 @@ Route::delete('master/master-gallery/delete-selected', [GalleryController::class
 
 Route::resource('gaji/karyawan', KepalaTokoKaryawanController::class);
 Route::get('slip-gaji/{id}', [KepalaTokoKaryawanController::class, 'cetak'])->name('cetak-slip-gaji');
+
+Route::resource('history-garansi', HistoryGaransiController::class);
+// routes/web.php
+Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'show'])->name('service.show');
 
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
