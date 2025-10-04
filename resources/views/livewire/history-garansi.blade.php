@@ -550,12 +550,12 @@
                 let div = document.createElement("div");
                 div.classList.add("flex", "space-x-2", "mb-2");
                 div.innerHTML = `
-            <select name="sparepart[${rowId}][id]" class="form-select w-1/2 sparepartSelect select2">
+            <select name="sparepart[${rowId}][id]" class="form-select w-1/2 sparepartSelect select2" required>
                 <option value="">-- Pilih Sparepart --</option>
                 ${products.map(p => `<option value="${p.id}" data-harga="${p.harga_modal}">${p.product_name}</option>`).join("")}
             </select>
-            <input type="number" name="sparepart[${rowId}][harga]" class="form-input w-1/4 harga" placeholder="Harga">
-            <input type="number" name="sparepart[${rowId}][qty]" class="form-input w-1/4 qty" placeholder="Qty" value="1" min="1">
+            <input type="number" name="sparepart[${rowId}][harga]" class="form-input w-1/4 harga" placeholder="Harga" required>
+            <input type="number" name="sparepart[${rowId}][qty]" class="form-input w-1/4 qty" placeholder="Qty" value="1" min="1" required>
             <button type="button" class="btn-sm bg-rose-500 text-white removeRow">✕</button>
         `;
 
