@@ -474,7 +474,7 @@
             @endif
         </tbody>
     </table>
-    <table class="w-100" border="1">
+    <table class="w-100">
         <tbody>
             <tr>
                 @php
