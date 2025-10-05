@@ -90,22 +90,34 @@
 
                                 <!-- Tindakan -->
                                 <div class="mb-3">
-                                    <label class="block text-sm font-medium mb-1">Tindakan</label>
-                                    <button type="button" id="addTindakanRow"
-                                        class="btn-sm bg-indigo-500 text-white mb-2">
-                                        + Tambah Tindakan
-                                    </button>
-                                    <div id="tindakanContainer"></div>
+                                    <label for="tindakan">Tindakan</label>
+                                    <select id="tindakan" name="tindakan[]" class="form-control select2" multiple>
+                                        @foreach ($serviceActions as $action)
+                                            <option value="{{ $action->id }}">{{ $action->nama_tindakan }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
 
-                                <!-- Total Biaya Servis -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Total Biaya Tindakan</label>
-                                    <input type="number" name="total_biaya_tindakan" id="total_biaya_tindakan"
-                                        value="0" class="form-input w-full" required>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="manualTindakanCheckbox">
+                                    <label class="form-check-label" for="manualTindakanCheckbox">
+                                        Tambah Tindakan Manual
+                                    </label>
                                 </div>
 
-                                <hr>
+                                <!-- Dynamic input manual tindakan -->
+                                <div id="manualTindakanContainer" style="display: none;">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Tindakan Manual</th>
+                                                <th><button type="button" id="addManualRow"
+                                                        class="btn btn-sm btn-success bg-danger">+</button></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="manualTindakanBody"></tbody>
+                                    </table>
+                                </div>
 
                                 <!-- Checkbox sebelum sparepart -->
                                 <div class="form-check mb-3">
@@ -125,17 +137,9 @@
 
                                 <!-- Total Biaya -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Modal Sparepart<span
-                                            class="text-rose-500">*</span></label>
-                                    <input type="number" name="modal_sparepart" id="modal_sparepart" value="0"
-                                        class="form-input w-full">
-                                </div>
-                                <!-- Total Biaya -->
-                                <div>
                                     <label class="block text-sm font-medium mb-1">Total Biaya<span
                                             class="text-rose-500">*</span></label>
-                                    <input type="number" name="total_biaya" id="total_biaya" value="0"
-                                        class="form-input w-full">
+                                    <input type="number" name="total_biaya" id="total_biaya" value="0" class="form-input w-full">
                                 </div>
 
                                 <!-- Catatan -->
@@ -258,11 +262,9 @@
                                     <ul class="list-disc ml-4">
                                         @foreach ($tindakans as $t)
                                             @php
-                                                $action = \App\Models\ServiceAction::find($t['id']);
+                                                $action = \App\Models\ServiceAction::find($t);
                                             @endphp
-                                            <li>{{ $action ? $action->nama_tindakan : $t['id_manual'] }}
-                                                    - Rp{{ number_format($t['harga'], 0, ',', '.') }}
-                                            </li>
+                                            <li>{{ $action ? $action->nama_tindakan : $t }}</li>
                                         @endforeach
                                     </ul>
                                 </td>
@@ -423,6 +425,31 @@
                 $('#exp_garansi').text(selected.data('expired'));
             });
         });
+        document.addEventListener("DOMContentLoaded", function() {
+            const checkbox = document.getElementById("manualTindakanCheckbox");
+            const container = document.getElementById("manualTindakanContainer");
+            const body = document.getElementById("manualTindakanBody");
+            const addManualBtn = document.getElementById("addManualRow");
+
+            checkbox.addEventListener("change", function() {
+                container.style.display = this.checked ? "block" : "none";
+            });
+
+            addManualBtn.addEventListener("click", function() {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+            <td><input type="text" name="tindakan[]" class="form-control" placeholder="Tindakan manual"></td>
+            <td><button type="button" class="btn btn-sm btn-danger removeRow">x</button></td>
+        `;
+                body.appendChild(row);
+            });
+
+            body.addEventListener("click", function(e) {
+                if (e.target.classList.contains("removeRow")) {
+                    e.target.closest("tr").remove();
+                }
+            });
+        });
     </script>
 
     <script>
@@ -527,16 +554,16 @@
                 let container = document.getElementById("rowContainer");
 
                 let div = document.createElement("div");
-                div.classList.add(
-                    "grid",
-                    "grid-cols-1", // default 1 kolom (mobile)
-                    "md:grid-cols-4", // di desktop jadi 4 kolom
-                    "gap-2",
-                    "items-center",
-                    "mb-2"
-                );
+                    div.classList.add(
+                        "grid", 
+                        "grid-cols-1",   // default 1 kolom (mobile)
+                        "md:grid-cols-4", // di desktop jadi 4 kolom
+                        "gap-2", 
+                        "items-center", 
+                        "mb-2"
+                    );
 
-                div.innerHTML = `
+                    div.innerHTML = `
                         <select name="sparepart[${rowId}][id]" 
                                 class="form-select sparepartSelect select2 w-full" required>
                             <option value="">-- Pilih Sparepart --</option>
@@ -566,7 +593,6 @@
 
                 div.querySelector(".harga").addEventListener("input", calculateTotal);
                 div.querySelector(".qty").addEventListener("input", calculateTotal);
-                div.querySelector(".tindakanHarga").addEventListener("input", calculateTotal);
 
                 div.querySelector(".removeRow").addEventListener("click", function() {
                     div.remove();
@@ -579,19 +605,9 @@
                 document.querySelectorAll("#rowContainer > div").forEach(row => {
                     let harga = parseFloat(row.querySelector(".harga").value || 0);
                     let qty = parseInt(row.querySelector(".qty").value || 0);
-
                     total += harga * qty;
-                    console.log(total);
-
                 });
-                // ubah ke angka biar gak digabung string
-                let total_biaya_tindakan = parseFloat($('#total_biaya_tindakan').val() || 0);
-
-                // hitung total keseluruhan
-                let totalKeseluruhan = total + total_biaya_tindakan;
-
-                $('#total_biaya').val(totalKeseluruhan);
-                document.getElementById("modal_sparepart").value = total;
+                document.getElementById("total_biaya").value = total;
             }
         });
         document.addEventListener("DOMContentLoaded", function() {
@@ -612,7 +628,6 @@
                     rowContainer.querySelectorAll("select, input").forEach(el => el.required = false);
                     // reset total biaya sparepart (biar ga ikut ngitung)
                     calculateTotal();
-
                 }
             });
 
@@ -624,104 +639,10 @@
                     let qty = parseInt(row.querySelector(".qty")?.value || 0);
                     total += harga * qty;
                 });
-                document.getElementById("modal_sparepart").value = total;
+                document.getElementById("total_biaya").value = total;
             }
         });
     </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            let tindakanList = @json($serviceActions); // pastikan kamu kirim $serviceActions dari controller
-            let tindakanContainer = document.getElementById("tindakanContainer");
-            let totalBiayaInput = document.getElementById("total_biaya_tindakan");
-            let totalBiayaFinal = document.getElementById("total_biaya");
-            let addTindakanBtn = document.getElementById("addTindakanRow");
-            let tindakanRowId = 0;
-
-            addTindakanBtn.addEventListener("click", function() {
-                tindakanRowId++;
-                let div = document.createElement("div");
-                div.classList.add("grid", "grid-cols-1", "md:grid-cols-3", "gap-2", "items-center", "mb-2");
-                div.innerHTML = `
-                <select name="tindakan[${tindakanRowId}][id]" 
-                        class="form-select tindakanSelect w-full" required>
-                    <option value="">-- Pilih Tindakan --</option>
-                    ${tindakanList.map(t => `<option value="${t.id}" data-harga="${t.harga_pelanggan}">${t.nama_tindakan}</option>`).join("")}
-                </select>
-                <input type="text" name="tindakan[${tindakanRowId}][id_manual]" class="form-input tindakanManual w-full hidden" placeholder="Input manual tindakan">
-
-                 <div class="flex items-center space-x-2">
-                    <input type="checkbox" class="form-checkbox toggleManual" id="manual-${tindakanRowId}">
-                    <label for="manual-${tindakanRowId}" class="text-sm text-slate-600">Input manual</label>
-                </div>
-
-                <input type="number" name="tindakan[${tindakanRowId}][harga]" 
-                       class="form-input tindakanHarga w-full" placeholder="Harga" value="0" required>
-                <button type="button" class="btn-sm bg-rose-500 text-white removeTindakan w-full md:w-auto">✕</button>
-            `;
-
-                tindakanContainer.appendChild(div);
-
-                // toggle manual input
-                div.querySelector(".toggleManual").addEventListener("change", function() {
-                    let manual = div.querySelector(".tindakanManual");
-                    let select = div.querySelector(".tindakanSelect");
-
-                    if (this.checked) {
-                        select.classList.add("hidden");
-                        select.removeAttribute("required");
-                        manual.classList.remove("hidden");
-                        manual.setAttribute("required", true);
-                        $(select).val('').trigger('change');
-                    } else {
-                        manual.classList.add("hidden");
-                        manual.removeAttribute("required");
-                        select.classList.remove("hidden");
-                        select.setAttribute("required", true);
-                        manual.value = '';
-                    }
-                });
-
-                let select = div.querySelector(".tindakanSelect");
-                let hargaInput = div.querySelector(".tindakanHarga");
-
-                div.querySelector(".tindakanHarga").addEventListener("input", calculateTindakanTotal);
-
-                // ketika pilih tindakan
-                select.addEventListener("change", function() {
-                    let harga = parseFloat(select.options[select.selectedIndex].dataset.harga || 0);
-                    hargaInput.value = harga;
-                    calculateTindakanTotal();
-                });
-
-                // hapus row tindakan
-                div.querySelector(".removeTindakan").addEventListener("click", function() {
-                    div.remove();
-                    calculateTindakanTotal();
-                });
-            });
-
-            function calculateTindakanTotal() {
-                let total = 0;
-                document.querySelectorAll("#tindakanContainer .tindakanHarga").forEach(input => {
-                    total += parseFloat(input.value || 0);
-                });
-                totalBiayaInput.value = total;
-                calculateFinalTotal();
-            }
-
-            function calculateFinalTotal() {
-                let totalTindakan = parseFloat(totalBiayaInput.value || 0);
-                let modalSparepart = parseFloat(document.getElementById("modal_sparepart").value || 0);
-                totalBiayaFinal.value = totalTindakan + modalSparepart;
-            }
-
-            // jika modal_sparepart berubah, update total akhir
-            document.getElementById("modal_sparepart").addEventListener("input", calculateFinalTotal);
-        });
-    </script>
-
-
-
 
 
     <!-- Pagination -->

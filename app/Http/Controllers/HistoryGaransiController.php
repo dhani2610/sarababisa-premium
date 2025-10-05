@@ -18,7 +18,6 @@ class HistoryGaransiController extends Controller
     public function index()
     {
         $users = User::all();
-
         return view('pages.kepalatoko.history.garansi', compact(
             'users'
         ));
@@ -64,64 +63,12 @@ class HistoryGaransiController extends Controller
         $data->teknisi_id  = $request->teknisi_id;
         $data->tindakan    = json_encode($request->tindakan);
         $data->sparepart   =  !empty($request->sparepart) ? json_encode($request->sparepart) : null;
+        $data->modal_sparepart = $request->modal_sparepart;
+        $data->total_biaya_tindakan = $request->total_biaya_tindakan;
         $data->total_biaya = $request->total_biaya;
         $data->catatan     = $request->catatan;
         $data->status     = 1;
         $data->save();
-
-        // if (!empty($request->sparepart)) {
-        //     foreach ($request->sparepart as $row) {
-        //         $spareparts = Product::find($row['id']);
-        //         if ($spareparts) {
-        //             $spareparts->stok -= (int)$row['qty'];
-        //             $spareparts->save();
-        //         }
-
-        //         $service = ServiceTransaction::find($request->service_id);
-
-        //         $harga_jual = $spareparts->harga_jual ?? 0;
-        //         $nama_pelanggan = Customer::find($service->customers_id)->nama;
-        //         $order = new Order();
-        //         $order->customers_id = $service->customers_id;
-        //         $order->users_id = $request->teknisi_id;
-        //         $order->order_date = Carbon::today()->locale('id')->translatedFormat('d F Y');
-        //         $order->total_products = 1;
-        //         $order->sub_total = $harga_jual;
-        //         $order->invoice_no = '' . mt_rand(date('Ymd00'), date('Ymd99'));
-        //         $order->nama_pelanggan = $nama_pelanggan;
-        //         $order->payment_method = "Tunai";
-        //         $order->pay = $harga_jual;
-        //         $order->due = 0;
-        //         $order->is_approve = 'Setuju';
-        //         $order->tgl_disetujui = Carbon::today();
-        //         $order->save();
-    
-        //         if ($request->teknisi_id != 1) {
-        //             $persen_sales = User::find($request->teknisi_id)->persen;
-        //         } else {
-        //             $persen_sales = null;
-        //         }
-        //         $persen_sales = null;
-    
-        //         $orderDetail = new OrderDetail();
-        //         $orderDetail->orders_id = $order->id;
-        //         $orderDetail->users_id = $request->teknisi_id;
-        //         $orderDetail->products_id = $spareparts->id;
-        //         $orderDetail->product_name = $spareparts->product_name;
-        //         $orderDetail->quantity = (int)$row['qty'];
-        //         $orderDetail->price = $harga_jual;
-        //         $orderDetail->total = $harga_jual;
-        //         $orderDetail->sub_total = $harga_jual;
-        //         $orderDetail->modal = $spareparts->harga_modal;
-        //         $orderDetail->profit = $harga_jual - $spareparts->harga_modal;
-        //         $orderDetail->persen_sales = $persen_sales;
-        //         $orderDetail->profit_toko = ($harga_jual - $spareparts->harga_modal) - ($spareparts->harga_jual - $spareparts->harga_modal) / 100 * $persen_sales;
-        //         $orderDetail->garansi = date('Y-m-d');
-        //         $orderDetail->product_discount_amount = 0;
-        //         $orderDetail->save();
-        //     }
-
-        // }
 
         if (!empty($request->sparepart)) {
             foreach ($request->sparepart as $row) {

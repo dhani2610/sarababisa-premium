@@ -258,11 +258,9 @@
                                     <ul class="list-disc ml-4">
                                         @foreach ($tindakans as $t)
                                             @php
-                                                $action = \App\Models\ServiceAction::find($t['id']);
+                                                $action = \App\Models\ServiceAction::find($t);
                                             @endphp
-                                            <li>{{ $action ? $action->nama_tindakan : $t['id_manual'] }}
-                                                    - Rp{{ number_format($t['harga'], 0, ',', '.') }}
-                                            </li>
+                                            <li>{{ $action ? $action->nama_tindakan : $t }}</li>
                                         @endforeach
                                     </ul>
                                 </td>
@@ -286,7 +284,7 @@
                                     @endif
                                 </td>
 
-                                <td class="px-2 py-3">Rp{{ number_format($item->total_biaya, 0, ',', '.') }}</td>
+                                <td class="px-2 py-3">Rp{{ number_format($item->modal_sparepart, 0, ',', '.') }}</td>
                                 <td class="px-2 py-3">{{ $item->catatan }}</td>
                                 <td class="px-2 py-3">
                                     <button
@@ -647,39 +645,12 @@
                     <option value="">-- Pilih Tindakan --</option>
                     ${tindakanList.map(t => `<option value="${t.id}" data-harga="${t.harga_pelanggan}">${t.nama_tindakan}</option>`).join("")}
                 </select>
-                <input type="text" name="tindakan[${tindakanRowId}][id_manual]" class="form-input tindakanManual w-full hidden" placeholder="Input manual tindakan">
-
-                 <div class="flex items-center space-x-2">
-                    <input type="checkbox" class="form-checkbox toggleManual" id="manual-${tindakanRowId}">
-                    <label for="manual-${tindakanRowId}" class="text-sm text-slate-600">Input manual</label>
-                </div>
-
                 <input type="number" name="tindakan[${tindakanRowId}][harga]" 
-                       class="form-input tindakanHarga w-full" placeholder="Harga" value="0" required>
+                       class="form-input tindakanHarga w-full" placeholder="Harga" required>
                 <button type="button" class="btn-sm bg-rose-500 text-white removeTindakan w-full md:w-auto">✕</button>
             `;
 
                 tindakanContainer.appendChild(div);
-
-                // toggle manual input
-                div.querySelector(".toggleManual").addEventListener("change", function() {
-                    let manual = div.querySelector(".tindakanManual");
-                    let select = div.querySelector(".tindakanSelect");
-
-                    if (this.checked) {
-                        select.classList.add("hidden");
-                        select.removeAttribute("required");
-                        manual.classList.remove("hidden");
-                        manual.setAttribute("required", true);
-                        $(select).val('').trigger('change');
-                    } else {
-                        manual.classList.add("hidden");
-                        manual.removeAttribute("required");
-                        select.classList.remove("hidden");
-                        select.setAttribute("required", true);
-                        manual.value = '';
-                    }
-                });
 
                 let select = div.querySelector(".tindakanSelect");
                 let hargaInput = div.querySelector(".tindakanHarga");
