@@ -100,7 +100,7 @@
 
                                 <!-- Total Biaya Servis -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Total Biaya Tindakan</label>
+                                    <label class="block text-sm font-medium mb-1">Total Modal Tindakan</label>
                                     <input type="number" name="total_biaya_tindakan" id="total_biaya_tindakan"
                                         value="0" class="form-input w-full" required>
                                 </div>
@@ -132,7 +132,7 @@
                                 </div>
                                 <!-- Total Biaya -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Total Biaya<span
+                                    <label class="block text-sm font-medium mb-1">Total Modal<span
                                             class="text-rose-500">*</span></label>
                                     <input type="number" name="total_biaya" id="total_biaya" value="0"
                                         class="form-input w-full">
@@ -232,7 +232,7 @@
                             <th class="px-2 py-3">Teknisi</th>
                             <th class="px-2 py-3">Tindakan</th>
                             <th class="px-2 py-3">Sparepart</th>
-                            <th class="px-2 py-3">Total Biaya</th>
+                            <th class="px-2 py-3">Total Modal</th>
                             <th class="px-2 py-3">Catatan</th>
                             <th class="px-2 py-3">Status</th>
                             <th class="px-2 py-3">Aksi</th>
