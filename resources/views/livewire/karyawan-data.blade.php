@@ -10,6 +10,7 @@
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
+            @if (auth()->user()->role == 'Kepala Toko')
             <!-- Search form -->
             <x-search-form placeholder="Masukkan nama karyawan" />
 
@@ -115,6 +116,7 @@
                     </div>
                 </div>
             </div>
+            @endif
             
         </div>
 
@@ -124,7 +126,7 @@
         <div x-data="handleSelect">
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 {{-- Left side --}}
-                <h2 class="font-semibold text-slate-800">Semua Karyawan <span class="text-slate-400 font-medium">{{ $workers_count }}</span></h2>
+                <h2 class="font-semibold text-slate-800">Semua Karyawan <span class="text-slate-400 font-medium">{{ $workers->count() }}</span></h2>
                 <div class="relative inline-flex">
                     <div class="table-items-action hidden">
                         <div class="flex items-center">
@@ -140,6 +142,7 @@
                     <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
+                            @if (auth()->user()->role == 'Kepala Toko')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="flex items-center">
                                     <label class="inline-flex">
@@ -148,6 +151,7 @@
                                     </label>
                                 </div>
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">No.</div>
                             </th>
@@ -191,6 +195,7 @@
                         @endphp
                         @foreach($workers as $item)                  
                             <tr>
+                                @if (auth()->user()->role == 'Kepala Toko')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
                                         <label class="inline-flex">
@@ -199,6 +204,7 @@
                                         </label>
                                     </div>
                                 </td>
+                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $i++ }}</div>
                                 </td>
@@ -318,6 +324,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        @if (auth()->user()->role == 'Kepala Toko')
                                         <a href="{{ route('karyawan.edit', $item->id) }}">
                                             <button class="text-slate-400 hover:text-slate-500 rounded-full">
                                                 <span class="sr-only">Edit</span>
@@ -398,6 +405,7 @@
                                             </div>                                            
                                         </div>
                                         <!-- End -->
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

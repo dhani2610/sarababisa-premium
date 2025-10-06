@@ -147,10 +147,12 @@ use App\Http\Controllers\AdminToko\UbahStatusProsesServisController as AdminToko
 use App\Http\Controllers\KepalaToko\TargetBulanSebelumnyaController as KepalaTokoTargetBulanSebelumnyaController;
 use App\Http\Controllers\AdminToko\TransaksiServisLangsungController as AdminTokoTransaksiServisLangsungController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\HistoryGaransiController;
 use App\Http\Controllers\KepalaToko\UbahStatusProsesServisController as KepalaTokoUbahStatusProsesServisController;
 use App\Http\Controllers\KepalaToko\TransaksiServisLangsungController as KepalaTokoTransaksiServisLangsungController;
 use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTransaksiServisLangsungController;
 use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as KepalaTokoServisBelumDisetujuiApproveController;
+use App\Http\Controllers\TipeOsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -237,6 +239,16 @@ Route::get('produk/item/{id}/download-barcode', [ProdukController::class, 'downl
 Route::delete('master/master-gallery/delete-selected', [GalleryController::class, 'deleteSelected'])
         ->name('master-gallery.deleteSelected');
 
+Route::resource('gaji/karyawan', KepalaTokoKaryawanController::class);
+Route::get('slip-gaji/{id}', [KepalaTokoKaryawanController::class, 'cetak'])->name('cetak-slip-gaji');
+
+Route::resource('history-garansi', HistoryGaransiController::class);
+Route::patch('/history-garansi/{id}/toggle-status', [HistoryGaransiController::class, 'toggleStatus'])
+    ->name('history-garansi.toggleStatus');
+
+// routes/web.php
+Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'show'])->name('service.show');
+
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
 
@@ -273,6 +285,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
 
     Route::resource('master/master-jenis-barang', KepalaTokoMasterJenisBarangController::class);
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
+    Route::resource('master/master-tipe-os', TipeOsController::class);
     Route::resource('master/master-gallery', GalleryController::class);
     
 
@@ -289,7 +302,6 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('manajemen/kasbon', KepalaTokoKasbonController::class);
     Route::patch('/debts/update', [KepalaTokoKasbonController::class, 'approveSelected']);
     Route::patch('/debts/reject', [KepalaTokoKasbonController::class, 'rejectSelected']);
-    Route::resource('gaji/karyawan', KepalaTokoKaryawanController::class);
     Route::delete('/workers/delete', [KepalaTokoKaryawanController::class, 'deleteSelected']);
     Route::resource('gaji/bonus', KepalaTokoGajiController::class);
     Route::delete('/bonus/delete', [KepalaTokoGajiController::class, 'deleteSelected']);
@@ -398,7 +410,6 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::class, 'cetakinkjet'])->name('kepalatoko-pengambilan-cetak-inkjet');
     Route::get('kepalatoko-nota-pengambilan-termal/{id}', [KepalaTokoSudahDiambilController::class, 'pengambilantermal'])->name('kepalatoko-nota-pengambilan-termal');
 
-    Route::get('slip-gaji/{id}', [KepalaTokoKaryawanController::class, 'cetak'])->name('cetak-slip-gaji');
 
     Route::post('/impor-pelanggan', [KepalaTokoPelangganController::class, 'import'])->name('impor-pelanggan');
     Route::get('export-pelanggan', [KepalaTokoPelangganController::class, 'export'])->name('pelanggan-export');

@@ -141,7 +141,13 @@
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td>
 					<td style="width: 60px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
-					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->profit / 100 * $item->persen_teknisi) }}</td>
+					<td style="width: 70px; text-align: right;">
+						@if ($item->tipe == 'Interface')
+						Rp. {{ number_format($item->bonus_interface) }}
+						@else
+						Rp. {{ number_format($item->profit / 100 * $item->persen_teknisi) }}
+						@endif
+					</td>
 				</tr>
 			@endforeach
 		</tbody>

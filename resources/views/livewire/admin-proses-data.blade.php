@@ -385,6 +385,16 @@
                                                         @endforeach
                                                     </select>
                                                 </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium mb-1" for="tipe">Tipe Teknisi<span
+                                                            class="text-rose-500">*</span></label>
+                                                    <select id="tipe" name="tipe"
+                                                        class="form-select text-sm py-1 w-full">
+                                                        <option selected value="">Pilih Tipe</option>
+                                                        <option value="Interface">Interface</option>
+                                                        <option value="Hardware">Hardware</option>
+                                                    </select>
+                                                </div>
                                                 <div x-data="{ showInputManual: false }">
                                                     <div class="flex justify-between items-center mb-1">
                                                         <label class="block text-sm font-medium">

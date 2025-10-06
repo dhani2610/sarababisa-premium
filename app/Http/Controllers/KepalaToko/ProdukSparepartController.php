@@ -84,7 +84,9 @@ class ProdukSparepartController extends Controller
             'ppn' => $request->ppn
         ]);
 
-        return redirect()->route('sparepart.index');
+        // return redirect()->route('sparepart.index');
+        return redirect()->back();
+
     }
 
     /**

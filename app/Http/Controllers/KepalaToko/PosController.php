@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\KepalaToko;
 
+use App\Models\SubCategory;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Order;
@@ -11,6 +12,10 @@ use App\Models\OrderDetail;
 use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
+use App\Models\Capacity;
+use App\Models\Color;
+use App\Models\ModelSerie;
 use Gloudemans\Shoppingcart\Facades\Cart;
 
 class PosController extends Controller
@@ -23,8 +28,16 @@ class PosController extends Controller
     public function index()
     {
         Cart::instance('sale')->destroy();
+        $toko = StoreSetting::find(1);
+        $brands = Brand::all();
+        $capacities = Capacity::all();
+        $model_series = ModelSerie::all();
+        $colors = Color::all();
+        $spareparts = SubCategory::where('categories_id', '=', '2')->get();
+        $accessories = SubCategory::where('categories_id', '=', '3')->get();
+        $tools = SubCategory::where('categories_id', '=', '4')->get();
 
-        return view('pages/kepalatoko/pos/index');
+        return view('pages/kepalatoko/pos/index',compact('brands','capacities','model_series','colors','toko','spareparts','accessories','tools'));
     }
 
     public function show($id)

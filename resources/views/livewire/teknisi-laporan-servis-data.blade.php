@@ -27,13 +27,26 @@
                 <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                     <tr>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                            <div class="font-semibold text-left">Tanggal</div>
+                            <div class="font-semibold text-left">Tanggal Disetujui</div>
+                        </th>
+                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            <div class="font-semibold text-left">Tanggal Diambil</div>
                         </th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Teknisi</div>
                         </th>
+                       
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Tindakan</div>
+                        </th>
+                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            <div class="font-semibold text-left">Biaya Servis</div>
+                        </th>
+                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            <div class="font-semibold text-left">Diskon</div>
+                        </th>
+                        </th><th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            <div class="font-semibold text-left">Pembayaran</div>
                         </th>
                         @if ($toko->is_bonus === 1)
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -48,7 +61,10 @@
                     @foreach($services as $item)                  
                         <tr>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-medium">{{ \Carbon\Carbon::parse($item->updated_at)->translatedFormat('d F Y') }}</div>
+                                <div class="font-medium">{{ \Carbon\Carbon::parse($item->tgl_disetujui)->translatedFormat('d F Y') }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-medium">{{ \Carbon\Carbon::parse($item->tgl_ambil)->translatedFormat('d F Y') }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 @if ($item->user)
@@ -58,14 +74,29 @@
                                 @endif
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-medium">{{ $item->tindakan_servis }}</div>
+                                <div class="font-medium">
+                                    {{ implode(', ', json_decode($item->tindakan_servis) ?? []) }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-medium">{{ number_format($item->biaya) }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-medium">{{ number_format($item->diskon) }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-medium">{{ $item->cara_pembayaran }}</div>
                             </td>
                             @if ($toko->is_bonus === 1)
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">
                                     @php
-                                        $bonus = $item->profit/100;
-                                        $bonus *= $item->user->persen;
+                                        if ($item->tipe == 'Interface') {
+                                            $bonus = $item->bonus_interface;
+                                        }else{
+                                            $bonus = $item->profit/100;
+                                            $bonus *= Auth::user()->persen;
+                                        }
                                     @endphp
                                     Rp. {{ number_format($bonus) }}
                                 </div>

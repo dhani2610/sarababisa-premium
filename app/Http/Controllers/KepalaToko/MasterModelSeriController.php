@@ -4,6 +4,7 @@ namespace App\Http\Controllers\KepalaToko;
 
 use App\Models\Brand;
 use App\Models\ModelSerie;
+use App\Models\TipeOs;
 use Illuminate\Http\Request;
 use App\Exports\ModelSeriExport;
 use App\Imports\ModelSeriImport;
@@ -124,9 +125,11 @@ class MasterModelSeriController extends Controller
     {
         $item = ModelSerie::with('brand')->findOrFail($id);
         $brands = Brand::all();
+        $tipe = TipeOs::get();
 
         return view('pages.kepalatoko.master.model-seri-edit', [
             'item' => $item,
+            'tipe' => $tipe,
             'brands' => $brands
         ]);
     }
@@ -138,7 +141,7 @@ class MasterModelSeriController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ModelSerieRequest $request, $id)
+    public function update(Request $request, $id)
     {
         $data = $request->all();
 

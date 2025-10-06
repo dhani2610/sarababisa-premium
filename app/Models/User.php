@@ -55,6 +55,7 @@ class User extends Authenticatable
         'ig',     
         'fb',     
         'tiktok',     
+        'bagian_teknisi',     
     ];
 
     /**

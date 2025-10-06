@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminToko;
 
 use App\Models\Term;
+use App\Models\TipeOs;
 use App\Models\Type;
 use App\Models\User;
 use App\Models\Brand;

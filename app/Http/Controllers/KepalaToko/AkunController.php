@@ -48,6 +48,7 @@ class AkunController extends Controller
             'name' => $request->name,
             'password' => bcrypt($request->password),
             'username' => $request->username,
+            'bagian_teknisi' => $request->bagian_teknisi,
             'role' => $request->role,
             'types_id' => $request->types_id,
             'workers_id' => $request->workers_id,
@@ -93,6 +94,7 @@ class AkunController extends Controller
         $item->update([
             'name' => $request->name,
             'password' => $password,
+            'bagian_teknisi' => $request->bagian_teknisi,
             'username' => $request->username,
             'role' => $request->role,
             'types_id' => $request->types_id,
