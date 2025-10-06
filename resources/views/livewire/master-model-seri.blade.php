@@ -81,6 +81,19 @@
                                             @endforeach
                                         </select>
                                     </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1" for="brands_id">Tipe OS</label>
+                                        <select id="id_tipe_os" name="id_tipe_os" class="form-select text-sm w-full">
+                                            @foreach ($tipe as $tp)
+                                                <option value="{{ $tp->id }}">{{ $tp->nama }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1" for="nominal_bonus">Nominal Bonus <span class="text-rose-500">*</span></label>
+                                        <input id="nominal_bonus" name="nominal_bonus" class="form-input w-full px-2 py-1" type="text" required />
+                                    </div>
                                 </div>
                             </div>
                             <!-- Modal footer -->
@@ -287,6 +300,12 @@
                                 <div class="font-semibold text-left">Nama Merek</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Tipe OS</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Bonus</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Aksi</div>
                             </th>
                         </tr>
@@ -323,6 +342,23 @@
                                     @else
                                         <div class="font-medium text-rose-600">Data merek telah dihapus</div>
                                     @endif
+                                </td>
+                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    @php
+                                        if (!empty($model->id_tipe_os)) {
+                                            $cek = \App\Models\TipeOs::where('id',$model->id_tipe_os)->first();
+                                            if (!empty($cek)) {
+                                                $tipe = $cek->nama;
+                                            }
+                                        } else {
+                                            $tipe = '-';
+                                        }
+                                        
+                                    @endphp
+                                    <div class="font-medium">{{ $tipe }}</div>
+                                </td>
+                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    <div class="font-medium">{{ number_format($model->nominal_bonus) }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="space-x-1 flex">

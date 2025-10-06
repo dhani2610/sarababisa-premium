@@ -32,7 +32,16 @@ class DashboardController extends Controller
             ->get()
             ->count();
 
+        $bonusServisInterface = ServiceTransaction::with('serviceaction')
+            ->where('tipe', 'Interface')
+            ->where('is_approve', 'Setuju')
+            ->where('users_id', Auth::user()->id)
+            ->whereYear('tgl_disetujui', $currentYear)
+            ->whereMonth('tgl_disetujui', $currentMonth)
+            ->get()
+            ->sum('bonus_interface');
         $profitservis = ServiceTransaction::with('serviceaction')
+            ->where('tipe', 'Hardware')
             ->where('is_approve', 'Setuju')
             ->where('users_id', Auth::user()->id)
             ->whereYear('tgl_disetujui', $currentYear)
@@ -40,7 +49,10 @@ class DashboardController extends Controller
             ->get()
             ->sum('profit');
         $bonusservis = ($profitservis / 100) * Auth::user()->persen;
-        $totalbonus = $bonusservis;
+
+        $totalbonusHardware = $bonusservis;
+        $totalbonusInterface = $bonusServisInterface;
+        $totalbonus = $bonusservis + $bonusServisInterface;
 
         // Ambil data transaksi servis yang memiliki status "Belum cek"
         $transactions = ServiceTransaction::where('status_servis', 'Belum cek')->get();
@@ -63,6 +75,8 @@ class DashboardController extends Controller
         return view('pages/teknisi/dashboard', compact(
             'totalbonus',
             'reminders',
+            'totalbonusHardware',
+            'totalbonusInterface',
             'target',
             'result',
             'reward',

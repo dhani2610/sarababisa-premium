@@ -15,6 +15,8 @@ class ModelSeriImport implements ToModel, WithHeadingRow, WithBatchInserts, With
         return new ModelSerie([
             'name'     => $row['Nama Model Seri'],
             'brands_id'     => $row['ID Merek'],
+            'id_tipe_os'     => $row['ID TIPE OS'],
+            'nominal_bonus'     => $row['ID TIPE OS'],
         ]);
     }
 

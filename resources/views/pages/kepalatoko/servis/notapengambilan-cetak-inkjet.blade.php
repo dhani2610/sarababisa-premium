@@ -315,7 +315,7 @@
                         $totalAkhir = max(0, $totalDasar);
                     @endphp
 
-                    <td id="data">: Rp. {{ number_format($totalAkhir) }}11</td>
+                    <td id="data">: Rp. {{ number_format($totalAkhir) }}</td>
 
                     {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka - $items->diskon) }}
                     </td> --}}
@@ -515,9 +515,13 @@
                 <th class="text-right w-75">
                     {{-- <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">Terbilang : {{ terbilang($totalWithPpn) }}</span> --}}
                 </th>
-                <th class="text-right w-75">
+                <th class="text-right w-75" colspan="4">
                     <i>
-                        <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">Terbilang : {{ terbilang($totalWithPpn) }}</span>
+                        <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">
+                            <b>
+                                Terbilang : {{ terbilang($totalWithPpn) }}
+                            </b>
+                        </span>
                     </i>
                 </th>
             </tr>

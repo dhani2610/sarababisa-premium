@@ -2,6 +2,7 @@
     <div class="w-full px-2" dir="ltr">
         <x-validation-errors class="mb-4" :errors="$errors" />
 
+
         <div class="flex gap-4">
             <div class="w-full relative inline-flex">
                 <select id="customer_id" name="customer_id" wire:model="customer_id" class="form-select text-sm block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md">

@@ -98,6 +98,7 @@
     <h4 style="margin-bottom: 6px; text-decoration: underline;">
         Ringkasan
     </h4>
+    <br>
 
     <table id="ringkasan">
         <tbody>
@@ -128,13 +129,21 @@
             <tr>
                 <th>Total Uang Muka</th>
                 <th>: Rp. {{ number_format($total_dp) }}</th>
+                <th>Total Pengeluaran</th>
+                <th>: Rp. {{ number_format($total_pengeluaran) }}</th>
+            </tr>
+            <tr>
+                <th>Saldo Akhir</th>
+                <th>: Rp. {{ number_format($saldo_akhir) }}</th>
             </tr>
         </tbody>
     </table>
-
-    <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
+    <br>
+    
+    <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
         Detail Transaksi
     </h4>
+    <br>
 
     <table id="detail">
         <thead>
@@ -159,8 +168,10 @@
             @foreach ($services as $item)
                 @php
                     $tindakan_servis = json_decode($item->tindakan_servis);
-                    $biaya_j = json_decode($item->biaya_j);
-                    $modal_j = json_decode($item->modal_j);
+                    // $biaya_j = json_decode($item->biaya_j);
+                    $biaya_j = json_decode(str_replace(['“','”'], '"', $item->biaya_j), true);
+                    $modal_j = json_decode(str_replace(['“','”'], '"', $item->modal_j), true);
+                    // $modal_j = json_decode($item->modal_j);
                 @endphp
                 @if (json_decode($item->tindakan_servis))
                     <tr>
@@ -419,55 +430,62 @@
                     <td>{{ $item->kerusakan }}</td>
                     <td>Rp. {{ number_format($item->estimasi_biaya) }}</td>
                     <td>Rp. {{ number_format($item->uang_muka) }}</td>
-                    {{-- <td class="" style="text-align: left; width: 80px;">
-                            @php
-                                $metode = [];
-                                if ($item->tunai > 0) {
-                                    $metode[] =
-                                        '<div>
-                        <strong>Tunai:</strong><br>
-                        Rp.' .
-                                        number_format($item->tunai, 0, ',', '.') .
-                                        '
-                     </div>';
-                                }
-                                if ($item->transfer > 0) {
-                                    $metode[] =
-                                        '<div>
-                        <strong>Transfer:</strong><br>
-                        Rp.' .
-                                        number_format($item->transfer, 0, ',', '.') .
-                                        '
-                     </div>';
-                                }
-                            @endphp
-                            @if ($item->kondisi_servis == 'Dibatalkan')
-                                @if ($item->uang_muka > 0 && $item->modal_sparepart > 0)
-                                    <div>
-                                        <strong>Modal - DP:</strong><br>
-                                        Rp.-{{ number_format($item->uang_muka - $item->modal_sparepart, 0, ',', '.') }}
-                                    </div>
-                                @elseif ($item->uang_muka > 0)
-                                    <div>
-                                        <strong>Uang Muka:</strong><br>
-                                        Rp.-{{ number_format($item->uang_muka, 0, ',', '.') }}
-                                    </div>
-                                @elseif ($item->modal_sparepart > 0)
-                                    <div>
-                                        <strong>Modal:</strong><br>
-                                        Rp.-{{ number_format($item->modal_sparepart, 0, ',', '.') }}
-                                    </div>
-                                @endif
-
-                            @else
-                            {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
-                            @endif
-
-                        </td> --}}
                 </tr>
             @endforeach
         </tbody>
     </table>
+
+    <hr>
+    <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
+        Pengeluaran
+    </h4>
+    
+    <table id="detail">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Tgl Pengeluaran</th>
+                <th>Nama</th>
+                <th>Item Pengeluaran</th>
+                <th>Status</th>
+                <th>Biaya</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $i = 1;
+            @endphp
+            @foreach ($pengeluaran_data as $item)
+                <tr>
+                    <td style="width: 10px;">{{ $loop->iteration }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</td>
+                    <td>
+                        @if ($item->user)
+                            {{ $item->user->name }}
+                        @else
+                            Akun sudah dihapus
+                        @endif
+                    </td>
+                    <td>{{ $item->name }}</td>
+                    <td>
+                        @if ($item->is_approve === null)
+                            Belum Disetujui
+                        @elseif ($item->is_approve === 'Setuju')
+                            Sudah Disetujui
+                        @else
+                            Ditolak
+                        @endif
+                    </td>
+                    <td>Rp. {{ number_format($item->price) }}</td>
+                </tr>
+            @endforeach
+             <tr>
+				<th colspan="5">Total Biaya</th>
+				<td style="text-align: right;">Rp. {{ number_format($total_pengeluaran) }}</td>
+			</tr>
+        </tbody>
+    </table>
+
 </body>
 
 </html>

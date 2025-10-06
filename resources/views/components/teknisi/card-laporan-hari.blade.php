@@ -16,8 +16,12 @@
                 <div class="text-xs font-semibold text-slate-400 uppercase mb-1">Bonus</div>
                 <div class="text-2xl font-bold text-emerald-500">
                     @php
-                        $bonus = $profithari/100;
-                        $bonus *= Auth::user()->persen;
+                        if (auth()->user()->bagian_teknisi == 'Teknisi Interface') {
+                            $bonus = $profithari;
+                        }else{
+                            $bonus = $profithari/100;
+                            $bonus *= Auth::user()->persen;
+                        }
                     @endphp
                     Rp. {{ number_format($bonus) }}    
                 </div>

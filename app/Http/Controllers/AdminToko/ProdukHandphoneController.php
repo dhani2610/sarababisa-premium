@@ -77,7 +77,8 @@ class ProdukHandphoneController extends Controller
             'ppn' => $request->ppn
         ]);
 
-        return redirect()->route('admin-handphone.index');
+        return redirect()->back();
+        // return redirect()->route('admin-handphone.index');
     }
 
     /**

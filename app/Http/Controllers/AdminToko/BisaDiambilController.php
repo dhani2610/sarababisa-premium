@@ -134,7 +134,7 @@ class BisaDiambilController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function updates(Request $request, $id)
+    public function update(Request $request, $id)
     {
         $item = ServiceTransaction::findOrFail($id);
 
@@ -179,6 +179,8 @@ class BisaDiambilController extends Controller
             'tindakan_servis' => $tindakan_servis,
             'modal_sparepart' => $request->modal_sparepart,
             'biaya' => $request->biaya,
+            'biaya_j' => $request->biaya_j,
+            'modal_j' => $request->modal_j,
             'persen_admin' => $request->persen_admin,
             'persen_teknisi' => $persen_teknisi,
             'omzet' => $request->biaya,

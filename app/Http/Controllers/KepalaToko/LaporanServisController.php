@@ -143,11 +143,11 @@ class LaporanServisController extends Controller
             ->orderBy('tgl_ambil', 'asc')
             ->get();
 
-        $total_servis = 0;
-        foreach ($daftar_servis as $v) {
-            $json = json_decode($v['tindakan_servis']) ? json_decode($v['tindakan_servis']) : [];
-            $total_servis += count($json) == 0 ? 1 : count($json);
-        }
+        // $total_servis = 0;
+        // foreach ($daftar_servis as $v) {
+        //     $json = json_decode($v['tindakan_servis']) ? json_decode($v['tindakan_servis']) : [];
+        //     $total_servis += count($json) == 0 ? 1 : count($json);
+        // }
 
         // Menghitung total pembayaran tunai
         $total_tunai = ServiceTransaction::where('status_servis', 'Sudah Diambil')
@@ -263,7 +263,13 @@ class LaporanServisController extends Controller
             ->orderBy('tgl_ambil', 'asc')
             ->get();
 
-            // return response()->json($services);
+        $total_servis = $services->count();
+        $saldo_akhir = $total_profit - $total_pengeluaran;
+
+        $pengeluaran_data = Expense::whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get();
+        // return response()->json($services);
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
         // return view('pages.kepalatoko.cetak-laporan-servis', [
             'users' => $users,
@@ -287,6 +293,8 @@ class LaporanServisController extends Controller
             'total_tunai' => $total_tunai,
             'total_transfer' => $total_transfer,
             'total_kredit' => $total_kredit,
+            'saldo_akhir' => $saldo_akhir,
+            'pengeluaran_data' => $pengeluaran_data,
             'total_dp' => $total_dp
         ]);
 

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\ServiceAction;
 use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
+use App\Models\ModelSerie;
 use Illuminate\Support\Facades\Auth;
 
 class UbahBisaDiambilController extends Controller
@@ -104,10 +105,29 @@ class UbahBisaDiambilController extends Controller
             $finalModal = $modalSparepart;
         }
 
+        
+        $cekTeknisi = User::find($request->users_id);
+        if ($cekTeknisi->bagian_teknisi == 'Teknisi Interface') {
+            if ($request->tipe == 'Interface') {
+                $nama_model = ModelSerie::find($item->model_series_id);
+                if (!empty($nama_model)) {
+                    $bonus_interface = $nama_model->nominal_bonus; 
+                }else{
+                $bonus_interface = 0; 
+                }
+            }else{
+                $bonus_interface = 0; 
+            }
+        }else{
+            $bonus_interface = 0; 
+        }
+
         // Transaction create
         $item->update([
             'users_id' => $request->users_id,
             'status_servis' => $request->status_servis,
+            'bonus_interface' => $bonus_interface,
+            'tipe' => $request->tipe,
             'tgl_selesai' => $request->tgl_selesai,
             'kondisi_servis' => $request->kondisi_servis,
             // 'service_actions_id' => $request->service_actions_id[0],

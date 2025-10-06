@@ -79,7 +79,9 @@ class ProdukToolController extends Controller
             'ppn' => $request->ppn
         ]);
 
-        return redirect()->route('admin-tool.index');
+        return redirect()->back();
+
+        // return redirect()->route('admin-tool.index');
     }
 
     /**

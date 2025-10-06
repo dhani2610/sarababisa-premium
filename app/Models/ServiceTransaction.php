@@ -71,6 +71,8 @@ class ServiceTransaction extends Model
         "pin",
         "pola",
         "ppn",
+        "bonus_interface",
+        "tipe",
     ];
 
     public function getActivitylogOptions(): LogOptions

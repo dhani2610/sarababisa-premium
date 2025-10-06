@@ -15,6 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
 use App\Models\Term;
+use App\Models\TipeOs;
 
 class TransaksiServisController extends Controller
 {

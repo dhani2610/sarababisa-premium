@@ -80,8 +80,9 @@ class ProdukAksesorisController extends Controller
             'garansi' => $request->garansi,
             'ppn' => $request->ppn
         ]);
+        return redirect()->back();
 
-        return redirect()->route('admin-aksesoris.index');
+        // return redirect()->route('admin-aksesoris.index');
     }
 
     /**

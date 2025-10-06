@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Brand;
 use App\Models\ModelSerie;
+use App\Models\TipeOs;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -29,9 +30,11 @@ class MasterModelSeri extends Component
     public function render()
     {
         $brands = Brand::all();
+        $tipe = TipeOs::all();
         $model_series_count = ModelSerie::all()->count();
         return view('livewire.master-model-seri', [
             'brands' => $brands,
+            'tipe' => $tipe,
             'model_series_count' => $model_series_count,
             'model_series' => $this->search === null ?
                 ModelSerie::latest()->paginate($this->paginate) :

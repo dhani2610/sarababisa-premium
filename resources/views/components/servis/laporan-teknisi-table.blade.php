@@ -30,9 +30,10 @@
                 <!-- Row -->
                 @foreach($users as $item)
                     @php
-                        $bonus = $item->servicetransaction->sum('profit')/100;
-                        $bonus *= $item->persen;
-                    @endphp                  
+                        $bonus_cek = ($item->servicetransaction->where('tipe','Hardware')->sum('profit') / 100) * $item->persen;
+                        $bonus = $bonus_cek + $item->servicetransaction->where('tipe','Interface')->sum('bonus_interface');
+                    @endphp
+              
                     <tr>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-medium">{{ $item->name }}</div>
