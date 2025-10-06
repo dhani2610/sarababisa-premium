@@ -269,7 +269,7 @@ class LaporanServisController extends Controller
         $pengeluaran_data = Expense::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
             ->get();
-        // return response()->json($services->count());
+        // return response()->json($services);
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
         // return view('pages.kepalatoko.cetak-laporan-servis', [
             'users' => $users,

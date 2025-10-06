@@ -168,8 +168,10 @@
             @foreach ($services as $item)
                 @php
                     $tindakan_servis = json_decode($item->tindakan_servis);
-                    $biaya_j = json_decode($item->biaya_j);
-                    $modal_j = json_decode($item->modal_j);
+                    // $biaya_j = json_decode($item->biaya_j);
+                    $biaya_j = json_decode(str_replace(['“','”'], '"', $item->biaya_j), true);
+                    $modal_j = json_decode(str_replace(['“','”'], '"', $item->modal_j), true);
+                    // $modal_j = json_decode($item->modal_j);
                 @endphp
                 @if (json_decode($item->tindakan_servis))
                     <tr>
