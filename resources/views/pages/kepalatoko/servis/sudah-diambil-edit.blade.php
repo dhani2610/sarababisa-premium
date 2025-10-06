@@ -234,11 +234,11 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Modal Sparepart </label>
-                                    <input id="modal_sparepart" name="modal_sparepart" class="form-input w-full px-2 py-1" type="number" readonly value="{{ $item->modal_sparepart }}"/>
+                                    <input id="modal_sparepart" name="modal_sparepart" class="form-input w-full px-2 py-1 " style="    background: rgb(203 213 225 / var(--tw-border-opacity));" type="number" readonly value="{{ $item->modal_sparepart }}"/>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="biaya">Biaya Servis </label>
-                                    <input id="biaya" name="biaya" class="form-input w-full px-2 py-1" type="number" readonly value="{{ $item->biaya }}"/>
+                                    <input id="biaya" name="biaya" class="form-input w-full px-2 py-1 " style="    background: rgb(203 213 225 / var(--tw-border-opacity));" type="number" readonly value="{{ $item->biaya }}"/>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="uang_muka">Uang Muka </label>
