@@ -375,34 +375,41 @@
         </script>
                 
         <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const modalJInput = document.getElementById("modal_j");
-            const modalSparepartInput = document.getElementById("modal_sparepart");
+       document.addEventListener("DOMContentLoaded", function () {
+    const modalJInput = document.getElementById("modal_j");
+    const modalSparepartInput = document.getElementById("modal_sparepart");
 
-            function calculateModal() {
-                try {
-                    // ambil nilai input, parse JSON (["225000","115000","30000"])
-                    let values = JSON.parse(modalJInput.value);
+    function calculateModal() {
+        try {
+            let raw = modalJInput.value.trim();
 
-                    // pastikan array angka
-                    let numbers = values.map(v => parseInt(v) || 0);
+            // perbaiki kutip miring dan koma aneh
+            raw = raw.replace(/[“”]/g, '"').replace(/‘’/g, "'").replace(/，/g, ",");
 
-                    // jumlahkan
-                    let total = numbers.reduce((a, b) => a + b, 0);
+            // parse JSON aman
+            let values = JSON.parse(raw);
 
-                    // taruh ke input modal_sparepart
-                    modalSparepartInput.value = total;
-                } catch (e) {
-                    modalSparepartInput.value = 0; // kalau format salah
-                }
-            }
+            // pastikan array angka
+            if (!Array.isArray(values)) values = [values];
+            let numbers = values.map(v => parseInt(v) || 0);
 
-            // hitung pertama kali
-            calculateModal();
+            // jumlahkan
+            let total = numbers.reduce((a, b) => a + b, 0);
 
-            // update realtime kalau ada perubahan
-            modalJInput.addEventListener("input", calculateModal);
-        });
+            // taruh ke input modal_sparepart
+            modalSparepartInput.value = total;
+        } catch (e) {
+            modalSparepartInput.value = 0;
+        }
+    }
+
+    // hitung pertama kali
+    calculateModal();
+
+    // update realtime kalau ada perubahan
+    modalJInput.addEventListener("input", calculateModal);
+});
+
         document.addEventListener("DOMContentLoaded", function () {
             const biayaJInput = document.getElementById("biaya_j");
             const biayaSparepartInput = document.getElementById("biaya");
