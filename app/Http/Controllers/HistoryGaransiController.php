@@ -64,7 +64,7 @@ class HistoryGaransiController extends Controller
         $data->teknisi_id  = $request->teknisi_id;
         $data->tindakan    = json_encode($request->tindakan);
         $data->sparepart   =  !empty($request->sparepart) ? json_encode($request->sparepart) : null;
-        $data->modal_sparepart = $request->modal_sparepart;
+        $data->modal_sparepart = $request->modal_sparepart ?? 0;
         $data->total_biaya_tindakan = $request->total_biaya_tindakan;
         $data->total_biaya = $request->total_biaya;
         $data->catatan     = $request->catatan;

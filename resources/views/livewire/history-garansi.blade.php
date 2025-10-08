@@ -124,7 +124,7 @@
                                 </div>
 
                                 <!-- Total Biaya -->
-                                <div>
+                                <div style="display:none;" id="modal_sparepart_wrapper">
                                     <label class="block text-sm font-medium mb-1">Modal Sparepart<span
                                             class="text-rose-500">*</span></label>
                                     <input type="number" name="modal_sparepart" id="modal_sparepart" value="0"
@@ -597,15 +597,18 @@
         document.addEventListener("DOMContentLoaded", function() {
             const sparepartCheckbox = document.getElementById("useSparepartCheckbox");
             const sparepartWrapper = document.getElementById("sparepart_wrapper");
+            const modalSparepartWrapper = document.getElementById("modal_sparepart_wrapper");
             const rowContainer = document.getElementById("rowContainer");
 
             sparepartCheckbox.addEventListener("change", function() {
                 if (this.checked) {
                     sparepartWrapper.style.display = "block";
+                    modalSparepartWrapper.style.display = "block";
                     // semua input sparepart wajib diisi (required)
                     rowContainer.querySelectorAll("select, input").forEach(el => el.required = true);
                 } else {
                     sparepartWrapper.style.display = "none";
+                    modalSparepartWrapper.style.display = "none";
                     // reset value dan hilangkan semua row sparepart
                     rowContainer.innerHTML = "";
                     // hilangkan required
