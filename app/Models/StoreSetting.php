@@ -22,6 +22,8 @@ class StoreSetting extends Model
         'is_bonus',
         'is_edit_transaksi',
         'is_edit_produk',
+        'token_bot',
+        'chat_id',
     ];
     
 }
