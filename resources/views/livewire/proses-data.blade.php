@@ -1503,6 +1503,18 @@
         </div>
     </div>
 <script>
+document.addEventListener('focusout', function(e) {
+    if (e.target.classList.contains('modal_sparepart')) {
+        let total = 0;
+        document.querySelectorAll('.modal_sparepart').forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+        document.getElementById('total_modal_sparepart').value = total;
+    }
+});
+</script>
+
+<script>
     function getCanvas(processId) {
         let canvas = document.getElementById('sig-canvas-' + processId);
         if (canvas) {
