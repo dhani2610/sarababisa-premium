@@ -23,7 +23,7 @@ class StoreSetting extends Model
         'is_edit_transaksi',
         'is_edit_produk',
         'token_bot',
-        'chat_id',
+        'report_time',
     ];
     
 }

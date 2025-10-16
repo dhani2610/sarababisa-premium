@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::table('store_settings', function (Blueprint $table) {
             $table->string('token_bot')->nullable();
             $table->string('chat_id')->nullable();
+            $table->time('report_time')->nullable();
         });
     }
 
@@ -29,6 +30,7 @@ return new class extends Migration
         Schema::table('store_settings', function (Blueprint $table) {
             $table->dropColumn('token_bot');
             $table->dropColumn('chat_id');
+            $table->dropColumn('report_time');
         });
     }
 };
