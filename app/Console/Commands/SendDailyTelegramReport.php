@@ -29,9 +29,9 @@ class SendDailyTelegramReport extends Command
         $this->info($now);
         $this->info(Carbon::parse($setting->report_time)->format('H:i'));
 
-        // if ($now !== Carbon::parse($setting->report_time)->format('H:i')) {
-        //     return Command::SUCCESS;
-        // }
+        if ($now !== Carbon::parse($setting->report_time)->format('H:i')) {
+            return Command::SUCCESS;
+        }
         
         $nowDate = date('Y-m-d');
         $this->info('tanggal',$nowDate);
