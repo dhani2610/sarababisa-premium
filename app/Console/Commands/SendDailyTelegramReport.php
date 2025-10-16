@@ -26,47 +26,52 @@ class SendDailyTelegramReport extends Command
         }
 
         $now = Carbon::now()->format('H:i');
-        if ($now !== Carbon::parse($setting->report_time)->format('H:i')) {
-            return Command::SUCCESS;
-        }
+        $this->info($now);
+        $this->info(Carbon::parse($setting->report_time)->format('H:i'));
 
-        $start_date = Carbon::today();
-        $end_date = Carbon::today();
+        // if ($now !== Carbon::parse($setting->report_time)->format('H:i')) {
+        //     return Command::SUCCESS;
+        // }
+        
+        $nowDate = date('Y-m-d');
+        $this->info('tanggal',$nowDate);
 
         $total_servis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereBetween('tgl_ambil', [$start_date, $end_date])
+            ->whereDate('tgl_ambil', $nowDate)
             ->count();
 
         $total_tunai = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereBetween('tgl_ambil', [$start_date, $end_date])
+            ->whereDate('tgl_ambil', $nowDate)
             ->sum('tunai');
 
         $total_transfer = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereBetween('tgl_ambil', [$start_date, $end_date])
+            ->whereDate('tgl_ambil', $nowDate)
             ->sum('transfer');
 
         $total_kredit = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereBetween('tgl_ambil', [$start_date, $end_date])
+            ->whereDate('tgl_ambil', $nowDate)
             ->sum('due');
 
         $total_diskon = ServiceTransaction::where('is_approve', 'Setuju')
-            ->whereBetween('tgl_ambil', [$start_date, $end_date])
+            ->whereDate('tgl_ambil', $nowDate)
             ->sum('diskon');
 
         $total_biaya = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereBetween('tgl_ambil', [$start_date, $end_date])
+            ->whereDate('tgl_ambil', $nowDate)
             ->sum('biaya');
 
         $total_modal = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereBetween('tgl_ambil', [$start_date, $end_date])
+            ->whereDate('tgl_ambil', $nowDate)
             ->sum('modal_sparepart');
 
         $total_profit = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereBetween('tgl_ambil', [$start_date, $end_date])
+            ->whereDate('tgl_ambil', $nowDate)
             ->sum('profit');
 
-        $total_pengeluaran = Expense::whereBetween('created_at', [$start_date, $end_date])->sum('price');
+        $total_pengeluaran = Expense::whereDate('created_at', $now)->sum('price');
         $saldo_akhir = $total_profit - $total_pengeluaran;
+
+        $this->info($total_servis);
 
         $message =
             "📅 *Laporan Harian - " . Carbon::today()->format('d M Y') . "*\n\n" .
