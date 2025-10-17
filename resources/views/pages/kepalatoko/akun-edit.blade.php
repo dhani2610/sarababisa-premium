@@ -105,6 +105,7 @@
                                     <label class="block text-sm font-medium mb-1" for="role">Role</label>
                                     <select id="role" name="role" class="form-select text-sm py-2 w-full">
                                         <option selected value="{{ $item->role }}">{{ $item->role }}</option>
+                                        <option value="Investor">Investor</option>
                                         <option value="Admin Toko">Admin Toko</option>
                                         <option value="Teknisi">Teknisi</option>
                                         <option value="Sales">Sales</option>
