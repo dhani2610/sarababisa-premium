@@ -11,6 +11,7 @@
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Print button -->
+            @if (Auth::user()->role != 'Investor')
             <div class="relative inline-flex" x-data="{ modalOpen: false }">
                 <button
                     class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600 mb-2 md:mb-0"
@@ -85,10 +86,13 @@
                     </div>
                 </div>
             </div>
+            @endif
+
 
             <!-- Search form -->
             <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/IMEI" />
 
+            @if (Auth::user()->role != 'Investor')
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true"
@@ -800,6 +804,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
         </div>
 
@@ -951,6 +956,7 @@
                     <thead
                         class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="flex items-center">
                                     <label class="inline-flex">
@@ -960,6 +966,7 @@
                                     </label>
                                 </div>
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">No.</div>
                             </th>
@@ -1002,9 +1009,11 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Status</div>
                             </th>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Aksi</div>
                             </th>
+                            @endif
                         </tr>
                     </thead>
                     <!-- Table body -->
@@ -1033,6 +1042,7 @@
                                 endif;
                             @endphp
                             <tr>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
                                         <label class="inline-flex">
@@ -1042,19 +1052,24 @@
                                         </label>
                                     </div>
                                 </td>
+                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $i++ }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <a href="{{ route('transaksi-servis.edit', $process->id) }}">
-                                        <div class="flex items-center text-blue-600">
-                                            <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                                                <path
-                                                    d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
-                                            </svg>
-                                            <div class="font-medium">{{ $process->nomor_servis }}</div>
-                                        </div>
-                                    </a>
+                                    @if (Auth::user()->role != 'Investor')
+                                        <a href="{{ route('transaksi-servis.edit', $process->id) }}">
+                                            <div class="flex items-center text-blue-600">
+                                                <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                                                    <path
+                                                        d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
+                                                </svg>
+                                                <div class="font-medium">{{ $process->nomor_servis }}</div>
+                                            </div>
+                                        </a>
+                                    @else
+                                        <div class="font-medium">{{ $process->nomor_servis }}</div>
+                                    @endif
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div>{{ \Carbon\Carbon::parse($process->created_at)->format('d/m/Y') }}</div>
@@ -1184,6 +1199,7 @@
                                             {{ $process->status_servis }}</div>
                                     </a>
                                 </td>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="space-x-1 flex">
 
@@ -1494,6 +1510,7 @@
                                         <!-- End Remove -->
                                     </div>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>

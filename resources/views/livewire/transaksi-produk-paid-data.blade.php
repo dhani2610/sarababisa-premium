@@ -82,6 +82,7 @@
                     <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="flex items-center">
                                     <label class="inline-flex">
@@ -90,6 +91,7 @@
                                     </label>
                                 </div>
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">No.</div>
                             </th>
@@ -114,9 +116,11 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Status</div>
                             </th>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Aksi</div>
                             </th>
+                            @endif
                         </tr>
                     </thead>
                     <!-- Table body -->
@@ -127,6 +131,7 @@
                         @endphp
                         @foreach($orders as $item)
                             <tr>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
                                         <label class="inline-flex">
@@ -135,6 +140,7 @@
                                         </label>
                                     </div>
                                 </td>
+                                @endif  
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $i++ }}</div>
                                 </td>
@@ -171,6 +177,7 @@
                                         @endif
                                     </a>
                                 </td>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="space-x-1 flex">
                                         <!-- Detail -->
@@ -356,6 +363,7 @@
                                         <!-- End Remove -->
                                     </div>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>

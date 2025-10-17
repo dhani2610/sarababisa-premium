@@ -82,6 +82,7 @@
                     <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="flex items-center">
                                     <label class="inline-flex">
@@ -90,6 +91,7 @@
                                     </label>
                                 </div>
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">No.</div>
                             </th>
@@ -123,9 +125,11 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Status</div>
                             </th>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Aksi</div>
                             </th>
+                            @endif
                         </tr>
                     </thead>
                     <!-- Table body -->
@@ -136,6 +140,7 @@
                         @endphp
                         @foreach($orders as $item)
                             <tr>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
                                         <label class="inline-flex">
@@ -144,10 +149,12 @@
                                         </label>
                                     </div>
                                 </td>
+                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $i++ }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    @if (Auth::user()->role != 'Investor')
                                     <a href="{{ route('transaksi-produk.edit', $item->id) }}">
                                         <div class="flex items-center text-blue-600">
                                             <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
@@ -156,6 +163,9 @@
                                             <div class="font-medium">{{ $item->invoice_no }}</div>
                                         </div>
                                     </a>
+                                    @else
+                                    <div class="font-medium">{{ $item->invoice_no }}</div>
+                                    @endif
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ \Carbon\Carbon::parse($item->created_at)->locale('id')->translatedFormat('d F Y') }}</div>
@@ -202,6 +212,7 @@
                                         @endif
                                     </a>
                                 </td>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="space-x-1 flex">
                                         <!-- Detail -->
@@ -387,6 +398,7 @@
                                         <!-- End Remove -->
                                     </div>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>

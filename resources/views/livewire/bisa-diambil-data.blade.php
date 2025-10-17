@@ -10,6 +10,7 @@
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
+            @if (Auth::user()->role != 'Investor')
             <!-- Print button -->
             <div class="relative inline-flex" x-data="{ modalOpen: false }">
                 <button
@@ -90,10 +91,12 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- Search form -->
             <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan/IMEI" />
 
+            @if (Auth::user()->role != 'Investor')
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true" aria-controls="tambah-modal">
@@ -273,6 +276,7 @@
                     </div>
                 </div>
             </div>
+            @endif
             
         </div>
 
@@ -407,6 +411,7 @@
                     <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="flex items-center">
                                     <label class="inline-flex">
@@ -415,6 +420,7 @@
                                     </label>
                                 </div>
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">No.</div>
                             </th>
@@ -430,9 +436,11 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Pelanggan</div>
                             </th>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Hubungi</div>
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Nama Barang</div>
                             </th>
@@ -460,9 +468,11 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Tgl Selesai</div>
                             </th>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Aksi</div>
                             </th>
+                            @endif
                         </tr>
                     </thead>
                     <!-- Table body -->
@@ -488,6 +498,7 @@
                                 endif;
                             @endphp
                             <tr>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
                                         <label class="inline-flex">
@@ -496,10 +507,12 @@
                                         </label>
                                     </div>
                                 </td>
+                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $i++ }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    @if (Auth::user()->role != 'Investor')
                                     <a href="{{ route('transaksi-servis-bisa-diambil.edit', $transaction->id) }}">
                                         <div class="flex items-center text-blue-600">
                                             <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
@@ -508,6 +521,10 @@
                                             <div class="font-medium">{{ $transaction->nomor_servis }}</div>
                                         </div>
                                     </a>
+                                    @else
+                                        <div class="font-medium">{{ $transaction->nomor_servis }}</div>
+                                    @endif
+
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div>{{ \Carbon\Carbon::parse($transaction->created_at)->format('d/m/Y') }}</div>
@@ -526,6 +543,7 @@
                                         <div class="font-medium text-rose-600">Data pelanggan telah dihapus</div>
                                     @endif
                                 </td>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="flex space-x-1">
                                         @php
@@ -600,6 +618,7 @@
                                         <!-- End -->
                                     </div>
                                 </td>
+                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $transaction->nama_barang }}</div>
                                 </td>
@@ -636,6 +655,7 @@
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div>{{ \Carbon\Carbon::parse($transaction->tgl_selesai)->format('d/m/Y') }}</div>
                                 </td>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="space-x-1 flex">
                                                 
@@ -840,6 +860,7 @@
                                         <!-- End -->
                                     </div>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
