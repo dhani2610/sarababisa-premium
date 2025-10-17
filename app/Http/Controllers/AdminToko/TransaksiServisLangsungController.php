@@ -354,6 +354,7 @@ class TransaksiServisLangsungController extends Controller
                 : '-';
 
             $pesan = "📦 *TRANSAKSI BARU*\n\n"
+                . "🧾 *PROSES DITINGGAL*\n"
                 . "🧾 *Nomor Servis:* {$transaksi->nomor_servis}\n"
                 . "🧾 *Tipe:* {$transaksi->tipe}\n"
                 . "👤 *Pelanggan:* {$nama_pelanggan->nama}\n"
