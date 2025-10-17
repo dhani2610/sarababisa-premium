@@ -100,6 +100,7 @@
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="role">Role <span class="text-rose-500">*</span></label>
                                             <select id="role" name="role" class="form-select text-sm py-1 w-full" required>
+                                                <option value="Investor">Investor</option>
                                                 <option value="Admin Toko">Admin Toko</option>
                                                 <option value="Teknisi">Teknisi</option>
                                                 <option value="Sales">Sales</option>
