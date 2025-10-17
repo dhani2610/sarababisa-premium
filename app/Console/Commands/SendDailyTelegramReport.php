@@ -6,10 +6,10 @@ use Illuminate\Console\Command;
 use App\Models\StoreSetting;
 use App\Models\ServiceTransaction;
 use App\Models\Expense;
-use App\Models\Incident;
+use App\Models\Order;
+use App\Models\OrderDetail;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
-use DB;
 
 class SendDailyTelegramReport extends Command
 {
@@ -26,73 +26,121 @@ class SendDailyTelegramReport extends Command
         }
 
         $now = Carbon::now()->format('H:i');
-        $this->info($now);
-        $this->info(Carbon::parse($setting->report_time)->format('H:i'));
 
         if ($now !== Carbon::parse($setting->report_time)->format('H:i')) {
             return Command::SUCCESS;
         }
-        
-        $nowDate = date('Y-m-d');
-        $this->info('tanggal',$nowDate);
 
+        $nowDate = date('Y-m-d');
+
+        /*
+        |--------------------------------------------------------------------------
+        | LAPORAN SERVIS
+        |--------------------------------------------------------------------------
+        */
         $total_servis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', $nowDate)
             ->count();
 
-        $total_tunai = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+        $total_tunai_servis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', $nowDate)
             ->sum('tunai');
 
-        $total_transfer = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+        $total_transfer_servis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', $nowDate)
             ->sum('transfer');
 
-        $total_kredit = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+        $total_kredit_servis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', $nowDate)
             ->sum('due');
 
-        $total_diskon = ServiceTransaction::where('is_approve', 'Setuju')
+        $total_diskon_servis = ServiceTransaction::where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', $nowDate)
             ->sum('diskon');
 
-        $total_biaya = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+        $total_biaya_servis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', $nowDate)
             ->sum('biaya');
 
-        $total_modal = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+        $total_modal_servis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', $nowDate)
             ->sum('modal_sparepart');
 
-        $total_profit = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+        $total_profit_servis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', $nowDate)
             ->sum('profit');
 
-        $total_pengeluaran = Expense::whereDate('created_at', $now)->sum('price');
-        $saldo_akhir = $total_profit - $total_pengeluaran;
+        /*
+        |--------------------------------------------------------------------------
+        | LAPORAN PENJUALAN
+        |--------------------------------------------------------------------------
+        */
+        $total_biaya_penjualan = OrderDetail::whereDate('created_at', $nowDate)->sum('total');
+        $total_profit_penjualan = OrderDetail::whereDate('created_at', $nowDate)->sum('profit');
+        $total_penjualan_item = OrderDetail::whereDate('created_at', $nowDate)->sum('quantity');
+        $total_modal_penjualan = OrderDetail::whereDate('created_at', $nowDate)->sum('modal');
 
-        $this->info($total_servis);
+        $sub_total_penjualan = OrderDetail::whereDate('created_at', $nowDate)->sum('sub_total');
+        $total_diskon_penjualan = $sub_total_penjualan - $total_biaya_penjualan;
 
+        $total_tunai_penjualan = Order::whereDate('created_at', $nowDate)->sum('tunai');
+        $total_transfer_penjualan = Order::whereDate('created_at', $nowDate)->sum('transfer');
+        $total_kredit_penjualan = Order::whereDate('created_at', $nowDate)->sum('due');
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL PENGELUARAN & SALDO
+        |--------------------------------------------------------------------------
+        */
+        $total_pengeluaran = Expense::whereDate('created_at', $nowDate)->sum('price');
+
+        // 🔹 SALDO GABUNGAN = profit servis + profit penjualan - pengeluaran
+        $saldo_akhir = ($total_profit_servis + $total_profit_penjualan) - $total_pengeluaran;
+
+        /*
+        |--------------------------------------------------------------------------
+        | FORMAT PESAN TELEGRAM
+        |--------------------------------------------------------------------------
+        */
         $message =
             "📅 *Laporan Harian - " . Carbon::today()->format('d M Y') . "*\n\n" .
-            "🧾 Total Servis: *{$total_servis} item*\n" .
-            "💰 Total Tunai: Rp " . number_format($total_tunai, 0, ',', '.') . "\n" .
-            "🏦 Total Transfer: Rp " . number_format($total_transfer, 0, ',', '.') . "\n" .
-            "💳 Total Kredit: Rp " . number_format($total_kredit, 0, ',', '.') . "\n" .
-            "🏷️ Total Diskon: Rp " . number_format($total_diskon, 0, ',', '.') . "\n" .
-            "🔧 Total Biaya Servis: Rp " . number_format($total_biaya, 0, ',', '.') . "\n" .
-            "⚙️ Total Modal Sparepart: Rp " . number_format($total_modal, 0, ',', '.') . "\n" .
-            "💵 Total Profit: Rp " . number_format($total_profit, 0, ',', '.') . "\n" .
-            "💸 Total Pengeluaran: Rp " . number_format($total_pengeluaran, 0, ',', '.') . "\n\n" .
-            "📊 *Saldo Akhir:* Rp " . number_format($saldo_akhir, 0, ',', '.');
 
+            "🔧 *LAPORAN SERVIS*\n" .
+            "🧾 Total Servis: *{$total_servis} item*\n" .
+            "💰 Tunai: Rp " . number_format($total_tunai_servis, 0, ',', '.') . "\n" .
+            "🏦 Transfer: Rp " . number_format($total_transfer_servis, 0, ',', '.') . "\n" .
+            "💳 Kredit: Rp " . number_format($total_kredit_servis, 0, ',', '.') . "\n" .
+            "🏷️ Diskon: Rp " . number_format($total_diskon_servis, 0, ',', '.') . "\n" .
+            "⚙️ Modal Sparepart: Rp " . number_format($total_modal_servis, 0, ',', '.') . "\n" .
+            "💵 Profit Servis: Rp " . number_format($total_profit_servis, 0, ',', '.') . "\n\n" .
+
+            "🛒 *LAPORAN PENJUALAN*\n" .
+            "📦 Total Item: *{$total_penjualan_item} item*\n" .
+            "💰 Tunai: Rp " . number_format($total_tunai_penjualan, 0, ',', '.') . "\n" .
+            "🏦 Transfer: Rp " . number_format($total_transfer_penjualan, 0, ',', '.') . "\n" .
+            "💳 Kredit: Rp " . number_format($total_kredit_penjualan, 0, ',', '.') . "\n" .
+            "🏷️ Diskon: Rp " . number_format($total_diskon_penjualan, 0, ',', '.') . "\n" .
+            "📈 Total Omzet: Rp " . number_format($total_biaya_penjualan, 0, ',', '.') . "\n" .
+            "⚙️ Total Modal: Rp " . number_format($total_modal_penjualan, 0, ',', '.') . "\n" .
+            "💵 Profit Penjualan: Rp " . number_format($total_profit_penjualan, 0, ',', '.') . "\n\n" .
+
+            "💸 *Total Pengeluaran:* Rp " . number_format($total_pengeluaran, 0, ',', '.') . "\n" .
+            "📊 *Saldo Akhir (Servis + Penjualan):* Rp " . number_format($saldo_akhir, 0, ',', '.');
+
+        $this->info($message);
+
+        /*
+        |--------------------------------------------------------------------------
+        | KIRIM TELEGRAM
+        |--------------------------------------------------------------------------
+        */
         Http::post("https://api.telegram.org/bot{$setting->token_bot}/sendMessage", [
             'chat_id' => $setting->chat_id,
             'text' => $message,
             'parse_mode' => 'Markdown',
         ]);
 
-        $this->info('Laporan harian Telegram terkirim.');
+        $this->info('✅ Laporan harian Telegram terkirim dengan penjualan.');
         return Command::SUCCESS;
     }
 }
