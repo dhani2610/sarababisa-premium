@@ -38,7 +38,7 @@
             <x-search-form placeholder="Cari berdasarkan keterangan" />
 
 
-
+            @if (Auth::user()->role != 'Investor')
             <!-- Button Tambah -->
             <div x-data="{ modalOpen: false }">
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
@@ -116,6 +116,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 
@@ -143,26 +144,32 @@
                 <thead
                     class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                     <tr>
+                        @if (Auth::user()->role != 'Investor')
                         <th class="px-2 py-3 text-center w-px">
                             <input type="checkbox" class="form-checkbox" @click="toggleAll">
                         </th>
+                        @endif
                         <th class="px-2 py-3 text-center">No</th>
                         <th class="px-2 py-3 text-center">Tanggal</th>
                         <th class="px-2 py-3 text-center">Tipe</th>
                         <th class="px-2 py-3 text-center">Nominal</th>
                         <th class="px-2 py-3 text-center">Bukti Transfer</th>
                         <th class="px-2 py-3 text-center">Keterangan</th>
+                        @if (Auth::user()->role != 'Investor')
                         <th class="px-2 py-3 text-center">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="text-sm divide-y divide-slate-200">
                     @php $no = $rincian->firstItem(); @endphp
                     @foreach ($rincian as $item)
                         <tr>
+                            @if (Auth::user()->role != 'Investor')
                             <td class="px-2 py-3 text-center">
                                 <input type="checkbox" class="form-checkbox table-item" value="{{ $item->id }}"
                                     @change="toggleItem($event)">
                             </td>
+                            @endif
                             <td class="px-2 py-3 text-center">{{ $no++ }}</td>
                             <td class="px-2 py-3 text-center">{{ $item->tanggal->format('d/m/Y') }}</td>
                             <td class="px-2 py-3 text-center">
@@ -180,6 +187,7 @@
                                     class="w-20 h-20 object-cover rounded">
                             </td>
                             <td class="px-2 py-3 text-center">{{ $item->keterangan }}</td>
+                            @if (Auth::user()->role != 'Investor')
                             <td class="px-2 py-3 text-center">
                                 <!-- Tombol Edit -->
                                 <div x-data="{ editModalOpen: false }" class="inline-block">
@@ -275,6 +283,7 @@
                                     <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Hapus</button>
                                 </form>
                             </td>
+                            @endif
                         </tr>
                     @endforeach
                 </tbody>
