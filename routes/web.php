@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\KepalaToko\ProdukController;
 use App\Http\Controllers\PortalController;
+use App\Http\Controllers\RincianInvestController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\DefaultController;
@@ -271,6 +272,14 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('servis/transaksi-servis', KepalaTokoTransaksiServisController::class);
     Route::post('servis/transaksi-servis/{id}/update-pin-pola', [KepalaTokoTransaksiServisController::class, 'updatePinPola'])
     ->name('transaksi-servis.update-pin-pola');
+
+
+    Route::get('rincian-invest', [RincianInvestController::class, 'index'])->name('rincian-invest.index');
+    Route::post('rincian-invest', [RincianInvestController::class, 'store'])->name('rincian-invest.store');
+    Route::put('rincian-invest/{id}', [RincianInvestController::class, 'update'])->name('rincian-invest.update');
+    Route::delete('rincian-invest/{id}', [RincianInvestController::class, 'destroy'])->name('rincian-invest.destroy');
+    Route::delete('/rincian-invest/bulk-delete', [RincianInvestController::class, 'bulkDelete'])->name('rincian-invest.bulkDelete');
+
 
     Route::delete('/services/delete', [KepalaTokoTransaksiServisController::class, 'deleteSelected']);
     Route::patch('/services/update', [KepalaTokoSudahDiambilController::class, 'approveSelected']);
