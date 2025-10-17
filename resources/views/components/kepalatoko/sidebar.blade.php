@@ -42,7 +42,6 @@
                 </h3>
                 <ul class="mt-3">
                     <!-- Dashboard -->
-                    @if (Auth::user()->role != 'Investor')
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['dashboard'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['dashboard'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('kepalatoko-dashboard') }}">
                             <div class="flex items-center">
@@ -55,6 +54,7 @@
                             </div>
                         </a>
                     </li>
+                    @if (Auth::user()->role != 'Investor')
                     <!-- Akun -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['akun'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['akun'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('akun') }}">
