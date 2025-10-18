@@ -98,13 +98,13 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="role">Role</label>
                                     <select id="role" name="role" class="form-select text-sm py-2 w-full">
-                                        <option selected value="{{ $item->role }}">{{ $item->role }}</option>
-                                        <option value="Investor">Investor</option>
-                                        <option value="Admin Toko">Admin Toko</option>
-                                        <option value="Teknisi">Teknisi</option>
-                                        <option value="Sales">Sales</option>
+                                        <option value="Investor" {{ $item->role == 'Investor' ? 'selected' : '' }}>Investor</option>
+                                        <option value="Admin Toko" {{ $item->role == 'Admin Toko' ? 'selected' : '' }}>Admin Toko</option>
+                                        <option value="Teknisi" {{ $item->role == 'Teknisi' ? 'selected' : '' }}>Teknisi</option>
+                                        <option value="Sales" {{ $item->role == 'Sales' ? 'selected' : '' }}>Sales</option>
                                     </select>
                                 </div>
+                                {{-- Hanya muncul kalau role = Investor --}}
                                 <div id="upload-investor" style="display: none;">
                                     <label class="block text-sm font-medium mb-1" for="pdf_investor">Upload PDF
                                         Investor</label>
@@ -234,24 +234,30 @@
             roleSelect.addEventListener('change', toggleFields);
         });
     </script>
+    
+    {{-- SCRIPT --}}
     <script>
-        function toggleInputs() {
-            const role = document.getElementById('role').value;
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleSelect = document.getElementById('role');
             const extraFields = document.getElementById('extra-fields');
             const uploadInvestor = document.getElementById('upload-investor');
 
-            if (role === 'Investor') {
-                extraFields.style.display = 'none';
-                uploadInvestor.style.display = 'block';
-            } else {
-                extraFields.style.display = 'block';
-                uploadInvestor.style.display = 'none';
+            function toggleInputs() {
+                if (roleSelect.value === 'Investor') {
+                    uploadInvestor.style.display = 'block';
+                    extraFields.style.display = 'none';
+                } else {
+                    uploadInvestor.style.display = 'none';
+                    extraFields.style.display = 'block';
+                }
             }
-        }
 
-        // Jalankan saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', toggleInputs);
+            // Jalankan saat halaman dimuat
+            toggleInputs();
+
+            // Jalankan setiap kali role diubah
+            roleSelect.addEventListener('change', toggleInputs);
+        });
     </script>
-
 
 </x-toko-layout>
