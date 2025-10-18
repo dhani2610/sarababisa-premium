@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Http\Livewire;
 
 use App\Models\RincianInvest;
+use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,9 +12,9 @@ class MasterRincianInvest extends Component
 
     public $paginate = 10;
     public $search;
-    public $filterTipe = 0; // 0 = semua
-
-    protected $updatesQueryString = ['search', 'filterTipe'];
+    public $filterTipe = 0;
+    public $filterInvestor = 0; // tambahkan
+    protected $updatesQueryString = ['search', 'filterTipe', 'filterInvestor'];
 
     public function updatingSearch()
     {
@@ -29,7 +29,13 @@ class MasterRincianInvest extends Component
 
     public function render()
     {
-        $query = RincianInvest::query();
+        $query = RincianInvest::with('investor');
+
+        if (auth()->user()->role == 'Investor') {
+            $query->where('id_investor', auth()->id());
+        } elseif ($this->filterInvestor != 0) {
+            $query->where('id_investor', $this->filterInvestor);
+        }
 
         if ($this->filterTipe != 0) {
             $query->where('tipe', $this->filterTipe);
@@ -50,6 +56,7 @@ class MasterRincianInvest extends Component
         return view('livewire.master-rincian-invest', [
             'rincian' => $data,
             'totals' => $totals,
+            'investors' => User::where('role', 'Investor')->get(), // untuk dropdown filter
         ]);
     }
 }

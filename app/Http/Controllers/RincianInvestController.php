@@ -14,11 +14,16 @@ class RincianInvestController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'nominal' => (int) str_replace('.', '', $request->nominal),
+        ]);
+
         $request->validate([
             'tipe' => 'required|integer|in:1,2,3',
             'tanggal' => 'required|date',
             'nominal' => 'required|numeric',
             'upload_bukti_tf' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'id_investor' => 'nullable|integer|exists:users,id',
             'keterangan' => 'nullable|string',
         ]);
 
@@ -28,6 +33,7 @@ class RincianInvestController extends Controller
             'tipe' => $request->tipe,
             'tanggal' => $request->tanggal,
             'nominal' => $request->nominal,
+            'id_investor' => $request->id_investor,
             'upload_bukti_tf' => $path,
             'keterangan' => $request->keterangan,
         ]);
@@ -37,6 +43,10 @@ class RincianInvestController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'nominal' => (int) str_replace('.', '', $request->nominal),
+        ]);
+
         $invest = RincianInvest::findOrFail($id);
 
         $request->validate([
@@ -44,6 +54,7 @@ class RincianInvestController extends Controller
             'tanggal' => 'required|date',
             'nominal' => 'required|numeric',
             'upload_bukti_tf' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'id_investor' => 'nullable|integer|exists:users,id',
             'keterangan' => 'nullable|string',
         ]);
 
@@ -60,6 +71,7 @@ class RincianInvestController extends Controller
             'tipe' => $request->tipe,
             'tanggal' => $request->tanggal,
             'nominal' => $request->nominal,
+            'id_investor' => $request->id_investor,
             'upload_bukti_tf' => $path,
             'keterangan' => $request->keterangan,
         ]);

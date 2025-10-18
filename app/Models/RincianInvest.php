@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,6 +10,7 @@ class RincianInvest extends Model
 
     protected $fillable = [
         'tipe',
+        'id_investor',
         'tanggal',
         'nominal',
         'upload_bukti_tf',
@@ -20,6 +20,11 @@ class RincianInvest extends Model
     protected $casts = [
         'tanggal' => 'date',
     ];
+
+    public function investor()
+    {
+        return $this->belongsTo(User::class, 'id_investor');
+    }
 
     public function getTipeLabelAttribute()
     {
