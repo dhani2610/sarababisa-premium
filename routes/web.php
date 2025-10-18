@@ -539,11 +539,11 @@ Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(fun
     Route::get('admin-export-produk', [AdminTokoProdukController::class, 'export'])->name('admin-produk-export');
 
     Route::get('laporan/admin-laporan-servis', [AdminTokoLaporanServisController::class, 'index'])->name('admin-laporan-servis');
-    Route::get('admin-cetak-laporan-servis', [AdminTokoLaporanServisController::class, 'cetak'])->name('admin-cetak-laporan-servis');
 
     Route::get('laporan/admin-laporan-penjualan', [AdminTokoLaporanPenjualanController::class, 'index'])->name('admin-laporan-penjualan');
     Route::get('admin-cetak-laporan-penjualan', [AdminTokoLaporanPenjualanController::class, 'cetak'])->name('admin-cetak-laporan-penjualan');
 });
+Route::get('admin-cetak-laporan-servis', [AdminTokoLaporanServisController::class, 'cetak'])->name('admin-cetak-laporan-servis');
 
 Route::middleware(['ensureTeknisiRole:Teknisi', 'checkSubscription'])->group(function () {
     Route::get('/teknisi-dashboard', [TeknisiDashboardController::class, 'index'])->name('teknisi-dashboard');
