@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('rincian_invests', function (Blueprint $table) {
             $table->id();
             $table->integer('tipe')->comment('1= masuk, 2= pembagian,3= lain lain');
+            $table->integer('id_investor');
             $table->date('tanggal');
             $table->string('nominal');
             $table->string('upload_bukti_tf');
