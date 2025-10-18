@@ -108,31 +108,33 @@ class LaporanServisController extends Controller
         $total_kredit = (clone $serviceQuery)->sum('due');
 
         // Top brands
+        // Top brands
         $topbrands = (clone $serviceQuery)
-            ->select('brands.name as brand_name')
             ->join('brands', 'service_transactions.brands_id', '=', 'brands.id')
-            ->groupBy('brand_name')
-            ->orderBy(DB::raw('COUNT(*)'), 'desc')
+            ->select('brands.name as brand_name', DB::raw('COUNT(brands.id) as total'))
+            ->groupBy('brands.id', 'brands.name')
+            ->orderByDesc('total')
             ->limit(3)
             ->get();
 
         // Top model series
         $topmodelseries = (clone $serviceQuery)
-            ->select('model_series.name as model_name')
             ->join('model_series', 'service_transactions.model_series_id', '=', 'model_series.id')
-            ->groupBy('model_name')
-            ->orderBy(DB::raw('COUNT(*)'), 'desc')
+            ->select('model_series.name as model_name', DB::raw('COUNT(model_series.id) as total'))
+            ->groupBy('model_series.id', 'model_series.name')
+            ->orderByDesc('total')
             ->limit(3)
             ->get();
 
         // Top actions
         $topactions = (clone $serviceQuery)
-            ->select('service_actions.nama_tindakan as action_name')
             ->join('service_actions', 'service_transactions.service_actions_id', '=', 'service_actions.id')
-            ->groupBy('action_name')
-            ->orderBy(DB::raw('COUNT(*)'), 'desc')
+            ->select('service_actions.nama_tindakan as action_name', DB::raw('COUNT(service_actions.id) as total'))
+            ->groupBy('service_actions.id', 'service_actions.nama_tindakan')
+            ->orderByDesc('total')
             ->limit(3)
             ->get();
+
 
         // Total modal, biaya, diskon, profit, dp
         $total_modal = (clone $serviceQuery)->sum('modal_sparepart');
