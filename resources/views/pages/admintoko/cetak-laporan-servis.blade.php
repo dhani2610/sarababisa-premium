@@ -127,12 +127,19 @@
                 <th>Total Profit</th>
                 <th>: Rp. {{ number_format($total_profit) }}</th>
                 @endif
+                 @if (Auth::user()->role == 'Teknisi')
+                <th>Total Pengeluaran</th>
+                <th>: Rp. {{ number_format($total_pengeluaran) }}</th>
+                @endif
             </tr>
             <tr>
                 <th>Total Uang Muka</th>
                 <th>: Rp. {{ number_format($total_dp) }}</th>
+                @if (Auth::user()->role != 'Teknisi')
                 <th>Total Pengeluaran</th>
                 <th>: Rp. {{ number_format($total_pengeluaran) }}</th>
+                @endif
+
             </tr>
             @if (Auth::user()->role != 'Teknisi')
             <tr>
