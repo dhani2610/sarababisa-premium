@@ -6,65 +6,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Laporan Teknisi</title>
 	<style>
-		@page {
-            margin: 3mm 4mm 10mm 3mm; /* Atur margin atas, kanan, bawah, dan kiri */
-        }
+    @page {
+        margin: 3mm 4mm 10mm 3mm; /* Atur margin atas, kanan, bawah, dan kiri */
+    }
 
-		.text-center {
-			text-align: center;
-		}
+    .text-center {
+        text-align: center;
+    }
 
-		.text-right {
-			text-align: right;
-		}
+    .text-right {
+        text-align: right;
+    }
 
-		.text-left {
-			text-align: left;
-		}
+    .text-left {
+        text-align: left;
+    }
 
-		.capital {
-			text-transform: uppercase;
-		}
+    .capital {
+        text-transform: uppercase;
+    }
 
-		#ringkasan td,
-		th,
-		tr,
-		table {
-			border-collapse: collapse;
-			font-size: 12px;
-			line-height: 1em;
-			padding: 4px 0 4px 0;
-			text-align: left;
-		}
+    #ringkasan td,
+    #ringkasan th,
+    #ringkasan tr,
+    #ringkasan table {
+        border-collapse: collapse;
+        font-size: 12px;
+        line-height: 1em;
+        padding: 4px 0 4px 0;
+        text-align: left;
+    }
 
-		#detail td,
-		#detail th,
-		#detail tr,
-		#detail table {
-			border-collapse: collapse;
-			font-size: 12px;
-			line-height: 1em;
-			padding: 4px;
-			text-align: center;
-			border: solid;
-		}
+    /* ✅ Fokus di sini: perkecil font hanya untuk tabel Detail Servis */
+    #detail td,
+    #detail th {
+        border: 1px solid #000;
+        border-collapse: collapse;
+        font-size: 9px;        /* kecilkan font */
+        line-height: 0.9em;    /* rapatkan jarak antar baris */
+        padding: 2px 3px;      /* kecilkan padding */
+        text-align: center;
+        word-wrap: break-word; /* pecah teks panjang biar tidak keluar */
+        white-space: normal;   /* biar bisa turun ke baris baru */
+    }
 
-		#analisis td,
-		th,
-		tr,
-		table {
-			border-collapse: collapse;
-			font-size: 14px;
-			line-height: 1em;
-			width: 100%;
-			padding: 4px 0 4px 0;
-			text-align: left;
-		}
+    #detail {
+        width: 100%;
+        table-layout: fixed;   /* pastikan tabel menyesuaikan lebar halaman */
+    }
 
-		#data {
-			border-bottom: 1px solid #ddd;
-		}
-	</style>
+    #analisis td,
+    #analisis th,
+    #analisis tr,
+    #analisis table {
+        border-collapse: collapse;
+        font-size: 14px;
+        line-height: 1em;
+        width: 100%;
+        padding: 4px 0 4px 0;
+        text-align: left;
+    }
+
+    #data {
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+
 </head>
 <body>
 	<div class="text-center">
