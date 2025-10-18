@@ -165,8 +165,8 @@ class LaporanServisController extends Controller
         $saldo_akhir = $total_profit - $total_pengeluaran;
 
         // return response()->json($services);
-        // $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
-               return View('pages.admintoko.cetak-laporan-servis', [
+        $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
+            //    return View('pages.admintoko.cetak-laporan-servis', [
             'users' => $users,
             'toko' => $toko,
             'imagePath' => $imagePath,
