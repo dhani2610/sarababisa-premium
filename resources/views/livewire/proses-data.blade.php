@@ -837,6 +837,8 @@
                             Diambil <span class="ml-1 text-slate-400">{{ $jumlah_sudah_diambil }}</span></button>
                     </a>
                 </li>
+
+                @if (Auth::user()->role != 'Investor')
                 <li class="m-1">
                     <a href="{{ route('transaksi-servis-belum-disetujui.index') }}">
                         <button
@@ -844,6 +846,7 @@
                             Disetujui <span class="ml-1 text-slate-400">{{ $jumlah_belum_disetujui }}</span></button>
                     </a>
                 </li>
+                @endif
             </ul>
         </div>
         <!-- Right side -->

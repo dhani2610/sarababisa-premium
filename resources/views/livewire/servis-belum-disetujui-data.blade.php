@@ -38,11 +38,13 @@
                         <button class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-transparent shadow-sm  bg-white text-slate-500 duration-150 ease-in-out">Sudah Diambil <span class="ml-1 text-slate-400">{{ $jumlah_sudah_diambil }}</span></button>
                     </a>
                 </li>
+                @if (Auth::user()->role != 'Investor')
                 <li class="m-1">
                     <a href="{{ route('transaksi-servis-belum-disetujui.index') }}">
                         <button class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-slate-200 hover:border-slate-300 shadow-sm bg-indigo-500 text-white duration-150 ease-in-out">Belum Disetujui <span class="ml-1 text-slate-400">{{ $jumlah_belum_disetujui }}</span></button>
                     </a>
                 </li>
+                @endif
             </ul>
         </div>
         <!-- Right side -->
