@@ -62,7 +62,7 @@
                         </div>
                     </div>
                     <!-- Modal content -->
-                    <form action="{{ route('akun-update', $item->id) }}" method="post">
+                    <form action="{{ route('akun-update', $item->id) }}" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="px-5 py-4">
                             <div class="space-y-3">
@@ -105,6 +105,19 @@
                                         <option value="Sales">Sales</option>
                                     </select>
                                 </div>
+                                <div id="upload-investor" style="display: none;">
+                                    <label class="block text-sm font-medium mb-1" for="pdf_investor">Upload PDF
+                                        Investor</label>
+                                    <input id="pdf_investor" name="pdf_investor" class="form-input w-full px-2 py-1"
+                                        type="file" accept="application/pdf" />
+                                    @if ($item->pdf_investor)
+                                        <p class="text-sm mt-1">📎
+                                            <a href="{{ asset('storage/' . $item->pdf_investor) }}" target="_blank"
+                                                class="text-indigo-500 underline">Lihat PDF Lama</a>
+                                        </p>
+                                    @endif
+                                </div>
+
                                 <!-- Semua field setelah role dibungkus -->
                                 <div id="extra-fields">
                                     <div>
@@ -221,5 +234,24 @@
             roleSelect.addEventListener('change', toggleFields);
         });
     </script>
+    <script>
+        function toggleInputs() {
+            const role = document.getElementById('role').value;
+            const extraFields = document.getElementById('extra-fields');
+            const uploadInvestor = document.getElementById('upload-investor');
+
+            if (role === 'Investor') {
+                extraFields.style.display = 'none';
+                uploadInvestor.style.display = 'block';
+            } else {
+                extraFields.style.display = 'block';
+                uploadInvestor.style.display = 'none';
+            }
+        }
+
+        // Jalankan saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', toggleInputs);
+    </script>
+
 
 </x-toko-layout>

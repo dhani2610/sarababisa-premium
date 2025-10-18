@@ -61,7 +61,7 @@
                                 </div>
                             </div>
                             <!-- Modal content -->
-                            <form action="{{ route('akun-store') }}" method="post">
+                            <form action="{{ route('akun-store') }}" method="post" enctype="multipart/form-data">
                                 @csrf
                                 <div class="px-5 py-4">
                                     <div class="space-y-3">
@@ -112,6 +112,15 @@
                                                 <option value="Sales">Sales</option>
                                             </select>
                                         </div>
+
+                                          <div id="upload-investor" style="display: none;">
+                                            <label class="block text-sm font-medium mb-1" for="pdf_investor">
+                                                Upload PDF Investor <span class="text-rose-500">*</span>
+                                            </label>
+                                            <input id="pdf_investor" name="pdf_investor" class="form-input w-full px-2 py-1"
+                                                type="file" accept="application/pdf" />
+                                        </div>
+
 
                                         <!-- Inputan bawah (dibungkus agar bisa di-hide semua sekaligus) -->
                                         <div id="extra-fields">
@@ -261,5 +270,24 @@
         // Jalankan saat pertama kali halaman dimuat juga
         document.addEventListener('DOMContentLoaded', toggleInputs);
     </script>
+
+<script>
+function toggleInputs() {
+    const role = document.getElementById('role').value;
+    const extraFields = document.getElementById('extra-fields');
+    const uploadInvestor = document.getElementById('upload-investor');
+
+    if (role === 'Investor') {
+        extraFields.style.display = 'none';
+        uploadInvestor.style.display = 'block';
+    } else {
+        extraFields.style.display = 'block';
+        uploadInvestor.style.display = 'none';
+    }
+}
+
+// Jalankan saat pertama kali halaman dimuat
+document.addEventListener('DOMContentLoaded', toggleInputs);
+</script>
 
 </x-toko-layout>
