@@ -224,6 +224,15 @@
                     <thead
                         class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
+                            <th class="px-2 py-3 w-px">
+                                <div class="flex items-center">
+                                    <label class="inline-flex">
+                                        <span class="sr-only">Select all</span>
+                                        <input id="parent-checkbox" class="form-checkbox" type="checkbox"
+                                            @click="toggleAll">
+                                    </label>
+                                </div>
+                            </th>
                             <th class="px-2 py-3">No.</th>
                             <th class="px-2 py-3">Tanggal</th>
                             <th class="px-2 py-3">Nomor Servis</th>
@@ -242,6 +251,15 @@
                         @php $i = 1; @endphp
                         @foreach ($data as $item)
                             <tr>
+                                <td class="px-2 py-3 w-px">
+                                    <div class="flex items-center">
+                                        <label class="inline-flex">
+                                            <input class="table-item form-checkbox" type="checkbox"
+                                                value="{{ $item->id }}" @click="uncheckParent">
+                                        </label>
+                                    </div>
+                                </td>
+
                                 <td class="px-2 py-3">{{ $i++ }}</td>
                                 <td class="px-2 py-3">{{ $item->date }}</td>
                                 <td class="px-2 py-3">{{ $item->service->nomor_servis ?? $item->service_id }}</td>
@@ -261,7 +279,7 @@
                                                 $action = \App\Models\ServiceAction::find($t['id']);
                                             @endphp
                                             <li>{{ $action ? $action->nama_tindakan : $t['id_manual'] }}
-                                                    - Rp{{ number_format($t['harga'], 0, ',', '.') }}
+                                                - Rp{{ number_format($t['harga'], 0, ',', '.') }}
                                             </li>
                                         @endforeach
                                     </ul>
@@ -425,62 +443,63 @@
         });
     </script>
 
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('handleSelect', () => ({
-                selectall: false,
-                selectAction() {
-                    countEl = document.querySelector('.table-items-action');
-                    if (!countEl) return;
-                    checkboxes = document.querySelectorAll('input.table-item:checked');
-                    document.querySelector('.table-items-count').innerHTML = checkboxes.length;
-                    if (checkboxes.length > 0) {
-                        countEl.classList.remove('hidden');
-                    } else {
-                        countEl.classList.add('hidden');
-                    }
-                },
-                toggleAll() {
-                    this.selectall = !this.selectall;
-                    checkboxes = document.querySelectorAll('input.table-item');
-                    [...checkboxes].map((el) => {
-                        el.checked = this.selectall;
-                    });
-                    this.selectAction();
-                },
-                uncheckParent() {
-                    this.selectall = false;
-                    document.getElementById('parent-checkbox').checked = false;
-                    this.selectAction();
-                },
-                deleteSelected() {
-                    const checkboxes = document.querySelectorAll('input.table-item:checked');
-                    const selectedIds = [...checkboxes].map((checkbox) => checkbox.value);
+  <script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('handleSelect', () => ({
+        selected: [],
+        deleteUrl: '{{ route("history-garansi.bulkDelete") }}', // kita buat route ini
+        toggleAll(e) {
+            const checked = e.target.checked;
+            this.selected = [];
+            document.querySelectorAll('.table-item').forEach(el => {
+                el.checked = checked;
+                if (checked) this.selected.push(el.value);
+            });
+            this.toggleAction();
+        },
+        uncheckParent() {
+            const all = document.querySelectorAll('.table-item');
+            const selected = Array.from(all).filter(x => x.checked).map(x => x.value);
+            this.selected = selected;
+            document.getElementById('parent-checkbox').checked = selected.length === all.length;
+            this.toggleAction();
+        },
+        toggleAction() {
+            const action = document.querySelector('.table-items-action');
+            const countEl = document.querySelector('.table-items-count');
+            if (this.selected.length > 0) {
+                action.classList.remove('hidden');
+                countEl.textContent = this.selected.length;
+            } else {
+                action.classList.add('hidden');
+            }
+        },
+        deleteSelected() {
+            if (this.selected.length === 0) return;
 
-                    // Kirim permintaan penghapusan ke server
-                    fetch('/colors/delete', {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            },
-                            body: JSON.stringify({
-                                selectedIds
-                            }),
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            alert(data.message);
-                            // Refresh halaman atau lakukan tindakan lain setelah penghapusan
-                            window.location.reload();
-                        })
-                        .catch(error => {
-                            console.error('Gagal menghapus data:', error);
-                        });
+            if (!confirm('Yakin ingin menghapus data terpilih?')) return;
+
+            fetch(this.deleteUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
                 },
-            }))
-        })
-    </script>
+                body: JSON.stringify({ ids: this.selected })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    }))
+});
+</script>
+
 
     <script>
         $(document).on('click', '.toggle-status', function() {

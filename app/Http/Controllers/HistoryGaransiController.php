@@ -42,6 +42,22 @@ class HistoryGaransiController extends Controller
             'users'
         ));
     }
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->ids;
+
+        if (!$ids || !is_array($ids)) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada data yang dipilih']);
+        }
+
+        try {
+            HistoryGaransi::whereIn('id', $ids)->delete();
+            return response()->json(['success' => true, 'message' => 'Data berhasil dihapus']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal menghapus data']);
+        }
+    }
+
 
     public function store(Request $request)
     {
