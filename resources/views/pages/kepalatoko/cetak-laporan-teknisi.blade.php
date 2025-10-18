@@ -6,38 +6,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Laporan Teknisi</title>
 	<style>
-    @page {
-        margin: 3mm 4mm 10mm 3mm; /* Atur margin atas, kanan, bawah, dan kiri */
-    }
+		@page {
+            margin: 3mm 4mm 10mm 3mm; /* Atur margin atas, kanan, bawah, dan kiri */
+        }
 
-    .text-center {
-        text-align: center;
-    }
+		.text-center {
+			text-align: center;
+		}
 
-    .text-right {
-        text-align: right;
-    }
+		.text-right {
+			text-align: right;
+		}
 
-    .text-left {
-        text-align: left;
-    }
+		.text-left {
+			text-align: left;
+		}
 
-    .capital {
-        text-transform: uppercase;
-    }
+		.capital {
+			text-transform: uppercase;
+		}
 
-    #ringkasan td,
-    #ringkasan th,
-    #ringkasan tr,
-    #ringkasan table {
-        border-collapse: collapse;
-        font-size: 12px;
-        line-height: 1em;
-        padding: 4px 0 4px 0;
-        text-align: left;
-    }
-
-    /* ✅ Fokus di sini: perkecil font hanya untuk tabel Detail Servis */
+		#ringkasan td,
+		th,
+		tr,
+		table {
+			border-collapse: collapse;
+			font-size: 12px;
+			line-height: 1em;
+			padding: 4px 0 4px 0;
+			text-align: left;
+		}
+ /* ✅ Fokus di sini: perkecil font hanya untuk tabel Detail Servis */
     #detail td,
     #detail th {
         border: 1px solid #000;
@@ -55,23 +54,22 @@
         table-layout: fixed;   /* pastikan tabel menyesuaikan lebar halaman */
     }
 
-    #analisis td,
-    #analisis th,
-    #analisis tr,
-    #analisis table {
-        border-collapse: collapse;
-        font-size: 14px;
-        line-height: 1em;
-        width: 100%;
-        padding: 4px 0 4px 0;
-        text-align: left;
-    }
+		#analisis td,
+		th,
+		tr,
+		table {
+			border-collapse: collapse;
+			font-size: 14px;
+			line-height: 1em;
+			width: 100%;
+			padding: 4px 0 4px 0;
+			text-align: left;
+		}
 
-    #data {
-        border-bottom: 1px solid #ddd;
-    }
-</style>
-
+		#data {
+			border-bottom: 1px solid #ddd;
+		}
+	</style>
 </head>
 <body>
 	<div class="text-center">
