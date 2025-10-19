@@ -40,6 +40,10 @@ class KasbonController extends Controller
      */
     public function store(Request $request)
     {
+        
+        $request->merge([
+            'total' => (int) str_replace('.', '', $request->total),
+        ]);
         $data = $request->all();
 
         Debt::create($data);
@@ -84,6 +88,10 @@ class KasbonController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'total' => (int) str_replace('.', '', $request->total),
+        ]);
+
         $data = $request->all();
 
         $item = Debt::findOrFail($id);

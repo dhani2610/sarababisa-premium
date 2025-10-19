@@ -16,7 +16,9 @@ use App\Models\ServiceAction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class TransaksiServisController extends Controller
 {
@@ -75,7 +77,7 @@ class TransaksiServisController extends Controller
         $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
 
         // Transaction create
-        ServiceTransaction::create([
+        $transaksi = ServiceTransaction::create([
             'nomor_servis' => $nomor_servis,
             'customers_id' => $request->customers_id,
             'nama_pelanggan' => $nama_pelanggan->nama,
@@ -98,7 +100,55 @@ class TransaksiServisController extends Controller
             'penerima' => $request->penerima
         ]);
 
+         try {
+            $tglMasuk = $transaksi->created_at
+                ? Carbon::parse($transaksi->created_at)->locale('id')->translatedFormat('d F Y')
+                : '-';
+
+            $pesan = "📦 *TRANSAKSI BARU*\n\n"
+                . "🧾 *PROSES DITINGGAL*\n"
+                . "🧾 *Status Servis:* {$transaksi->status_servis}\n"
+                . "🧾 *Nomor Servis:* {$transaksi->nomor_servis}\n"
+                . "👤 *Pelanggan:* {$nama_pelanggan->nama}\n"
+                . "📱 *Barang:* {$nama_barang}\n"
+                // . "⚙️ *Tindakan Servis:*\n{$tindakanText}\n\n"
+                . "🧾 *Estimasi Pengerjaan:* {$transaksi->estimasi_pengerjaan}\n"
+                . "💰 *Estimasi Biaya:* Rp " . number_format($transaksi->estimasi_biaya, 0, ',', '.') . "\n"
+                . "💰 *Uang Muka:* Rp " . number_format($transaksi->uang_muka, 0, ',', '.') . "\n\n"
+                . "📅 *Tanggal Masuk:* {$tglMasuk}\n"
+                . "🧍‍♂️ *penerima:* " . Auth::user()->name;
+
+            $this->sendMessage($pesan);
+
+        } catch (\Exception $e) {
+            \Log::error("Gagal kirim Telegram: " . $e->getMessage());
+        }
+
         return redirect()->route('admin-transaksi-servis.index');
+    }
+
+    public function sendMessage($message)
+    {
+        $storeSetting = \App\Models\StoreSetting::find(1);
+        if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
+            $botToken = $storeSetting->token_bot;
+            $chatId   = $storeSetting->chat_id;
+    
+            if (!$botToken || !$chatId) {
+                \Log::warning('Telegram bot token atau chat_id belum diset di pengaturan toko.');
+                return;
+            }
+    
+            try {
+                Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                    'chat_id' => $chatId,
+                    'text' => $message,
+                    'parse_mode' => 'Markdown',
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Gagal kirim pesan Telegram: ' . $e->getMessage());
+            }
+        } 
     }
 
     /**

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\KepalaToko\ProdukController;
 use App\Http\Controllers\PortalController;
+use App\Http\Controllers\RincianInvestController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\DefaultController;
@@ -245,6 +246,7 @@ Route::get('slip-gaji/{id}', [KepalaTokoKaryawanController::class, 'cetak'])->na
 Route::resource('history-garansi', HistoryGaransiController::class);
 Route::patch('/history-garansi/{id}/toggle-status', [HistoryGaransiController::class, 'toggleStatus'])
     ->name('history-garansi.toggleStatus');
+Route::post('/history-garansi/bulk-delete', [HistoryGaransiController::class, 'bulkDelete'])->name('history-garansi.bulkDelete');
 
 // routes/web.php
 Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'show'])->name('service.show');
@@ -271,6 +273,14 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('servis/transaksi-servis', KepalaTokoTransaksiServisController::class);
     Route::post('servis/transaksi-servis/{id}/update-pin-pola', [KepalaTokoTransaksiServisController::class, 'updatePinPola'])
     ->name('transaksi-servis.update-pin-pola');
+
+
+    Route::get('rincian-invest', [RincianInvestController::class, 'index'])->name('rincian-invest.index');
+    Route::post('rincian-invest', [RincianInvestController::class, 'store'])->name('rincian-invest.store');
+    Route::put('rincian-invest/{id}', [RincianInvestController::class, 'update'])->name('rincian-invest.update');
+    Route::delete('rincian-invest/{id}', [RincianInvestController::class, 'destroy'])->name('rincian-invest.destroy');
+    Route::delete('/rincian-invest/bulk-delete', [RincianInvestController::class, 'bulkDelete'])->name('rincian-invest.bulkDelete');
+
 
     Route::delete('/services/delete', [KepalaTokoTransaksiServisController::class, 'deleteSelected']);
     Route::patch('/services/update', [KepalaTokoSudahDiambilController::class, 'approveSelected']);
@@ -529,11 +539,11 @@ Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(fun
     Route::get('admin-export-produk', [AdminTokoProdukController::class, 'export'])->name('admin-produk-export');
 
     Route::get('laporan/admin-laporan-servis', [AdminTokoLaporanServisController::class, 'index'])->name('admin-laporan-servis');
-    Route::get('admin-cetak-laporan-servis', [AdminTokoLaporanServisController::class, 'cetak'])->name('admin-cetak-laporan-servis');
 
     Route::get('laporan/admin-laporan-penjualan', [AdminTokoLaporanPenjualanController::class, 'index'])->name('admin-laporan-penjualan');
     Route::get('admin-cetak-laporan-penjualan', [AdminTokoLaporanPenjualanController::class, 'cetak'])->name('admin-cetak-laporan-penjualan');
 });
+Route::get('admin-cetak-laporan-servis', [AdminTokoLaporanServisController::class, 'cetak'])->name('admin-cetak-laporan-servis');
 
 Route::middleware(['ensureTeknisiRole:Teknisi', 'checkSubscription'])->group(function () {
     Route::get('/teknisi-dashboard', [TeknisiDashboardController::class, 'index'])->name('teknisi-dashboard');

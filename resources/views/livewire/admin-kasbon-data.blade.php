@@ -82,7 +82,7 @@
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="total">Nominal Kasbon <span class="text-rose-500">*</span></label>
                                         <div class="relative">
-                                            <input id="total" name="total" class="form-input w-full pl-10 px-2 py-1" type="number" required/>
+                                            <input id="total" name="total" class="form-input w-full pl-10 px-2 py-1 format-nominal" type="text" required/>
                                             <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                                 <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                             </div>
@@ -312,6 +312,20 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('format-nominal')) {
+                let input = e.target;
+                let value = input.value.replace(/\D/g, ""); // hanya angka
+
+                // Jangan batasi panjang angka
+                if (value.length > 15) return; // (opsional: batasi sampai 999 triliun biar aman)
+
+                // Format angka ke ribuan (1.000.000)
+                input.value = value ? value.replace(/\B(?=(\d{3})+(?!\d))/g, ".") : "";
+            }
+        });
+    </script>
 
     <script>
         // A basic demo function to handle "select all" functionality

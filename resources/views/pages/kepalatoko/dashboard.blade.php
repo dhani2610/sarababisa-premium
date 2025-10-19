@@ -9,6 +9,7 @@
         <x-dashboard.welcome-banner :haritotalomzet="$haritotalomzet" :haritotalprofitkotor="$haritotalprofitkotor" :haripengeluaran="$haripengeluaran" :haripembelian="$haripembelian"/>
 
         <!-- Banner -->
+        @if (Auth::user()->role != 'Investor')
         <div class="mb-6">
             <div class="space-y-3">
                 @if ($stokhabis != null)
@@ -117,6 +118,7 @@
                 <!-- End -->
             </div>
         </div>
+        @endif
 
         <div class="grid grid-cols-12 gap-6">
             <!-- Card Keuangan -->

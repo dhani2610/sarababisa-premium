@@ -95,11 +95,11 @@
 
                             $('#biaya').val((parseInt(curBiaya) - parseInt(prevBiaya.val()) + parseInt(data
                                 .biaya)).toString());
-                            $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal
-                                    .val()) + parseInt(data
-                                    .modal_sparepart))
-                                .toString());
-                            prevModal.val(data.modal_sparepart)
+                            // $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal
+                            //         .val()) + parseInt(data
+                            //         .modal_sparepart))
+                            //     .toString());
+                            // prevModal.val(data.modal_sparepart)
                             prevBiaya.val(data.biaya)
                             myEl.parent().parent().parent().find('[name="modal_sparepart"]:first').val(data
                                 .modal_sparepart)
@@ -113,14 +113,14 @@
                 }
             });
 
-            $(document).on('change', '.modal_sparepart', function(e) {
-                const myEl = $(this);
-                const curModal = $('#total_modal_sparepart').val() || 0;
-                const prevModal = myEl.parent().parent().parent().find('[name="prev_modal"]:first');
-                $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal.val()) + parseInt(myEl.val()))
-                    .toString());
-                prevModal.val(myEl.val())
-            })
+            // $(document).on('change', '.modal_sparepart', function(e) {
+            //     const myEl = $(this);
+            //     const curModal = $('#total_modal_sparepart').val() || 0;
+            //     const prevModal = myEl.parent().parent().parent().find('[name="prev_modal"]:first');
+            //     $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal.val()) + parseInt(myEl.val()))
+            //         .toString());
+            //     prevModal.val(myEl.val())
+            // })
 
             $(document).on('change', '.biaya_servis', function(e) {
                 const myEl = $(this);
@@ -210,7 +210,7 @@
                             class="form-select text-sm py-1 w-full" style="width: 100%;">
                             <option selected value="">Pilih Sparepart</option>
                             @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
-                                <option value="{{ $item->id }}">{{ $item->product_name }}
+                                <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ $item->product_name }}
                                 </option>
                             @endforeach
                         </select>
@@ -311,14 +311,14 @@
                 }
             });
 
-            $(document).on('change', '.modal_sparepart', function(e) {
-                const myEl = $(this);
-                const curModal = $('#total_modal_sparepart').val() || 0;
-                const prevModal = myEl.parent().parent().parent().find('[name="prev_modal"]:first');
-                $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal.val()) + parseInt(myEl.val()))
-                    .toString());
-                prevModal.val(myEl.val())
-            })
+            // $(document).on('change', '.modal_sparepart', function(e) {
+            //     const myEl = $(this);
+            //     const curModal = $('#total_modal_sparepart').val() || 0;
+            //     const prevModal = myEl.parent().parent().parent().find('[name="prev_modal"]:first');
+            //     $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal.val()) + parseInt(myEl.val()))
+            //         .toString());
+            //     prevModal.val(myEl.val())
+            // })
 
             $(document).on('change', '.biaya_servis', function(e) {
                 const myEl = $(this);

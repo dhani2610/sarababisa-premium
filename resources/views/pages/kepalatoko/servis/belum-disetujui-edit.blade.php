@@ -68,7 +68,7 @@
                     <form action="{{ route('transaksi-servis-belum-disetujui.update', $item->id) }}" method="post">
                         @method('PUT')
                         @csrf
-                        <div class="px-5 py-4">
+                         <div class="px-5 py-4">
                             <div class="space-y-3">
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="created_at">Tgl. Terima </label>
@@ -76,7 +76,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="tgl_ambil">Tgl. Ambil </label>
-                                    <input id="tgl_ambil" name="tgl_ambil" class="form-input w-full px-2 py-1" type="date" value="{{ \Carbon\Carbon::parse($item->tgl_ambil)->format('Y-m-d') }}"/>
+                                    <input id="tgl_ambil" name="tgl_ambil" class="form-input w-full px-2 py-1" type="datetime" value="{{ $item->tgl_ambil }}"/>
                                 </div>
                                 @if ($item->is_approve != null)
                                 <div>
@@ -205,12 +205,32 @@
                                     </select>
                                 </div>
                                 <div>
+                                    <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Modal Sparepart </label>
+                                        <p class="text-xs mt-1" style="color:red">
+                                            ⚠️ Jika ingin mengubah nominal, cukup ubah angkanya saja.
+                                            Jika ingin menambahkan nominal baru, pisahkan dengan koma di dalam tanda kurung siku.
+                                            Contoh: ["10000","3000"]
+                                        </p>
+
+                                    <input id="modal_j" name="modal_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->modal_j }}"/>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Pengerjaan Sparepart </label>
+                                        <p class="text-xs mt-1" style="color:red">
+                                            ⚠️ Jika ingin mengubah nominal, cukup ubah angkanya saja.
+                                            Jika ingin menambahkan nominal baru, pisahkan dengan koma di dalam tanda kurung siku.
+                                            Contoh: ["10000","3000"]
+                                        </p>
+
+                                    <input id="biaya_j" name="biaya_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->biaya_j }}"/>
+                                </div>
+                                <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Modal Sparepart </label>
-                                    <input id="modal_sparepart" name="modal_sparepart" class="form-input w-full px-2 py-1" type="number" value="{{ $item->modal_sparepart }}"/>
+                                    <input id="modal_sparepart" name="modal_sparepart" class="form-input w-full px-2 py-1 " style="    background: rgb(203 213 225 / var(--tw-border-opacity));" type="number" readonly value="{{ $item->modal_sparepart }}"/>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="biaya">Biaya Servis </label>
-                                    <input id="biaya" name="biaya" class="form-input w-full px-2 py-1" type="number" value="{{ $item->biaya }}"/>
+                                    <input id="biaya" name="biaya" class="form-input w-full px-2 py-1 " style="    background: rgb(203 213 225 / var(--tw-border-opacity));" type="number" readonly value="{{ $item->biaya }}"/>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="uang_muka">Uang Muka </label>
@@ -226,26 +246,92 @@
                                     @endif
                                     />
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1" for="cara_pembayaran">Cara Pembayaran  </label>
-                                    <select id="cara_pembayaran" name="cara_pembayaran" class="form-select text-sm py-1 w-full" >
-                                            <option selected value="{{ $item->cara_pembayaran }}">{{ $item->cara_pembayaran }}</option>
+                                    <div>
+                                    <div x-data="{ caraPembayaran: @js($item->cara_pembayaran ?? 'Tunai') }">
+                                        <label class="block text-sm font-medium mb-1" for="cara_pembayaran">Cara Pembayaran</label>
+
+                                        <select id="cara_pembayaran" name="cara_pembayaran"
+                                            class="form-select text-sm py-1 w-full"
+                                            x-model="caraPembayaran">
                                             <option value="Tunai">Tunai</option>
                                             <option value="Transfer">Transfer</option>
-                                            <option value="Tempo 1 Hari">Tempo 1 Hari</option>
-                                            <option value="Tempo 2 Hari">Tempo 2 Hari</option>
-                                            <option value="Tempo 3 Hari">Tempo 3 Hari</option>
-                                            <option value="Tempo 4 Hari">Tempo 4 Hari</option>
-                                            <option value="Tempo 5 Hari">Tempo 5 Hari</option>
-                                            <option value="Tempo 6 Hari">Tempo 6 Hari</option>
-                                            <option value="Tempo 1 Minggu">Tempo 1 Minggu</option>
-                                            <option value="Tempo 2 Minggu">Tempo 2 Minggu</option>
-                                            <option value="Tempo 3 Minggu">Tempo 3 Minggu</option>
-                                            <option value="Tempo 1 Bulan">Tempo 1 Bulan</option>
-                                            <option value="Tempo 2 Bulan">Tempo 2 Bulan</option>
-                                            <option value="Tempo 3 Bulan">Tempo 3 Bulan</option>
-                                    </select>
+                                            <option value="Kredit">Kredit</option>
+                                            <option value="Tunai & Transfer">Tunai & Transfer</option>
+                                        </select>
+
+                                        <!-- Tunai & Transfer -->
+                                        <div x-show="caraPembayaran === 'Tunai & Transfer'" class="mt-3">
+                                            <label class="block text-sm font-medium text-indigo-500">
+                                                Silahkan isi hanya pada salah satu input saja: Tunai / Transfer
+                                            </label>
+                                            <div class="flex flex-row gap-3">
+                                                <div class="w-1/2">
+                                                    <label class="block text-sm font-medium mb-1" for="tunai">Tunai</label>
+                                                    <input class="form-input w-full py-1" type="number"
+                                                        name="tunai" id="tunai"
+                                                        value="{{ $item->tunai ?? 0 }}" />
+                                                </div>
+                                                <div class="w-1/2">
+                                                    <label class="block text-sm font-medium mb-1" for="transfer">Transfer</label>
+                                                    <input class="form-input w-full py-1" type="number"
+                                                        name="transfer" id="transfer"
+                                                        value="{{ $item->transfer ?? 0 }}" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Kredit -->
+                                        <div x-show="caraPembayaran === 'Kredit'" class="mt-3">
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1" for="pay">
+                                                    Jumlah Pembayaran <span class="text-rose-500">*</span>
+                                                </label>
+                                                <input id="pay" name="pay"
+                                                    class="form-input w-full px-2 py-1"
+                                                    type="number"
+                                                    value="{{ old('pay') }}" />
+                                            </div>
+
+                                            <div class="flex items-center gap-5 mt-3">
+                                                <label class="flex items-center">
+                                                    <input name="tunai_check" type="checkbox" value="1"
+                                                        class="form-checkbox"
+                                                        {{ $item->tunai ? 'checked' : '' }}/>
+                                                    <span class="text-sm ml-2">Tunai</span>
+                                                </label>
+
+                                                <label class="flex items-center">
+                                                    <input name="transfer_check" type="checkbox" value="1"
+                                                        class="form-checkbox"
+                                                        {{ $item->transfer ? 'checked' : '' }}/>
+                                                    <span class="text-sm ml-2">Transfer</span>
+                                                </label>
+                                            </div>
+
+                                            <label class="block text-sm font-medium mt-3" for="tempo">
+                                                Waktu Tempo <span class="text-rose-500">*</span>
+                                            </label>
+                                            <select id="tempo" name="tempo"
+                                                class="form-select w-full mt-1">
+                                                <option value="">Pilih Waktu Tempo</option>
+                                                <option value="1">Tempo 1 Hari</option>
+                                                <option value="2">Tempo 2 Hari</option>
+                                                <option value="3">Tempo 3 Hari</option>
+                                                <option value="4">Tempo 4 Hari</option>
+                                                <option value="5">Tempo 5 Hari</option>
+                                                <option value="6">Tempo 6 Hari</option>
+                                                <option value="7">Tempo 1 Minggu</option>
+                                                <option value="14">Tempo 2 Minggu</option>
+                                                <option value="21">Tempo 3 Minggu</option>
+                                                <option value="30">Tempo 1 Bulan</option>
+                                                <option value="60">Tempo 2 Bulan</option>
+                                                <option value="90">Tempo 3 Bulan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
                                 </div>
+                              
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="exp_garansi">Masa Garansi</label>
                                     @if ($item->exp_garansi != null)
@@ -290,6 +376,125 @@
                 $('#selectjs3').select2();
                 $('#selectjs4').select2();
             });
+        </script>
+        <script>
+       document.addEventListener("DOMContentLoaded", function () {
+            const modalJInput = document.getElementById("modal_j");
+            const modalSparepartInput = document.getElementById("modal_sparepart");
+
+            function calculateModal() {
+                try {
+                    let raw = modalJInput.value.trim();
+
+                    // perbaiki kutip miring dan koma aneh
+                    raw = raw.replace(/[“”]/g, '"').replace(/‘’/g, "'").replace(/，/g, ",");
+
+                    // parse JSON aman
+                    let values = JSON.parse(raw);
+
+                    // pastikan array angka
+                    if (!Array.isArray(values)) values = [values];
+                    let numbers = values.map(v => parseInt(v) || 0);
+
+                    // jumlahkan
+                    let total = numbers.reduce((a, b) => a + b, 0);
+
+                    // taruh ke input modal_sparepart
+                    modalSparepartInput.value = total;
+                } catch (e) {
+                    modalSparepartInput.value = 0;
+                }
+            }
+
+            // hitung pertama kali
+            calculateModal();
+
+            // update realtime kalau ada perubahan
+            modalJInput.addEventListener("input", calculateModal);
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const biayaJInput = document.getElementById("biaya_j");
+            const biayaSparepartInput = document.getElementById("biaya");
+
+            function calculatebiaya() {
+                try {
+                    // ambil nilai input, parse JSON (["225000","115000","30000"])
+                    let values = JSON.parse(biayaJInput.value);
+
+                    // pastikan array angka
+                    let numbers = values.map(v => parseInt(v) || 0);
+
+                    // jumlahkan
+                    let total = numbers.reduce((a, b) => a + b, 0);
+
+                    // taruh ke input biaya_sparepart
+                    biayaSparepartInput.value = total;
+                } catch (e) {
+                    biayaSparepartInput.value = 0; // kalau format salah
+                }
+            }
+
+            // hitung pertama kali
+            calculatebiaya();
+
+            // update realtime kalau ada perubahan
+            biayaJInput.addEventListener("input", calculatebiaya);
+        });
+
+        
+        let ppn = {{ $item->ppn }};
+
+        function getTotal() {
+            let biaya = parseInt($('#biaya').val()) || 0;
+            let diskon = parseInt($('#diskon').val()) || 0;
+
+            // Hitung subtotal
+            let subtotal = Math.max(biaya - diskon, 0);
+
+            // Tambah PPN kalau ada
+            if (ppn > 0) {
+                subtotal += Math.round(subtotal * ppn / 100);
+            }
+
+            return subtotal;
+        }
+
+        $(document).ready(function () {
+            // Kalau user ubah tunai
+            $('#tunai').on('input', function () {
+                if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
+                    let total = getTotal();
+                    let tunai = parseInt($(this).val()) || 0;
+                    let transfer = total - tunai;
+                    $('#transfer').val(transfer >= 0 ? transfer : 0);
+                }
+            });
+
+            // Kalau user ubah transfer
+            $('#transfer').on('input', function () {
+                if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
+                    let total = getTotal();
+                    let transfer = parseInt($(this).val()) || 0;
+                    let tunai = total - transfer;
+                    $('#tunai').val(tunai >= 0 ? tunai : 0);
+                }
+            });
+
+            // Kalau biaya atau diskon berubah, reset ulang input tunai & transfer
+            $('#biaya, #diskon').on('input', function () {
+                $('#tunai').trigger('input');
+            });
+
+            // Saat cara pembayaran diganti
+            $('#cara_pembayaran').on('change', function () {
+                if ($(this).val() === 'Tunai & Transfer') {
+                    $('#tunai').trigger('input');
+                } else {
+                    $('#tunai, #transfer').val(0);
+                }
+            });
+        });
         </script>
     @endpush
 </x-admin-layout>

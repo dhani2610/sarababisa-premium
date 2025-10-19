@@ -17,7 +17,7 @@ class EnsureUserRole
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::user() && Auth::user()->role == 'Kepala Toko') {
+        if (Auth::user() && Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Investor') {
             return $next($request);
         }
 

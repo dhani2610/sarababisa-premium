@@ -54,6 +54,7 @@
                             </div>
                         </a>
                     </li>
+                    @if (Auth::user()->role != 'Investor')
                     <!-- Akun -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['akun'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['akun'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('akun') }}">
@@ -78,6 +79,7 @@
                             </div>
                         </a>
                     </li>
+                    @endif
                     <!-- Servis -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['servis'])){{ 'bg-slate-900' }}@endif" x-data="{ open: {{ in_array(Request::segment(1), ['servis']) ? 1 : 0 }} }">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['servis'])){{ 'hover:text-slate-200' }}@endif" href="#0" @click.prevent="sidebarExpanded ? open = !open : sidebarExpanded = true">
@@ -100,16 +102,20 @@
                         </a>
                         <div class="lg:hidden lg:sidebar-expanded:block 2xl:block">
                             <ul class="pl-9 mt-1 @if(!in_array(Request::segment(1), ['servis'])){{ 'hidden' }}@endif" :class="open ? '!block' : 'hidden'">
+                                @if (Auth::user()->role != 'Investor')
+
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('tindakan-servis.index', 'tindakan-servis.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('tindakan-servis.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Tindakan</span>
                                     </a>
                                 </li>
+                                @endif
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('transaksi-servis.index', 'transaksi-servis-bisa-diambil.index', 'transaksi-servis-sudah-diambil.index', 'transaksi-servis.edit', 'transaksi-servis.show', 'transaksi-servis-belum-disetujui.index', 'transaksi-servis-belum-disetujui.edit', 'servis-belum-disetujui-approve.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('transaksi-servis.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Transaksi</span>
                                     </a>
                                 </li>
+                                @if (Auth::user()->role != 'Investor')
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('log-servis')){{ '!text-indigo-500' }}@endif" href="{{ route('log-servis') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Log Servis</span>
@@ -120,6 +126,7 @@
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">History Garansi</span>
                                     </a>
                                 </li>
+                                @endif
                             </ul>
                         </div>
                     </li>
@@ -145,6 +152,7 @@
                         </a>
                         <div class="lg:hidden lg:sidebar-expanded:block 2xl:block">
                             <ul class="pl-9 mt-1 @if(!in_array(Request::segment(1), ['produk'])){{ 'hidden' }}@endif" :class="open ? '!block' : 'hidden'">
+                                @if (Auth::user()->role != 'Investor')
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('kategori.index', 'kategori.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('kategori.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Kategori Produk</span>
@@ -180,6 +188,7 @@
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Point of Sales (POS)</span>
                                     </a>
                                 </li>
+                                @endif
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('transaksi-produk.index', 'transaksi-produk-paid.index', 'transaksi-produk-due.index', 'transaksi-produk.show', 'transaksi-produk.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('transaksi-produk.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Transaksi</span>
@@ -189,6 +198,7 @@
                         </div>
                     </li>
                     <!-- Master Data -->
+                    @if (Auth::user()->role != 'Investor')
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['master'])){{ 'bg-slate-900' }}@endif" x-data="{ open: {{ in_array(Request::segment(1), ['master']) ? 1 : 0 }} }">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['master'])){{ 'hover:text-slate-200' }}@endif" href="#0" @click.prevent="sidebarExpanded ? open = !open : sidebarExpanded = true">
                             <div class="flex items-center justify-between">
@@ -249,6 +259,7 @@
                             </ul>
                         </div>
                     </li>
+                    @endif
                     <!-- Laporan -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['laporan'])){{ 'bg-slate-900' }}@endif" x-data="{ open: {{ in_array(Request::segment(1), ['laporan']) ? 1 : 0 }} }">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['laporan'])){{ 'hover:text-slate-200' }}@endif" href="#0" @click.prevent="sidebarExpanded ? open = !open : sidebarExpanded = true">
@@ -277,6 +288,12 @@
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('laporan-penjualan')){{ '!text-indigo-500' }}@endif" href="{{ route('laporan-penjualan') }}">
+                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Laporan Penjualan</span>
+                                    </a>
+                                </li>
+                                @if (Auth::user()->role != 'Investor')
+                                <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('laporan-pajak-servis')){{ '!text-indigo-500' }}@endif" href="{{ route('laporan-pajak-servis') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Laporan Pajak Servis</span>
                                     </a>
@@ -284,11 +301,6 @@
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('laporan-teknisi')){{ '!text-indigo-500' }}@endif" href="{{ route('laporan-teknisi') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Laporan Teknisi</span>
-                                    </a>
-                                </li>
-                                <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('laporan-penjualan')){{ '!text-indigo-500' }}@endif" href="{{ route('laporan-penjualan') }}">
-                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Laporan Penjualan</span>
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
@@ -306,9 +318,11 @@
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Laporan Admin</span>
                                     </a>
                                 </li>
+                                @endif
                             </ul>
                         </div>
                     </li>
+                    @if (Auth::user()->role != 'Investor')
                     <!-- Settings -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['pengaturan'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['pengaturan'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('informasi-toko') }}">
@@ -323,9 +337,31 @@
                             </div>
                         </a>
                     </li>
+                    @endif
+
                 </ul>
             </div>
             <!-- More group -->
+            <div>
+                <h3 class="text-xs uppercase text-slate-500 font-semibold pl-3">
+                    <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">•••</span>
+                    <span class="lg:hidden lg:sidebar-expanded:block 2xl:block">Rincian Invest</span>
+                </h3>
+                <ul class="mt-3">   
+                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['rincian-invest.index'])){{ 'bg-slate-900' }}@endif">
+                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['rincian-invest.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('rincian-invest.index') }}">
+                            <div class="flex items-center">
+                                <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['rincian-invest.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M20 7a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 0120 7zM4 23a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 014 23z" />
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['rincian-invest.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M17 23a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 010-2 4 4 0 004-4 1 1 0 012 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1zM7 13a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 110-2 4 4 0 004-4 1 1 0 112 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1z" />
+                                </svg>
+                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Rincian Invest</span>
+                            </div>
+                        </a>
+                    </li>                 
+                </ul>
+            </div>
+            @if (Auth::user()->role != 'Investor')
             <div>
                 <h3 class="text-xs uppercase text-slate-500 font-semibold pl-3">
                     <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">•••</span>
@@ -429,6 +465,7 @@
                     </li>
                 </ul>
             </div>
+            @endif
             <footer>
                 <div class="pl-3 text-xs text-slate-500 font-semibold">
                     © 2023-{{ date('Y') }} Saraba Bisa

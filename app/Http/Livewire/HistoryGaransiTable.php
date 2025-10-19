@@ -34,7 +34,13 @@ class HistoryGaransiTable extends Component
                 $q->where('nomor_servis', 'like', '%' . $this->search . '%');
             });
         }
-
+        // dd(auth()->user()->role);
+        if (auth()->user()->role == 'Teknisi') {
+            $query->where('teknisi_id', auth()->user()->id);
+            $users = User::where('id',auth()->user()->id)->get();
+        }else{
+            $users = User::all();
+        }
 
         $serviceTransactions = ServiceTransaction::all();
         $products = Product::whereHas('subCategory.category', function ($q) {
@@ -42,7 +48,6 @@ class HistoryGaransiTable extends Component
         })->where('stok', '>=', 1)->get();
 
         $serviceActions = ServiceAction::all();
-        $users = User::all();
 
         return view('livewire.history-garansi', [
             'data' => $query->paginate($this->paginate),

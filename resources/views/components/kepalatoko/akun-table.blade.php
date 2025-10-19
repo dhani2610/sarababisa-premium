@@ -55,6 +55,9 @@
                             <div class="font-semibold text-left">Persen</div>
                         </th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            <div class="font-semibold text-left">PDF Investor</div>
+                        </th>
+                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Aksi</div>
                         </th>
                     </tr>
@@ -107,6 +110,16 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium text-slate-800">{{ $user->persen }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    @if ($user->role == 'Investor')
+                                        @if ($user->pdf_investor)
+                                            <p class="text-sm mt-1">📎
+                                                <a href="{{ asset('storage/' . $user->pdf_investor) }}" target="_blank"
+                                                    class="text-indigo-500 underline">Lihat PDF</a>
+                                            </p>
+                                        @endif
+                                    @endif
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="space-x-1 flex">

@@ -12,6 +12,7 @@
             <livewire:toggle-bonus></livewire:toggle-bonus>
             <livewire:toggle-edit-transaksi></livewire:toggle-edit-transaksi>
             <livewire:toggle-edit-produk></livewire:toggle-edit-produk>
+            <livewire:toggle-telegram-bot />
         </div>
 
         <!-- Panel footer -->
@@ -25,3 +26,8 @@
         </footer>
     </form>
 </div>
+<script>
+window.addEventListener('notify', event => {
+    alert(event.detail.message); // Bisa diganti pakai toast atau SweetAlert
+});
+</script>
