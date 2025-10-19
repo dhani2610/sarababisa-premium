@@ -427,7 +427,7 @@
                             class="form-select text-sm py-1 w-full" style="width: 100%;">
                             <option selected value="">Pilih Sparepart</option>
                             @foreach ($products as $item)
-                                <option value="{{ $item->id }}">{{ $item->product_name }}
+                                <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ $item->product_name }}
                                 </option>
                             @endforeach
                         </select>
@@ -478,10 +478,10 @@
 
                             $('#biaya').val((parseInt(curBiaya) - parseInt(prevBiaya.val()) + parseInt(data
                                 .biaya)).toString());
-                            $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal
-                                    .val()) + parseInt(data
-                                    .modal_sparepart))
-                                .toString());
+                            // $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal
+                            //         .val()) + parseInt(data
+                            //         .modal_sparepart))
+                            //     .toString());
                             prevModal.val(data.modal_sparepart)
                             prevBiaya.val(data.biaya)
                             myEl.parent().parent().parent().find('[name="modal_sparepart[]"]:first').val(
@@ -497,14 +497,14 @@
                 }
             });
 
-            $(document).on('change', '.modal_sparepart', function(e) {
-                const myEl = $(this);
-                const curModal = $('#total_modal_sparepart').val() || 0;
-                const prevModal = myEl.parent().parent().parent().find('[name="prev_modal"]:first');
-                $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal.val()) + parseInt(myEl.val()))
-                    .toString());
-                prevModal.val(myEl.val())
-            })
+            // $(document).on('change', '.modal_sparepart', function(e) {
+            //     const myEl = $(this);
+            //     const curModal = $('#total_modal_sparepart').val() || 0;
+            //     const prevModal = myEl.parent().parent().parent().find('[name="prev_modal"]:first');
+            //     $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal.val()) + parseInt(myEl.val()))
+            //         .toString());
+            //     prevModal.val(myEl.val())
+            // })
 
             $(document).on('change', '.biaya_servis', function(e) {
                 const myEl = $(this);
@@ -553,15 +553,45 @@
             })
         </script>
     @endpush
-    <script>
-    document.addEventListener('focusout', function(e) {
-        if (e.target.classList.contains('modal_sparepart')) {
-            let total = 0;
-            document.querySelectorAll('.modal_sparepart').forEach(input => {
-                total += parseFloat(input.value) || 0;
-            });
-            document.getElementById('total_modal_sparepart').value = total;
-        }
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Inisialisasi select2 pada elemen awal ---
+    $('#selectjs6').select2();
+
+    // --- Ketika sparepart dipilih, ambil harga_modal ---
+    $(document).on('change', 'select[name="products_id[]"]', function () {
+        let hargaModal = $(this).find(':selected').data('harga_modal') || 0;
+        // cari input modal_sparepart dalam section yang sama
+        $(this).closest('.konfirmasi-stok, [x-data]').find('.modal_sparepart').val(hargaModal).trigger('input');
     });
-    </script>
+
+    // --- Kalkulasi total otomatis ---
+    $(document).on('input', '.modal_sparepart', function () {
+        hitungTotalModal();
+    });
+
+    function hitungTotalModal() {
+        let total = 0;
+        $('.modal_sparepart').each(function () {
+            total += parseFloat($(this).val()) || 0;
+        });
+        $('#total_modal_sparepart').val(total);
+    }
+
+    // --- Saat tombol tambah tindakan diklik ---
+    $('#tambah-servis').on('click', function () {
+        $('#servis-lain').append(`{!! str_replace(["\n", "\r", "'"], ["", "", "\\'"], $konfirSparepartEl ?? '') !!}`);
+        // Re-inisialisasi select2 untuk elemen baru
+        $('.selectAction2').select2({
+            placeholder: 'Pilih Sparepart'
+        });
+
+        // Pasang listener harga modal untuk elemen baru
+        $('.selectAction2').off('change').on('change', function () {
+            let hargaModal = $(this).find(':selected').data('harga_modal') || 0;
+            $(this).closest('.konfirmasi-stok').find('.modal_sparepart').val(hargaModal).trigger('input');
+        });
+    });
+});
+</script>
 </x-admin-layout>

@@ -1555,13 +1555,43 @@ $(document).ready(function () {
     });
 </script> --}}
 <script>
-document.addEventListener('focusout', function(e) {
-    if (e.target.classList.contains('modal_sparepart')) {
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Inisialisasi select2 pada elemen awal ---
+    $('#selectjs6').select2();
+
+    // --- Ketika sparepart dipilih, ambil harga_modal ---
+    $(document).on('change', 'select[name="products_id[]"]', function () {
+        let hargaModal = $(this).find(':selected').data('harga_modal') || 0;
+        // cari input modal_sparepart dalam section yang sama
+        $(this).closest('.konfirmasi-stok, [x-data]').find('.modal_sparepart').val(hargaModal).trigger('input');
+    });
+
+    // --- Kalkulasi total otomatis ---
+    $(document).on('input', '.modal_sparepart', function () {
+        hitungTotalModal();
+    });
+
+    function hitungTotalModal() {
         let total = 0;
-        document.querySelectorAll('.modal_sparepart').forEach(input => {
-            total += parseFloat(input.value) || 0;
+        $('.modal_sparepart').each(function () {
+            total += parseFloat($(this).val()) || 0;
         });
-        document.getElementById('total_modal_sparepart').value = total;
+        $('#total_modal_sparepart').val(total);
     }
+
+    // --- Saat tombol tambah tindakan diklik ---
+    $('#tambah-servis').on('click', function () {
+        $('#servis-lain').append(`{!! str_replace(["\n", "\r", "'"], ["", "", "\\'"], $konfirSparepartEl ?? '') !!}`);
+        // Re-inisialisasi select2 untuk elemen baru
+        $('.selectAction2').select2({
+            placeholder: 'Pilih Sparepart'
+        });
+
+        // Pasang listener harga modal untuk elemen baru
+        $('.selectAction2').off('change').on('change', function () {
+            let hargaModal = $(this).find(':selected').data('harga_modal') || 0;
+            $(this).closest('.konfirmasi-stok').find('.modal_sparepart').val(hargaModal).trigger('input');
+        });
+    });
 });
 </script>
