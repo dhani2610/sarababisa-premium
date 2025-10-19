@@ -18,6 +18,7 @@ use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
 use App\Models\TipeOs;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class TransaksiServisLangsungController extends Controller
 {
@@ -30,6 +31,7 @@ class TransaksiServisLangsungController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99')).rand(10,90);
         $nama_pelanggan = Customer::find($request->customers_id);
 
@@ -206,7 +208,7 @@ class TransaksiServisLangsungController extends Controller
 
 
         // Transaction create
-        ServiceTransaction::create([
+        $transaksi = ServiceTransaction::create([
             'nomor_servis' => $nomor_servis,
             'customers_id' => $request->customers_id,
             'nama_pelanggan' => $nama_pelanggan->nama,
@@ -309,6 +311,65 @@ class TransaksiServisLangsungController extends Controller
             }
         }
 
+        try {
+            $tindakanText = count($tindakan_servis) > 0
+                ? "• " . implode("\n• ", $tindakan_servis)
+                : "-";
+
+            $teknisiName = $request->users_id
+                ? User::find($request->users_id)->name
+                : '-';
+
+            $tglAmbil = $request->tgl_ambil
+                ? Carbon::parse($request->tgl_ambil)->locale('id')->translatedFormat('d F Y')
+                : '-';
+
+            $pesan = "📦 *TRANSAKSI BARU*\n\n"
+                . "🧾 *TRANSAKSI LANGSUNG*\n"
+                . "🧾 *Nomor Servis:* {$transaksi->nomor_servis}\n"
+                . "🧾 *Tipe:* {$transaksi->tipe}\n"
+                . "👤 *Pelanggan:* {$nama_pelanggan->nama}\n"
+                . "📱 *Barang:* {$nama_barang}\n"
+                // . "⚙️ *Tindakan Servis:*\n{$tindakanText}\n\n"
+                . "💰 *Biaya:* Rp " . number_format($transaksi->biaya, 0, ',', '.') . "\n"
+                . "💸 *Diskon:* Rp " . number_format($transaksi->diskon ?? 0, 0, ',', '.') . "\n"
+                . "🧾 *Total Bayar:* Rp " . number_format($transaksi->pay, 0, ',', '.') . "\n"
+                . "💳 *Pembayaran:* {$transaksi->cara_pembayaran}\n\n"
+                . "👨‍🔧 *Teknisi:* {$teknisiName}\n"
+                . "📅 *Tanggal Ambil:* {$tglAmbil}\n"
+                . "🧍‍♂️ *Penyerah:* " . Auth::user()->name;
+
+            $this->sendMessage($pesan);
+
+        } catch (\Exception $e) {
+            \Log::error("Gagal kirim Telegram: " . $e->getMessage());
+        }
+
+
         return redirect()->route('transaksi-servis-sudah-diambil.index');
+    }
+
+    public function sendMessage($message)
+    {
+        $storeSetting = \App\Models\StoreSetting::find(1);
+        if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
+            $botToken = $storeSetting->token_bot;
+            $chatId   = $storeSetting->chat_id;
+    
+            if (!$botToken || !$chatId) {
+                \Log::warning('Telegram bot token atau chat_id belum diset di pengaturan toko.');
+                return;
+            }
+    
+            try {
+                Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                    'chat_id' => $chatId,
+                    'text' => $message,
+                    'parse_mode' => 'Markdown',
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Gagal kirim pesan Telegram: ' . $e->getMessage());
+            }
+        } 
     }
 }

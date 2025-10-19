@@ -12,13 +12,20 @@ class ServiceActionImport implements ToModel, WithHeadingRow, WithBatchInserts, 
 {
     public function model(array $row)
     {
-        return new ServiceAction([
-            'nama_tindakan'     => $row['Nama Tindakan'],
-            'modal_sparepart'    => $row['Modal Sparepart'],
-            'harga_toko'    => $row['Harga Pelanggan Toko'],
-            'harga_pelanggan'    => $row['Harga Pelanggan Biasa'],
-            'garansi'    => $row['Garansi'],
-        ]);
+        // Update jika nama_tindakan sudah ada, buat baru jika belum
+        ServiceAction::updateOrCreate(
+            [
+                'nama_tindakan' => $row['Nama Tindakan'], // kunci unik
+            ],
+            [
+                'modal_sparepart'   => $row['Modal Sparepart'],
+                'harga_toko'        => $row['Harga Pelanggan Toko'],
+                'harga_pelanggan'   => $row['Harga Pelanggan Biasa'],
+                'garansi'           => $row['Garansi'],
+            ]
+        );
+
+        return null;
     }
 
     public function batchSize(): int
@@ -28,6 +35,6 @@ class ServiceActionImport implements ToModel, WithHeadingRow, WithBatchInserts, 
 
     public function uniqueBy()
     {
-        return 'nama_tindakan';
+        return ['nama_tindakan'];
     }
 }

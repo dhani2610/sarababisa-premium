@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Expense;
 use App\Models\HistoryGaransi;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -41,6 +42,22 @@ class HistoryGaransiController extends Controller
             'users'
         ));
     }
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->ids;
+
+        if (!$ids || !is_array($ids)) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada data yang dipilih']);
+        }
+
+        try {
+            HistoryGaransi::whereIn('id', $ids)->delete();
+            return response()->json(['success' => true, 'message' => 'Data berhasil dihapus']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal menghapus data']);
+        }
+    }
+
 
     public function store(Request $request)
     {
@@ -63,7 +80,7 @@ class HistoryGaransiController extends Controller
         $data->teknisi_id  = $request->teknisi_id;
         $data->tindakan    = json_encode($request->tindakan);
         $data->sparepart   =  !empty($request->sparepart) ? json_encode($request->sparepart) : null;
-        $data->modal_sparepart = $request->modal_sparepart;
+        $data->modal_sparepart = $request->modal_sparepart ?? 0;
         $data->total_biaya_tindakan = $request->total_biaya_tindakan;
         $data->total_biaya = $request->total_biaya;
         $data->catatan     = $request->catatan;
@@ -104,54 +121,62 @@ class HistoryGaransiController extends Controller
                     continue; // skip kalau stok tidak cukup
                 }
 
-                // Harga jual
-                $harga_jual = $spareparts->harga_jual ?? 0;
+                // // Harga jual
+                // $harga_jual = $spareparts->harga_jual ?? 0;
 
-                // Buat Order
-                $order = new Order();
-                $order->customers_id   = $service->customers_id;
-                $order->users_id       = $request->teknisi_id ?? null;
-                $order->order_date     = Carbon::today()->locale('id')->translatedFormat('d F Y');
-                $order->total_products = 1;
-                $order->sub_total      = $harga_jual;
-                $order->invoice_no     = '' . mt_rand(date('Ymd00'), date('Ymd99'));
-                $order->nama_pelanggan = $customer->nama;
-                $order->payment_method = "Tunai";
-                $order->pay            = $harga_jual;
-                $order->due            = 0;
-                $order->is_approve     = 'Setuju';
-                $order->tgl_disetujui  = Carbon::today();
-                $order->save();
+                // // Buat Order
+                // $order = new Order();
+                // $order->customers_id   = $service->customers_id;
+                // $order->users_id       = $request->teknisi_id ?? null;
+                // $order->order_date     = Carbon::today()->locale('id')->translatedFormat('d F Y');
+                // $order->total_products = 1;
+                // $order->sub_total      = $harga_jual;
+                // $order->invoice_no     = '' . mt_rand(date('Ymd00'), date('Ymd99'));
+                // $order->nama_pelanggan = $customer->nama;
+                // $order->payment_method = "Tunai";
+                // $order->pay            = $harga_jual;
+                // $order->due            = 0;
+                // $order->is_approve     = 'Setuju';
+                // $order->tgl_disetujui  = Carbon::today();
+                // $order->save();
 
-                // Hitung persen sales (cek dulu user nya ada/tidak)
-                $persen_sales = null;
-                if (!empty($request->teknisi_id) && $request->teknisi_id != 1) {
-                    $user = User::find($request->teknisi_id);
-                    if ($user) {
-                        $persen_sales = $user->persen;
-                    }
-                }
+                // // Hitung persen sales (cek dulu user nya ada/tidak)
+                // $persen_sales = null;
+                // if (!empty($request->teknisi_id) && $request->teknisi_id != 1) {
+                //     $user = User::find($request->teknisi_id);
+                //     if ($user) {
+                //         $persen_sales = $user->persen;
+                //     }
+                // }
 
-                // Buat Order Detail
-                $orderDetail = new OrderDetail();
-                $orderDetail->orders_id   = $order->id;
-                $orderDetail->users_id    = $request->teknisi_id ?? null;
-                $orderDetail->products_id = $spareparts->id;
-                $orderDetail->product_name= $spareparts->product_name;
-                $orderDetail->quantity    = (int)$row['qty'];
-                $orderDetail->price       = $harga_jual;
-                $orderDetail->total       = $harga_jual;
-                $orderDetail->sub_total   = $harga_jual;
-                $orderDetail->modal       = $spareparts->harga_modal;
-                $orderDetail->profit      = $harga_jual - $spareparts->harga_modal;
-                $orderDetail->persen_sales= $persen_sales;
-                $orderDetail->profit_toko = $persen_sales
-                    ? ($harga_jual - $spareparts->harga_modal) - (($spareparts->harga_jual - $spareparts->harga_modal) / 100 * $persen_sales)
-                    : $harga_jual - $spareparts->harga_modal;
-                $orderDetail->garansi     = date('Y-m-d');
-                $orderDetail->product_discount_amount = 0;
-                $orderDetail->save();
+                // // Buat Order Detail
+                // $orderDetail = new OrderDetail();
+                // $orderDetail->orders_id   = $order->id;
+                // $orderDetail->users_id    = $request->teknisi_id ?? null;
+                // $orderDetail->products_id = $spareparts->id;
+                // $orderDetail->product_name= $spareparts->product_name;
+                // $orderDetail->quantity    = (int)$row['qty'];
+                // $orderDetail->price       = $harga_jual;
+                // $orderDetail->total       = $harga_jual;
+                // $orderDetail->sub_total   = $harga_jual;
+                // $orderDetail->modal       = $spareparts->harga_modal;
+                // $orderDetail->profit      = $harga_jual - $spareparts->harga_modal;
+                // $orderDetail->persen_sales= $persen_sales;
+                // $orderDetail->profit_toko = $persen_sales
+                //     ? ($harga_jual - $spareparts->harga_modal) - (($spareparts->harga_jual - $spareparts->harga_modal) / 100 * $persen_sales)
+                //     : $harga_jual - $spareparts->harga_modal;
+                // $orderDetail->garansi     = date('Y-m-d');
+                // $orderDetail->product_discount_amount = 0;
+                // $orderDetail->save();
             }
+        }
+
+        if ($request->total_biaya > 0) {
+            Expense::create([
+                'name' => $request->catatan,
+                'price' => $request->total_biaya,
+                'users_id' => auth()->user()->id
+            ]);
         }
 
 

@@ -11,6 +11,7 @@
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Print button -->
+            @if (Auth::user()->role != 'Investor')
             <div class="relative inline-flex" x-data="{ modalOpen: false }">
                 <button
                     class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600 mb-2 md:mb-0"
@@ -85,10 +86,13 @@
                     </div>
                 </div>
             </div>
+            @endif
+
 
             <!-- Search form -->
             <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/IMEI" />
 
+            @if (Auth::user()->role != 'Investor')
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true"
@@ -602,13 +606,6 @@
                                                             <option value="1825">5 Tahun</option>
                                                         </select>
                                                     </div>
-                                                    {{-- <div class="mt-3">
-                                                        <label class="block text-sm font-medium mb-1"
-                                                            for="modal_sparepart">Modal Sparepart <span
-                                                                class="text-rose-500">*</span></label>
-                                                        <input class="form-input w-full px-2 py-1 modal_sparepart"
-                                                            type="number" name="modal_sparepart[]" :required="showDetails" />
-                                                    </div> --}}
                                                     <div class="mt-3">
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="modal_sparepart">Modal Sparepart <span
@@ -656,7 +653,7 @@
                                                             <span class="text-rose-500">*</span></label>
                                                         <input class="form-input w-full px-2 py-1" type="number"
                                                             name="biaya" id="biaya" />
-                                                    </div>
+                                                    </div>  
                                                     <div>
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="diskon">Diskon</label>
@@ -800,6 +797,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
         </div>
 
@@ -832,6 +830,8 @@
                             Diambil <span class="ml-1 text-slate-400">{{ $jumlah_sudah_diambil }}</span></button>
                     </a>
                 </li>
+
+                @if (Auth::user()->role != 'Investor')
                 <li class="m-1">
                     <a href="{{ route('transaksi-servis-belum-disetujui.index') }}">
                         <button
@@ -839,6 +839,7 @@
                             Disetujui <span class="ml-1 text-slate-400">{{ $jumlah_belum_disetujui }}</span></button>
                     </a>
                 </li>
+                @endif
             </ul>
         </div>
         <!-- Right side -->
@@ -951,6 +952,7 @@
                     <thead
                         class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="flex items-center">
                                     <label class="inline-flex">
@@ -960,6 +962,7 @@
                                     </label>
                                 </div>
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">No.</div>
                             </th>
@@ -999,12 +1002,16 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Est. Pengerjaan</div>
                             </th>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Status</div>
                             </th>
+                            @endif
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Aksi</div>
                             </th>
+                            @endif
                         </tr>
                     </thead>
                     <!-- Table body -->
@@ -1033,6 +1040,7 @@
                                 endif;
                             @endphp
                             <tr>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
                                         <label class="inline-flex">
@@ -1042,19 +1050,24 @@
                                         </label>
                                     </div>
                                 </td>
+                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $i++ }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <a href="{{ route('transaksi-servis.edit', $process->id) }}">
-                                        <div class="flex items-center text-blue-600">
-                                            <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                                                <path
-                                                    d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
-                                            </svg>
-                                            <div class="font-medium">{{ $process->nomor_servis }}</div>
-                                        </div>
-                                    </a>
+                                    @if (Auth::user()->role != 'Investor')
+                                        <a href="{{ route('transaksi-servis.edit', $process->id) }}">
+                                            <div class="flex items-center text-blue-600">
+                                                <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                                                    <path
+                                                        d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
+                                                </svg>
+                                                <div class="font-medium">{{ $process->nomor_servis }}</div>
+                                            </div>
+                                        </a>
+                                    @else
+                                        <div class="font-medium">{{ $process->nomor_servis }}</div>
+                                    @endif
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div>{{ \Carbon\Carbon::parse($process->created_at)->format('d/m/Y') }}</div>
@@ -1177,6 +1190,7 @@
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $process->estimasi_pengerjaan }}</div>
                                 </td>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <a href="{{ route('ubah-status-proses-edit', $process->id) }}">
                                         <div
@@ -1184,6 +1198,8 @@
                                             {{ $process->status_servis }}</div>
                                     </a>
                                 </td>
+                                @endif
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="space-x-1 flex">
 
@@ -1494,6 +1510,7 @@
                                         <!-- End Remove -->
                                     </div>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
@@ -1502,6 +1519,48 @@
             </div>
         </div>
     </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Inisialisasi select2 pada elemen awal ---
+    $('#selectjs6').select2();
+
+    // --- Ketika sparepart dipilih, ambil harga_modal ---
+    $(document).on('change', 'select[name="products_id[]"]', function () {
+        let hargaModal = $(this).find(':selected').data('harga_modal') || 0;
+        // cari input modal_sparepart dalam section yang sama
+        $(this).closest('.konfirmasi-stok, [x-data]').find('.modal_sparepart').val(hargaModal).trigger('input');
+    });
+
+    // --- Kalkulasi total otomatis ---
+    $(document).on('input', '.modal_sparepart', function () {
+        hitungTotalModal();
+    });
+
+    function hitungTotalModal() {
+        let total = 0;
+        $('.modal_sparepart').each(function () {
+            total += parseFloat($(this).val()) || 0;
+        });
+        $('#total_modal_sparepart').val(total);
+    }
+
+    // --- Saat tombol tambah tindakan diklik ---
+    $('#tambah-servis').on('click', function () {
+        $('#servis-lain').append(`{!! str_replace(["\n", "\r", "'"], ["", "", "\\'"], $konfirSparepartEl ?? '') !!}`);
+        // Re-inisialisasi select2 untuk elemen baru
+        $('.selectAction2').select2({
+            placeholder: 'Pilih Sparepart'
+        });
+
+        // Pasang listener harga modal untuk elemen baru
+        $('.selectAction2').off('change').on('change', function () {
+            let hargaModal = $(this).find(':selected').data('harga_modal') || 0;
+            $(this).closest('.konfirmasi-stok').find('.modal_sparepart').val(hargaModal).trigger('input');
+        });
+    });
+});
+</script>
+
 <script>
     function getCanvas(processId) {
         let canvas = document.getElementById('sig-canvas-' + processId);
@@ -1759,53 +1818,6 @@ $(document).ready(function () {
     });
 
 </script>
-{{-- 
-<script>
-    function getTotal() {
-        let biaya = parseInt($('#biaya').val()) || 0;
-        let diskon = parseInt($('#diskon').val()) || 0;
-        let totalFinal = Math.max(biaya - diskon, 0);
-        console.log('totalFinal',totalFinal);
-        
-        return totalFinal;
-    }
-
-    $(document).ready(function() {
-        // Kalau user ubah tunai
-        $('#tunai').on('input', function() {
-            if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
-                let total = getTotal();
-                let tunai = parseInt($(this).val()) || 0;
-                let transfer = total - tunai;
-                $('#transfer').val(transfer >= 0 ? transfer : 0);
-            }
-        });
-
-        // Kalau user ubah transfer
-        $('#transfer').on('input', function() {
-            if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
-                let total = getTotal();
-                let transfer = parseInt($(this).val()) || 0;
-                let tunai = total - transfer;
-                $('#tunai').val(tunai >= 0 ? tunai : 0);
-            }
-        });
-
-        // Kalau biaya atau diskon berubah, reset ulang input tunai & transfer
-        $('#biaya, #diskon').on('input', function() {
-            $('#tunai').trigger('input');
-        });
-
-        // Saat cara pembayaran diganti
-        $('#cara_pembayaran').on('change', function() {
-            if ($(this).val() === 'Tunai & Transfer') {
-                $('#tunai').trigger('input');
-            } else {
-                $('#tunai, #transfer').val(0);
-            }
-        });
-    });
-</script> --}}
 
 
 @php

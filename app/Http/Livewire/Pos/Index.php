@@ -17,6 +17,7 @@ use App\Models\StoreSetting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use Illuminate\Support\Facades\Http;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class Index extends Component
@@ -297,6 +298,31 @@ class Index extends Component
                     'payment_method' => $this->users_id,
                     'users_id'        => Auth::user()->id,
                 ]);
+            }
+
+            // === 📢 Kirim Notifikasi Telegram ===
+            try {
+                $tglTransaksi = Carbon::parse($sale->created_at)->locale('id')->translatedFormat('d F Y');
+
+                $pesan = "🧾 *TRANSAKSI PENJUALAN BARU*\n\n"
+                    . "📄 *No. Invoice:* {$sale->invoice_no}\n"
+                    . "📅 *Tanggal:* {$tglTransaksi}\n"
+                    . "👤 *Customer:* {$nama_pelanggan->nama}\n\n"
+                    . "💰 *Modal:* Rp " . number_format($sale->sub_total - $sale->discount_amount, 0, ',', '.') . "\n"
+                    . "💸 *Jumlah Pembayaran:* Rp " . number_format((float) $sale->pay, 0, ',', '.') . "\n"
+                    . "🏦 *Metode Pembayaran:* {$sale->payment_method}\n\n";
+
+                // Kirim ke Telegram
+                $storeSetting = \App\Models\StoreSetting::find(1);
+                if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
+                    Http::post("https://api.telegram.org/bot{$storeSetting->token_bot}/sendMessage", [
+                        'chat_id' => $storeSetting->chat_id,
+                        'text' => $pesan,
+                        'parse_mode' => 'Markdown',
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Log::error("Gagal kirim Telegram: " . $e->getMessage());
             }
 
             $this->alert('success', 'Transaksi penjualan berhasil dibuat!');

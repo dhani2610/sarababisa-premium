@@ -402,7 +402,7 @@
                             class="form-select text-sm py-1 w-full" style="width: 100%;">
                             <option selected value="">Pilih Sparepart</option>
                             @foreach ($products as $item)
-                                <option value="{{ $item->id }}">{{ $item->product_name }}
+                                <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ $item->product_name }}
                                 </option>
                             @endforeach
                         </select>
@@ -528,4 +528,45 @@
             })
         </script>
     @endpush
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Inisialisasi select2 pada elemen awal ---
+    $('#selectjs6').select2();
+
+    // --- Ketika sparepart dipilih, ambil harga_modal ---
+    $(document).on('change', 'select[name="products_id[]"]', function () {
+        let hargaModal = $(this).find(':selected').data('harga_modal') || 0;
+        // cari input modal_sparepart dalam section yang sama
+        $(this).closest('.konfirmasi-stok, [x-data]').find('.modal_sparepart').val(hargaModal).trigger('input');
+    });
+
+    // --- Kalkulasi total otomatis ---
+    $(document).on('input', '.modal_sparepart', function () {
+        hitungTotalModal();
+    });
+
+    function hitungTotalModal() {
+        let total = 0;
+        $('.modal_sparepart').each(function () {
+            total += parseFloat($(this).val()) || 0;
+        });
+        $('#total_modal_sparepart').val(total);
+    }
+
+    // --- Saat tombol tambah tindakan diklik ---
+    $('#tambah-servis').on('click', function () {
+        $('#servis-lain').append(`{!! str_replace(["\n", "\r", "'"], ["", "", "\\'"], $konfirSparepartEl ?? '') !!}`);
+        // Re-inisialisasi select2 untuk elemen baru
+        $('.selectAction2').select2({
+            placeholder: 'Pilih Sparepart'
+        });
+
+        // Pasang listener harga modal untuk elemen baru
+        $('.selectAction2').off('change').on('change', function () {
+            let hargaModal = $(this).find(':selected').data('harga_modal') || 0;
+            $(this).closest('.konfirmasi-stok').find('.modal_sparepart').val(hargaModal).trigger('input');
+        });
+    });
+});
+</script>
 </x-toko-layout>
