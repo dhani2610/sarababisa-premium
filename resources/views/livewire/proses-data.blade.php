@@ -1818,53 +1818,6 @@ $(document).ready(function () {
     });
 
 </script>
-{{-- 
-<script>
-    function getTotal() {
-        let biaya = parseInt($('#biaya').val()) || 0;
-        let diskon = parseInt($('#diskon').val()) || 0;
-        let totalFinal = Math.max(biaya - diskon, 0);
-        console.log('totalFinal',totalFinal);
-        
-        return totalFinal;
-    }
-
-    $(document).ready(function() {
-        // Kalau user ubah tunai
-        $('#tunai').on('input', function() {
-            if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
-                let total = getTotal();
-                let tunai = parseInt($(this).val()) || 0;
-                let transfer = total - tunai;
-                $('#transfer').val(transfer >= 0 ? transfer : 0);
-            }
-        });
-
-        // Kalau user ubah transfer
-        $('#transfer').on('input', function() {
-            if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
-                let total = getTotal();
-                let transfer = parseInt($(this).val()) || 0;
-                let tunai = total - transfer;
-                $('#tunai').val(tunai >= 0 ? tunai : 0);
-            }
-        });
-
-        // Kalau biaya atau diskon berubah, reset ulang input tunai & transfer
-        $('#biaya, #diskon').on('input', function() {
-            $('#tunai').trigger('input');
-        });
-
-        // Saat cara pembayaran diganti
-        $('#cara_pembayaran').on('change', function() {
-            if ($(this).val() === 'Tunai & Transfer') {
-                $('#tunai').trigger('input');
-            } else {
-                $('#tunai, #transfer').val(0);
-            }
-        });
-    });
-</script> --}}
 
 
 @php
