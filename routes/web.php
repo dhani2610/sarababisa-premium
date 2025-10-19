@@ -279,7 +279,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('rincian-invest', [RincianInvestController::class, 'store'])->name('rincian-invest.store');
     Route::put('rincian-invest/{id}', [RincianInvestController::class, 'update'])->name('rincian-invest.update');
     Route::delete('rincian-invest/{id}', [RincianInvestController::class, 'destroy'])->name('rincian-invest.destroy');
-    Route::delete('/rincian-invest/bulk-delete', [RincianInvestController::class, 'bulkDelete'])->name('rincian-invest.bulkDelete');
+    Route::post('/rincian-invest/bulk-delete', [RincianInvestController::class, 'bulkDelete'])->name('rincian-invest.bulkDelete');
 
 
     Route::delete('/services/delete', [KepalaTokoTransaksiServisController::class, 'deleteSelected']);
