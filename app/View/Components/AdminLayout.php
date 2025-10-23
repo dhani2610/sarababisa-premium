@@ -14,6 +14,9 @@ class AdminLayout extends Component
      */
     public function render()
     {
+        if (Auth::check() == null) {
+            return redirect('/login');
+        }
         $role = Auth::user()->role ?? 'guest';
         if ($role == 'Teknisi') {
             return view('layouts.teknisi');

@@ -261,6 +261,11 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::get('/json-data-target-persen', [DataTargetPersenController::class, 'getDataTargetPersen'])->name('json_data_target-persen');
     Route::get('/json-data-pengeluaran', [DataPengeluaranController::class, 'getDataPengeluaran'])->name('pengeluaran');
     Route::get('/akun', [KepalaTokoAkunController::class, 'index'])->name('akun');
+    Route::get('/akun/setting', [KepalaTokoAkunController::class, 'setting'])->name('setting');
+    Route::post('/akun/setting/update-exp-date', [KepalaTokoAkunController::class, 'updateExpDate'])
+    ->name('akun.update-exp-date');
+
+
     Route::post('/akun', [KepalaTokoAkunController::class, 'store'])->name('akun-store');
     Route::get('/akun/{id}', [KepalaTokoAkunController::class, 'edit'])->name('akun-edit');
     Route::post('/akun{id}', [KepalaTokoAkunController::class, 'update'])->name('akun-update');
