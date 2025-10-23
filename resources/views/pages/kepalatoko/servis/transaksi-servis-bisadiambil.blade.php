@@ -373,7 +373,11 @@
                 <input type="hidden" name="prev_biaya" value="0">
             </div>`
             let konfirSparepartEl = `<div x-data="{ showDetails: false }" class="konfirmasi-stok border-b-2 pb-4">
-                    <label class="block text-sm font-medium mb-1" for="modal_sparepart">Apakah
+                <button type="button"
+                    class="hapus-servis bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded">
+                    Hapus Tindakan
+                </button>    
+                <label class="block text-sm font-medium mb-1" for="modal_sparepart">Apakah
                         menggunakan stok sparepart toko?</label>
                     <div class="flex flex-wrap items-center -m-3">
                         <div class="m-3">
@@ -566,6 +570,24 @@ document.addEventListener('DOMContentLoaded', function () {
             let hargaModal = $(this).find(':selected').data('harga_modal') || 0;
             $(this).closest('.konfirmasi-stok').find('.modal_sparepart').val(hargaModal).trigger('input');
         });
+    });
+    $(document).on('click', '.hapus-servis', function() {
+        if (confirm('Yakin ingin menghapus tindakan servis ini?')) {
+            const parent = $(this).closest('.konfirmasi-stok');
+            // Hilangkan nilai biaya dari total global
+            const biayaServis = parseInt(parent.find('.biaya_servis').val()) || 0;
+            const modalSparepart = parseInt(parent.find('.modal_sparepart').val()) || 0;
+
+            const curBiaya = parseInt($('#biaya').val()) || 0;
+            const curModal = parseInt($('#total_modal_sparepart').val()) || 0;
+
+            $('#biaya').val(curBiaya - biayaServis);
+            $('#total_modal_sparepart').val(curModal - modalSparepart);
+
+            // Hapus elemen
+            parent.prev('.tindakan-servis').remove(); // hapus pasangan pilih tindakan
+            parent.remove(); // hapus blok sparepart
+        }
     });
 });
 </script>
