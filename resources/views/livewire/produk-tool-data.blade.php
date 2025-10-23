@@ -18,9 +18,9 @@
             <x-search-form placeholder="Masukkan nama produk" />
 
             <!-- Modal Upload Foto -->
-                <div 
-                    x-data="{ open: @entangle('showFotoModal') }" 
-                    x-show="open" 
+                <div
+                    x-data="{ open: @entangle('showFotoModal') }"
+                    x-show="open"
                     x-cloak
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
 
@@ -29,15 +29,15 @@
 
                     <!-- Preview -->
                     @if ($fotoProduk)
-                        <img src="{{ $fotoProduk->temporaryUrl() }}" 
+                        <img src="{{ $fotoProduk->temporaryUrl() }}"
                             class="w-32 h-32 object-cover rounded-lg mx-auto mb-3 border">
                     @elseif ($produkId && \App\Models\Product::find($produkId)?->foto)
-                        <img src="{{ Storage::url(\App\Models\Product::find($produkId)->foto) }}" 
+                        <img src="{{ Storage::url(\App\Models\Product::find($produkId)->foto) }}"
                             class="w-32 h-32 object-cover rounded-lg mx-auto mb-3 border">
                     @endif
-                    <input 
-                            type="file" 
-                            wire:model="fotoProduk" 
+                    <input
+                            type="file"
+                            wire:model="fotoProduk"
                             accept=".png,.jpg,.jpeg,.webp"
                             x-on:change="
                                 if ($event.target.files[0].size > 1024 * 1024) {
@@ -50,7 +50,7 @@
                                 file:rounded-md file:border-0
                                 file:text-sm file:font-semibold
                                 file:bg-blue-50 file:text-blue-700
-                                hover:file:bg-blue-100" 
+                                hover:file:bg-blue-100"
                         />
 
                     @error('fotoProduk') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -195,7 +195,16 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium mb-1" for="harga_jual">Harga Jual <span class="text-rose-500">*</span></label>
+                                        <label class="block text-sm font-medium mb-1" for="harga_jual_toko">Harga Jual Toko<span class="text-rose-500">*</span></label>
+                                        <div class="relative">
+                                            <input id="harga_jual_toko" name="harga_jual_toko" class="form-input w-full pl-10 px-2 py-1" type="number" required/>
+                                            <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
+                                                <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1" for="harga_jual">Harga Jual Pelanggan<span class="text-rose-500">*</span></label>
                                         <div class="relative">
                                             <input id="harga_jual" name="harga_jual" class="form-input w-full pl-10 px-2 py-1" type="number" required/>
                                             <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
@@ -272,7 +281,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
     </div>
@@ -426,7 +435,7 @@
                                 </div>
                             </form>
                         </div>
-                    </div>                                            
+                    </div>
             </div>
             <!-- End Import Excel-->
         </div>
@@ -525,7 +534,10 @@
                                 <div class="font-semibold text-left">Modal</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-semibold text-left">Harga Jual</div>
+                                <div class="font-semibold text-left">Harga Jual Toko</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Harga Jual Pelanggan</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Keterangan</div>
@@ -547,7 +559,7 @@
                         @php
                             $i = 1
                         @endphp
-                        @foreach($products as $item)                  
+                        @foreach($products as $item)
                             <tr>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
@@ -580,6 +592,9 @@
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">Rp. {{ number_format($item->harga_modal) }}</div>
+                                </td>
+                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    <div class="font-medium">Rp. {{ number_format($item->harga_jual_toko) }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">Rp. {{ number_format($item->harga_jual) }}</div>
@@ -673,10 +688,10 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>                                            
+                                            </div>
                                         </div>
                                         <!-- End -->
-                                        
+
                                         <button x-data x-on:click="$dispatch('open-delete', { id: {{ $item->id }} })" class="text-rose-500 hover:text-rose-600 rounded-full">
                                             <span class="sr-only">Delete</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ff2825" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -771,7 +786,7 @@
                     });
                 },
             }))
-        })    
+        })
     </script>
 
     <!-- Pagination -->

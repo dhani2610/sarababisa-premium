@@ -207,6 +207,7 @@ class ProdukSparepartController extends Controller
             'stok' => $request->stok,
             'stok_minimal' => $request->stok_minimal,
             'harga_modal' => $request->harga_modal,
+            'harga_jual_toko' => $request->harga_jual_toko,
             'harga_jual' => $request->harga_jual,
             'keterangan' => $request->keterangan,
             'garansi' => $request->garansi,

@@ -156,6 +156,7 @@ class ProdukAksesorisController extends Controller
             'stok_minimal' => $request->stok_minimal,
             'harga_modal' => $request->harga_modal,
             'harga_jual' => $request->harga_jual,
+            'harga_jual_toko' => $request->harga_jual_toko,
             'keterangan' => $request->keterangan,
             'garansi' => $request->garansi,
             'ppn' => $request->ppn
