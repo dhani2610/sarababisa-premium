@@ -179,7 +179,7 @@ Route::get('/get-action/{service_actions_id}', [AutoBiayaServisController::class
 Route::get('/get-sparepart/{products_id}', [AutoModalSparepartController::class, 'getSparepart']);
 Route::get('/get-product/{products_id}', [AutoHargaJualController::class, 'getProduct']);
 
-// Default All Route 
+// Default All Route
 Route::controller(DefaultController::class)->group(function () {
     Route::get('/get-modelserie', 'GetModelSerie')->name('get-modelserie');
     Route::get('/get-product', 'GetProduct')->name('get-product');
@@ -297,7 +297,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
     Route::resource('master/master-tipe-os', TipeOsController::class);
     Route::resource('master/master-gallery', GalleryController::class);
-    
+
 
     Route::resource('master/master-merek', KepalaTokoMasterMerekController::class);
     Route::resource('master/master-kapasitas', KepalaTokoMasterKapasitasController::class);
