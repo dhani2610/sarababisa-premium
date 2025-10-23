@@ -32,7 +32,9 @@
                             <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
                                 <!-- Logo -->
                                 <a class="block" href="#">
-                                    <img src="{{ asset('images/logo-saraba-bisa.png') }}" alt="" class="h-8">
+                                    <img src="{{ $setting && $setting->profile_photo_path 
+                                        ? Storage::url($setting->profile_photo_path) 
+                                        : asset('images/logo-saraba-bisa.png') }}" alt="" class="h-8">
                                 </a>
                             </div>
                         </div>
@@ -47,7 +49,9 @@
 
                 <!-- Image -->
                 <div class="hidden md:block absolute top-0 bottom-0 right-0 md:w-1/2" aria-hidden="true">
-                    <img class="object-cover object-center w-full h-full" src="{{ asset('images/bg-auth.jpg') }}" width="760" height="1024" alt="Authentication image" />
+                    <img class="object-cover object-center w-full h-full" src="{{ $setting && $setting->foto_login 
+                        ? Storage::url($setting->foto_login) 
+                        : asset('images/bg-auth.jpg') }}" width="760" height="1024" alt="Authentication image" />
                 </div>
 
             </div>
