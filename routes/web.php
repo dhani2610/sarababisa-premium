@@ -242,14 +242,16 @@ Route::delete('master/master-gallery/delete-selected', [GalleryController::class
 
 Route::resource('gaji/karyawan', KepalaTokoKaryawanController::class);
 Route::get('slip-gaji/{id}', [KepalaTokoKaryawanController::class, 'cetak'])->name('cetak-slip-gaji');
-
+Route::get('/history-garansi/cetak', [HistoryGaransiController::class, 'cetak'])
+    ->name('history-garansi.cetak');
 Route::resource('history-garansi', HistoryGaransiController::class);
 Route::patch('/history-garansi/{id}/toggle-status', [HistoryGaransiController::class, 'toggleStatus'])
     ->name('history-garansi.toggleStatus');
 Route::post('/history-garansi/bulk-delete', [HistoryGaransiController::class, 'bulkDelete'])->name('history-garansi.bulkDelete');
 
+
 // routes/web.php
-Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'show'])->name('service.show');
+// Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'yyy'])->name('service.show');
 
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');

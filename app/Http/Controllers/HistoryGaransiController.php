@@ -23,6 +23,47 @@ class HistoryGaransiController extends Controller
             'users'
         ));
     }
+
+    public function cetak(Request $request)
+    {
+        // Ambil info toko
+        $users = User::find(1);
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+
+        // Filter tanggal
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+
+        // Ambil data history garansi berdasarkan periode
+        $data = HistoryGaransi::with(['service', 'teknisi', 'penerima'])
+            ->whereBetween('created_at', [$start_date, $end_date])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Hitung ringkasan
+        $totalData = $data->count();
+        $totalSelesai = $data->where('status', 'Selesai')->count();
+        $totalProses = $data->where('status', 'Proses')->count();
+        $totalBatal = $data->where('status', 'Batal')->count();
+
+        // Buat PDF
+        // return View('pages.kepalatoko.cetak-laporan-history-garansi', [
+        $pdf = Pdf::loadView('pages.kepalatoko.cetak-laporan-history-garansi', [
+            'users' => $users,
+            'imagePath' => $imagePath,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'data' => $data,
+            'totalData' => $totalData,
+            'totalSelesai' => $totalSelesai,
+            'totalProses' => $totalProses,
+            'totalBatal' => $totalBatal,
+        ]);
+
+        $filename = 'Laporan History Garansi ' . $start_date . ' sd ' . $end_date . '.pdf';
+        return $pdf->stream($filename);
+    }
     public function edit($id)
     {
         $serviceTransactions = ServiceTransaction::all();
