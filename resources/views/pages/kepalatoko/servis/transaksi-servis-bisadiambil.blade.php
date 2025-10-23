@@ -25,12 +25,12 @@
                         <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                     </svg>
                     <span class="hidden xs:block ml-2">Tambah Transaksi Baru</span>
-                </button>                        
-                
+                </button>
+
             </div>
 
         </div>
-     
+
         <div x-data="{ modalOpen: true }">
             <!-- Modal backdrop -->
             <div
@@ -214,7 +214,7 @@
                                                 <label class="block text-sm font-medium mb-1" for="products_id">Sparepart Toko yg Digunakan</label>
                                                 <select id="selectjs6" name="products_id[]" class="form-select text-sm py-1 w-full selectAction2" style="width: 100%;">
                                                     <option selected value="">Pilih Sparepart</option>
-                                                    @foreach ($products as $item)
+                                                    @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
                                                         <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ $item->product_name }}</option>
                                                     @endforeach
                                                 </select>
@@ -401,7 +401,7 @@
                         <select class="selectAction2" name="products_id[]"
                             class="form-select text-sm py-1 w-full" style="width: 100%;">
                             <option selected value="">Pilih Sparepart</option>
-                            @foreach ($products as $item)
+                            @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
                                 <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ $item->product_name }}
                                 </option>
                             @endforeach

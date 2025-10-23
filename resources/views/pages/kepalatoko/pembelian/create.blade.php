@@ -4,7 +4,7 @@
 
 <x-toko-layout background="bg-white">
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-     
+
         <!-- Page header -->
         <div class="sm:flex sm:justify-between sm:items-center">
 
@@ -82,16 +82,16 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                                            
+                    </div>
                 </div>
                 <!-- End -->
-                
+
             </div>
 
         </div>
 
         <div class="space-y-8 mt-8 mb-6">
-            <div class="grid gap-5 md:grid-cols-3">              
+            <div class="grid gap-5 md:grid-cols-3">
                 <div>
                     <!-- Start -->
                     <div>
@@ -138,7 +138,7 @@
         <div>
             <select id="products_id" name="products_id" class="form-select text-sm w-full selectjs1" required>
                 <option value="">Pilih Produk</option>
-                @foreach ($products as $item)
+                @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
                     <option value="{{ $item->id }}">{{ $item->product_name }}</option>
                 @endforeach
             </select>
@@ -237,19 +237,19 @@
                 </td>
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                    <input type="number" min="1" class="form-input quantity text-right" name="quantity[]" value=""> 
+                    <input type="number" min="1" class="form-input quantity text-right" name="quantity[]" value="">
                 </td>
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                    <input type="number" class="form-input product_price text-right" name="product_price[]" value=""> 
+                    <input type="number" class="form-input product_price text-right" name="product_price[]" value="">
                 </td>
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                    <input type="text" class="form-input" name="keterangan[]"> 
+                    <input type="text" class="form-input" name="keterangan[]">
                 </td>
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                    <input type="number" class="form-input total_price" name="total_price[]" value="0" readonly> 
+                    <input type="number" class="form-input total_price" name="total_price[]" value="0" readonly>
                 </td>
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -304,7 +304,7 @@
                             product_name:product_name
                         };
                         var html = template(data);
-                        $("#addRow").append(html); 
+                        $("#addRow").append(html);
                 });
 
                 $(document).on("click",".removeeventmore",function(event){
@@ -331,7 +331,7 @@
                     const n = sum;
                     const formatted = n.toLocaleString('id');
                     $('#estimated_amount').val(formatted);
-                }  
+                }
             })
         </script>
 

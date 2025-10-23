@@ -553,7 +553,7 @@
                                                                 modalSparepart = selected.dataset.hargaModal || 0;
                                                             ">
                                                             <option selected value="">Pilih Sparepart</option>
-                                                            @foreach ($products as $item)
+                                                            @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
                                                                 <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">
                                                                     {{ $item->product_name }}
                                                                 </option>
@@ -653,7 +653,7 @@
                                                             <span class="text-rose-500">*</span></label>
                                                         <input class="form-input w-full px-2 py-1" type="number"
                                                             name="biaya" id="biaya" />
-                                                    </div>  
+                                                    </div>
                                                     <div>
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="diskon">Diskon</label>
@@ -754,7 +754,7 @@
                                                         <textarea id="catatan" name="catatan" class="form-textarea w-full px-2 py-1" rows="2"></textarea>
                                                     </div> --}}
                                                 </div>
-                                                
+
                                             </div>
                                             <div id="total_modal_batal_wrapper" class="mt-4 space-y-3" style="display: none;">
                                                 <label class="block text-sm font-medium mb-1" for="total_modal_batal">
@@ -1216,9 +1216,9 @@
                                         </div>
 
                                         <!-- Modal PIN & Pola -->
-                                        <div x-data="{ open: false }" 
+                                        <div x-data="{ open: false }"
                                             x-show="open"
-                                            @open-pin-modal-{{ $process->id }}.window="open = true" 
+                                            @open-pin-modal-{{ $process->id }}.window="open = true"
                                             @close-pin-modal-{{ $process->id }}.window="open = false"
                                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                                             x-cloak
@@ -1234,7 +1234,7 @@
                                                     <!-- PIN -->
                                                     <div>
                                                         <label class="text-sm font-medium text-gray-600">PIN</label> <br>
-                                                        <input type="number" value="{{ $process->pin }}"  
+                                                        <input type="number" value="{{ $process->pin }}"
                                                             wire:model.defer="pin"  id="pinInput-{{ $process->id }}"
                                                             class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
                                                     </div>
@@ -1646,8 +1646,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Prevent scroll saat touch canvas
         ["touchstart","touchend","touchmove"].forEach(evt => {
-            canvas.addEventListener(evt, function(e) { 
-                if (e.target === canvas) e.preventDefault(); 
+            canvas.addEventListener(evt, function(e) {
+                if (e.target === canvas) e.preventDefault();
             }, { passive:false });
         });
 
