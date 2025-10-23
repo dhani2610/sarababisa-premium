@@ -13,6 +13,7 @@ use App\Models\ServiceAction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class HistoryGaransiController extends Controller
 {
