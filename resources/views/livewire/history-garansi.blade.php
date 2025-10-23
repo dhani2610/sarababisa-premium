@@ -14,7 +14,7 @@
             <x-search-form placeholder="Cari berdasarkan nama Nomor Service" />
 
             <!-- Print button -->
-            @if (Auth::user()->role == 'Kepala Toko')
+            @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
             <div class="relative inline-flex" x-data="{ modalOpen: false }">
                 <button
                     class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600 mb-2 md:mb-0"
