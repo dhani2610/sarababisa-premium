@@ -360,6 +360,7 @@ class TransaksiServisLangsungController extends Controller
                 . "👤 *Pelanggan:* {$nama_pelanggan->nama}\n"
                 . "📱 *Barang:* {$nama_barang}\n"
                 // . "⚙️ *Tindakan Servis:*\n{$tindakanText}\n\n"
+                . "💰 *Total Modal Sparepart:* Rp " . number_format($transaksi->modal_sparepart, 0, ',', '.') . "\n"
                 . "💰 *Biaya:* Rp " . number_format($transaksi->biaya, 0, ',', '.') . "\n"
                 . "💸 *Diskon:* Rp " . number_format($transaksi->diskon ?? 0, 0, ',', '.') . "\n"
                 . "🧾 *Total Bayar:* Rp " . number_format($transaksi->pay, 0, ',', '.') . "\n"
