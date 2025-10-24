@@ -52,7 +52,6 @@
       <title>Nota Penjualan Handphone #{{ $order->invoice_no }}</title>
   </head>
   <body>
-      {{-- @dd($orderItem) --}}
 
     <div class="resi">
       <div class="text-center">
@@ -89,9 +88,9 @@
 
       <hr style="border-top: 1px dotted;">
 
+      @foreach ($orderItem as $item)
       <table>
         <tbody>
-          @foreach ($orderItem as $item)
               <tr>
                 @if ($item->garansi_imei != null)
                 <td colspan="3">{{ $item->product_name }} {{ $item->product->nomor_seri }} {{ $item->product->keterangan }} (Garansi item s/d {{ $item->garansi }}) (Garansi IMEI s/d {{ $item->garansi_imei }})</td>
@@ -104,7 +103,8 @@
               <tr>
                 <td> {{ number_format($item->product->harga_jual) }}</td>
                 <td>X {{ $item->quantity }}</td>
-                <td>= {{ number_format($item->total - $item->ppn) }}</td>
+                {{-- <td>= {{ number_format($item->total - $item->ppn) }}</td> --}}
+                <td>= {{ number_format($item->sub_total - $item->ppn) }}</td>
               </tr>
           @endforeach
         </tbody>
