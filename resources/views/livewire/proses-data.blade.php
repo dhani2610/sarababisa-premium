@@ -1711,12 +1711,13 @@ function kirimFontee(token, phone, message) {
                 polaInput.value = data;
             }
 
-            console.log('payload:', payload);
 
             let payload = {
                 pin: pinInput.value,
                 pola: polaInput.value
             };
+            console.log(payload);
+            
 
             fetch(`/servis/transaksi-servis/${id}/update-pin-pola`, {
                 method: "POST",
