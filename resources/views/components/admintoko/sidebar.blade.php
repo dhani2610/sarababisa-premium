@@ -164,7 +164,7 @@
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-pos')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-pos') }}">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('pos')){{ '!text-indigo-500' }}@endif" href="{{ route('pos') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Point of Sales (POS)</span>
                                     </a>
                                 </li>

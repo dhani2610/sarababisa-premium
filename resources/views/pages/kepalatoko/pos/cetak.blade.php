@@ -56,7 +56,7 @@
                     <div class="p-6">
                         <div class="relative">
                             <!-- Close button -->
-                            <a href="{{ route('admin-pos') }}">
+                            <a href="{{ url('produk/pos') }}">
                                 <button class="absolute top-0 right-0 text-slate-400 hover:text-slate-500" @click="modalOpen = false">
                                     <div class="sr-only">Close</div>
                                     <svg class="w-4 h-4 fill-current">
@@ -184,7 +184,7 @@
                         </div>
                     </div>
                 </div>
-            </div>                                            
+            </div>
         </div>
         <!-- End -->
     </div>

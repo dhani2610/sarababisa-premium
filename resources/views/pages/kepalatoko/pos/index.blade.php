@@ -15,7 +15,7 @@
         </div>
 
         <div class="grid grid-cols-12 gap-6">
-            
+
             <div class="flex flex-col col-span-full sm:col-span-6 bg-white shadow-lg rounded-sm border border-slate-200">
                 @include('pages.kepalatoko.pos.components.cms-produk')
 

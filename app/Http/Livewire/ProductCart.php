@@ -265,12 +265,25 @@ class ProductCart extends Component
         $toko = StoreSetting::find(1);
         $cart_items = Cart::instance($this->cart_instance)->content();
 
+        // foreach ($cart_items as $index => $cart_item) {
+        //     $this->discount_type[$cart_item->id] = $cart_item->options->product_discount_type;
+        //     $this->item_discount[$cart_item->id] = ($cart_item->options->product_discount_type === 'fixed')
+        //         ? $cart_item->options->product_discount
+        //         : round(100 * $cart_item->options->product_discount / $cart_item->price);
+        // }
+
         foreach ($cart_items as $index => $cart_item) {
-            $this->discount_type[$cart_item->id] = $cart_item->options->product_discount_type;
-            $this->item_discount[$cart_item->id] = ($cart_item->options->product_discount_type === 'fixed')
-                ? $cart_item->options->product_discount
-                : round(100 * $cart_item->options->product_discount / $cart_item->price);
+            if (!isset($this->discount_type[$cart_item->id])) {
+                $this->discount_type[$cart_item->id] = $cart_item->options->product_discount_type;
+            }
+
+            if (!isset($this->item_discount[$cart_item->id])) {
+                $this->item_discount[$cart_item->id] = ($cart_item->options->product_discount_type === 'fixed')
+                    ? $cart_item->options->product_discount
+                    : round(100 * $cart_item->options->product_discount / $cart_item->price);
+            }
         }
+
 
         return view('livewire.product-cart', [
             'cart_items' => $cart_items,

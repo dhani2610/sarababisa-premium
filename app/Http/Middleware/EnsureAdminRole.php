@@ -17,7 +17,7 @@ class EnsureAdminRole
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() && in_array(Auth::user()->role, ['Admin Toko', 'Teknisi'])) {
+        if (Auth::check() && in_array(Auth::user()->role, ['Admin Toko', 'Teknisi','Kepala Toko'])) {
             return $next($request);
         }
 
