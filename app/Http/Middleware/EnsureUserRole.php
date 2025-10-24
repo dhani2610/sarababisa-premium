@@ -20,7 +20,7 @@ class EnsureUserRole
         if (Auth::check() == null) {
             return redirect('/login');
         }
-        if (Auth::user() && Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Investor' || Auth::user()->role == 'Admin Toko') {
+        if (Auth::user() && Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Investor' || Auth::user()->role == 'Admin Toko' || Auth::user()->role == 'Teknisi') {
             return $next($request);
         }
 

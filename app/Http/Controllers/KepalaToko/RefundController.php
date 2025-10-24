@@ -15,16 +15,27 @@ class RefundController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 25);
-        $refunds = Refund::with(['ServiceTransaction','teknisi'])->orderBy('created_at','desc')->paginate($perPage);
 
-        // untuk dropdown servis - hanya contoh, bisa ditambah filter
-        $servis = ServiceTransaction::with('user')->orderBy('id','desc')->get();
+        // Query dasar
+        $query = Refund::with(['ServiceTransaction', 'teknisi'])
+            ->orderBy('created_at', 'desc');
+
+        // Jika role user adalah Teknisi, filter berdasarkan teknisi_id
+        if (auth()->user()->role === 'Teknisi') {
+            $query->where('teknisi_id', auth()->id());
+        }
+
+        $refunds = $query->paginate($perPage);
+
+        // Untuk dropdown servis
+        $servis = ServiceTransaction::with('user')->orderBy('id', 'desc')->get();
 
         return view('pages.kepalatoko.master.refund', [
             'refunds' => $refunds,
             'servis' => $servis,
         ]);
     }
+
     public function show($id)
     {
         return response()->json(['message' => 'Not implemented'], 404);
