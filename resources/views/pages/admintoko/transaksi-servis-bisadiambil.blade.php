@@ -132,7 +132,7 @@
                                             </label>
                                             <!-- End -->
                                         </div>
-                                        <div class="m-3">
+                                        {{-- <div class="m-3">
                                             <!-- Start -->
                                             <label class="flex items-center">
                                                 <input type="radio" name="kondisi_servis" value="Tidak bisa"
@@ -140,7 +140,7 @@
                                                 <span class="text-sm ml-2">Tidak bisa</span>
                                             </label>
                                             <!-- End -->
-                                        </div>
+                                        </div> --}}
                                         <div class="m-3">
                                             <!-- Start -->
                                             <label class="flex items-center">
