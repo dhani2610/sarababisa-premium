@@ -65,7 +65,7 @@
                             </div>
                         </div>
                         <!-- Modal content -->
-                        <form action="{{ route('refund.cetak') }}" method="get" target="_blank">
+                        <form action="{{ route('refunds.cetak') }}" method="get" target="_blank">
 
                             @csrf
                             <div class="px-5 py-4">
