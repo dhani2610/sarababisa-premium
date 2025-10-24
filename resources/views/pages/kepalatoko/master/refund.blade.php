@@ -42,7 +42,7 @@
 
                                     <div>
                                         <label class="block text-sm font-medium mb-1">Nominal <span class="text-rose-500">*</span></label>
-                                        <input name="nominal" type="number" class="form-input w-full" required />
+                                        <input name="nominal" type="number" id="nominal_input" class="form-input w-full" required />
                                     </div>
 
                                     <div>
@@ -200,6 +200,7 @@ document.addEventListener('alpine:init', () => {
 document.addEventListener('DOMContentLoaded', function () {
     const servisSelect = document.getElementById('servis_select');
     const teknisiNameInput = document.getElementById('teknisi_name');
+    const NominalInput = document.getElementById('nominal_input');
 
     if (servisSelect) {
         servisSelect.addEventListener('change', function () {
@@ -211,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(res => res.json())
                 .then(data => {
                     teknisiNameInput.value = data.teknisi_name ?? '';
+                    NominalInput.value = data.nominal ?? 0;
                 })
                 .catch(err => {
                     console.error(err);

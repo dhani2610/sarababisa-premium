@@ -8,6 +8,7 @@ use App\Models\Refund;
 use App\Models\ServiceTransaction;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RefundController extends Controller
 {
@@ -117,10 +118,18 @@ class RefundController extends Controller
             return response()->json(['message' => 'Servis tidak ditemukan'], 404);
         }
 
+        if ($servis->tipe == 'Interface') {
+            $bonus = $servis->bonus_interface;
+        }else{
+            $bonus = $servis->profit/100;
+            $bonus *= $servis->persen_teknisi;
+        }
+
         return response()->json([
             'id' => $servis->id,
             'teknisi_id' => $servis->users_id ?? $servis->user_id ?? null,
             'teknisi_name' => optional($servis->user)->name ?? null,
+            'nominal' => $bonus,
         ]);
     }
 }
