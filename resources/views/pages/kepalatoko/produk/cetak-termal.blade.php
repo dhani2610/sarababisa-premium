@@ -38,8 +38,8 @@
       }
 
       td.title {
-        width: 80px;
-        max-width: 80px;
+        width: 90px;
+        max-width: 90px;
         word-break: break-all;
       }
 
@@ -52,6 +52,8 @@
       <title>Nota Penjualan Handphone #{{ $order->invoice_no }}</title>
   </head>
   <body>
+      {{-- @dd($orderItem) --}}
+
     <div class="resi">
       <div class="text-center">
         @if ($users->profile_photo_path != null)
@@ -100,7 +102,7 @@
                 @endif
               </tr>
               <tr>
-                <td> {{ number_format($item->price) }}</td>
+                <td> {{ number_format($item->product->harga_jual) }}</td>
                 <td>X {{ $item->quantity }}</td>
                 <td>= {{ number_format($item->total - $item->ppn) }}</td>
               </tr>
@@ -142,9 +144,33 @@
           <tr>
               <td class="title">M.Pembayaran</td>
               <td class="value">: {{ $order->payment_method  }}</td>
-            </tr>
+          </tr>
+          @if ($order->payment_method == 'Tunai')
           <tr>
-            <td class="title">Pembayaran</td>
+              <td class="title">Tunai</td>
+              <td class="value">: Rp. {{ number_format($order->tunai ?? $order->pay) }}</td>
+          </tr>
+
+          @elseif ($order->payment_method == 'Transfer')
+          <tr>
+              <td class="title">Transfer</td>
+              <td class="value">: Rp. {{ number_format($order->transfer ?? $order->pay) }}</td>
+          </tr>
+
+          @elseif ($order->payment_method == 'Tunai & Transfer')
+          <tr>
+              <td class="title">Tunai</td>
+              <td class="value">: Rp. {{ number_format($order->tunai ?? 0) }}</td>
+          </tr>
+          <tr>
+              <td class="title">Transfer</td>
+              <td class="value">: Rp. {{ number_format($order->transfer ?? 0) }}</td>
+          </tr>
+          @endif
+
+          
+          <tr>
+            <td class="title">Total Pembayaran</td>
             <td class="value">: Rp. {{ number_format($order->pay) }}</td>
           </tr>
           @if ($order->due > 0)

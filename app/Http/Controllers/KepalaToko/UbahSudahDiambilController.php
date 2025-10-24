@@ -112,6 +112,7 @@ class UbahSudahDiambilController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         $item = ServiceTransaction::findOrFail($id);
         $profittransaksi = $request->biaya - $request->modal_sparepart - $request->diskon;
         $bagihasil = ($request->biaya - $request->modal_sparepart - $request->diskon) / 100;
