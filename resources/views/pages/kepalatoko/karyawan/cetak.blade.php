@@ -41,13 +41,13 @@
 		}
 		return $temp;
 	}
- 
+
 	function terbilang($nilai) {
 		if($nilai<0) {
 			$hasil = "minus ". trim(penyebut($nilai));
 		} else {
 			$hasil = trim(penyebut($nilai));
-		}     		
+		}
 		return $hasil;
 	}
 	@endphp
@@ -167,7 +167,7 @@
 		<thead>
 			<tr>
 			<th scope="col">Total Pengurangan</th>
-			<th scope="col" class="text-right text-danger">Rp. {{ number_format($totalkasbon + $totalinsiden) }}</th>
+			<th scope="col" class="text-right text-danger">Rp. {{ number_format($totalkasbon + $totalinsiden + $totalPotonganServis) }}</th>
 			</tr>
 		</thead>
 	</table>

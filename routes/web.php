@@ -16,6 +16,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AutoBiayaServisController;
 use App\Http\Controllers\AutoModalSparepartController;
 use App\Http\Controllers\AutoHargaJualController;
+use App\Http\Controllers\KepalaToko\RefundController;
 use App\Http\Controllers\KepalaToko\DataServisController;
 use App\Http\Controllers\KepalaToko\DataTargetController;
 use App\Http\Controllers\KepalaToko\RecycleBinController;
@@ -304,6 +305,11 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
     Route::resource('master/master-tipe-os', TipeOsController::class);
     Route::resource('master/master-gallery', GalleryController::class);
+
+
+    Route::resource('refund', RefundController::class)->names('refund');
+    Route::delete('refund/delete-selected', [RefundController::class, 'deleteSelected'])->name('refund.deleteSelected');
+    Route::get('refund/service/{id}', [RefundController::class, 'serviceDetail'])->name('refund.serviceDetail');
 
 
     Route::resource('master/master-merek', KepalaTokoMasterMerekController::class);
