@@ -38,8 +38,8 @@
       }
 
       td.title {
-        width: 60px;
-        max-width: 60px;
+        width: 80px;
+        max-width: 80px;
         word-break: break-all;
       }
 
@@ -139,6 +139,10 @@
                 <td class="value">: Rp. {{ number_format($total) }}</td>
               </tr>
           @endif
+          <tr>
+              <td class="title">M.Pembayaran</td>
+              <td class="value">: {{ $order->payment_method  }}</td>
+            </tr>
           <tr>
             <td class="title">Pembayaran</td>
             <td class="value">: Rp. {{ number_format($order->pay) }}</td>
