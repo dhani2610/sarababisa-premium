@@ -310,7 +310,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('refund', RefundController::class)->names('refund');
     Route::post('refund/delete-selected', [RefundController::class, 'deleteSelected'])->name('refund.deleteSelected');
     Route::get('refund/service/{id}', [RefundController::class, 'serviceDetail'])->name('refund.serviceDetail');
-
+    Route::get('/refund-cetak', [RefundController::class, 'cetak'])->name('refunds.cetak');
 
     Route::resource('master/master-merek', KepalaTokoMasterMerekController::class);
     Route::resource('master/master-kapasitas', KepalaTokoMasterKapasitasController::class);

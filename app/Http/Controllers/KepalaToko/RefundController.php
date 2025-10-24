@@ -9,6 +9,8 @@ use App\Models\ServiceTransaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class RefundController extends Controller
 {
@@ -35,6 +37,50 @@ class RefundController extends Controller
             'servis' => $servis,
         ]);
     }
+
+    public function cetak(Request $request)
+    {
+        // Ambil info toko
+        $users = User::find(1);
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+
+        // Filter tanggal
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+
+        // Query data refund berdasarkan periode
+        $query = Refund::with(['ServiceTransaction.user', 'teknisi'])
+            ->whereBetween('created_at', [$start_date, Carbon::parse($end_date)->endOfDay()])
+            ->orderBy('created_at', 'desc');
+
+        // Kalau role user teknisi, hanya ambil refund dia
+        if (auth()->user()->role === 'Teknisi') {
+            $query->where('teknisi_id', auth()->id());
+        }
+
+        $refunds = $query->get();
+
+        // Hitung total
+        $totalRefund = $refunds->sum('nominal');
+        $totalData = $refunds->count();
+
+        // Generate PDF
+        $pdf = Pdf::loadView('pages.kepalatoko.cetak-laporan-refund', [
+        // return View('pages.kepalatoko.cetak-laporan-refund', [
+            'users' => $users,
+            'imagePath' => $imagePath,
+            'refunds' => $refunds,
+            'totalRefund' => $totalRefund,
+            'totalData' => $totalData,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+        ]);
+
+        $filename = 'Laporan Refund ' . $start_date . ' sd ' . $end_date . '.pdf';
+        return $pdf->stream($filename);
+    }
+
 
     public function show($id)
     {
@@ -81,7 +127,7 @@ class RefundController extends Controller
     public function edit($id)
     {
         $item = Refund::findOrFail($id);
-        $servis = ServiceTransaction::with('user')->orderBy('id','desc')->get();
+        $servis = ServiceTransaction::with('user')->orderBy('id', 'desc')->get();
 
         return view('pages.kepalatoko.master.refund-edit', [
             'item' => $item,
@@ -131,8 +177,8 @@ class RefundController extends Controller
 
         if ($servis->tipe == 'Interface') {
             $bonus = $servis->bonus_interface;
-        }else{
-            $bonus = $servis->profit/100;
+        } else {
+            $bonus = $servis->profit / 100;
             $bonus *= $servis->persen_teknisi;
         }
 
