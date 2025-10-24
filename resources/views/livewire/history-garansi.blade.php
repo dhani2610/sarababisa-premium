@@ -96,7 +96,7 @@
                 </div>
             </div>
             @endif
-                
+
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
@@ -132,7 +132,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Nomor Service <span
                                             class="text-rose-500">*</span></label>
-                                    <select name="service_id" id="service_id" class="form-select select2 w-full"
+                                    <select name="service_id" id="service_id" class="form-select  w-full"
                                         required>
                                         <option value="">-- Pilih Nomor Service --</option>
                                         @foreach ($serviceTransactions as $st)
@@ -152,7 +152,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Penerima <span
                                             class="text-rose-500">*</span></label>
-                                    <select name="penerima_id" class="form-select w-full select2" required>
+                                    <select name="penerima_id" class="form-select w-full " required>
                                         <option value="">-- Pilih Penerima --</option>
                                         @foreach ($users as $u)
                                             <option value="{{ $u->id }}">{{ $u->name }}</option>
@@ -164,7 +164,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Teknisi<span
                                             class="text-rose-500">*</span></label>
-                                    <select name="teknisi_id" class="form-select w-full select2" required>
+                                    <select name="teknisi_id" class="form-select w-full " required>
                                         <option value="">-- Pilih Teknisi --</option>
                                         @foreach ($users as $u)
                                             <option value="{{ $u->id }}">{{ $u->name }}</option>
@@ -392,8 +392,8 @@
                                 <td class="px-2 py-3">{{ $item->catatan }}</td>
                                 <td class="px-2 py-3">
                                     <button
-                                        class="toggle-status px-2 py-1 rounded 
-            {{ $item->status == 1 ? 'bg-yellow-100 text-yellow-700' : ($item->status == 2 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') }}"
+                                        class="toggle-status px-2 py-1 rounded
+                                        {{ $item->status == 1 ? 'bg-yellow-100 text-yellow-700' : ($item->status == 2 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') }}"
                                         data-id="{{ $item->id }}">
                                         @if ($item->status == 1)
                                             Diproses
@@ -640,19 +640,19 @@ document.addEventListener('alpine:init', () => {
                 );
 
                 div.innerHTML = `
-                        <select name="sparepart[${rowId}][id]" 
+                        <select name="sparepart[${rowId}][id]"
                                 class="form-select sparepartSelect select2 w-full" required>
                             <option value="">-- Pilih Sparepart --</option>
                             ${products.map(p => `<option value="${p.id}" data-harga="${p.harga_modal}">${p.product_name}</option>`).join("")}
                         </select>
 
-                        <input type="number" name="sparepart[${rowId}][harga]" 
+                        <input type="number" name="sparepart[${rowId}][harga]"
                             class="form-input harga w-full" placeholder="Harga" required>
 
-                        <input type="number" name="sparepart[${rowId}][qty]" 
+                        <input type="number" name="sparepart[${rowId}][qty]"
                             class="form-input qty w-full" placeholder="Qty" value="1" min="1" required>
 
-                        <button type="button" 
+                        <button type="button"
                                 class="btn-sm bg-rose-500 text-white w-full md:w-auto removeRow">
                             ✕
                         </button>
@@ -748,7 +748,7 @@ document.addEventListener('alpine:init', () => {
                 let div = document.createElement("div");
                 div.classList.add("grid", "grid-cols-1", "md:grid-cols-3", "gap-2", "items-center", "mb-2");
                 div.innerHTML = `
-                <select name="tindakan[${tindakanRowId}][id]" 
+                <select name="tindakan[${tindakanRowId}][id]"
                         class="form-select tindakanSelect w-full" required>
                     <option value="">-- Pilih Tindakan --</option>
                     ${tindakanList.map(t => `<option value="${t.id}" data-harga="${t.harga_pelanggan}">${t.nama_tindakan}</option>`).join("")}
@@ -760,7 +760,7 @@ document.addEventListener('alpine:init', () => {
                     <label for="manual-${tindakanRowId}" class="text-sm text-slate-600">Input manual</label>
                 </div>
 
-                <input type="number" name="tindakan[${tindakanRowId}][harga]" 
+                <input type="number" name="tindakan[${tindakanRowId}][harga]"
                        class="form-input tindakanHarga w-full" placeholder="Harga" value="0" required>
                 <button type="button" class="btn-sm bg-rose-500 text-white removeTindakan w-full md:w-auto">✕</button>
             `;

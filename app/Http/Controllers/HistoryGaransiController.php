@@ -38,8 +38,8 @@ class HistoryGaransiController extends Controller
 
         // Ambil data history garansi berdasarkan periode
         $data = HistoryGaransi::with(['service', 'teknisi', 'penerima'])
-            ->whereBetween('created_at', [$start_date, $end_date])
-            ->orderBy('created_at', 'desc')
+            ->whereBetween('date', [$start_date, $end_date])
+            ->orderBy('date', 'desc')
             ->get();
 
         // Hitung ringkasan

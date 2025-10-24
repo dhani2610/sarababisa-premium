@@ -108,22 +108,24 @@
 </head>
 
 <body>
-	<div class="text-center">
-		@if ($users->profile_photo_path != null)
-			<img src="data:image/png;base64,{{ base64_encode(file_get_contents($imagePath)) }}" alt="" height="70">
-		@endif
-		<h4 style="margin-top: 5px; margin-bottom: 0">{{ $users->nama_toko }}</h4>
-		<p style="margin-top: 3px; margin-bottom: 5px;">{{ $users->alamat_toko }}</p>
-	</div>
+    <div class="text-center">
+        @if ($users->profile_photo_path != null)
+            <img src="data:image/png;base64,{{ base64_encode(file_get_contents($imagePath)) }}" alt=""
+                height="70">
+        @endif
+        <h4 style="margin-top: 5px; margin-bottom: 0">{{ $users->nama_toko }}</h4>
+        <p style="margin-top: 3px; margin-bottom: 5px;">{{ $users->alamat_toko }}</p>
+    </div>
 
-	<hr style="border-top: 1px dashed; margin-bottom: 0;">
+    <hr style="border-top: 1px dashed; margin-bottom: 0;">
 
-	<div class="text-center">
-		<h4 style="margin-bottom: 6px; margin-top: 5px;">
-			LAPORAN HISTORY GARANSI
-		</h4>
-		<p style="margin-top: 0">Periode : {{ \Carbon\Carbon::parse($start_date)->format('d-m-Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->format('d-m-Y') }}</p>
-	</div>
+    <div class="text-center">
+        <h4 style="margin-bottom: 6px; margin-top: 5px;">
+            LAPORAN HISTORY GARANSI
+        </h4>
+        <p style="margin-top: 0">Periode : {{ \Carbon\Carbon::parse($start_date)->format('d-m-Y') }} s/d
+            {{ \Carbon\Carbon::parse($end_date)->format('d-m-Y') }}</p>
+    </div>
 
     <br>
 
@@ -131,7 +133,7 @@
         Ringkasan
     </h4>
 
-   
+
     <table id="ringkasan">
         <tbody>
             <tr>
@@ -153,31 +155,88 @@
         Detail History
     </h4>
     <br>
-    <table id="detail">
-        <thead>
+    <table class="table-auto w-full" id="detail">
+
+        <thead id="detail"
+            class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
             <tr>
-                <th>No</th>
-                <th>No. Servis</th>
-                <th>Nama Pelanggan</th>
-                <th>Nama Teknisi</th>
-                <th>Penerima</th>
-                <th>Tanggal</th>
-                <th>Status</th>
-                <th>Keterangan</th>
+                <th style="width:30%">No.</th>
+                <th class="">Tanggal</th>
+                <th class="">Nomor Servis</th>
+                <th class="">Customer</th>
+                <th class="">Penerima</th>
+                <th class="">Teknisi</th>
+                <th class="">Tindakan</th>
+                <th class="">Sparepart</th>
+                <th class="">Total Modal</th>
+                <th class="">Catatan</th>
+                <th class="">Status</th>
             </tr>
         </thead>
-        <tbody>
-            @php $no = 1; @endphp
+        <tbody class="text-sm divide-y divide-slate-200">
+            @php $i = 1; @endphp
             @foreach ($data as $item)
                 <tr>
-                    <td>{{ $no++ }}</td>
-                    <td>{{ $item->service->nomor_servis ?? '-' }}</td>
-                    <td class="text-left">{{ $item->service->nama_pelanggan ?? '-' }}</td>
-                    <td>{{ $item->teknisi->name ?? '-' }}</td>
-                    <td>{{ $item->penerima->name ?? '-' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</td>
-                    <td>{{ $item->status }}</td>
-                    <td class="text-left">{{ $item->keterangan ?? '-' }}</td>
+                    <td style="width:30%">{{ $i++ }}</td>
+                    <td class="">{{ $item->date }}</td>
+                    <td class="">{{ $item->service->nomor_servis ?? $item->service_id }}</td>
+                    <td class="">{{ $item->service->customer->nama ?? '-' }}</td>
+                    <td class="">{{ $item->penerima->name ?? '-' }}</td>
+                    <td class="">{{ $item->teknisi->name ?? '-' }}</td>
+
+                    {{-- Tindakan --}}
+                    <td style="text-align:left">
+                        @php
+                            $tindakans = json_decode($item->tindakan, true) ?? [];
+                        @endphp
+
+                        {{-- <ul class="list-disc ml-4"> --}}
+                            @foreach ($tindakans as $t)
+                                @php
+                                    $action = \App\Models\ServiceAction::find($t['id']);
+                                @endphp
+                                {{-- <li> --}}
+                                    - {{ $action ? $action->nama_tindakan : $t['id_manual'] }}
+                                    - Rp{{ number_format($t['harga'], 0, ',', '.') }}
+                                {{-- </li> --}}
+                                <br>
+                                <br>
+                            @endforeach
+                        {{-- </ul> --}}
+                    </td>
+
+                    {{-- Sparepart --}}
+                    <td style="text-align:left">
+                        @php $spareparts = json_decode($item->sparepart, true); @endphp
+                        @if ($spareparts)
+                            {{-- <ul class=""> --}}
+                                @foreach ($spareparts as $sp)
+                                    @php $prd = \App\Models\Product::find($sp['id']); @endphp
+                                    {{-- <li> --}}
+                                        - {{ $prd->product_name ?? 'Produk ID ' . $sp['id'] }}
+                                        (x{{ $sp['qty'] }})
+                                        - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
+                                    {{-- </li> --}}
+                                    <br>
+                                    <br> 
+                                @endforeach
+                            {{-- </ul> --}}
+                        @else
+                            -
+                        @endif
+                    </td>
+
+                    <td class="">Rp{{ number_format($item->total_biaya, 0, ',', '.') }}</td>
+                    <td class="">{{ $item->catatan }}</td>
+                    <td class="">
+                            @if ($item->status == 1)
+                                Diproses
+                            @elseif ($item->status == 2)
+                                Selesai
+                            @elseif ($item->status == 3)
+                                Dibatalkan
+                            @endif
+                    </td>
                 </tr>
             @endforeach
         </tbody>
