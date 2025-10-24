@@ -44,9 +44,9 @@ class HistoryGaransiController extends Controller
 
         // Hitung ringkasan
         $totalData = $data->count();
-        $totalSelesai = $data->where('status', 'Selesai')->count();
-        $totalProses = $data->where('status', 'Proses')->count();
-        $totalBatal = $data->where('status', 'Batal')->count();
+        $totalSelesai = $data->where('status', 2)->count();
+        $totalProses = $data->where('status', 1)->count();
+        $totalBatal = $data->where('status', 3)->count();
 
         // Buat PDF
         // return View('pages.kepalatoko.cetak-laporan-history-garansi', [
