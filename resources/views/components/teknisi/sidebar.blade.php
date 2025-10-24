@@ -196,7 +196,7 @@
                                     <path class="fill-current @if(in_array(Request::segment(1), ['refund.index'])){{ 'text-indigo-600' }}@else{{ 'text-slate-700' }}@endif" d="M13 15L0 7v9c0 .355.189.685.496.864L13 24v-9z" />
                                     <path class="fill-current @if(in_array(Request::segment(1), ['refund.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M13 15.047V24l10.573-7.181A.999.999 0 0024 16V8l-11 7.047z" />
                                 </svg>
-                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Refund Servis</span>
+                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Refund Invoice</span>
                             </div>
                         </a>
                     </li>
