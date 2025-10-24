@@ -119,6 +119,14 @@
               </tr>
           @else
               <tr>
+              <td class="title">Diskon</td>
+              @if ($item->product_discount_amount <= 0)
+                  <td align="value">0</td>
+              @else
+                  <td align="value">: Rp. {{ number_format($item->product_discount_amount) }}</td>
+              @endif
+              </tr>
+              <tr>
               <td class="title">Sub Total</td>
               <td class="value">: Rp. {{ number_format($totalWithoutTax) }}</td>
               </tr>
