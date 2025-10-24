@@ -124,10 +124,11 @@ class KaryawanController extends Controller
         ->whereMonth('created_at', $date->month)
         ->get();
 
-        $totalPotonganServis = $potonganServis->sum('nominal');
+        $totalPotonganServis = $potonganServis;
         $namaKaryawan = $items->name;
 
         $pdf = PDF::loadView('pages.kepalatoko.karyawan.cetak', [
+        // return View('pages.kepalatoko.karyawan.cetak', [
             'tanggal' => $tanggal,
             'periode' => $periode,
             'users' => $users,

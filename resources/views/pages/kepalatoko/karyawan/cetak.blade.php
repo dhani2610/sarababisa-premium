@@ -162,12 +162,23 @@
 			@endforeach
 		</tbody>
 	</table>
+	
+	@foreach ($totalPotonganServis as $pt)
+		<table class="table table-sm table-borderless">
+			<thead>
+				<tr>
+				<th scope="col">Refund Invoice {{  $pt->ServiceTransaction->nomor_servis  }}</th>
+				<th scope="col" class="text-right text-danger">Rp. {{ number_format($pt->nominal) }}</th>
+				</tr>
+			</thead>
+		</table>
+	@endforeach
 
 	<table class="table table-sm table-borderless">
 		<thead>
 			<tr>
 			<th scope="col">Total Pengurangan</th>
-			<th scope="col" class="text-right text-danger">Rp. {{ number_format($totalkasbon + $totalinsiden + $totalPotonganServis) }}</th>
+			<th scope="col" class="text-right text-danger">Rp. {{ number_format($totalkasbon + $totalinsiden +  $totalPotonganServis->sum('nominal')) }}</th>
 			</tr>
 		</thead>
 	</table>
@@ -176,7 +187,7 @@
 		<thead>
 			<tr>
 			<th scope="col">TOTAL DITERIMA KARYAWAN</th>
-			<th scope="col" class="text-right text-success">Rp. {{ number_format($items->gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis) }}</th>
+			<th scope="col" class="text-right text-success">Rp. {{ number_format($items->gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal')) }}</th>
 			</tr>
 		</thead>
 	</table>
