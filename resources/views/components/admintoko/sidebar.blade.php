@@ -94,7 +94,7 @@
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-transaksi-servis.index', 'admin-servis-bisa-diambil.index', 'admin-servis-bisa-diambil.edit', 'admin-servis-sudah-diambil.index', 'admin-servis-sudah-diambil.edit', 'admin-transaksi-servis.edit', 'admin-transaksi-servis.show')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-transaksi-servis.index') }}">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('transaksi-servis.index', 'transaksi-servis-bisa-diambil.index', 'transaksi-servis-sudah-diambil.index', 'transaksi-servis.edit', 'transaksi-servis.show', 'transaksi-servis-belum-disetujui.index', 'transaksi-servis-belum-disetujui.edit', 'servis-belum-disetujui-approve.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('transaksi-servis.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Transaksi</span>
                                     </a>
                                 </li>

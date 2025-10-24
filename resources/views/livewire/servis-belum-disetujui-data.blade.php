@@ -12,14 +12,14 @@
 
             <!-- Search form -->
             <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan" />
-            
+
         </div>
 
     </div>
 
     <!-- More actions -->
     <div class="sm:flex sm:justify-between sm:items-center mb-5">
-    
+
         <!-- Left side -->
         <div class="mb-4 sm:mb-0">
             <ul class="flex flex-wrap -m-1">
@@ -63,7 +63,7 @@
                     </svg>
                 </button>
                 <div
-                    class="origin-top-left z-10 absolute top-full min-w-56 bg-white border border-slate-200 pt-1.5 rounded shadow-lg overflow-hidden mt-1 left-4"                
+                    class="origin-top-left z-10 absolute top-full min-w-56 bg-white border border-slate-200 pt-1.5 rounded shadow-lg overflow-hidden mt-1 left-4"
                     @click.outside="open = false"
                     @keydown.escape.window="open = false"
                     x-show="open"
@@ -73,7 +73,7 @@
                     x-transition:leave="transition ease-out duration-200"
                     x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0"
-                    x-cloak                
+                    x-cloak
                 >
                     <div class="text-xs font-semibold text-slate-400 uppercase pt-1.5 pb-2 px-4">Filter</div>
                     <ul class="mb-4">
@@ -174,11 +174,11 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Pelanggan</div>
                             </th>
-                            @if (Auth::user()->role != 'Investor')
+                            {{-- @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Hubungi</div>
                             </th>
-                            @endif
+                            @endif --}}
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Nama Barang</div>
                             </th>
@@ -240,7 +240,7 @@
                         @php
                             $i = 1
                         @endphp
-                        @foreach($service_transactions as $transaction)                 
+                        @foreach($service_transactions as $transaction)
                             @php
                                 if ($transaction->profit < '0') :
                                     $color = 'text-red-600';
@@ -288,7 +288,7 @@
                                         </div>
                                     </a>
                                     @else
-                                    <div class="font-medium">{{ $transaction->nomor_servis }}</div> 
+                                    <div class="font-medium">{{ $transaction->nomor_servis }}</div>
                                     @endif
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -312,7 +312,7 @@
                                         <div></div>
                                     @endif
                                 </td>
-                                @if (Auth::user()->role != 'Investor')
+                                {{-- @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="flex space-x-1">
                                         @php
@@ -353,7 +353,7 @@
                                                 </div>
                                             </div>
                                             <!-- End -->
-                                            
+
                                             <!-- Start -->
                                             <div
                                                 class="relative"
@@ -433,7 +433,7 @@
                                                 </div>
                                             </div>
                                             <!-- End -->
-                                            
+
                                             <!-- Start -->
                                             <div
                                                 class="relative"
@@ -471,7 +471,7 @@
                                         @endif
                                     </div>
                                 </td>
-                                @endif
+                                @endif --}}
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $transaction->type->name }} {{ $transaction->brand->name }} {{ $transaction->modelserie->name }}</div>
                                 </td>
@@ -588,10 +588,10 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>                                            
+                                            </div>
                                         </div>
                                         <!-- End -->
-                                        
+
                                         <button x-data x-on:click="$dispatch('open-delete', { id: {{ $transaction->id }} })" class="text-rose-500 hover:text-rose-600 rounded-full">
                                             <span class="sr-only">Delete</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ff2825" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -713,7 +713,7 @@
                     });
                 },
             }))
-        })    
+        })
     </script>
 
     <!-- Pagination -->

@@ -1090,18 +1090,16 @@
                                     <div class="flex space-x-1">
                                         @php
                                             $nomor = $process->customer->nomor_hp;
-                                            $nomorwa = preg_replace('/^08/', 628, $nomor);
+                                            $nomorwa = preg_replace('/^08/', '628', $nomor);
+                                            $fonteeToken = \App\Models\StoreSetting::first()->fonnte ?? null;
                                         @endphp
-                                        <!-- Start -->
-                                        <div class="relative" x-data="{ open: false }" @mouseenter="open = true"
-                                            @mouseleave="open = false">
-                                            <a href="https://api.whatsapp.com/send?phone={{ $nomorwa }}&text="
-                                                 target="_blank">
-                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                    class="icon icon-tabler icon-tabler-brand-whatsapp" width="20"
-                                                    height="20" viewBox="0 0 24 24" stroke-width="1.5"
-                                                    stroke="#00b341" fill="none" stroke-linecap="round"
-                                                    stroke-linejoin="round">
+
+                                        {{-- TOMBOL WHATSAPP --}}
+                                        <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                                            <a href="https://api.whatsapp.com/send?phone={{ $nomorwa }}&text=" target="_blank">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp"
+                                                    width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5"
+                                                    stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                     <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
                                                     <path
@@ -1117,33 +1115,49 @@
                                                     x-transition:leave="transition ease-out duration-200"
                                                     x-transition:leave-start="opacity-100"
                                                     x-transition:leave-end="opacity-0" x-cloak>
-                                                    <div class="text-xs text-slate-200 whitespace-nowrap">Kirim pesan
-                                                        melalui Whatsapp</div>
+                                                    <div class="text-xs text-slate-200 whitespace-nowrap">
+                                                        Kirim pesan melalui Whatsapp
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <!-- End -->
 
-                                        <!-- Start -->
-                                        <div class="relative" x-data="{ open: false }" @mouseenter="open = true"
-                                            @mouseleave="open = false">
-                                            <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Service*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Service%20:%20{{ $process->nomor_servis }}%0ANama%20user%20:%20*{{ $process->nama_pelanggan }}*%0AUnit%20:%20{{ $process->nama_barang }}%0ADiterima%20:%20{{ $process->penerima }}%0ATanggal%20:%20{{ \Carbon\Carbon::parse($process->created_at)->translatedFormat('d F Y h:i') }}%0AKerusakan%20:%20{{ $process->kerusakan }}%0A%0ALink%20tracking%20:%20{{ env('APP_URL') }}/tracking%0ATerimakasih"
-                                                 target="_blank">
-                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                    class="icon icon-tabler icon-tabler-file-invoice" width="20"
-                                                    height="20" viewBox="0 0 24 24" stroke-width="1.5"
-                                                    stroke="#00abfb" fill="none" stroke-linecap="round"
-                                                    stroke-linejoin="round">
+                                        {{-- TOMBOL KIRIM KE FONTEE / MANUAL --}}
+                                        <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                                            <a href="javascript:void(0)"
+                                                @click="
+                                                    @if($fonteeToken)
+                                                        kirimFontee('{{ $fonteeToken }}', '{{ $nomorwa }}',
+                                                            '*Notifikasi Service*%0A{{ $toko->nama_toko }}%0A%0A' +
+                                                            'No. Service : {{ $process->nomor_servis }}%0A' +
+                                                            'Nama user : *{{ $process->nama_pelanggan }}*%0A' +
+                                                            'Unit : {{ $process->nama_barang }}%0A' +
+                                                            'Diterima : {{ $process->penerima }}%0A' +
+                                                            'Tanggal : {{ \Carbon\Carbon::parse($process->created_at)->translatedFormat('d F Y h:i') }}%0A' +
+                                                            'Kerusakan : {{ $process->kerusakan }}%0A%0A' +
+                                                            'Link tracking : {{ env('APP_URL') }}/tracking%0A' +
+                                                            'Terimakasih'
+                                                        )
+                                                    @else
+                                                        window.open('https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Service*%0A{{ $toko->nama_toko }}%0A%0A' +
+                                                            'No.%20Service%20:%20{{ $process->nomor_servis }}%0A' +
+                                                            'Nama%20user%20:%20*{{ $process->nama_pelanggan }}*%0A' +
+                                                            'Unit%20:%20{{ $process->nama_barang }}%0ADiterima%20:%20{{ $process->penerima }}%0A' +
+                                                            'Tanggal%20:%20{{ \Carbon\Carbon::parse($process->created_at)->translatedFormat('d F Y h:i') }}%0A' +
+                                                            'Kerusakan%20:%20{{ $process->kerusakan }}%0A%0A' +
+                                                            'Link%20tracking%20:%20{{ env('APP_URL') }}/tracking%0ATerimakasih', '_blank');
+                                                    @endif
+                                                ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice"
+                                                    width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5"
+                                                    stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                     <path d="M14 3v4a1 1 0 0 0 1 1h4" />
                                                     <path
                                                         d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                                    <line x1="9" y1="7" x2="10"
-                                                        y2="7" />
-                                                    <line x1="9" y1="13" x2="15"
-                                                        y2="13" />
-                                                    <line x1="13" y1="17" x2="15"
-                                                        y2="17" />
+                                                    <line x1="9" y1="7" x2="10" y2="7" />
+                                                    <line x1="9" y1="13" x2="15" y2="13" />
+                                                    <line x1="13" y1="17" x2="15" y2="17" />
                                                 </svg>
                                             </a>
                                             <div class="z-10 absolute bottom-full left-1/2 -translate-x-1/2">
@@ -1155,13 +1169,12 @@
                                                     x-transition:leave="transition ease-out duration-200"
                                                     x-transition:leave-start="opacity-100"
                                                     x-transition:leave-end="opacity-0" x-cloak>
-                                                    <div class="text-xs text-slate-200">Kirim tanda terima servis dan
-                                                        link tracking.</div>
+                                                    <div class="text-xs text-slate-200">Kirim tanda terima servis dan link tracking.</div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <!-- End -->
                                     </div>
+
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $process->nama_barang }}</div>
@@ -1560,6 +1573,33 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+{{-- SCRIPT JS UNTUK FONTEE --}}
+<script>
+function kirimFontee(token, phone, message) {
+    fetch('https://api.fonnte.com/send', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+        },
+        body: JSON.stringify({
+            target: phone,
+            message: decodeURIComponent(message)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === true || data.success) {
+            alert('✅ Pesan berhasil dikirim ke Pelanggan!');
+        } else {
+            alert('⚠️ Gagal mengirim ke Pelanggan. Coba lagi.');
+        }
+    })
+    .catch(() => alert('❌ Terjadi kesalahan saat mengirim ke Fontee.'));
+}
+</script>
+
 
 <script>
     function getCanvas(processId) {

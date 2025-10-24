@@ -277,14 +277,14 @@
                 </div>
             </div>
             @endif
-            
+
         </div>
 
     </div>
 
     <!-- More actions -->
     <div class="sm:flex sm:justify-between sm:items-center mb-5">
-    
+
         <!-- Left side -->
         <div class="mb-4 sm:mb-0">
             <ul class="flex flex-wrap -m-1">
@@ -328,7 +328,7 @@
                     </svg>
                 </button>
                 <div
-                    class="origin-top-left z-10 absolute top-full min-w-56 bg-white border border-slate-200 pt-1.5 rounded shadow-lg overflow-hidden mt-1 left-4"                
+                    class="origin-top-left z-10 absolute top-full min-w-56 bg-white border border-slate-200 pt-1.5 rounded shadow-lg overflow-hidden mt-1 left-4"
                     @click.outside="open = false"
                     @keydown.escape.window="open = false"
                     x-show="open"
@@ -338,7 +338,7 @@
                     x-transition:leave="transition ease-out duration-200"
                     x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0"
-                    x-cloak                
+                    x-cloak
                 >
                     <div class="text-xs font-semibold text-slate-400 uppercase pt-1.5 pb-2 px-4">Filter</div>
                     <ul class="mb-4">
@@ -389,7 +389,7 @@
                 </select>
             </div>
         </div>
-    
+
     </div>
 
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
@@ -549,19 +549,21 @@
                                 </td>
                                 @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    @php
+                                        $nomor = $transaction->customer->nomor_hp;
+                                        $nomorwa = preg_replace('/^08/', '628', $nomor);
+                                        $fonteeToken = \App\Models\StoreSetting::first()->fonnte ?? null;
+                                    @endphp
+
                                     <div class="flex space-x-1">
-                                        @php
-                                            $nomor = $transaction->customer->nomor_hp;
-                                            $nomorwa = preg_replace('/^08/', 628, $nomor);
-                                        @endphp
-                                        <!-- Start -->
+                                        <!-- START: Kirim Manual WhatsApp -->
                                         <div
                                             class="relative"
                                             x-data="{ open: false }"
                                             @mouseenter="open = true"
                                             @mouseleave="open = false"
                                         >
-                                            <a href="https://api.whatsapp.com/send?phone={{$nomorwa}}&text="  target="_blank">
+                                            <a href="https://api.whatsapp.com/send?phone={{ $nomorwa }}&text=" target="_blank">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                     <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
@@ -584,23 +586,42 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!-- End -->
-                                        
-                                        <!-- Start -->
+                                        <!-- END: Kirim Manual WhatsApp -->
+
+                                        <!-- START: Kirim Pemberitahuan -->
                                         <div
                                             class="relative"
                                             x-data="{ open: false }"
                                             @mouseenter="open = true"
                                             @mouseleave="open = false"
                                         >
-                                            <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20|%20{{ $toko->nama_toko }}*%20Barang%20Servis%20*{{ $transaction->nama_barang }}*%20dengan%20No.%20Servis%20*{{ $transaction->nomor_servis }}*%20kondisinya%20*{{ $transaction->kondisi_servis }}*%20pada%20tanggal%20{{ \Carbon\Carbon::parse($transaction->tgl_selesai)->translatedFormat('d F Y') }}%20dan%20*{{ $transaction->status_servis }}*%20dengan%20biaya%20Rp.%20{{ number_format($transaction->biaya) }}.%20Terima%20Kasih."  target="_blank">
+                                            <a href="javascript:void(0)"
+                                                @click="
+                                                    @if($fonteeToken)
+                                                        kirimFontee(
+                                                            '{{ $fonteeToken }}',
+                                                            '{{ $nomorwa }}',
+                                                            '*Notifikasi | {{ $toko->nama_toko }}*%0ABarang Servis *{{ $transaction->nama_barang }}*%0A' +
+                                                            'No. Servis *{{ $transaction->nomor_servis }}*%0A' +
+                                                            'Kondisi: *{{ $transaction->kondisi_servis }}*%0A' +
+                                                            'Tanggal: {{ \Carbon\Carbon::parse($transaction->tgl_selesai)->translatedFormat('d F Y') }}%0A' +
+                                                            'Status: *{{ $transaction->status_servis }}*%0A' +
+                                                            'Biaya: Rp. {{ number_format($transaction->biaya) }}%0A%0ATerima Kasih.'
+                                                        )
+                                                    @else
+                                                        window.open(
+                                                            'https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20|%20{{ $toko->nama_toko }}*%20Barang%20Servis%20*{{ $transaction->nama_barang }}*%20dengan%20No.%20Servis%20*{{ $transaction->nomor_servis }}*%20kondisinya%20*{{ $transaction->kondisi_servis }}*%20pada%20tanggal%20{{ \Carbon\Carbon::parse($transaction->tgl_selesai)->translatedFormat('d F Y') }}%20dan%20*{{ $transaction->status_servis }}*%20dengan%20biaya%20Rp.%20{{ number_format($transaction->biaya) }}.%20Terima%20Kasih.',
+                                                            '_blank'
+                                                        );
+                                                    @endif
+                                                ">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                                <line x1="9" y1="7" x2="10" y2="7" />
-                                                <line x1="9" y1="13" x2="15" y2="13" />
-                                                <line x1="13" y1="17" x2="15" y2="17" />
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                                    <line x1="9" y1="7" x2="10" y2="7" />
+                                                    <line x1="9" y1="13" x2="15" y2="13" />
+                                                    <line x1="13" y1="17" x2="15" y2="17" />
                                                 </svg>
                                             </a>
                                             <div class="z-10 absolute bottom-full left-1/2 -translate-x-1/2">
@@ -619,7 +640,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!-- End -->
+                                        <!-- END: Kirim Pemberitahuan -->
                                     </div>
                                 </td>
                                 @endif
@@ -664,7 +685,7 @@
                                 @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="space-x-1 flex">
-                                                
+
                                         <div>
                                             <button wire:click="openPinModal({{ $transaction->id }})" class="text-indigo-500 hover:text-indigo-600 rounded-full">
                                                 <span class="sr-only">Service PIN & Pola</span>
@@ -677,9 +698,9 @@
                                         </div>
 
                                         <!-- Modal PIN & Pola -->
-                                        <div x-data="{ open: false }" 
+                                        <div x-data="{ open: false }"
                                             x-show="open"
-                                            @open-pin-modal-{{ $transaction->id }}.window="open = true" 
+                                            @open-pin-modal-{{ $transaction->id }}.window="open = true"
                                             @close-pin-modal-{{ $transaction->id }}.window="open = false"
                                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                                             x-cloak
@@ -695,7 +716,7 @@
                                                     <!-- PIN -->
                                                     <div>
                                                         <label class="text-sm font-medium text-gray-600">PIN</label> <br>
-                                                        <input type="number" value="{{ $transaction->pin }}"  
+                                                        <input type="number" value="{{ $transaction->pin }}"
                                                             wire:model.defer="pin" id="pinInput-{{ $transaction->id }}"
                                                             class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
                                                     </div>
@@ -928,7 +949,7 @@
                     });
                 },
             }))
-        })    
+        })
     </script>
 
     <!-- Pagination -->
@@ -1026,8 +1047,8 @@
 
         // Prevent scroll saat touch canvas
         ["touchstart","touchend","touchmove"].forEach(evt => {
-            canvas.addEventListener(evt, function(e) { 
-                if (e.target === canvas) e.preventDefault(); 
+            canvas.addEventListener(evt, function(e) {
+                if (e.target === canvas) e.preventDefault();
             }, { passive:false });
         });
 
@@ -1057,7 +1078,7 @@
             };
 
             console.log('payload:', payload);
-            
+
 
             fetch(`/servis/transaksi-servis/${id}/update-pin-pola`, {
                 method: "POST",
@@ -1104,5 +1125,30 @@
             polaInput.value = "";
         }
     });
+</script>
+
+<script>
+function kirimFontee(token, phone, message) {
+    fetch('https://api.fonnte.com/send', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+        },
+        body: JSON.stringify({
+            target: phone,
+            message: decodeURIComponent(message)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === true || data.success) {
+            alert('✅ Pesan berhasil dikirim ke Pelanggan!');
+        } else {
+            alert('⚠️ Gagal mengirim ke Pelanggan. Coba lagi.');
+        }
+    })
+    .catch(() => alert('❌ Terjadi kesalahan saat mengirim ke Fontee.'));
+}
 </script>
 
