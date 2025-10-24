@@ -308,7 +308,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
 
 
     Route::resource('refund', RefundController::class)->names('refund');
-    Route::delete('refund/delete-selected', [RefundController::class, 'deleteSelected'])->name('refund.deleteSelected');
+    Route::post('refund/delete-selected', [RefundController::class, 'deleteSelected'])->name('refund.deleteSelected');
     Route::get('refund/service/{id}', [RefundController::class, 'serviceDetail'])->name('refund.serviceDetail');
 
 

@@ -208,7 +208,7 @@
                 if (!confirm('Yakin ingin menghapus data terpilih?')) return;
 
                 fetch('{{ route('refund.deleteSelected') }}', {
-                        method: 'DELETE',
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
