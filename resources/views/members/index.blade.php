@@ -57,6 +57,15 @@
 
 <body>
     <div class="container py-4">
+        <div class="d-flex justify-content-end mb-3">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    Logout
+                </button>
+            </form>
+        </div>
+
         <h1 class="section-header mb-4 text-center">Member Card Manager</h1>
 
         <!-- Form Tambah Member -->
@@ -135,7 +144,10 @@
                 return Swal.fire('Peringatan', 'Nama dan Link wajib diisi!', 'warning');
             }
 
-            axios.post('/members', { title, link })
+            axios.post('/members', {
+                    title,
+                    link
+                })
                 .then(() => Swal.fire('Sukses', 'Member berhasil ditambahkan', 'success'))
                 .then(() => location.reload())
                 .catch(() => Swal.fire('Error', 'Gagal menambah member', 'error'));
@@ -145,7 +157,10 @@
             const title = document.getElementById(`title-${id}`).value;
             const link = document.getElementById(`link-${id}`).value;
 
-            axios.put(`/members/${id}`, { title, link })
+            axios.put(`/members/${id}`, {
+                    title,
+                    link
+                })
                 .then(() => Swal.fire('Sukses', 'Data member diperbarui', 'success'))
                 .then(() => location.reload())
                 .catch(() => Swal.fire('Error', 'Gagal update member', 'error'));
@@ -176,10 +191,13 @@
             const exp_date = document.getElementById(`exp_date-${id}`).value;
             if (!exp_date) return Swal.fire('Peringatan', 'Tanggal expired belum diisi', 'warning');
 
-            axios.post(`/members/${id}/update-expired`, { exp_date })
+            axios.post(`/members/${id}/update-expired`, {
+                    exp_date
+                })
                 .then(res => Swal.fire('Sukses', res.data.msg, 'success'))
                 .catch(() => Swal.fire('Error', 'Gagal update expired', 'error'));
         }
     </script>
 </body>
+
 </html>
