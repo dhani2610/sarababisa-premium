@@ -494,7 +494,7 @@
                 if (!confirm("Yakin hapus data yang dipilih?")) return;
 
                 fetch("{{ route('rincian-invest.bulkDelete') }}", {
-                        method: "DELETE",
+                        method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                             "X-CSRF-TOKEN": "{{ csrf_token() }}"

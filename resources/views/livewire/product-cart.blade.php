@@ -24,13 +24,17 @@
                                 {{ $cart_item->name }} @if ($cart_item->options->code != null)
                                     ({{ $cart_item->options->code }})
                                 @endif
-                                <div x-data="{ modalDiskon: @entangle('discountModal') }">
+                                {{-- <div x-data="{ modalDiskon: @entangle('discountModal') }"> --}}
+                                <div x-data="{ modalDiskon: false }" wire:key="diskon-section-{{ $cart_item->rowId }}">
+
+
                                     <!-- Button trigger Discount Modal -->
                                     <button type="button" @click.prevent="modalDiskon = true" aria-controls="modal-discount"
                                         class="border border-red-500 text-red-500 hover:text-reg-800">
-                                        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-percentage"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 17m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M7 7m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M6 18l12 -12" /></svg>
+                                        {{-- <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-percentage"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 17m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M7 7m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M6 18l12 -12" /></svg> --}}
+                                        Setting Diskon
                                     </button>
-                                    
+
                                     <!-- Modal backdrop -->
                                     <div
                                         class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
@@ -44,7 +48,7 @@
                                         aria-hidden="true"
                                         x-cloak
                                     ></div>
-                                    
+
                                     <!-- Modal dialog -->
                                     <div
                                         id="modal-discount"
@@ -52,6 +56,7 @@
                                         role="dialog"
                                         aria-modal="true"
                                         x-show="modalDiskon"
+                                        wire:key="discount-modal-{{ $cart_item->rowId }}"
                                         x-transition:enter="transition ease-in-out duration-200"
                                         x-transition:enter-start="opacity-0 translate-y-4"
                                         x-transition:enter-end="opacity-100 translate-y-0"
@@ -76,6 +81,7 @@
                                                         <div>
                                                             <label>Tipe Diskon</label>
                                                             <select wire:model="discount_type.{{ $cart_item->id }}"
+                                                                    wire:key="discount-type-{{ $cart_item->rowId }}"
                                                                 class="block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md mt-1"
                                                                 required>
                                                                 <option value="fixed">Fixed</option>

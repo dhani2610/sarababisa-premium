@@ -16,6 +16,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AutoBiayaServisController;
 use App\Http\Controllers\AutoModalSparepartController;
 use App\Http\Controllers\AutoHargaJualController;
+use App\Http\Controllers\KepalaToko\RefundController;
 use App\Http\Controllers\KepalaToko\DataServisController;
 use App\Http\Controllers\KepalaToko\DataTargetController;
 use App\Http\Controllers\KepalaToko\RecycleBinController;
@@ -179,7 +180,7 @@ Route::get('/get-action/{service_actions_id}', [AutoBiayaServisController::class
 Route::get('/get-sparepart/{products_id}', [AutoModalSparepartController::class, 'getSparepart']);
 Route::get('/get-product/{products_id}', [AutoHargaJualController::class, 'getProduct']);
 
-// Default All Route 
+// Default All Route
 Route::controller(DefaultController::class)->group(function () {
     Route::get('/get-modelserie', 'GetModelSerie')->name('get-modelserie');
     Route::get('/get-product', 'GetProduct')->name('get-product');
@@ -242,14 +243,17 @@ Route::delete('master/master-gallery/delete-selected', [GalleryController::class
 
 Route::resource('gaji/karyawan', KepalaTokoKaryawanController::class);
 Route::get('slip-gaji/{id}', [KepalaTokoKaryawanController::class, 'cetak'])->name('cetak-slip-gaji');
-
+Route::get('/history-garansi/cetak', [HistoryGaransiController::class, 'cetak'])
+    ->name('history-garansi.cetak');
 Route::resource('history-garansi', HistoryGaransiController::class);
 Route::patch('/history-garansi/{id}/toggle-status', [HistoryGaransiController::class, 'toggleStatus'])
     ->name('history-garansi.toggleStatus');
 Route::post('/history-garansi/bulk-delete', [HistoryGaransiController::class, 'bulkDelete'])->name('history-garansi.bulkDelete');
 
+
 // routes/web.php
-Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'show'])->name('service.show');
+// Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'yyy'])->name('service.show');
+    Route::get('/update-expired', [KepalaTokoAkunController::class, 'updateExpDateJson'])->name('update-expired');
 
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
@@ -261,6 +265,11 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::get('/json-data-target-persen', [DataTargetPersenController::class, 'getDataTargetPersen'])->name('json_data_target-persen');
     Route::get('/json-data-pengeluaran', [DataPengeluaranController::class, 'getDataPengeluaran'])->name('pengeluaran');
     Route::get('/akun', [KepalaTokoAkunController::class, 'index'])->name('akun');
+    Route::get('/akun/setting', [KepalaTokoAkunController::class, 'setting'])->name('setting');
+    Route::post('/akun/setting/update-exp-date', [KepalaTokoAkunController::class, 'updateExpDate'])
+    ->name('akun.update-exp-date');
+
+
     Route::post('/akun', [KepalaTokoAkunController::class, 'store'])->name('akun-store');
     Route::get('/akun/{id}', [KepalaTokoAkunController::class, 'edit'])->name('akun-edit');
     Route::post('/akun{id}', [KepalaTokoAkunController::class, 'update'])->name('akun-update');
@@ -279,7 +288,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('rincian-invest', [RincianInvestController::class, 'store'])->name('rincian-invest.store');
     Route::put('rincian-invest/{id}', [RincianInvestController::class, 'update'])->name('rincian-invest.update');
     Route::delete('rincian-invest/{id}', [RincianInvestController::class, 'destroy'])->name('rincian-invest.destroy');
-    Route::delete('/rincian-invest/bulk-delete', [RincianInvestController::class, 'bulkDelete'])->name('rincian-invest.bulkDelete');
+    Route::post('/rincian-invest/bulk-delete', [RincianInvestController::class, 'bulkDelete'])->name('rincian-invest.bulkDelete');
 
 
     Route::delete('/services/delete', [KepalaTokoTransaksiServisController::class, 'deleteSelected']);
@@ -297,7 +306,12 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
     Route::resource('master/master-tipe-os', TipeOsController::class);
     Route::resource('master/master-gallery', GalleryController::class);
-    
+
+
+    Route::resource('refund', RefundController::class)->names('refund');
+    Route::post('refund/delete-selected', [RefundController::class, 'deleteSelected'])->name('refund.deleteSelected');
+    Route::get('refund/service/{id}', [RefundController::class, 'serviceDetail'])->name('refund.serviceDetail');
+    Route::get('/refund-cetak', [RefundController::class, 'cetak'])->name('refunds.cetak');
 
     Route::resource('master/master-merek', KepalaTokoMasterMerekController::class);
     Route::resource('master/master-kapasitas', KepalaTokoMasterKapasitasController::class);

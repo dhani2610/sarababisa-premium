@@ -7,6 +7,7 @@ use App\Models\Debt;
 use App\Models\User;
 use App\Models\Budget;
 use App\Models\Salary;
+use App\Models\Refund;
 use App\Models\Worker;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -118,9 +119,16 @@ class KaryawanController extends Controller
             ->whereMonth('created_at', $date->month)
             ->sum('biaya_teknisi');
 
+        $user = User::where('workers_id',$id)->first();
+        $potonganServis = Refund::where('teknisi_id', $user->id)->whereYear('created_at', $date->year)
+        ->whereMonth('created_at', $date->month)
+        ->get();
+
+        $totalPotonganServis = $potonganServis;
         $namaKaryawan = $items->name;
 
         $pdf = PDF::loadView('pages.kepalatoko.karyawan.cetak', [
+        // return View('pages.kepalatoko.karyawan.cetak', [
             'tanggal' => $tanggal,
             'periode' => $periode,
             'users' => $users,
@@ -130,6 +138,7 @@ class KaryawanController extends Controller
             'debts' => $debts,
             'incidents' => $incidents,
             'totalkasbon' => $totalkasbon,
+            'totalPotonganServis' => $totalPotonganServis,
             'totalinsiden' => $totalinsiden
         ]);
 

@@ -323,7 +323,7 @@
                             @php
                                 $i = 1
                             @endphp
-                            @foreach($products as $item)                  
+                            @foreach($products as $item)
                             <form action="{{ url('/produk/add-cart') }}" method="post">
                                 @csrf
                                 <input type="hidden" name="id" value="{{ $item->id }}">
@@ -335,8 +335,8 @@
                                 <input type="hidden" name="garansi" value="{{ $item->garansi }}">
                                 <input type="hidden" name="garansi_imei" value="{{ $item->garansi_imei }}">
                                 <input type="hidden" name="ppn" value="{{ $item->ppn }}">
-                                
-                                <tr>    
+
+                                <tr>
                                     <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                         <div class="font-medium">{{ $i++ }}</div>
                                     </td>

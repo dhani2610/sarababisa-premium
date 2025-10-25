@@ -98,6 +98,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="role">Role</label>
                                     <select id="role" name="role" class="form-select text-sm py-2 w-full">
+                                        <option value="Kepala Toko" {{ $item->role == 'Kepala Toko' ? 'selected' : '' }}>Kepala Toko</option>
                                         <option value="Investor" {{ $item->role == 'Investor' ? 'selected' : '' }}>Investor</option>
                                         <option value="Admin Toko" {{ $item->role == 'Admin Toko' ? 'selected' : '' }}>Admin Toko</option>
                                         <option value="Teknisi" {{ $item->role == 'Teknisi' ? 'selected' : '' }}>Teknisi</option>

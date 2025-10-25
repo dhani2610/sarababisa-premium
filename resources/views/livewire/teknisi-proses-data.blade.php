@@ -151,8 +151,8 @@
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="qc_masuk">Pengecekan Fungsi <span class="text-rose-500">*</span></label>
-                                            <input id="qc_masuk" name="qc_masuk" 
-                                            class="form-input w-full px-2 py-1" 
+                                            <input id="qc_masuk" name="qc_masuk"
+                                            class="form-input w-full px-2 py-1"
                                             type="text" required
                                             placeholder="Contoh: Tombol, Kamera, Speaker, dll"
                                             />
@@ -340,7 +340,7 @@
                                                 <label class="block text-sm font-medium mb-1" for="products_id">Sparepart Toko yg Digunakan</label>
                                                 <select id="selectjs6" name="products_id[]" class="form-select text-sm py-1 w-full" style="width: 100%;">
                                                     <option selected value="">Pilih Sparepart</option>
-                                                    @foreach ($products as $item)
+                                                    @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
                                                         <option value="{{ $item->id }}">{{ $item->product_name }}</option>
                                                     @endforeach
                                                 </select>
@@ -501,7 +501,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        
+
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="catatan">Catatan</label>
                                             <textarea id="catatan" name="catatan" class="form-textarea w-full px-2 py-1" rows="2"></textarea>
@@ -528,7 +528,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
     </div>
@@ -604,7 +604,7 @@
                         $i = 1
                     @endphp
                     @foreach($processes as $process)
-                        @php                    
+                        @php
                             if ($process->status_servis === 'Sedang Dikerjakan') :
                                 $status_color = 'bg-emerald-100 text-emerald-600';
                                 $total_color = 'text-emerald-500';
@@ -621,7 +621,7 @@
                                 $status_color = 'bg-slate-100 text-slate-500';
                                 $total_color = 'text-slate-500';
                             endif;
-                        @endphp                  
+                        @endphp
                         <tr>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ $i++ }}</div>
@@ -686,7 +686,7 @@
                                         </div>
                                     </div>
                                     <!-- End -->
-                                    
+
                                     <!-- Start -->
                                     <div
                                         class="relative"
@@ -794,7 +794,7 @@
                                         </div>
                                     </div>
                                     <!-- End -->
-                                    
+
                                     <!-- Start -->
                                     <div x-data="{ modalOpen: false }">
                                         <button
@@ -890,7 +890,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>                                            
+                                            </div>
                                     </div>
                                     <!-- End -->
                                 </div>

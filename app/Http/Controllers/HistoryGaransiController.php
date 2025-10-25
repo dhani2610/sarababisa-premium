@@ -13,6 +13,7 @@ use App\Models\ServiceAction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class HistoryGaransiController extends Controller
 {
@@ -22,6 +23,47 @@ class HistoryGaransiController extends Controller
         return view('pages.kepalatoko.history.garansi', compact(
             'users'
         ));
+    }
+
+    public function cetak(Request $request)
+    {
+        // Ambil info toko
+        $users = User::find(1);
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+
+        // Filter tanggal
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+
+        // Ambil data history garansi berdasarkan periode
+        $data = HistoryGaransi::with(['service', 'teknisi', 'penerima'])
+            ->whereBetween('date', [$start_date, $end_date])
+            ->orderBy('date', 'desc')
+            ->get();
+
+        // Hitung ringkasan
+        $totalData = $data->count();
+        $totalSelesai = $data->where('status', 2)->count();
+        $totalProses = $data->where('status', 1)->count();
+        $totalBatal = $data->where('status', 3)->count();
+
+        // Buat PDF
+        // return View('pages.kepalatoko.cetak-laporan-history-garansi', [
+        $pdf = Pdf::loadView('pages.kepalatoko.cetak-laporan-history-garansi', [
+            'users' => $users,
+            'imagePath' => $imagePath,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'data' => $data,
+            'totalData' => $totalData,
+            'totalSelesai' => $totalSelesai,
+            'totalProses' => $totalProses,
+            'totalBatal' => $totalBatal,
+        ]);
+
+        $filename = 'Laporan History Garansi ' . $start_date . ' sd ' . $end_date . '.pdf';
+        return $pdf->stream($filename);
     }
     public function edit($id)
     {

@@ -82,7 +82,7 @@
 			Laporan Produk
 		</h4>
 	</div>
-	
+
 	<h4 style="margin-bottom: 6px; text-decoration: underline;">
 		Ringkasan
 	</h4>
@@ -130,7 +130,7 @@
 			@php
 				$i = 1
 			@endphp
-			@foreach ($products as $item)
+			@foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
 				<tr>
 					<td style="width: 10px;">{{ $i++ }}</td>
 					{{-- <td style="text-align: left; width: 90px;">

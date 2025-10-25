@@ -25,6 +25,7 @@ class StoreSetting extends Model
         'token_bot',
         'chat_id',
         'report_time',
+        'fonnte',
     ];
-    
+
 }

@@ -2,6 +2,7 @@
 
 namespace App\View\Components;
 
+use App\Models\User;
 use Illuminate\View\Component;
 
 class AuthenticationLayout extends Component
@@ -13,6 +14,8 @@ class AuthenticationLayout extends Component
      */
     public function render()
     {
-        return view('layouts.authentication');
+        $setting = User::find(1);
+
+        return view('layouts.authentication', compact('setting'));
     }
 }

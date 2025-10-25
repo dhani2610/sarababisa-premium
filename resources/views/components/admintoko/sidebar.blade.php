@@ -94,7 +94,7 @@
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-transaksi-servis.index', 'admin-servis-bisa-diambil.index', 'admin-servis-bisa-diambil.edit', 'admin-servis-sudah-diambil.index', 'admin-servis-sudah-diambil.edit', 'admin-transaksi-servis.edit', 'admin-transaksi-servis.show')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-transaksi-servis.index') }}">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('transaksi-servis.index', 'transaksi-servis-bisa-diambil.index', 'transaksi-servis-sudah-diambil.index', 'transaksi-servis.edit', 'transaksi-servis.show', 'transaksi-servis-belum-disetujui.index', 'transaksi-servis-belum-disetujui.edit', 'servis-belum-disetujui-approve.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('transaksi-servis.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Transaksi</span>
                                     </a>
                                 </li>
@@ -143,8 +143,13 @@
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Supplier</span>
                                     </a>
                                 </li>
-                                <li class="mb-1 last:mb-0">
+                                {{-- <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-item.index', 'admin-item.edit', 'admin-handphone.index', 'admin-handphone.edit', 'admin-sparepart.index', 'admin-sparepart.edit', 'admin-aksesoris.index', 'admin-aksesoris.edit', 'admin-tool.index', 'admin-tool.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-item.index') }}">
+                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Item Produk</span>
+                                    </a>
+                                </li> --}}
+                                <li class="mb-1 last:mb-0">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('item.index', 'item.edit', 'handphone.index', 'handphone.edit', 'sparepart.index', 'sparepart.edit', 'aksesoris.index', 'aksesoris.edit', 'tool.index', 'tool.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('item.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Item Produk</span>
                                     </a>
                                 </li>
@@ -159,7 +164,7 @@
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-pos')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-pos') }}">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('pos')){{ '!text-indigo-500' }}@endif" href="{{ route('pos') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Point of Sales (POS)</span>
                                     </a>
                                 </li>
@@ -333,6 +338,7 @@
                             </ul>
                         </div>
                     </li>
+                    
                 </ul>
             </div>
 

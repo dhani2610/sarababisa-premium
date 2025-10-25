@@ -26,15 +26,13 @@ class InformasiTokoController extends Controller
         $validated = $request->validate([
             'profile_photo_path' => 'nullable|file|mimes:jpeg,jpg,png|max:1024',
             'foto_portal'        => 'nullable|file|mimes:jpeg,jpg,png|max:1024',
+            'foto_login'         => 'nullable|file|mimes:jpeg,jpg,png|max:1024',
         ], [
-            'profile_photo_path.uploaded' => 'Upload foto profil gagal. Pastikan ukuran tidak lebih dari 1 MB.',
-            'profile_photo_path.mimes'    => 'Foto profil harus menggunakan format JPG atau PNG.',
-            'profile_photo_path.max'      => 'Ukuran foto profil maksimal 1 MB.',
-
-            'foto_portal.uploaded' => 'Upload foto portal gagal. Pastikan ukuran tidak lebih dari 1 MB.',
-            'foto_portal.mimes'    => 'Foto portal harus menggunakan format JPG atau PNG.',
-            'foto_portal.max'      => 'Ukuran foto portal maksimal 1 MB.',
+            'profile_photo_path.max' => 'Ukuran foto profil maksimal 1 MB.',
+            'foto_portal.max'        => 'Ukuran foto portal maksimal 1 MB.',
+            'foto_login.max'         => 'Ukuran foto login maksimal 1 MB.',
         ]);
+
 
 
         $data = $request->all();
@@ -48,6 +46,12 @@ class InformasiTokoController extends Controller
         if ($request->hasFile('foto_portal')) {
             $data['foto_portal'] = $request->file('foto_portal')->store('assets/user', 'public');
         }
+
+        // ✅ Upload foto login
+        if ($request->hasFile('foto_login')) {
+            $data['foto_login'] = $request->file('foto_login')->store('assets/user', 'public');
+        }
+
 
         // ✅ Filter phones yang tidak kosong
         $filteredPhones = collect($request->phones ?? [])->filter(function ($item) {

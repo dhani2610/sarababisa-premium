@@ -160,7 +160,7 @@ class LaporanPenjualanController extends Controller
             }])
             ->select('id')
             ->get();
-            
+
         $profithari = $rumusprofithari->sum(function ($order) {
             return $order->detailOrders->sum('total_ppn');
         });
@@ -293,6 +293,8 @@ class LaporanPenjualanController extends Controller
             ->whereDate('created_at', '<=', $end_date)
             ->sum('due');
 
+            // dd($orders);
+            // return  response()->json($orders);
             // return view('pages.kepalatoko.cetak-laporan-penjualan', [
         $pdf = Pdf::loadView('pages.kepalatoko.cetak-laporan-penjualan', [
             'users' => $users,

@@ -418,7 +418,7 @@
                                                 <select id="selectjs6" name="products_id[]"
                                                     class="form-select text-sm py-1 w-full" style="width: 100%;">
                                                     <option selected value="">Pilih Sparepart</option>
-                                                    @foreach ($products as $item)
+                                                    @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
                                                         <option value="{{ $item->id }}">{{ $item->product_name }}
                                                         </option>
                                                     @endforeach
