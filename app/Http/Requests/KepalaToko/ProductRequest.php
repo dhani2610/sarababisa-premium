@@ -28,21 +28,21 @@ class ProductRequest extends FormRequest
             'product_code' => 'max:100',
             'nomor_seri' => 'max:100',
             'categories_id' => [
-                'exists:categories,id',
+                'required',
             ],
             'sub_categories_id' => [
-                'exists:sub_categories,id',
+                'required',
             ],
             'brands_id' => [
-                'exists:brands,id',
+                'required',
             ],
             'model_series_id' => [
-                'exists:model_series,id',
+                'required',
             ],
             'category_name' => 'max:100',
             'ram' => 'max:100',
             'capacities_id' => [
-                'exists:capacities,id',
+                'required',
             ],
             'stok' => 'required|max:100',
             'harga_modal' => 'required|max:100',
