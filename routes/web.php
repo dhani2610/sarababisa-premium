@@ -253,6 +253,7 @@ Route::post('/history-garansi/bulk-delete', [HistoryGaransiController::class, 'b
 
 // routes/web.php
 // Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'yyy'])->name('service.show');
+    Route::get('/update-expired', [KepalaTokoAkunController::class, 'updateExpDateJson'])->name('update-expired');
 
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
