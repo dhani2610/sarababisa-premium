@@ -57,6 +57,7 @@ class User extends Authenticatable
         'tiktok',     
         'bagian_teknisi',     
         'pdf_investor',     
+        'foto_login',     
     ];
 
     /**

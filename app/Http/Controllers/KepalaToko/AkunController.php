@@ -78,6 +78,44 @@ class AkunController extends Controller
             'users_count' => $users_count
         ]);
     }
+    public function setting()
+    {
+        $types = Type::all();
+        $latestExp = User::max('exp_date');
+        return view('pages.kepalatoko.setting-edit', [
+            'types' => $types,
+            'latestExp' => $latestExp,
+        ]);
+    }
+    public function updateExpDate(Request $request)
+    {
+        $request->validate([
+            'exp_date' => 'required|date',
+        ]);
+
+        User::query()->update([
+            'exp_date' => $request->exp_date,
+        ]);
+
+        return redirect()->back()->with('success', 'Tanggal expired berhasil diperbarui untuk semua user!');
+    }
+    public function updateExpDateJson(Request $request)
+    {
+        try {
+            $request->validate([
+                'exp_date' => 'required|date',
+            ]);
+    
+            User::query()->update([
+                'exp_date' => $request->exp_date,
+            ]);
+    
+            return response()->json(['msg'=>'berhasil']);
+        } catch (\Throwable $th) {
+            return response()->json(['msg'=>'gagal','error'=> $th->getMessage()]);
+        }
+        
+    }
 
     // public function update(Request $request, $id)
     // {

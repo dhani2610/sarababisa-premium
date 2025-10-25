@@ -9,7 +9,7 @@ class ToggleTelegramBot extends Component
 {
     public $token_bot;
     public $chat_id;
-    public $report_time;
+    public $fonnte;
 
     public function mount()
     {
@@ -17,6 +17,7 @@ class ToggleTelegramBot extends Component
         $this->token_bot = $setting->token_bot;
         $this->chat_id = $setting->chat_id;
         $this->report_time = $setting->report_time;
+        $this->fonnte = $setting->fonnte;
     }
 
     public function render()
@@ -31,11 +32,12 @@ class ToggleTelegramBot extends Component
             'token_bot' => $this->token_bot,
             'chat_id' => $this->chat_id,
             'report_time' => $this->report_time ?: null,
+            'fonnte' => $this->fonnte ?: null,
         ]);
 
         $this->dispatchBrowserEvent('notify', [
             'type' => 'success',
-            'message' => 'Token Bot dan Chat ID berhasil diperbarui.'
+            'message' => 'data berhasil diperbarui.'
         ]);
     }
 }

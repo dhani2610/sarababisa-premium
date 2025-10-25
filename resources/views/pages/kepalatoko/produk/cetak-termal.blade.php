@@ -38,8 +38,8 @@
       }
 
       td.title {
-        width: 60px;
-        max-width: 60px;
+        width: 90px;
+        max-width: 90px;
         word-break: break-all;
       }
 
@@ -52,6 +52,7 @@
       <title>Nota Penjualan Handphone #{{ $order->invoice_no }}</title>
   </head>
   <body>
+
     <div class="resi">
       <div class="text-center">
         @if ($users->profile_photo_path != null)
@@ -87,9 +88,9 @@
 
       <hr style="border-top: 1px dotted;">
 
+      @foreach ($orderItem as $item)
       <table>
         <tbody>
-          @foreach ($orderItem as $item)
               <tr>
                 @if ($item->garansi_imei != null)
                 <td colspan="3">{{ $item->product_name }} {{ $item->product->nomor_seri }} {{ $item->product->keterangan }} (Garansi item s/d {{ $item->garansi }}) (Garansi IMEI s/d {{ $item->garansi_imei }})</td>
@@ -100,9 +101,10 @@
                 @endif
               </tr>
               <tr>
-                <td> {{ number_format($item->price) }}</td>
+                <td> {{ number_format($item->product->harga_jual) }}</td>
                 <td>X {{ $item->quantity }}</td>
-                <td>= {{ number_format($item->total - $item->ppn) }}</td>
+                {{-- <td>= {{ number_format($item->total - $item->ppn) }}</td> --}}
+                <td>= {{ number_format($item->sub_total - $item->ppn) }}</td>
               </tr>
           @endforeach
         </tbody>
@@ -119,6 +121,14 @@
               </tr>
           @else
               <tr>
+              <td class="title">Diskon</td>
+              @if ($item->product_discount_amount <= 0)
+                  <td align="value">0</td>
+              @else
+                  <td align="value">: Rp. {{ number_format($item->product_discount_amount) }}</td>
+              @endif
+              </tr>
+              <tr>
               <td class="title">Sub Total</td>
               <td class="value">: Rp. {{ number_format($totalWithoutTax) }}</td>
               </tr>
@@ -132,7 +142,35 @@
               </tr>
           @endif
           <tr>
-            <td class="title">Pembayaran</td>
+              <td class="title">M.Pembayaran</td>
+              <td class="value">: {{ $order->payment_method  }}</td>
+          </tr>
+          @if ($order->payment_method == 'Tunai')
+          <tr>
+              <td class="title">Tunai</td>
+              <td class="value">: Rp. {{ number_format($order->tunai ?? $order->pay) }}</td>
+          </tr>
+
+          @elseif ($order->payment_method == 'Transfer')
+          <tr>
+              <td class="title">Transfer</td>
+              <td class="value">: Rp. {{ number_format($order->transfer ?? $order->pay) }}</td>
+          </tr>
+
+          @elseif ($order->payment_method == 'Tunai & Transfer')
+          <tr>
+              <td class="title">Tunai</td>
+              <td class="value">: Rp. {{ number_format($order->tunai ?? 0) }}</td>
+          </tr>
+          <tr>
+              <td class="title">Transfer</td>
+              <td class="value">: Rp. {{ number_format($order->transfer ?? 0) }}</td>
+          </tr>
+          @endif
+
+          
+          <tr>
+            <td class="title">Total Pembayaran</td>
             <td class="value">: Rp. {{ number_format($order->pay) }}</td>
           </tr>
           @if ($order->due > 0)

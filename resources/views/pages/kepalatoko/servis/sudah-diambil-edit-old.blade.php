@@ -278,7 +278,7 @@
                                                          modalSparepart = selected.dataset.hargaModal || 0;
                                                      ">
                                                     <option selected value="">Pilih Sparepart</option>
-                                                    @foreach ($products as $item)
+                                                    @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
                                                         <option value="{{ $item->id }}"
                                                             data-harga_modal="{{ $item->harga_modal }}">
                                                             {{ $item->product_name }}
@@ -613,14 +613,14 @@
                 $('input[name="kondisi_servis"]:checked').trigger('change');
             });
         </script>
-        {{-- 
+        {{--
 <script>
     function getTotal() {
         let biaya = parseInt($('#biaya').val()) || 0;
         let diskon = parseInt($('#diskon').val()) || 0;
         let totalFinal = Math.max(biaya - diskon, 0);
         console.log('totalFinal',totalFinal);
-        
+
         return totalFinal;
     }
 
@@ -1077,4 +1077,3 @@
         </script>
     {{-- @endpush --}}
 </x-admin-layout>
-                

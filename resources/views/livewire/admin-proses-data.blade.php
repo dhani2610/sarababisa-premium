@@ -418,7 +418,7 @@
                                                             @endforeach
                                                         </select>
                                                     </div>
-        
+
                                                     <div x-show="showInputManual" class="mt-2">
                                                         <input class="form-input w-full px-2 py-1" type="text"
                                                             name="tindakan_servis[]" />
@@ -461,7 +461,7 @@
                                                         <select id="selectjs6" name="products_id[]"
                                                             class="form-select text-sm py-1 w-full" style="width: 100%;">
                                                             <option selected value="">Pilih Sparepart</option>
-                                                            @foreach ($products as $item)
+                                                            @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
                                                                 <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ $item->product_name }}
                                                                 </option>
                                                             @endforeach
@@ -479,7 +479,7 @@
                                                             @endforeach
                                                         </select>
                                                     </div>
-        
+
                                                     <div>
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="garansi">Garansi</label>
@@ -512,7 +512,7 @@
                                                             <option value="1825">5 Tahun</option>
                                                         </select>
                                                     </div>
-        
+
                                                     <div class="mt-3">
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="modal_sparepart">Modal Sparepart <span
@@ -520,7 +520,7 @@
                                                         <input class="form-input w-full px-2 py-1 modal_sparepart"
                                                             type="number" name="modal_sparepart[]" x-model="modalSparepart" :required="showDetails" />
                                                     </div>
-        
+
                                                     <div class="mt-3">
                                                         <label class="block text-sm font-medium mb-1" for="biaya_servis">Biaya
                                                             Servis <span class="text-rose-500">*</span></label>
@@ -542,7 +542,7 @@
                                                         class="form-input w-full px-2 py-1" type="text"
                                                         placeholder="Contoh: Tombol, Kamera, Speaker, dll" :required="showDetails" />
                                                 </div>
-        
+
                                                 <div>
                                                     <label class="block text-sm font-medium mb-1"
                                                         for="total_modal_sparepart">Total
@@ -574,7 +574,7 @@
                                                         <option value="Kredit">Kredit</option>
                                                         <option value="Tunai & Transfer">Tunai & Transfer</option>
                                                     </select>
-        
+
                                                     <div x-show="caraPembayaran === 'Tunai & Transfer'" class="mt-3">
                                                         <label class="block text-sm font-medium text-indigo-500">Silahkan isi
                                                             hanya pada salah satu input saja: Tunai / Transfer</label>
@@ -593,7 +593,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-        
+
                                                     <div x-show="caraPembayaran === 'Kredit'" class="mt-3">
                                                         <div>
                                                             <label class="block text-sm font-medium mb-1"
@@ -612,7 +612,7 @@
                                                                 </label>
                                                                 <!-- End -->
                                                             </div>
-        
+
                                                             <div class="m-3">
                                                                 <!-- Start -->
                                                                 <label class="flex items-center">
@@ -1026,9 +1026,9 @@
                                         </div>
 
                                         <!-- Modal PIN & Pola -->
-                                        <div x-data="{ open: false }" 
+                                        <div x-data="{ open: false }"
                                             x-show="open"
-                                            @open-pin-modal-{{ $process->id }}.window="open = true" 
+                                            @open-pin-modal-{{ $process->id }}.window="open = true"
                                             @close-pin-modal-{{ $process->id }}.window="open = false"
                                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                                             x-cloak
@@ -1044,7 +1044,7 @@
                                                     <!-- PIN -->
                                                     <div>
                                                         <label class="text-sm font-medium text-gray-600">PIN</label> <br>
-                                                        <input type="number" value="{{ $process->pin }}"  
+                                                        <input type="number" value="{{ $process->pin }}"
                                                             wire:model.defer="pin" id="pinInput-{{ $process->id }}"
                                                             class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
                                                     </div>
@@ -1338,8 +1338,8 @@
 
         // Prevent scroll saat touch canvas
         ["touchstart","touchend","touchmove"].forEach(evt => {
-            canvas.addEventListener(evt, function(e) { 
-                if (e.target === canvas) e.preventDefault(); 
+            canvas.addEventListener(evt, function(e) {
+                if (e.target === canvas) e.preventDefault();
             }, { passive:false });
         });
 
@@ -1369,7 +1369,7 @@
             };
 
             console.log('payload:', payload);
-            
+
 
             fetch(`/servis/admin-transaksi-servis/${id}/update-pin-pola`, {
                 method: "POST",

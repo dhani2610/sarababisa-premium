@@ -107,7 +107,7 @@ class ProdukController extends Controller
             'product' => $product,
             'barcodeData' => $barcodeData
         ])->setPaper([0, 0, 226.77, 141.73]); // ukuran kertas kecil (80x50mm)
-        
+
 
         return $pdf->stream('barcode_' . $product->product_code . '.pdf');
     }

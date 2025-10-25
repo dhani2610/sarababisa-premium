@@ -39,7 +39,10 @@
 
                 <!-- Modal -->
                 {{-- @if (env('TOKEN_FONNTE') === '' || env('TOKEN_FONNTE') === null || empty(env('TOKEN_FONNTE'))) --}}
-                @if (empty(env('TOKEN_FONNTE')))
+                @php
+                    $fonteeToken = \App\Models\StoreSetting::first()->fonnte ?? null;
+                @endphp
+                @if (empty($fonteeToken))
 
                     <div class="fixed inset-0 z-50 overflow-y-auto  flex items-center justify-center px-4 sm:px-6" x-show="modalOpen"
                         x-transition:enter="transition ease-in-out duration-200"

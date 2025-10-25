@@ -91,6 +91,7 @@ class RincianInvestController extends Controller
     }
     public function bulkDelete(Request $request)
     {
+        // return response()->json(['success' => false, 'message' => $request->selectedIds]);
         RincianInvest::whereIn('id', $request->selectedIds)->delete();
         return response()->json(['success' => true]);
     }

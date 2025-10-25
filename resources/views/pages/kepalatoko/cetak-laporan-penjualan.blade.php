@@ -64,6 +64,40 @@
 		#data {
 			border-bottom: 1px solid #ddd;
 		}
+
+        /* ✅ Fokus di sini: perkecil font hanya untuk tabel Detail Servis */
+    #detail td,
+    #detail th {
+        border: 1px solid #000;
+        border-collapse: collapse;
+        font-size: 9px;        /* kecilkan font */
+        line-height: 0.9em;    /* rapatkan jarak antar baris */
+        padding: 2px 3px;      /* kecilkan padding */
+        text-align: center;
+        word-wrap: break-word; /* pecah teks panjang biar tidak keluar */
+        white-space: normal;   /* biar bisa turun ke baris baru */
+    }
+
+    #detail {
+        width: 100%;
+        table-layout: fixed;   /* pastikan tabel menyesuaikan lebar halaman */
+    }
+
+		#analisis td,
+		th,
+		tr,
+		table {
+			border-collapse: collapse;
+			font-size: 14px;
+			line-height: 1em;
+			width: 100%;
+			padding: 4px 0 4px 0;
+			text-align: left;
+		}
+
+		#data {
+			border-bottom: 1px solid #ddd;
+		}
 	</style>
 </head>
 <body>
@@ -83,7 +117,7 @@
 		</h4>
 		<p style="margin-top: 0">Periode : {{ \Carbon\Carbon::parse($start_date)->format('d-m-Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->format('d-m-Y') }}</p>
 	</div>
-	
+
 	<h4 style="margin-bottom: 6px; text-decoration: underline;">
 		Ringkasan
 	</h4>
@@ -140,6 +174,7 @@
 				<th>Harga Jual</th>
 				<th>Diskon</th>
 				<th>Profit</th>
+				<th>Pembayaran</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -192,6 +227,16 @@
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->total) }}</td>
 					<td style="width: 60px; text-align: right;">Rp. {{ number_format($item->sub_total - $item->total) }}</td>
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
+					<td style="width: 70px; text-align: left;">
+                        @if ($item->order->payment_method == 'Tunai')
+                            Tunai : Rp. {{ number_format($item->order->tunai ?? $item->order->pay) }}
+                        @elseif ($item->order->payment_method == 'Transfer')
+                            Transfer : Rp. {{ number_format($item->order->tunai ?? $item->order->pay) }}
+                        @elseif ($item->order->payment_method == 'Tunai & Transfer')
+                            Tunai : Rp. {{ number_format($item->tunai) }} <br> <hr>
+                            Transfer : Rp. {{ number_format($item->order->transfer) }}
+                        @endif
+                    </td>
 				</tr>
 			@endforeach
 		</tbody>

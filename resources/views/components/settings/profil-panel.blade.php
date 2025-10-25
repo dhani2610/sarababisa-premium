@@ -42,6 +42,46 @@
                 </div>
             </section>
             <section>
+                <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Foto Login</h3>
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <img class="w-20 h-20 object-cover rounded" 
+                            src="{{ Auth::user()->foto_login ? Storage::url(Auth::user()->foto_login) : asset('img/default-login.jpg') }}" 
+                            width="80" height="80" alt="Foto Login" />
+                    </div>
+                    <div>
+                        <input 
+                            type="file" 
+                            name="foto_login" 
+                            id="foto_login" 
+                            accept="image/*"
+                            class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white"
+                            onchange="checkFileSizeLogin(this)"
+                        >
+                        <p id="foto_login_alert" class="text-red-500 text-xs mt-1 hidden">
+                            Ukuran foto maksimal 1 MB!
+                        </p>
+                        <p class="text-gray-500 text-xs mt-1">
+                            Maksimal ukuran file: 1 MB
+                        </p>
+                    </div>
+                </div>
+
+                <script>
+                    function checkFileSizeLogin(input) {
+                        const file = input.files[0];
+                        const alertEl = document.getElementById('foto_login_alert');
+                        if (file && file.size > 1024 * 1024) {
+                            alertEl.classList.remove('hidden');
+                            input.value = ''; // reset input
+                        } else {
+                            alertEl.classList.add('hidden');
+                        }
+                    }
+                </script>
+            </section>
+
+            <section>
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Foto Portal</h3>
                 <div class="flex items-center">
                     <div class="mr-4">

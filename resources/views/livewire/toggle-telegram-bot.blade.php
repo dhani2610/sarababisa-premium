@@ -23,6 +23,14 @@
             <p class="text-xs text-slate-500 mt-1">Kosongkan jika tidak ingin laporan otomatis.</p>
         </div>
 
+        <h3 class="text-xl leading-snug text-slate-800 font-bold mb-1">Integrasi WhatsApp Gateway</h3>
+        <div class="text-sm mb-3">Lihat vidio tutorial <a href="https://www.youtube.com/@fonnte" target="_blank" rel="noopener noreferrer" style="color: blue">Klik disini</a> </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Token Fonnte</label>
+            <input type="text" wire:model.defer="fonnte" class="form-input w-full" placeholder="Masukkan Token Fonnte...">
+        </div>
+
         <!-- Tombol Simpan -->
         <div class="flex justify-end">
             <button wire:click="saveSetting" class="btn bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg">

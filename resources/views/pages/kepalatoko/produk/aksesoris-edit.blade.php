@@ -25,8 +25,8 @@
                             <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                         </svg>
                         <span class="hidden xs:block ml-2">Tambah Aksesoris</span>
-                </button>                      
-                
+                </button>
+
             </div>
 
         </div>
@@ -127,7 +127,16 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-1" for="harga_jual">Harga Jual</label>
+                                    <label class="block text-sm font-medium mb-1" for="harga_jual_toko">Harga Jual Toko<span class="text-rose-500">*</span></label>
+                                    <div class="relative">
+                                        <input id="harga_jual_toko" name="harga_jual_toko" class="form-input w-full pl-10 px-2 py-1" type="number" value="{{ $item->harga_jual_toko }}" required/>
+                                        <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
+                                            <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="harga_jual">Harga Jual Pelanggan</label>
                                     <div class="relative">
                                         <input id="harga_jual" name="harga_jual" class="form-input w-full pl-10 px-2 py-1" type="number" value="{{ $item->harga_jual }}"/>
                                         <div class="absolute inset-0 right-auto flex items-center pointer-events-none">

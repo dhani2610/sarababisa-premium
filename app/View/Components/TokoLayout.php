@@ -14,6 +14,9 @@ class TokoLayout extends Component
      */
     public function render()
     {
+        if (Auth::check() == null) {
+            return redirect('/login');
+        }
         $role = Auth::user()->role ?? 'guest';
         if ($role == 'Teknisi') {
             return view('layouts.teknisi');
@@ -22,7 +25,7 @@ class TokoLayout extends Component
         }elseif ($role == 'Admin Toko') {
             return view('layouts.admin');
         }
-        
+
         return view('layouts.toko');
     }
 }

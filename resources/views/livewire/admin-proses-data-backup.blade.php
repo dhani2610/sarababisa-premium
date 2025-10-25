@@ -148,8 +148,8 @@
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="qc_masuk">Pengecekan Fungsi <span class="text-rose-500">*</span></label>
-                                            <input id="qc_masuk" name="qc_masuk" 
-                                            class="form-input w-full px-2 py-1" 
+                                            <input id="qc_masuk" name="qc_masuk"
+                                            class="form-input w-full px-2 py-1"
                                             type="text" required
                                             placeholder="Contoh: Tombol, Kamera, Speaker, dll"
                                             />
@@ -345,7 +345,7 @@
                                                 <label class="block text-sm font-medium mb-1" for="products_id">Sparepart Toko yg Digunakan</label>
                                                 <select id="selectjs6" name="products_id" class="form-select text-sm py-1 w-full" style="width: 100%;">
                                                     <option selected value="">Pilih Sparepart</option>
-                                                    @foreach ($products as $item)
+                                                    @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
                                                         <option value="{{ $item->id }}">{{ $item->product_name }}</option>
                                                     @endforeach
                                                 </select>
@@ -540,7 +540,7 @@
                     </svg>
                 </button>
                 <div
-                    class="origin-top-left z-10 absolute top-full min-w-56 bg-white border border-slate-200 pt-1.5 rounded shadow-lg overflow-hidden mt-1 left-4"                
+                    class="origin-top-left z-10 absolute top-full min-w-56 bg-white border border-slate-200 pt-1.5 rounded shadow-lg overflow-hidden mt-1 left-4"
                     @click.outside="open = false"
                     @keydown.escape.window="open = false"
                     x-show="open"
@@ -550,7 +550,7 @@
                     x-transition:leave="transition ease-out duration-200"
                     x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0"
-                    x-cloak                
+                    x-cloak
                 >
                     <div class="text-xs font-semibold text-slate-400 uppercase pt-1.5 pb-2 px-4">Filter</div>
                     <ul class="mb-4">
@@ -673,7 +673,7 @@
                         $i = 1
                     @endphp
                     @foreach($processes as $process)
-                        @php                    
+                        @php
                             if ($process->status_servis === 'Sedang Dikerjakan') :
                                 $status_color = 'bg-emerald-100 text-emerald-600';
                                 $total_color = 'text-emerald-500';
@@ -752,7 +752,7 @@
                                         </div>
                                     </div>
                                     <!-- End -->
-                                    
+
                                     <!-- Start -->
                                     <div
                                         class="relative"
@@ -954,7 +954,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>                                            
+                                            </div>
                                     </div>
                                     <!-- End Printer-->
                                 </div>

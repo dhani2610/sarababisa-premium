@@ -19,6 +19,7 @@ class Product extends Model
         'stok_minimal',
         'harga_modal',
         'harga_jual',
+        'harga_jual_toko',
         'keterangan',
         'nomor_seri',
         'garansi',
