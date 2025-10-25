@@ -21,7 +21,7 @@
                                         ? Storage::url($setting->profile_photo_path) 
                                         : asset('images/logo-saraba-bisa.png') }}" 
                                     alt="Logo Toko" 
-                                    class="h-8 object-contain"
+                                    class="h-12 object-contain"
                                 />
 
                             </a>
