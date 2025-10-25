@@ -34,7 +34,7 @@
                                 <a class="block" href="#">
                                     <img src="{{ $setting && $setting->profile_photo_path 
                                         ? Storage::url($setting->profile_photo_path) 
-                                        : asset('images/logo-saraba-bisa.png') }}" alt="" class="h-12">
+                                        : asset('images/logo-saraba-bisa.png') }}" alt="" class="" style="height: 5rem!important;margin-top: 61%;!important">
                                 </a>
                             </div>
                         </div>
