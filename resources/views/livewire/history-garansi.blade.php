@@ -328,7 +328,9 @@
                             <th class="px-2 py-3">Total Modal</th>
                             <th class="px-2 py-3">Catatan</th>
                             <th class="px-2 py-3">Status</th>
+                            @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                             <th class="px-2 py-3">Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody class="text-sm divide-y divide-slate-200">
@@ -406,6 +408,7 @@
                                 </td>
 
 
+                                @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                                 {{-- Aksi (popup hapus tetap) --}}
                                 <td class="px-2 py-3">
                                     <div class="flex space-x-2">
@@ -494,6 +497,7 @@
                                         </div>
                                     </div>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
