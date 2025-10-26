@@ -27,13 +27,23 @@ class ProductRequest extends FormRequest
             'product_name' => 'required|unique:products,product_name',
             'product_code' => 'max:100',
             'nomor_seri' => 'max:100',
-            'categories_id' => 'required',
-            'sub_categories_id' => 'required',
-            'brands_id' => 'required',
-            'model_series_id' => 'required',
+            'categories_id' => [
+                'exists:categories,id',
+            ],
+            'sub_categories_id' => [
+                'exists:sub_categories,id',
+            ],
+            'brands_id' => [
+                'exists:brands,id',
+            ],
+            'model_series_id' => [
+                'exists:model_series,id',
+            ],
             'category_name' => 'max:100',
             'ram' => 'max:100',
-            'capacities_id' => 'required',
+            'capacities_id' => [
+                'exists:capacities,id',
+            ],
             'stok' => 'required|max:100',
             'harga_modal' => 'required|max:100',
             'harga_jual' => 'required|max:100',
