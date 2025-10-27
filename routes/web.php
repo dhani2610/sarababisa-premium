@@ -359,6 +359,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
 
     Route::resource('produk/pos', KepalaTokoPosController::class);
     Route::resource('produk/transaksi-penjualan-approve', KepalaTokoApprovePenjualanController::class);
+    Route::get('transaksi-produk/data', [App\Http\Controllers\KepalaToko\TransaksiProdukController::class, 'data'])->name('transaksi-produk.data');
     Route::resource('produk/transaksi-produk', KepalaTokoTransaksiProdukController::class);
     Route::delete('/product-transactions/delete', [KepalaTokoTransaksiProdukController::class, 'deleteSelected']);
     Route::patch('/product-transactions/update', [KepalaTokoTransaksiProdukController::class, 'approveSelected']);
