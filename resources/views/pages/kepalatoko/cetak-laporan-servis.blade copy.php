@@ -98,6 +98,7 @@
     <h4 style="margin-bottom: 6px; text-decoration: underline;">
         Ringkasan
     </h4>
+    <br>
 
     <table id="ringkasan">
         <tbody>
@@ -121,16 +122,28 @@
             </tr>
             <tr>
                 <th>Total Modal Sparepart</th>
-				<th>: Rp. {{ number_format($total_modal) }}</th>
+                <th>: Rp. {{ number_format($total_modal) }}</th>
                 <th>Total Profit</th>
-				<th>: Rp. {{ number_format($total_profit) }}</th>
+                <th>: Rp. {{ number_format($total_profit) }}</th>
+            </tr>
+            <tr>
+                <th>Total Uang Muka</th>
+                <th>: Rp. {{ number_format($total_dp) }}</th>
+                <th>Total Pengeluaran</th>
+                <th>: Rp. {{ number_format($total_pengeluaran) }}</th>
+            </tr>
+            <tr>
+                <th>Saldo Akhir</th>
+                <th>: Rp. {{ number_format($saldo_akhir) }}</th>
             </tr>
         </tbody>
     </table>
+    <br>
 
-    <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
+    <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
         Detail Transaksi
     </h4>
+    <br>
 
     <table id="detail">
         <thead>
@@ -138,13 +151,14 @@
                 <th>No.</th>
                 <th>No. Servis</th>
                 <th>Pelanggan</th>
+                <th>Teknisi</th>
                 <th>Model Seri</th>
                 <th>Tindakan</th>
-                <th>Teknisi</th>
                 <th>Modal Sparepart</th>
                 <th>Biaya Servis</th>
                 <th>Diskon</th>
                 <th>Profit</th>
+                <th>Pembayaran</th>
             </tr>
         </thead>
         <tbody>
@@ -154,15 +168,31 @@
             @foreach ($services as $item)
                 @php
                     $tindakan_servis = json_decode($item->tindakan_servis);
-                    $biaya_j = json_decode($item->biaya_j);
-                    $modal_j = json_decode($item->modal_j);
+                    // $biaya_j = json_decode($item->biaya_j);
+                    $biaya_j = json_decode(str_replace(['“','”'], '"', $item->biaya_j), true);
+                    $modal_j = json_decode(str_replace(['“','”'], '"', $item->modal_j), true);
+                    // $modal_j = json_decode($item->modal_j);
                 @endphp
                 @if (json_decode($item->tindakan_servis))
                     <tr>
                         <td style="width: 10px;" rowspan="{{ count($tindakan_servis) }}">{{ $i++ }}</td>
                         <td class="text-center" style="width: 60px;" rowspan="{{ count($tindakan_servis) }}">
                             {{ $item->nomor_servis }}</td>
-                        <td style="text-align: left; width: 70px;" class="capital" rowspan="{{ count($tindakan_servis) }}">{{ $item->nama_pelanggan }}</td>
+                        <td style="text-align: left; width: 70px;" class="capital"
+                            rowspan="{{ count($tindakan_servis) }}">{{ $item->nama_pelanggan }}</td>
+                        @if ($item->user)
+                            <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
+                                {{ $item->user->name }}
+                            </td>
+                        @elseif ($item->user()->withTrashed()->first())
+                            <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
+                                {{ $item->user()->withTrashed()->first()->name }}
+                            </td>
+                        @else
+                            <td style="text-align: center; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
+                                -
+                            </td>
+                        @endif
                         <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
                             @if ($item->modelserie)
                                 {{ $item->modelserie->name }}
@@ -170,47 +200,108 @@
                                 -
                             @endif
                         </td>
-                        <td class="capital" style="text-align: left; width: 80px;">
+                        <td class="" style="text-align: left; width: 80px;">
                             @if ($item->kondisi_servis != 'Sudah jadi')
                                 {{ $item->kondisi_servis }}
                             @else
                                 {{ $tindakan_servis[0] }}
                             @endif
                         </td>
-                        @if ($item->user)
-                            <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
-                                {{ $item->user->name }}
-                            </td>
-                        @elseif ($item->user()->withTrashed()->first())
-                            <td style="text-align: left; width: 70px;">
-                                {{ $item->user()->withTrashed()->first()->name }}
-                            </td>
-                        @else
-                            <td style="text-align: center; width: 70px;">
-                                -
-                            </td>
-                        @endif
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($modal_j[0]) }}
+
+                        @php
+                            $modal_convert = is_array($modal_j) ? ($modal_j[0] ?? 0) : $modal_j;
+                        @endphp
+                        <td style="width: 60px; text-align: right;">
+                            Rp. {{ number_format($modal_convert) }}
                         </td>
+                        {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($modal_j[0]) }}
+                        </td> --}}
                         <td style="width: 60px; text-align: right;">Rp. {{ number_format($biaya_j[0]) }}</td>
-                        <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
+                        {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td> --}}
+                        <td style="width: 50px; text-align: right;" rowspan="{{ count($tindakan_servis) }}">Rp. {{ number_format($item->diskon) }}</td>
                         <td style="width: 60px; text-align: right;">Rp.
-                            {{ number_format($biaya_j[0] - $modal_j[0]) }}</td>
+                            {{ number_format($biaya_j[0] - $modal_convert - $item->diskon) }}</td>
+
+                        <td class="" rowspan="{{ count($tindakan_servis) }}"
+                            style="text-align: left; width: 80px;">
+                            @php
+                                $metode = [];
+                                if ($item->tunai > 0) {
+                                    $metode[] =
+                                        '<div>
+                        <strong>Tunai:</strong><br>
+                        Rp.' .
+                                        number_format($item->tunai, 0, ',', '.') .
+                                        '
+                     </div>';
+                                }
+                                if ($item->transfer > 0) {
+                                    $metode[] =
+                                        '<div>
+                        <strong>Transfer:</strong><br>
+                        Rp.' .
+                                        number_format($item->transfer, 0, ',', '.') .
+                                        '
+                     </div>';
+                                }
+                            @endphp
+                            @if ($item->kondisi_servis == 'Dibatalkan')
+                                @php
+                                    if ($item->uang_muka > 0 && $item->modal_sparepart > 0) {
+                                        $label = 'Modal - DP:';
+                                        $nilai = $item->uang_muka - $item->modal_sparepart;
+                                    } elseif ($item->uang_muka > 0 && $item->biaya > 0) {
+                                        $label = 'Modal - DP:';
+                                        $nilai = $item->uang_muka - $item->biaya;
+                                    } elseif ($item->uang_muka > 0) {
+                                        $label = 'Uang Muka:';
+                                        $nilai = $item->uang_muka;
+                                    } elseif ($item->modal_sparepart > 0) {
+                                        $label = 'Modal:';
+                                        $nilai = $item->modal_sparepart;
+                                    } else {
+                                        $label = '';
+                                        $nilai = 0;
+                                    }
+                                @endphp
+
+                                <div>
+                                    <strong>{{ $label }}</strong><br>
+                                    Rp.-{{ number_format($nilai, 0, ',', '.') }}
+                                </div>
+                            @else
+                            {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
+                            @endif
+
+                        </td>
                     </tr>
                     @for ($k = 1; $k < count($tindakan_servis); $k++)
                         <tr>
-                            <td class="capital" style="text-align: left; width: 80px;">
+                            <td class="" style="text-align: left; width: 80px;">
                                 @if ($item->kondisi_servis != 'Sudah jadi')
                                     {{ $item->kondisi_servis }}
                                 @else
                                     {{ $tindakan_servis[$k] }}
                                 @endif
                             </td>
+                            {{-- <td class="" style="text-align: left; width: 80px;">
+                                @php
+                                    $metode = [];
+                                    if ($item->tunai > 0) {
+                                        $metode[] = 'Tunai: Rp ' . number_format($item->tunai, 0, ',', '.');
+                                    }
+                                    if ($item->transfer > 0) {
+                                        $metode[] = 'Transfer: Rp ' . number_format($item->transfer, 0, ',', '.');
+                                    }
+                                @endphp
+                                {!! implode('<br><hr style="margin: 2px 0;">', $metode) !!}
+                            </td> --}}
                             <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($modal_j[$k]) }}
                             </td>
                             <td style="width: 60px; text-align: right;">Rp. {{ number_format($biaya_j[$k]) }}</td>
-                            <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
+                            {{-- <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td> --}}
+                            {{-- <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->profit) }}</td> --}}
                             <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($biaya_j[$k] - $modal_j[$k]) }}</td>
                         </tr>
@@ -220,20 +311,6 @@
                         <td style="width: 10px;">{{ $i++ }}</td>
                         <td class="text-center" style="width: 60px;">{{ $item->nomor_servis }}</td>
                         <td style="text-align: left; width: 70px;" class="capital">{{ $item->nama_pelanggan }}</td>
-                        <td style="text-align: left; width: 70px;">
-                            @if ($item->modelserie)
-                                {{ $item->modelserie->name }}
-                            @else
-                                -
-                            @endif
-                        </td>
-                        <td class="capital" style="text-align: left; width: 80px;">
-                            @if ($item->kondisi_servis != 'Sudah jadi')
-                                {{ $item->kondisi_servis }}
-                            @else
-                                {{ json_decode($item->tindakan_servis) ? implode(', ', json_decode($item->tindakan_servis)) : $item->tindakan_servis }}
-                            @endif
-                        </td>
                         @if ($item->user)
                             <td style="text-align: left; width: 70px;">
                                 {{ $item->user->name }}
@@ -247,16 +324,174 @@
                                 -
                             </td>
                         @endif
+                        <td style="text-align: left; width: 70px;">
+                            @if ($item->modelserie)
+                                {{ $item->modelserie->name }}
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td class="" style="text-align: left; width: 80px;">
+                            @if ($item->kondisi_servis != 'Sudah jadi')
+                                {{ $item->kondisi_servis }}
+                            @else
+                                {{ json_decode($item->tindakan_servis) ? implode(', ', json_decode($item->tindakan_servis)) : $item->tindakan_servis }}
+                            @endif
+                        </td>
+
                         <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}
                         </td>
                         <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td>
                         <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
                         <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
+
+                        <td class="" style="text-align: left; width: 80px;">
+                            @php
+                                $metode = [];
+                                if ($item->tunai > 0) {
+                                    $metode[] =
+                                        '<div>
+                        <strong>Tunai:</strong><br>
+                        Rp.' .
+                                        number_format($item->tunai, 0, ',', '.') .
+                                        '
+                     </div>';
+                                }
+                                if ($item->transfer > 0) {
+                                    $metode[] =
+                                        '<div>
+                        <strong>Transfer:</strong><br>
+                        Rp.' .
+                                        number_format($item->transfer, 0, ',', '.') .
+                                        '
+                     </div>';
+                                }
+                            @endphp
+                            @if ($item->kondisi_servis == 'Dibatalkan')
+                                @php
+                                    if ($item->uang_muka > 0 && $item->modal_sparepart > 0) {
+                                        $label = 'Modal - DP:';
+                                        $nilai = $item->uang_muka - $item->modal_sparepart;
+                                    } elseif ($item->uang_muka > 0 && $item->biaya > 0) {
+                                        $label = 'Modal - DP:';
+                                        $nilai = $item->uang_muka - $item->biaya;
+                                    } elseif ($item->uang_muka > 0) {
+                                        $label = 'Uang Muka:';
+                                        $nilai = $item->uang_muka;
+                                    } elseif ($item->modal_sparepart > 0) {
+                                        $label = 'Modal:';
+                                        $nilai = $item->modal_sparepart;
+                                    } else {
+                                        $label = '';
+                                        $nilai = 0;
+                                    }
+                                @endphp
+
+                                <div>
+                                    <strong>{{ $label }}</strong><br>
+                                    Rp.-{{ number_format($nilai, 0, ',', '.') }}
+                                </div>
+
+
+                            @else
+                            {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
+                            @endif
+
+                        </td>
                     </tr>
                 @endif
             @endforeach
         </tbody>
     </table>
+
+    <hr>
+    <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
+        Uang Muka
+    </h4>
+    <table id="detail">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>No. Servis</th>
+                <th>Pelanggan</th>
+                <th>Penerima</th>
+                <th>Model Seri</th>
+                <th>Kerusakan</th>
+                <th>Estimasi Biaya</th>
+                <th>Uang Muka</th>
+                {{-- <th>Pembayaran</th> --}}
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $i = 1;
+            @endphp
+            @foreach ($servicesDP as $item)
+                <tr>
+                    <td style="width: 10px;">{{ $loop->iteration }}</td>
+                    <td>{{ $item->nomor_servis }}</td>
+                    <td>{{ $item->nama_pelanggan }}</td>
+                    <td>{{ $item->penerima }}</td>
+                    <td>{{ $item->modelserie->name ?? '-' }}</td>
+                    <td>{{ $item->kerusakan }}</td>
+                    <td>Rp. {{ number_format($item->estimasi_biaya) }}</td>
+                    <td>Rp. {{ number_format($item->uang_muka) }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <hr>
+    <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
+        Pengeluaran
+    </h4>
+
+    <table id="detail">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Tgl Pengeluaran</th>
+                <th>Nama</th>
+                <th>Item Pengeluaran</th>
+                <th>Status</th>
+                <th>Biaya</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $i = 1;
+            @endphp
+            @foreach ($pengeluaran_data as $item)
+                <tr>
+                    <td style="width: 10px;">{{ $loop->iteration }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</td>
+                    <td>
+                        @if ($item->user)
+                            {{ $item->user->name }}
+                        @else
+                            Akun sudah dihapus
+                        @endif
+                    </td>
+                    <td>{{ $item->name }}</td>
+                    <td>
+                        @if ($item->is_approve === null)
+                            Belum Disetujui
+                        @elseif ($item->is_approve === 'Setuju')
+                            Sudah Disetujui
+                        @else
+                            Ditolak
+                        @endif
+                    </td>
+                    <td>Rp. {{ number_format($item->price) }}</td>
+                </tr>
+            @endforeach
+             <tr>
+				<th colspan="5">Total Biaya</th>
+				<td style="text-align: right;">Rp. {{ number_format($total_pengeluaran) }}</td>
+			</tr>
+        </tbody>
+    </table>
+
 </body>
 
 </html>
