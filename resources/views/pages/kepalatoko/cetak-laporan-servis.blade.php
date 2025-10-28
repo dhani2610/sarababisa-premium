@@ -139,7 +139,7 @@
         </tbody>
     </table>
     <br>
-    
+
     <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
         Detail Transaksi
     </h4>
@@ -208,8 +208,11 @@
                             @endif
                         </td>
 
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($modal_j[0]) }}
+                        <td style="width: 60px; text-align: right;">
+                            Rp. {{ number_format(is_array($modal_j) ? ($modal_j[0] ?? 0) : $modal_j) }}
                         </td>
+                        {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($modal_j[0]) }}
+                        </td> --}}
                         <td style="width: 60px; text-align: right;">Rp. {{ number_format($biaya_j[0]) }}</td>
                         {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td> --}}
                         <td style="width: 50px; text-align: right;" rowspan="{{ count($tindakan_servis) }}">Rp. {{ number_format($item->diskon) }}</td>
@@ -439,7 +442,7 @@
     <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
         Pengeluaran
     </h4>
-    
+
     <table id="detail">
         <thead>
             <tr>
