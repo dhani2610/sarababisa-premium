@@ -208,8 +208,11 @@
                             @endif
                         </td>
 
+                        @php
+                            $modal_convert = is_array($modal_j) ? ($modal_j[0] ?? 0) : $modal_j;
+                        @endphp
                         <td style="width: 60px; text-align: right;">
-                            Rp. {{ number_format(is_array($modal_j) ? ($modal_j[0] ?? 0) : $modal_j) }}
+                            Rp. {{ number_format($modal_convert) }}
                         </td>
                         {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($modal_j[0]) }}
                         </td> --}}
@@ -217,7 +220,7 @@
                         {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td> --}}
                         <td style="width: 50px; text-align: right;" rowspan="{{ count($tindakan_servis) }}">Rp. {{ number_format($item->diskon) }}</td>
                         <td style="width: 60px; text-align: right;">Rp.
-                            {{ number_format($biaya_j[0] - $modal_j[0] - $item->diskon) }}</td>
+                            {{ number_format($biaya_j[0] - $modal_convert - $item->diskon) }}</td>
 
                         <td class="" rowspan="{{ count($tindakan_servis) }}"
                             style="text-align: left; width: 80px;">
