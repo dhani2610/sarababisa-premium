@@ -376,7 +376,7 @@
                 <button type="button"
                     class="hapus-servis bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded">
                     Hapus Tindakan
-                </button>    
+                </button>
                 <label class="block text-sm font-medium mb-1" for="modal_sparepart">Apakah
                         menggunakan stok sparepart toko?</label>
                     <div class="flex flex-wrap items-center -m-3">
