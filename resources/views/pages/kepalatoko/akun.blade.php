@@ -106,6 +106,7 @@
                                             <select id="role" name="role"
                                                 class="form-select text-sm py-1 w-full" required
                                                 onchange="toggleInputs()">
+                                                <option value="Kepala Toko">Kepala Toko</option>
                                                 <option value="Investor">Investor</option>
                                                 <option value="Admin Toko">Admin Toko</option>
                                                 <option value="Teknisi">Teknisi</option>
@@ -255,21 +256,6 @@
 
     </div>
 
-    <!-- JS -->
-    <script>
-        function toggleInputs() {
-            const role = document.getElementById('role').value;
-            const extraFields = document.getElementById('extra-fields');
-            if (role === 'Investor') {
-                extraFields.style.display = 'none';
-            } else {
-                extraFields.style.display = 'block';
-            }
-        }
-
-        // Jalankan saat pertama kali halaman dimuat juga
-        document.addEventListener('DOMContentLoaded', toggleInputs);
-    </script>
 
 <script>
 function toggleInputs() {
@@ -280,6 +266,9 @@ function toggleInputs() {
     if (role === 'Investor') {
         extraFields.style.display = 'none';
         uploadInvestor.style.display = 'block';
+    } else if (role === 'Kepala Toko') {
+        extraFields.style.display = 'none';
+        uploadInvestor.style.display = 'none';
     } else {
         extraFields.style.display = 'block';
         uploadInvestor.style.display = 'none';
@@ -288,6 +277,8 @@ function toggleInputs() {
 
 // Jalankan saat pertama kali halaman dimuat
 document.addEventListener('DOMContentLoaded', toggleInputs);
+document.getElementById('role').addEventListener('change', toggleInputs);
 </script>
+
 
 </x-toko-layout>

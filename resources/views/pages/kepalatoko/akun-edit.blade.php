@@ -215,50 +215,36 @@
         </div>
 
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const roleSelect = document.getElementById('role');
-            const extraFields = document.getElementById('extra-fields');
+   <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('role');
+    const extraFields = document.getElementById('extra-fields');
+    const uploadInvestor = document.getElementById('upload-investor');
 
-            function toggleFields() {
-                if (roleSelect.value === 'Investor') {
-                    extraFields.style.display = 'none';
-                } else {
-                    extraFields.style.display = 'block';
-                }
-            }
+    function toggleInputs() {
+        const role = roleSelect.value;
 
-            // Jalankan langsung saat halaman dibuka (cek default value)
-            toggleFields();
+        if (role === 'Investor') {
+            // Investor: hanya tampil upload PDF
+            uploadInvestor.style.display = 'block';
+            extraFields.style.display = 'none';
+        } else if (role === 'Kepala Toko') {
+            // Kepala Toko: sembunyikan semua
+            uploadInvestor.style.display = 'none';
+            extraFields.style.display = 'none';
+        } else {
+            // Role lain (Admin, Kasir, dll): tampilkan extraFields
+            uploadInvestor.style.display = 'none';
+            extraFields.style.display = 'block';
+        }
+    }
 
-            // Jalankan setiap kali user ubah role
-            roleSelect.addEventListener('change', toggleFields);
-        });
-    </script>
-    
-    {{-- SCRIPT --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const roleSelect = document.getElementById('role');
-            const extraFields = document.getElementById('extra-fields');
-            const uploadInvestor = document.getElementById('upload-investor');
+    // Jalankan saat halaman pertama kali dimuat
+    toggleInputs();
 
-            function toggleInputs() {
-                if (roleSelect.value === 'Investor') {
-                    uploadInvestor.style.display = 'block';
-                    extraFields.style.display = 'none';
-                } else {
-                    uploadInvestor.style.display = 'none';
-                    extraFields.style.display = 'block';
-                }
-            }
-
-            // Jalankan saat halaman dimuat
-            toggleInputs();
-
-            // Jalankan setiap kali role diubah
-            roleSelect.addEventListener('change', toggleInputs);
-        });
-    </script>
+    // Jalankan setiap kali role berubah
+    roleSelect.addEventListener('change', toggleInputs);
+});
+</script>
 
 </x-toko-layout>
