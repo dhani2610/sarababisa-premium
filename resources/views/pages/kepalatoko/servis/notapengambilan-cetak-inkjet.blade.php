@@ -112,7 +112,8 @@
             <td class="text-left"><strong>No. Servis</strong> : {{ $items->nomor_servis }}</td>
             <td class="text-right"><strong>Tanggal</strong> :
                 {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }}</td>
-            <td class="text-right"><strong>Dicetak oleh</strong> : {{ Auth::user()->name }}</td>
+            {{-- <td class="text-right"><strong>Dicetak oleh</strong> : {{ Auth::user()->name }}</td> --}}
+            <td class="text-right"><strong>Dicetak oleh</strong> : Admin</td>
         </tr>
     </table>
 
