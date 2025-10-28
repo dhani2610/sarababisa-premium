@@ -1136,17 +1136,22 @@
                                                             'Tanggal : {{ \Carbon\Carbon::parse($process->created_at)->translatedFormat('d F Y h:i') }}%0A' +
                                                             'Kerusakan : {{ $process->kerusakan }}%0A%0A' +
                                                             'Link tracking : {{ env('APP_URL') }}/tracking%0A' +
+                                                            'Link nota : {{ route('kepalatoko-cetak-inkjet', $process->id) }}%0A%0A' +
                                                             'Terimakasih'
                                                         )
                                                     @else
                                                         window.open('https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Service*%0A{{ $toko->nama_toko }}%0A%0A' +
                                                             'No.%20Service%20:%20{{ $process->nomor_servis }}%0A' +
                                                             'Nama%20user%20:%20*{{ $process->nama_pelanggan }}*%0A' +
-                                                            'Unit%20:%20{{ $process->nama_barang }}%0ADiterima%20:%20{{ $process->penerima }}%0A' +
+                                                            'Unit%20:%20{{ $process->nama_barang }}%0A' +
+                                                            'Diterima%20:%20{{ $process->penerima }}%0A' +
                                                             'Tanggal%20:%20{{ \Carbon\Carbon::parse($process->created_at)->translatedFormat('d F Y h:i') }}%0A' +
                                                             'Kerusakan%20:%20{{ $process->kerusakan }}%0A%0A' +
-                                                            'Link%20tracking%20:%20{{ env('APP_URL') }}/tracking%0ATerimakasih', '_blank');
+                                                            'Link%20tracking%20:%20{{ env('APP_URL') }}/tracking%0A' +
+                                                            'Link%20nota%20:%20{{ route('kepalatoko-cetak-inkjet', $process->id) }}%0A%0A' +
+                                                            'Terimakasih', '_blank');
                                                     @endif
+
                                                 ">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice"
                                                     width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5"
