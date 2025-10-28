@@ -6,7 +6,7 @@
             <div class="mb-4 sm:mb-0">
                 <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Refund ✨</h1>
             </div>
-         
+
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
@@ -121,7 +121,7 @@
                                                 <label class="block text-sm font-medium mb-1">Nomor Servis <span
                                                         class="text-rose-500">*</span></label>
                                                 <select id="servis_select" name="servis_transaction_id"
-                                                    class="form-select w-full" required>
+                                                    class="form-select select2 w-full" required>
                                                     <option value="">-- Pilih Nomor Servis --</option>
                                                     @foreach ($servis as $s)
                                                         <option value="{{ $s->id }}">#{{ $s->nomor_servis }}
@@ -167,7 +167,7 @@
                     </div>
                 </div>
             @endif
-            
+
         </div>
         </div>
 
@@ -260,7 +260,21 @@
     </div>
 </x-toko-layout>
 
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 {{-- Scripts: handle auto teknisi and bulk delete --}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // aktifkan select2
+        $('.select2').select2({
+            width: '100%', // biar full width
+        });
+    });
+</script>
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('handleSelect', () => ({
