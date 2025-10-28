@@ -229,11 +229,11 @@
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
 					<td style="width: 70px; text-align: left;">
                         @if ($item->order->payment_method == 'Tunai')
-                            Tunai : Rp. {{ number_format($item->order->tunai ?? $item->order->pay) }}
+                            Tunai : Rp. {{ number_format($item->order->tunai) }}
                         @elseif ($item->order->payment_method == 'Transfer')
-                            Transfer : Rp. {{ number_format($item->order->tunai ?? $item->order->pay) }}
+                            Transfer : Rp. {{ number_format($item->order->transfer) }}
                         @elseif ($item->order->payment_method == 'Tunai & Transfer')
-                            Tunai : Rp. {{ number_format($item->tunai) }} <br> <hr>
+                            Tunai : Rp. {{ number_format($item->order->tunai) }} <br> <hr>
                             Transfer : Rp. {{ number_format($item->order->transfer) }}
                         @endif
                     </td>
