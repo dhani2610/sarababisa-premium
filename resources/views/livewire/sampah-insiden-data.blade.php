@@ -198,7 +198,7 @@
                                 <div class="font-medium">Rp. {{ number_format($item->price) }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-medium">{{ $item->worker->name }}</div>
+                                <div class="font-medium">{{ $item->worker->name?? '-' }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="space-x-1 flex">
