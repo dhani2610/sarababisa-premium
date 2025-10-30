@@ -4,6 +4,7 @@ use App\Http\Controllers\KepalaToko\ProdukController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\RincianInvestController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Livewire\MasterAbsensi;
 
 use App\Http\Controllers\DefaultController;
 
@@ -23,6 +24,7 @@ use App\Http\Controllers\KepalaToko\RecycleBinController;
 use App\Http\Controllers\KepalaToko\DataPenjualanController;
 use App\Http\Controllers\KepalaToko\DataPengeluaranController;
 use App\Http\Controllers\KepalaToko\DataTargetPersenController;
+use App\Http\Controllers\KepalaToko\AttendanceController;
 use App\Http\Controllers\Sales\PosController as SalesPosController;
 use App\Http\Controllers\Sales\KasbonController as SalesKasbonController;
 use App\Http\Controllers\Sales\ProdukController as SalesProdukController;
@@ -255,6 +257,15 @@ Route::delete('/master/master-izin/delete-selected', [MasterIzinController::clas
     ->name('master-izin.deleteSelected');
 Route::resource('master/master-izin', MasterIzinController::class);
 
+
+// Livewire page (index)
+// Route::get('master/master-absensi', MasterAbsensi::class)->name('master-absensi.index');
+
+// Controller endpoints for store & deletes (Livewire only displays)
+Route::get('master/master-absensi', [AttendanceController::class, 'index'])->name('master-absensi.index');
+Route::post('master/master-absensi/store', [AttendanceController::class, 'store'])->name('master-absensi.store');
+Route::delete('master/master-absensi/delete-selected', [AttendanceController::class, 'deleteSelected'])->name('master-absensi.deleteSelected');
+Route::delete('master/master-absensi/{id}', [AttendanceController::class, 'destroy'])->name('master-absensi.destroy');
 
 // routes/web.php
 // Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'yyy'])->name('service.show');
