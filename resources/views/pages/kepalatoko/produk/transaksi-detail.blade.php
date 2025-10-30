@@ -265,9 +265,41 @@
                         if ($order->customer != null) {
                             $nomor = $order->customer->nomor_hp;
                             $nomorwa = preg_replace('/^08/', 628, $nomor);
+                            $fonteeToken = \App\Models\StoreSetting::first()->fonnte ?? null;
                         }
                     @endphp
-                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Penjualan*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Nota%20:%20{{ $order->invoice_no }}%0ANama%20pelanggan%20:%20*{{ $order->nama_pelanggan }}*%0AProduk%20:%0A{{ $produkDetails }}%0APembayaran%20:%20{{ $order->payment_method }}%0A%0ALink%20garansi%20:%20{{ $toko->link_toko }}/garansi%0A%0ATerimakasih"  target="_blank">
+                    {{-- <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Penjualan*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Nota%20:%20{{ $order->invoice_no }}%0ANama%20pelanggan%20:%20*{{ $order->nama_pelanggan }}*%0AProduk%20:%0A{{ $produkDetails }}%0APembayaran%20:%20{{ $order->payment_method }}%0A%0ALink%20garansi%20:%20{{ $toko->link_toko }}/garansi%0A%0ATerimakasih"  target="_blank"> --}}
+                    <a href="javascript:void(0)"
+                        @click="
+                            @if($fonteeToken ?? false)
+                                kirimFontee(
+                                    '{{ $fonteeToken }}',
+                                    '{{ $nomorwa }}',
+                                    '*Notifikasi Penjualan*%0A{{ $toko->nama_toko }}%0A%0A' +
+                                    'No. Nota : {{ $order->invoice_no }}%0A' +
+                                    'Nama pelanggan : *{{ $order->nama_pelanggan }}*%0A' +
+                                    'Produk : {{ $produkDetails }}%0A' +
+                                    'Pembayaran : {{ $order->payment_method }}%0A%0A' +
+                                    'Link garansi : {{ $toko->link_toko }}/garansi%0A' +
+                                    'Link nota : {{ route('lunas-cetak-inkjet', $order->id) }}%0A%0A' +
+                                    'Terimakasih'
+                                )
+                            @else
+                                window.open(
+                                    'https://wa.me/{{ $nomorwa }}/?text=' +
+                                    '*Notifikasi%20Penjualan*%0A{{ $toko->nama_toko }}%0A%0A' +
+                                    'No.%20Nota%20:%20{{ $order->invoice_no }}%0A' +
+                                    'Nama%20pelanggan%20:%20*{{ $order->nama_pelanggan }}*%0A' +
+                                    'Produk%20:%20{{ $produkDetails }}%0A' +
+                                    'Pembayaran%20:%20{{ $order->payment_method }}%0A%0A' +
+                                    'Link%20garansi%20:%20{{ $toko->link_toko }}/garansi%0A' +
+                                    'Link%20nota%20:%20{{ route('lunas-cetak-inkjet', $order->id) }}%0A%0A' +
+                                    'Terimakasih',
+                                    '_blank'
+                                );
+                            @endif
+                        ">
+
                         <button class="btn w-full bg-emerald-500 hover:bg-emerald-600 text-white mt-3">
                             <span class="mr-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -300,4 +332,31 @@
             })
         }
     </script>
+        
+    {{-- SCRIPT JS UNTUK FONTEE --}}
+    <script>
+    function kirimFontee(token, phone, message) {
+        fetch('https://api.fonnte.com/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({
+                target: phone,
+                message: decodeURIComponent(message)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === true || data.success) {
+                alert('✅ Pesan berhasil dikirim ke Pelanggan!');
+            } else {
+                alert('⚠️ Gagal mengirim ke Pelanggan. Coba lagi.');
+            }
+        })
+        .catch(() => alert('❌ Terjadi kesalahan saat mengirim ke Fontee.'));
+    }
+    </script>
+
 </x-toko-layout>

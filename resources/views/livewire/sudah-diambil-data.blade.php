@@ -561,7 +561,8 @@
                                                     . "Status : {$transaction->kondisi_servis}\n"
                                                     . "Garansi sampai : " . ($transaction->exp_garansi ? \Carbon\Carbon::parse($transaction->exp_garansi)->translatedFormat('d F Y') : 'Tidak ada garansi') . "\n"
                                                     . "Pembayaran : {$transaction->cara_pembayaran}\n\n"
-                                                    . "Link tracking : " . env('APP_URL') . "/tracking\n\n"
+                                                    . "Link tracking : " . env('APP_URL') . "/tracking\n"
+                                                    . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $transaction->id)  . "\n\n"
                                                     . "Terimakasih";
 
                                                 // Versi encoded untuk WhatsApp link

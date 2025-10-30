@@ -387,7 +387,6 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('produk/complete-order', [KepalaTokoPosController::class, 'CompleteOrder']);
     Route::get('produk/pos/{id}', [KepalaTokoPosController::class, 'show'])->name('show-print-order');
 
-    Route::get('transaksi-produk-inkjet/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakinkjet'])->name('lunas-cetak-inkjet');
     Route::get('transaksi-produk-termal/{orders_id}', [KepalaTokoTransaksiProdukController::class, 'cetaktermal'])->name('cetak-termal');
 
     Route::get('laporan/laporan-servis', [KepalaTokoLaporanServisController::class, 'index'])->name('laporan-servis');
@@ -431,7 +430,6 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('servis/kembali-bisa-diambil{id}', [KepalaTokoSudahDiambilController::class, 'back'])->name('kembali-bisa-diambil');
 
     Route::get('nota-terima-termal/{id}', [KepalaTokoTransaksiServisController::class, 'cetaktermal'])->name('kepalatoko-cetak-termal');
-    Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::class, 'cetakinkjet'])->name('kepalatoko-pengambilan-cetak-inkjet');
     Route::get('kepalatoko-nota-pengambilan-termal/{id}', [KepalaTokoSudahDiambilController::class, 'pengambilantermal'])->name('kepalatoko-nota-pengambilan-termal');
 
 
@@ -454,6 +452,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
 });
 
 Route::get('nota-terima-inkjet/{id}', [KepalaTokoTransaksiServisController::class, 'cetakinkjet'])->name('kepalatoko-cetak-inkjet');
+Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::class, 'cetakinkjet'])->name('kepalatoko-pengambilan-cetak-inkjet');
+Route::get('transaksi-produk-inkjet/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakinkjet'])->name('lunas-cetak-inkjet');
 
 Route::resource('servis/admin-transaksi-servis', AdminTokoTransaksiServisController::class);
 Route::resource('servis/admin-servis-bisa-diambil', AdminTokoBisaDiambilController::class);

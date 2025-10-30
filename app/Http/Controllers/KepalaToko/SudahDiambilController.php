@@ -497,6 +497,10 @@ class SudahDiambilController extends Controller
             $tempo = null;
         }
 
+        $garansiList = $request->garansi ?? [];
+        foreach ($garansiList as $val) {
+            $expired[] = Carbon::now()->addDays($val);
+        }
         // Transaction create
         $item->update([
             'created_at' => $request->created_at,
@@ -523,7 +527,9 @@ class SudahDiambilController extends Controller
             'uang_muka' => $request->uang_muka,
             'diskon' => $request->diskon,
             'cara_pembayaran' => $request->cara_pembayaran,
-            'exp_garansi' => $request->exp_garansi,
+            'garansi'       => !empty($request->garansi) && isset($request->garansi[0]) ? $request->garansi[0] : null,
+            'exp_garansi'   => !empty($expired) && isset($expired[0]) ? $expired[0] : null,
+            'exp_garansi_j' => json_encode($expired ?? []),
             'tgl_ambil' => $request->tgl_ambil,
             'pengambil' => $request->pengambil,
             'persen_teknisi' => $persen_teknisi,
