@@ -8,18 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Izin extends Model
 {
     use HasFactory;
-     protected $table = 'izins';
 
     protected $fillable = [
-        'user_id',
-        'tipe',
-        'keterangan',
-        'tanggal',
-        'nominal_potongan',
+        'user_id', 'tipe', 'keterangan', 'tanggal', 'nominal_potongan'
     ];
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 }

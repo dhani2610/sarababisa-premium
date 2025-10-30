@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Budget;
 use App\Models\Salary;
 use App\Models\Refund;
+use App\Models\Izin;
 use App\Models\Worker;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -127,8 +128,12 @@ class KaryawanController extends Controller
         $totalPotonganServis = $potonganServis;
         $namaKaryawan = $items->name;
 
+        $izin = Izin::where('user_id',$user->id)->whereYear('tanggal', $date->year)
+        ->whereMonth('tanggal', $date->month)->get()->sum('nominal_potongan');
+
         $pdf = PDF::loadView('pages.kepalatoko.karyawan.cetak', [
         // return View('pages.kepalatoko.karyawan.cetak', [
+            'izin' => $izin,
             'tanggal' => $tanggal,
             'periode' => $periode,
             'users' => $users,

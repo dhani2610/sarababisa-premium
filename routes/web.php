@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\KepalaToko\MasterIzinController;
 use App\Http\Controllers\KepalaToko\ProdukController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\RincianInvestController;
@@ -156,6 +155,7 @@ use App\Http\Controllers\KepalaToko\TransaksiServisLangsungController as KepalaT
 use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTransaksiServisLangsungController;
 use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as KepalaTokoServisBelumDisetujuiApproveController;
 use App\Http\Controllers\TipeOsController;
+use App\Http\Controllers\KepalaToko\MasterIzinController;
 
 /*
 |--------------------------------------------------------------------------
@@ -251,6 +251,10 @@ Route::patch('/history-garansi/{id}/toggle-status', [HistoryGaransiController::c
     ->name('history-garansi.toggleStatus');
 Route::post('/history-garansi/bulk-delete', [HistoryGaransiController::class, 'bulkDelete'])->name('history-garansi.bulkDelete');
 
+Route::delete('/master/master-izin/delete-selected', [MasterIzinController::class, 'deleteSelected'])
+    ->name('master-izin.deleteSelected');
+Route::resource('master/master-izin', MasterIzinController::class);
+
 
 // routes/web.php
 // Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'yyy'])->name('service.show');
@@ -307,8 +311,6 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
     Route::resource('master/master-tipe-os', TipeOsController::class);
     Route::resource('master/master-gallery', GalleryController::class);
-
-    Route::get('master/master-izin', [MasterIzinController::class, 'index'])->name('master-izin.index');
 
 
     Route::resource('refund', RefundController::class)->names('refund');
@@ -390,6 +392,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('produk/complete-order', [KepalaTokoPosController::class, 'CompleteOrder']);
     Route::get('produk/pos/{id}', [KepalaTokoPosController::class, 'show'])->name('show-print-order');
 
+    Route::get('transaksi-produk-inkjet/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakinkjet'])->name('lunas-cetak-inkjet');
     Route::get('transaksi-produk-termal/{orders_id}', [KepalaTokoTransaksiProdukController::class, 'cetaktermal'])->name('cetak-termal');
 
     Route::get('laporan/laporan-servis', [KepalaTokoLaporanServisController::class, 'index'])->name('laporan-servis');
@@ -433,6 +436,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('servis/kembali-bisa-diambil{id}', [KepalaTokoSudahDiambilController::class, 'back'])->name('kembali-bisa-diambil');
 
     Route::get('nota-terima-termal/{id}', [KepalaTokoTransaksiServisController::class, 'cetaktermal'])->name('kepalatoko-cetak-termal');
+    Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::class, 'cetakinkjet'])->name('kepalatoko-pengambilan-cetak-inkjet');
     Route::get('kepalatoko-nota-pengambilan-termal/{id}', [KepalaTokoSudahDiambilController::class, 'pengambilantermal'])->name('kepalatoko-nota-pengambilan-termal');
 
 
@@ -454,15 +458,10 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('/impor-tool', [KepalaTokoProdukToolController::class, 'import'])->name('impor-tool');
 });
 
-Route::get('nota-terima-inkjet/{id}', [KepalaTokoTransaksiServisController::class, 'cetakinkjet'])->name('kepalatoko-cetak-inkjet');
+Route::get('izin', [MasterIzinController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
+Route::get('nota-terima-inkjet/{id}', [KepalaTokoTransaksiServisController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
 Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::class, 'cetakinkjet'])->name('kepalatoko-pengambilan-cetak-inkjet');
 Route::get('transaksi-produk-inkjet/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakinkjet'])->name('lunas-cetak-inkjet');
-
-Route::resource('servis/admin-transaksi-servis', AdminTokoTransaksiServisController::class);
-Route::resource('servis/admin-servis-bisa-diambil', AdminTokoBisaDiambilController::class);
-Route::resource('servis/admin-servis-sudah-diambil', AdminTokoSudahDiambilController::class);
-Route::post('servis/admin-transaksi-servis/{id}/update-pin-pola', [AdminTokoTransaksiServisController::class, 'updatePinPola'])
-    ->name('transaksi-servis.update-pin-pola');
 Route::post('/servis/admin-transaksi-servis-langsung', [AdminTokoTransaksiServisLangsungController::class, 'store'])->name('admin-servis-langsung');
 
 Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(function () {

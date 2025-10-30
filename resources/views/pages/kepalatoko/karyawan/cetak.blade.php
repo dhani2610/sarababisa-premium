@@ -162,7 +162,7 @@
 			@endforeach
 		</tbody>
 	</table>
-	
+
 	@foreach ($totalPotonganServis as $pt)
 		<table class="table table-sm table-borderless">
 			<thead>
@@ -177,8 +177,16 @@
 	<table class="table table-sm table-borderless">
 		<thead>
 			<tr>
+			<th scope="col">Izin/Sakit/Alfa</th>
+			<th scope="col" class="text-right text-danger">Rp. {{ number_format($izin) }}</th>
+			</tr>
+		</thead>
+	</table>
+	<table class="table table-sm table-borderless">
+		<thead>
+			<tr>
 			<th scope="col">Total Pengurangan</th>
-			<th scope="col" class="text-right text-danger">Rp. {{ number_format($totalkasbon + $totalinsiden +  $totalPotonganServis->sum('nominal')) }}</th>
+			<th scope="col" class="text-right text-danger">Rp. {{ number_format($totalkasbon + $totalinsiden +  $totalPotonganServis->sum('nominal') + $izin) }}</th>
 			</tr>
 		</thead>
 	</table>
@@ -187,7 +195,7 @@
 		<thead>
 			<tr>
 			<th scope="col">TOTAL DITERIMA KARYAWAN</th>
-			<th scope="col" class="text-right text-success">Rp. {{ number_format($items->gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal')) }}</th>
+			<th scope="col" class="text-right text-success">Rp. {{ number_format($items->gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal') - $izin) }}</th>
 			</tr>
 		</thead>
 	</table>
