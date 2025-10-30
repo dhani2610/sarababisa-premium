@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\KepalaToko\MasterIzinController;
 use App\Http\Controllers\KepalaToko\ProdukController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\RincianInvestController;
@@ -306,6 +307,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
     Route::resource('master/master-tipe-os', TipeOsController::class);
     Route::resource('master/master-gallery', GalleryController::class);
+
+    Route::get('master/master-izin', [MasterIzinController::class, 'index'])->name('master-izin.index');
 
 
     Route::resource('refund', RefundController::class)->names('refund');
