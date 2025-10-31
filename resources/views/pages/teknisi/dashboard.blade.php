@@ -18,13 +18,13 @@
                             </svg>
                             <div class="font-medium">Ada {{ $reminders }} servis yang belum dikerjakan lebih dari 1 minggu nih, cek sekarang!</div>
                         </div>
-                        <a class="font-medium text-white ml-4 mt-[3px]" href="{{ route('teknisi-transaksi-servis.index') }}">-&gt;</a>
+                        <a class="font-medium text-white ml-4 mt-[3px]" href="{{ route('transaksi-servis.index') }}">-&gt;</a>
                     </div>
                 </div>
             @endif
             <!-- Reminder Servis End -->
         </div>
-        
+
         @if ($target != 0)
             <!-- Cards -->
             <div class="grid grid-cols-12 gap-6">

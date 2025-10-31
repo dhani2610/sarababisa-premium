@@ -7,7 +7,7 @@ use Livewire\WithPagination;
 use App\Models\Attendance;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-
+use Carbon\Carbon;
 class MasterAbsensi extends Component
 {
     use WithPagination;
@@ -54,9 +54,31 @@ class MasterAbsensi extends Component
             ? User::select('id','name')->get()
             : User::where('id', $user->id)->select('id','name')->get();
 
+
+        $totalMasuk = Attendance::where('type', 'masuk')->count();
+        $totalPulang = Attendance::where('type', 'pulang')->count();
+        $totalAbsen = $totalMasuk + $totalPulang;
+
+          // === Tambahan: Hitung Hari Ini ===
+        $today = Carbon::today();
+        $hariIniMasuk = Attendance::where('type', 'masuk')
+            ->whereDate('created_at', $today)
+            ->count();
+        $hariIniPulang = Attendance::where('type', 'pulang')
+            ->whereDate('created_at', $today)
+            ->count();
+        $hariIniTotal = $hariIniMasuk + $hariIniPulang;
+
+
         return view('livewire.master-absensi', [
             'attendances' => $query->paginate($this->paginate),
             'users' => $users,
+            'totalMasuk' => $totalMasuk,
+            'totalPulang' => $totalPulang,
+            'totalAbsen' => $totalAbsen,
+            'hariIniMasuk' => $hariIniMasuk,
+            'hariIniPulang' => $hariIniPulang,
+            'hariIniTotal' => $hariIniTotal,
             'count' => Attendance::count(),
         ]);
     }

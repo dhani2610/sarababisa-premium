@@ -17,6 +17,137 @@
                 z-index: 9999 !important;
             }
         </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+        <!-- Statistik -->
+        <div class="space-y-4 mb-6">
+            <!-- Filter Bulan -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Statistik Izin</h2>
+                </div>
+                <div>
+                    <input type="month" wire:model="filter_bulan" class="form-input border-slate-300 rounded-md">
+                </div>
+            </div>
+
+            <!-- Tabs tipe -->
+            <div class="flex space-x-3 border-b border-slate-200 mb-2">
+                @foreach (['izin', 'sakit', 'alfa'] as $tipe)
+                    <button wire:click="$set('filter_tipe', '{{ $tipe }}')"
+                        class="py-2 px-4 text-sm font-medium border-b-2 transition-all duration-200
+                    {{ $filter_tipe === $tipe ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
+                        {{ ucfirst($tipe) }}
+                    </button>
+                @endforeach
+                <button wire:click="$set('filter_tipe', null)"
+                    class="py-2 px-4 text-sm font-medium border-b-2 transition-all duration-200
+                {{ $filter_tipe === null ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
+                    Semua
+                </button>
+            </div>
+
+            <!-- Baris 1: Hari Ini -->
+            <div class="flex flex-wrap gap-4">
+                <div class="flex-1 min-w-[200px] bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
+                    <div class="p-3 bg-purple-100 text-purple-600 rounded-full">
+                        <i class="fas fa-calendar-day text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500">Hari Ini</h3>
+                        <div class="text-lg font-bold text-slate-800">
+                            {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
+                    <div class="p-3 bg-green-100 text-green-600 rounded-full"><i class="fas fa-user-check text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500">Izin Hari Ini</h3>
+                        <div class="text-lg font-bold text-slate-800">{{ $stats['hariIni']['izin'] }} Orang</div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
+                    <div class="p-3 bg-yellow-100 text-yellow-600 rounded-full"><i class="fas fa-user-md text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500">Sakit Hari Ini</h3>
+                        <div class="text-lg font-bold text-slate-800">{{ $stats['hariIni']['sakit'] }} Orang</div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
+                    <div class="p-3 bg-red-100 text-red-600 rounded-full"><i class="fas fa-user-times text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500">Alfa Hari Ini</h3>
+                        <div class="text-lg font-bold text-slate-800">{{ $stats['hariIni']['alfa'] }} Orang</div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
+                    <div class="p-3 bg-blue-100 text-blue-600 rounded-full"><i class="fas fa-users text-xl"></i></div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500">Total Hari Ini</h3>
+                        <div class="text-lg font-bold text-slate-800">{{ $stats['hariIni']['total'] }} Orang</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Baris 2: Bulan Ini -->
+            <div class="flex flex-wrap gap-4">
+                <div class="flex-1 min-w-[200px] bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
+                    <div class="p-3 bg-purple-100 text-purple-600 rounded-full">
+                        <i class="fas fa-calendar-alt text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500">Bulan Ini</h3>
+                        <div class="text-lg font-bold text-slate-800">
+                            {{ \Carbon\Carbon::parse($filter_bulan)->translatedFormat('F Y') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
+                    <div class="p-3 bg-green-100 text-green-600 rounded-full"><i class="fas fa-user-check text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500">Izin Bulan Ini</h3>
+                        <div class="text-lg font-bold text-slate-800">{{ $stats['bulanIni']['izin'] }} Orang</div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
+                    <div class="p-3 bg-yellow-100 text-yellow-600 rounded-full"><i class="fas fa-user-md text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500">Sakit Bulan Ini</h3>
+                        <div class="text-lg font-bold text-slate-800">{{ $stats['bulanIni']['sakit'] }} Orang</div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
+                    <div class="p-3 bg-red-100 text-red-600 rounded-full"><i class="fas fa-user-times text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500">Alfa Bulan Ini</h3>
+                        <div class="text-lg font-bold text-slate-800">{{ $stats['bulanIni']['alfa'] }} Orang</div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
+                    <div class="p-3 bg-blue-100 text-blue-600 rounded-full"><i class="fas fa-users text-xl"></i></div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500">Total Bulan Ini</h3>
+                        <div class="text-lg font-bold text-slate-800">{{ $stats['bulanIni']['total'] }} Orang</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Header -->
         <div class="sm:flex sm:justify-between sm:items-center mb-3">
@@ -28,7 +159,8 @@
                 <x-search-form placeholder="Cari berdasarkan nama user" />
 
                 <!-- Tombol Tambah -->
-                <button type="button" class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click="modalOpen = true">
+                <button type="button" class="btn bg-indigo-500 hover:bg-indigo-600 text-white"
+                    @click="modalOpen = true">
                     <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
                         <path
                             d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
@@ -95,13 +227,13 @@
                 </h2>
             </div>
 
-            <div class="table-items-action hidden flex items-center space-x-2">
-                <div class="text-sm text-slate-500">
-                    <span class="table-items-count">0</span> data terpilih
+             <div class="table-items-action hidden flex items-center gap-2">
+                    <div class="text-sm text-slate-500">
+                    <span class="table-items-count ml-2">0</span> data terpilih
                 </div>
                 <button type="button" class="btn bg-rose-500 hover:bg-rose-600 text-white btn-sm"
                     @click="deleteSelected">Hapus Terpilih</button>
-            </div>
+                </div>
 
             <div class="overflow-x-auto">
                 <table class="table-auto w-full">
@@ -116,7 +248,8 @@
                                 </label>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">No</th>
-                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Nama User</th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Nama User
+                            </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Tipe</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Tanggal</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Nominal</th>
@@ -130,8 +263,8 @@
                         @foreach ($izins as $izin)
                             <tr>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 text-center">
-                                    <input type="checkbox" value="{{ $izin->id }}" class="form-checkbox table-item"
-                                        @click="uncheckParent">
+                                    <input type="checkbox" value="{{ $izin->id }}"
+                                        class="form-checkbox table-item" @click="uncheckParent">
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
                                     {{ $i++ }}</td>

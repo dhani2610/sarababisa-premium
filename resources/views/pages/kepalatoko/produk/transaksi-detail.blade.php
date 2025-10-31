@@ -4,7 +4,7 @@
 
 <x-toko-layout>
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-     
+
         <!-- Billing Information -->
         <div class="mb-6">
             <div class="text-slate-800 font-semibold mb-4">Data Pelanggan</div>
@@ -53,7 +53,7 @@
                                 </div>
                                 <div class="text-sm font-medium text-slate-800 ml-6">
                                     @if ($item->ppn > 0)
-                                        <span class="text-xs text-blue-500">(+PPN Rp. {{ number_format($item->ppn) }})</span>    
+                                        <span class="text-xs text-blue-500">(+PPN Rp. {{ number_format($item->ppn) }})</span>
                                     @endif
                                      Rp. {{ number_format($item->price * $item->quantity + $item->ppn) }}
                                 </div>
@@ -259,7 +259,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>                                            
+                            </div>
                     </div>
                     @php
                         if ($order->customer != null) {
@@ -280,7 +280,7 @@
                                     'Nama pelanggan : *{{ $order->nama_pelanggan }}*%0A' +
                                     'Produk : {{ $produkDetails }}%0A' +
                                     'Pembayaran : {{ $order->payment_method }}%0A%0A' +
-                                    'Link garansi : {{ $toko->link_toko }}/garansi%0A' +
+                                    'Link garansi : {{ env('APP_URL') }}/garansi%0A' +
                                     'Link nota : {{ route('lunas-cetak-inkjet', $order->id) }}%0A%0A' +
                                     'Terimakasih'
                                 )
@@ -292,7 +292,7 @@
                                     'Nama%20pelanggan%20:%20*{{ $order->nama_pelanggan }}*%0A' +
                                     'Produk%20:%20{{ $produkDetails }}%0A' +
                                     'Pembayaran%20:%20{{ $order->payment_method }}%0A%0A' +
-                                    'Link%20garansi%20:%20{{ $toko->link_toko }}/garansi%0A' +
+                                    'Link%20garansi%20:%20{{ env('APP_URL') }}/garansi%0A' +
                                     'Link%20nota%20:%20{{ route('lunas-cetak-inkjet', $order->id) }}%0A%0A' +
                                     'Terimakasih',
                                     '_blank'
@@ -332,7 +332,7 @@
             })
         }
     </script>
-        
+
     {{-- SCRIPT JS UNTUK FONTEE --}}
     <script>
     function kirimFontee(token, phone, message) {
