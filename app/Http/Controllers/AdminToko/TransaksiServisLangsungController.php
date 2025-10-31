@@ -45,7 +45,7 @@ class TransaksiServisLangsungController extends Controller
             $persen_teknisi = null;
         }
 
-       
+
         // --- BLOK LOGIKA YANG DIPERBAIKI ---
         $tindakan_servis = []; // 1. Inisialisasi sebagai array kosong
 
@@ -90,7 +90,7 @@ class TransaksiServisLangsungController extends Controller
         $bagihasil = ($biaya - $modalSparepart - $request->diskon) / 100;
 
 
-         
+
         // $ppn = 0;
         // $cekppn = StoreSetting::find(1);
         // if (!empty($cekppn)) {
@@ -100,7 +100,7 @@ class TransaksiServisLangsungController extends Controller
         //         $ppn = 0;
         //     }
         // }
-        
+
         // if ($request->cara_pembayaran === 'Tunai') {
         //     if (!empty($request->diskon) && $request->diskon > 0) {
         //         $tunai = $request->biaya - $request->diskon;
@@ -112,7 +112,7 @@ class TransaksiServisLangsungController extends Controller
         //     $pay = $request->biaya;
         // }
 
-       
+
         // if ($request->cara_pembayaran === 'Transfer') {
         //     if (!empty($request->diskon) && $request->diskon > 0) {
         //         $transfer = $request->biaya - $request->diskon;
@@ -223,15 +223,15 @@ class TransaksiServisLangsungController extends Controller
         if ($cekTeknisi->bagian_teknisi == 'Teknisi Interface') {
             if ($request->tipe == 'Interface') {
                 if (!empty($nama_model)) {
-                    $bonus_interface = $nama_model->nominal_bonus; 
+                    $bonus_interface = $nama_model->nominal_bonus;
                 }else{
-                $bonus_interface = 0; 
+                $bonus_interface = 0;
                 }
             }else{
-                $bonus_interface = 0; 
+                $bonus_interface = 0;
             }
         }else{
-            $bonus_interface = 0; 
+            $bonus_interface = 0;
         }
 
 
@@ -339,7 +339,7 @@ class TransaksiServisLangsungController extends Controller
             }
         }
 
-        
+
         try {
             $tindakanText = count($tindakan_servis) > 0
                 ? "• " . implode("\n• ", $tindakan_servis)
@@ -385,12 +385,12 @@ class TransaksiServisLangsungController extends Controller
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;
-    
+
             if (!$botToken || !$chatId) {
                 \Log::warning('Telegram bot token atau chat_id belum diset di pengaturan toko.');
                 return;
             }
-    
+
             try {
                 Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                     'chat_id' => $chatId,
@@ -400,6 +400,6 @@ class TransaksiServisLangsungController extends Controller
             } catch (\Exception $e) {
                 \Log::error('Gagal kirim pesan Telegram: ' . $e->getMessage());
             }
-        } 
+        }
     }
 }

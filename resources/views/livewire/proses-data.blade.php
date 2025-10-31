@@ -831,7 +831,7 @@
                     </a>
                 </li>
 
-                @if (Auth::user()->role != 'Investor' || Auth::user()->role != 'Admin Toko' )
+                @if (Auth::user()->role == 'Kepala Toko' )
                 <li class="m-1">
                     <a href="{{ route('transaksi-servis-belum-disetujui.index') }}">
                         <button
