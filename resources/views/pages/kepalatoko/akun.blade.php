@@ -114,7 +114,9 @@
                                             </select>
                                         </div>
 
-                                          <div id="upload-investor" style="display: none;">
+
+
+                                        <div id="upload-investor" style="display: none;">
                                             <label class="block text-sm font-medium mb-1" for="pdf_investor">
                                                 Upload PDF Investor <span class="text-rose-500">*</span>
                                             </label>
@@ -135,6 +137,7 @@
                                                     <option value="Teknisi Hardware">Tidak</option>
                                                 </select>
                                             </div>
+                                            <br>
 
                                             <div x-data="{ showDetails: false }">
                                                 <label class="block text-sm font-medium mb-1" for="types_id">Jika
@@ -169,6 +172,7 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <br>
 
                                             <div>
                                                 <label class="block text-sm font-medium" for="workers_id">Relasi Data
@@ -186,6 +190,26 @@
                                                 </select>
                                             </div>
 
+                                            <div id="bonus-admin" style="display: none;">
+                                                <div>
+                                                    <label class="block text-sm font-medium mb-1" for="tipe_bonus_admin">
+                                                        Tipe Bonus <span class="text-rose-500">*</span>
+                                                    </label>
+                                                    <select id="tipe_bonus_admin" name="tipe_bonus_admin" class="form-select text-sm py-1 w-full">
+                                                        <option value="">Pilih Tipe Bonus</option>
+                                                        <option value="Persen">Persen</option>
+                                                        <option value="Tetap">Tetap</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="mt-3">
+                                                    <label class="block text-sm font-medium mb-1" for="nominal_bonus_admin">
+                                                        Nominal Bonus per Nota <span class="text-rose-500">*Isi jika tipe bonus tetap</span>
+                                                    </label>
+                                                    <input id="nominal_bonus_admin" name="nominal_bonus_admin"
+                                                        class="form-input w-full px-2 py-1" type="number" placeholder="Contoh: 5000" />
+                                                </div>
+                                            </div>
                                             <div>
                                                 <label class="block text-sm font-medium mb-1"
                                                     for="persen">Persen</label>
@@ -262,16 +286,24 @@ function toggleInputs() {
     const role = document.getElementById('role').value;
     const extraFields = document.getElementById('extra-fields');
     const uploadInvestor = document.getElementById('upload-investor');
+    const bonusAdmin = document.getElementById('bonus-admin');
 
     if (role === 'Investor') {
         extraFields.style.display = 'none';
         uploadInvestor.style.display = 'block';
+        bonusAdmin.style.display = 'none';
     } else if (role === 'Kepala Toko') {
         extraFields.style.display = 'none';
         uploadInvestor.style.display = 'none';
+        bonusAdmin.style.display = 'none';
+    } else if (role === 'Admin Toko') {
+        extraFields.style.display = 'block';
+        uploadInvestor.style.display = 'none';
+        bonusAdmin.style.display = 'block';
     } else {
         extraFields.style.display = 'block';
         uploadInvestor.style.display = 'none';
+        bonusAdmin.style.display = 'none';
     }
 }
 

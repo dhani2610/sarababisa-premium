@@ -230,7 +230,7 @@ class Index extends Component
                 'tunai'      => $this->tunai,
                 'transfer'      => $this->transfer,
                 'note'                => $this->note,
-                'is_approve'      => 'Setuju',
+                'is_approve'      => Auth::user()->role == 'Kepala Toko' ? 'Setuju' : null,
                 'tgl_disetujui'      => date('Y-m-d'),
             ]);
 
@@ -277,6 +277,8 @@ class Index extends Component
                     'garansi'      => $expired,
                     'garansi_imei'      => $expired_imei,
                     'payment_method'      => $this->payment_method,
+                    'is_admin_toko'      => Auth::user()->role == 'Admin Toko' ? 'Admin' : null,
+                    'admin_id'      => Auth::user()->role == 'Admin Toko' ? Auth::user()->id : null,
                 ]);
 
                 $product = Product::findOrFail($cart_item->id);

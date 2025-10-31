@@ -100,6 +100,8 @@ class TransaksiServisController extends Controller
 
         // Transaction create
         $transaksi = ServiceTransaction::create([
+            'admin_id' => Auth::user()->id,
+            'is_admin_toko' => Auth::user()->role == 'Admin Toko' ? 'Admin' : null,
             'nomor_servis' => $nomor_servis,
             'customers_id' => $request->customers_id,
             'nama_pelanggan' => $nama_pelanggan->nama,

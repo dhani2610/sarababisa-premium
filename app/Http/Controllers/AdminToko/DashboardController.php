@@ -45,7 +45,40 @@ class DashboardController extends Controller
             ->get()
             ->sum('profit');
 
-        $totalbonus = ($adminbiayaservis / 100 + $adminprofitpenjualan / 100) * Auth::user()->persen;
+        $adminNotaServis = ServiceTransaction::where('is_admin_toko', 'Admin')
+            ->where('admin_id', Auth::user()->id)
+            ->where('is_approve', 'Setuju')
+            ->whereYear('tgl_disetujui', $currentYear)
+            ->whereMonth('tgl_disetujui', $currentMonth)
+            ->get()
+            ->count();
+        $adminNotaPenjualan = OrderDetail::where('is_admin_toko', 'Admin')
+            ->where('admin_id', Auth::user()->id)
+            ->whereHas('order', function ($query) use ($currentMonth) {
+                $query->where('is_approve', 'Setuju')
+                    ->whereYear('tgl_disetujui', now()->year)
+                    ->whereMonth('tgl_disetujui', $currentMonth);
+            })
+            ->get()
+            ->count();
+
+        $user = Auth::user();
+
+        $tipeBonusNota = $user->tipe_bonus_admin; // 'Persen' atau 'Tetap'
+        $nominalBonusNota = $user->nominal_bonus_admin ?? 0;
+        $persen = $user->persen ?? 0;
+
+        if ($tipeBonusNota === 'Persen') {
+            $totalbonus = (($adminbiayaservis + $adminprofitpenjualan) / 100) * $persen;
+        } elseif ($tipeBonusNota === 'Tetap') {
+            $totalNota = $adminNotaServis + $adminNotaPenjualan;
+            $totalbonus = $totalNota * $nominalBonusNota;
+        } else {
+            $totalbonus = 0;
+        }
+        // dd($tipeBonusNota,$totalNota,$totalbonus);
+        // $totalbonus = ($adminbiayaservis / 100 + $adminprofitpenjualan / 100) * Auth::user()->persen;
+        // dd(($adminbiayaservis / 100 + $adminprofitpenjualan / 100),$adminbiayaservis,$adminprofitpenjualan,$totalbonus);
 
         $totalbudgets = Budget::all()->sum('total');
         $totalbiayaservis = ServiceTransaction::where('is_approve', 'Setuju')

@@ -105,6 +105,8 @@
                                         <option value="Sales" {{ $item->role == 'Sales' ? 'selected' : '' }}>Sales</option>
                                     </select>
                                 </div>
+
+
                                 {{-- Hanya muncul kalau role = Investor --}}
                                 <div id="upload-investor" style="display: none;">
                                     <label class="block text-sm font-medium mb-1" for="pdf_investor">Upload PDF
@@ -190,6 +192,29 @@
                                         </select>
                                     </div>
 
+                                    <!-- BONUS ADMIN TOKO -->
+                                    <div id="bonus-admin" style="display: none;">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1" for="tipe_bonus_admin">
+                                                Tipe Bonus <span class="text-rose-500">*</span>
+                                            </label>
+                                            <select id="tipe_bonus_admin" name="tipe_bonus_admin" class="form-select text-sm py-1 w-full">
+                                                <option value="">Pilih Tipe Bonus</option>
+                                                <option value="Persen" {{ $item->tipe_bonus_admin == 'Persen' ? 'selected' : '' }}>Persen</option>
+                                                <option value="Tetap" {{ $item->tipe_bonus_admin == 'Tetap' ? 'selected' : '' }}>Tetap</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mt-3">
+                                            <label class="block text-sm font-medium mb-1" for="nominal_bonus_admin">
+                                                Nominal Bonus per Nota <span class="text-rose-500">*Isi jika tipe bonus tetap</span>
+                                            </label>
+                                            <input id="nominal_bonus_admin" name="nominal_bonus_admin"
+                                                class="form-input w-full px-2 py-1" type="number" placeholder="Contoh: 5000"
+                                                value="{{ $item->nominal_bonus_admin }}" />
+                                        </div>
+                                    </div>
+
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="persen">Persen</label>
                                         <input id="persen" name="persen" class="form-input w-full px-2 py-1"
@@ -220,31 +245,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const roleSelect = document.getElementById('role');
     const extraFields = document.getElementById('extra-fields');
     const uploadInvestor = document.getElementById('upload-investor');
+    const bonusAdmin = document.getElementById('bonus-admin');
 
     function toggleInputs() {
         const role = roleSelect.value;
 
         if (role === 'Investor') {
-            // Investor: hanya tampil upload PDF
             uploadInvestor.style.display = 'block';
             extraFields.style.display = 'none';
+            bonusAdmin.style.display = 'none';
         } else if (role === 'Kepala Toko') {
-            // Kepala Toko: sembunyikan semua
             uploadInvestor.style.display = 'none';
             extraFields.style.display = 'none';
-        } else {
-            // Role lain (Admin, Kasir, dll): tampilkan extraFields
+            bonusAdmin.style.display = 'none';
+        } else if (role === 'Admin Toko') {
             uploadInvestor.style.display = 'none';
             extraFields.style.display = 'block';
+            bonusAdmin.style.display = 'block';
+        } else {
+            uploadInvestor.style.display = 'none';
+            extraFields.style.display = 'block';
+            bonusAdmin.style.display = 'none';
         }
     }
 
-    // Jalankan saat halaman pertama kali dimuat
     toggleInputs();
-
-    // Jalankan setiap kali role berubah
     roleSelect.addEventListener('change', toggleInputs);
 });
 </script>
+
 
 </x-toko-layout>
