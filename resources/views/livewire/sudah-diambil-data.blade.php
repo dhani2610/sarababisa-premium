@@ -689,7 +689,11 @@
                             @if (Auth::user()->role != 'Investor')
 
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    @if (Auth::user()->role == 'Kepala Toko')
                                     <a href="{{ route('transaksi-servis-approve.edit', $transaction->id) }}">
+                                    @else
+                                    <a href="#">
+                                    @endif
                                         @if ($transaction->is_approve === null)
                                             <div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-amber-500 text-white">Belum Disetujui</div>
                                         @elseif ($transaction->is_approve === 'Setuju')
