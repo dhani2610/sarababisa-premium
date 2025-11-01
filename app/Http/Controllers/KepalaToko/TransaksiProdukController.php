@@ -45,6 +45,14 @@ class TransaksiProdukController extends Controller
 
         return DataTables::of($orders)
             ->addIndexColumn()
+            ->addColumn('checkbox', fn($row) => '
+                <div class="flex items-center">
+                    <label class="inline-flex">
+                        <span class="sr-only">Select</span>
+                        <input class="table-item form-checkbox" type="checkbox" value="'.$row->id.'" @click="uncheckParent" />
+                    </label>
+                </div>
+            ')
             ->addColumn('invoice_no', function ($row) {
                 $link = route('transaksi-produk.edit', $row->id);
                 if (auth()->user()->role != 'Investor') {
@@ -85,7 +93,7 @@ class TransaksiProdukController extends Controller
             ->addColumn('status', function ($row) {
                 $route = route('transaksi-penjualan-approve.edit', $row->id);
 
-                if (auth()->user()->role != 'Investor') {
+                if (auth()->user()->role == 'Kepala Toko') {
                     $content = '<a href="'.$route.'">';
                 } else {
                     $content = '';
@@ -215,7 +223,7 @@ class TransaksiProdukController extends Controller
                     </div>
                 </div>';
             })
-            ->rawColumns(['invoice_no','sales','sisa','status','aksi'])
+            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi'])
             ->make(true);
     }
 
@@ -230,6 +238,14 @@ class TransaksiProdukController extends Controller
 
         return DataTables::of($orders)
             ->addIndexColumn()
+            ->addColumn('checkbox', fn($row) => '
+                <div class="flex items-center">
+                    <label class="inline-flex">
+                        <span class="sr-only">Select</span>
+                        <input class="table-item form-checkbox" type="checkbox" value="'.$row->id.'" @click="uncheckParent" />
+                    </label>
+                </div>
+            ')
             ->addColumn('invoice_no', function ($row) {
                 $link = route('transaksi-produk.edit', $row->id);
                 if (auth()->user()->role != 'Investor') {
@@ -269,7 +285,7 @@ class TransaksiProdukController extends Controller
             ->addColumn('status', function ($row) {
                 $route = route('transaksi-penjualan-approve.edit', $row->id);
 
-                if (auth()->user()->role != 'Investor') {
+                if (auth()->user()->role == 'Kepala Toko') {
                     $content = '<a href="'.$route.'">';
                 } else {
                     $content = '';
@@ -399,7 +415,7 @@ class TransaksiProdukController extends Controller
                     </div>
                 </div>';
             })
-            ->rawColumns(['invoice_no','sales','sisa','status','aksi'])
+            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi'])
             ->make(true);
     }
     public function dataDue(Request $request)
@@ -413,6 +429,14 @@ class TransaksiProdukController extends Controller
 
         return DataTables::of($orders)
             ->addIndexColumn()
+            ->addColumn('checkbox', fn($row) => '
+                <div class="flex items-center">
+                    <label class="inline-flex">
+                        <span class="sr-only">Select</span>
+                        <input class="table-item form-checkbox" type="checkbox" value="'.$row->id.'" @click="uncheckParent" />
+                    </label>
+                </div>
+            ')
             ->addColumn('invoice_no', function ($row) {
                 $link = route('transaksi-produk.edit', $row->id);
                 if (auth()->user()->role != 'Investor') {
@@ -452,7 +476,7 @@ class TransaksiProdukController extends Controller
             ->addColumn('status', function ($row) {
                 $route = route('transaksi-penjualan-approve.edit', $row->id);
 
-                if (auth()->user()->role != 'Investor') {
+                if (auth()->user()->role == 'Kepala Toko') {
                     $content = '<a href="'.$route.'">';
                 } else {
                     $content = '';
@@ -582,7 +606,7 @@ class TransaksiProdukController extends Controller
                     </div>
                 </div>';
             })
-            ->rawColumns(['invoice_no','sales','sisa','status','aksi'])
+            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi'])
             ->make(true);
     }
 

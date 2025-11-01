@@ -112,6 +112,16 @@
                             <thead
                                 class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                                 <tr>
+                                    @if (Auth::user()->role == 'Kepala Toko')
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                                        <div class="flex items-center">
+                                            <label class="inline-flex">
+                                                <span class="sr-only">Select all</span>
+                                                <input id="parent-checkbox" class="form-checkbox" type="checkbox" @click="toggleAll" />
+                                            </label>
+                                        </div>
+                                    </th>
+                                    @endif
                                     <th>No.</th>
                                     <th>Invoice</th>
                                     <th>Tgl Transaksi</th>
@@ -254,7 +264,18 @@
                         processing: true,
                         serverSide: false,
                         ajax: '{{ route('transaksi-produk.data.lunas') }}',
-                        columns: [{
+                        columns: [
+                            @if (Auth::user()->role == 'Kepala Toko')
+                            {
+                                data: 'checkbox',
+                                orderable: false,
+                                searchable: false,
+                                render: function(data, type, row) {
+                                    return data;
+                                }
+                            },
+                            @endif
+                            {
                                 data: 'DT_RowIndex',
                                 orderable: false,
                                 searchable: false
@@ -318,6 +339,30 @@
                             } // biar ga error kalau data null
                         ]
                     });
+                    $('#parent-checkbox').on('click', function() {
+                        const isChecked = $(this).is(':checked');
+                        $('.table-item').prop('checked', isChecked);
+                        toggleBulkAction();
+                    });
+
+                    // Handle individual checkbox
+                    $('#transaksiTable').on('change', '.table-item', function() {
+                        const allChecked = $('.table-item').length === $('.table-item:checked').length;
+                        $('#parent-checkbox').prop('checked', allChecked);
+                        toggleBulkAction();
+                    });
+
+                    // Fungsi untuk toggle tampilan "x item dipilih"
+                    function toggleBulkAction() {
+                        const checkedCount = $('.table-item:checked').length;
+                        $('.table-items-count').text(checkedCount);
+
+                        if (checkedCount > 0) {
+                            $('.table-items-action').removeClass('hidden');
+                        } else {
+                            $('.table-items-action').addClass('hidden');
+                        }
+                    }
                 });
             </script>
 
