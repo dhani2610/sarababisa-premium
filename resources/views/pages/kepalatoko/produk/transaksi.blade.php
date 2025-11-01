@@ -4,13 +4,8 @@
 <x-toko-layout>
 
 
-    <!-- ✅ DataTables core CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
-    <!-- ✅ (Opsional) DataTables Buttons extension CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
-
-    <!-- ✅ (Opsional) Jika kamu pakai Bootstrap -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
@@ -110,7 +105,7 @@
                         </div>
                     </div>
                     <!-- Table -->
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto p-4">
 
                         <table id="transaksiTable" class="table-auto w-full text-sm">
                             <thead

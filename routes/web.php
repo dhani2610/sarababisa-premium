@@ -295,6 +295,9 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('servis/tindakan-servis', KepalaTokoTindakanServisController::class);
     Route::resource('pelanggan', KepalaTokoPelangganController::class);
     Route::post('pelanggan-broadcast', [KepalaTokoPelangganController::class,'broadcast'])->name('pelanggan.broadcast');
+
+    Route::get('/transaksi-servis/data', [KepalaTokoTransaksiServisController::class, 'getData'])->name('transaksi-servis.data');
+
     Route::resource('servis/transaksi-servis', KepalaTokoTransaksiServisController::class);
     Route::post('servis/transaksi-servis/{id}/update-pin-pola', [KepalaTokoTransaksiServisController::class, 'updatePinPola'])
     ->name('transaksi-servis.update-pin-pola');
@@ -312,6 +315,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::patch('/services/reject', [KepalaTokoSudahDiambilController::class, 'rejectSelected']);
     Route::resource('servis/transaksi-servis-approve', KepalaTokoApproveController::class);
     Route::resource('servis/servis-belum-disetujui-approve', KepalaTokoServisBelumDisetujuiApproveController::class);
+    Route::get('servis/transaksi-servis-bisa-diambil/data', [KepalaTokoBisaDiambilController::class,'getData'])->name('transaksi-servis-bisa-diambil.data');
     Route::resource('servis/transaksi-servis-bisa-diambil', KepalaTokoBisaDiambilController::class);
     Route::resource('servis/transaksi-servis-sudah-diambil', KepalaTokoSudahDiambilController::class);
     Route::resource('servis/transaksi-servis-belum-disetujui', KepalaTokoServisBelumDisetujuiController::class);
