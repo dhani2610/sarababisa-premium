@@ -238,27 +238,28 @@
                     });
                 };
 
-                // fungsi kirimFontee (dipanggil dari kolom hubungi bila ada token)
-                window.kirimFontee = function(token, number, message) {
-                    // implementasi sederhana: kirim POST ke endpoint fontee di backend (kamu bisa ubah endpointnya)
-                    fetch('{{ url('/send-fontee') }}', {
+                function kirimFontee(token, phone, message) {
+                    fetch('https://api.fonnte.com/send', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            'Authorization': token
                         },
                         body: JSON.stringify({
-                            token: token,
-                            number: number,
-                            message: message
+                            target: phone,
+                            message: decodeURIComponent(message)
                         })
-                    }).then(res => res.json()).then(data => {
-                        alert(data.message || 'Pesan terkirim via Fontee');
-                    }).catch(err => {
-                        console.error(err);
-                        alert('Gagal kirim Fontee');
-                    });
-                };
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === true || data.success) {
+                            alert('✅ Pesan berhasil dikirim ke Pelanggan!');
+                        } else {
+                            alert('⚠️ Gagal mengirim ke Pelanggan. Coba lagi.');
+                        }
+                    })
+                    .catch(() => alert('❌ Terjadi kesalahan saat mengirim ke Fontee.'));
+                }
 
                 // fungsi saveCanvasAjax & resetCanvas: placeholder, sesuaikan implementasi sesuai backend kamu
                 window.saveCanvasAjax = function(id) {

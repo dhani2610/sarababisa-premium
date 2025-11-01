@@ -317,6 +317,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('servis/servis-belum-disetujui-approve', KepalaTokoServisBelumDisetujuiApproveController::class);
     Route::get('servis/transaksi-servis-bisa-diambil/data', [KepalaTokoBisaDiambilController::class,'getData'])->name('transaksi-servis-bisa-diambil.data');
     Route::resource('servis/transaksi-servis-bisa-diambil', KepalaTokoBisaDiambilController::class);
+
+    Route::get('servis/transaksi-servis-sudah-diambil/data', [KepalaTokoSudahDiambilController::class,'getData'])->name('transaksi-servis-sudah-diambil.data');
     Route::resource('servis/transaksi-servis-sudah-diambil', KepalaTokoSudahDiambilController::class);
     Route::resource('servis/transaksi-servis-belum-disetujui', KepalaTokoServisBelumDisetujuiController::class);
     Route::get('servis/log-servis', [KepalaTokoLogServisController::class, 'index'])->name('log-servis');
