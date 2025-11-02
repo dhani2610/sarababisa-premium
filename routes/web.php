@@ -4,6 +4,7 @@ use App\Http\Controllers\KepalaToko\ProdukController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\RincianInvestController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Livewire\MasterAbsensi;
 
 use App\Http\Controllers\DefaultController;
 
@@ -23,6 +24,7 @@ use App\Http\Controllers\KepalaToko\RecycleBinController;
 use App\Http\Controllers\KepalaToko\DataPenjualanController;
 use App\Http\Controllers\KepalaToko\DataPengeluaranController;
 use App\Http\Controllers\KepalaToko\DataTargetPersenController;
+use App\Http\Controllers\KepalaToko\AttendanceController;
 use App\Http\Controllers\Sales\PosController as SalesPosController;
 use App\Http\Controllers\Sales\KasbonController as SalesKasbonController;
 use App\Http\Controllers\Sales\ProdukController as SalesProdukController;
@@ -155,6 +157,7 @@ use App\Http\Controllers\KepalaToko\TransaksiServisLangsungController as KepalaT
 use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTransaksiServisLangsungController;
 use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as KepalaTokoServisBelumDisetujuiApproveController;
 use App\Http\Controllers\TipeOsController;
+use App\Http\Controllers\KepalaToko\MasterIzinController;
 
 /*
 |--------------------------------------------------------------------------
@@ -250,6 +253,19 @@ Route::patch('/history-garansi/{id}/toggle-status', [HistoryGaransiController::c
     ->name('history-garansi.toggleStatus');
 Route::post('/history-garansi/bulk-delete', [HistoryGaransiController::class, 'bulkDelete'])->name('history-garansi.bulkDelete');
 
+Route::delete('/master/master-izin/delete-selected', [MasterIzinController::class, 'deleteSelected'])
+    ->name('master-izin.deleteSelected');
+Route::resource('master/master-izin', MasterIzinController::class);
+
+
+// Livewire page (index)
+// Route::get('master/master-absensi', MasterAbsensi::class)->name('master-absensi.index');
+
+// Controller endpoints for store & deletes (Livewire only displays)
+Route::get('master/master-absensi', [AttendanceController::class, 'index'])->name('master-absensi.index');
+Route::post('master/master-absensi/store', [AttendanceController::class, 'store'])->name('master-absensi.store');
+Route::delete('master/master-absensi/delete-selected', [AttendanceController::class, 'deleteSelected'])->name('master-absensi.deleteSelected');
+Route::delete('master/master-absensi/{id}', [AttendanceController::class, 'destroy'])->name('master-absensi.destroy');
 
 // routes/web.php
 // Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'yyy'])->name('service.show');
@@ -279,6 +295,9 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('servis/tindakan-servis', KepalaTokoTindakanServisController::class);
     Route::resource('pelanggan', KepalaTokoPelangganController::class);
     Route::post('pelanggan-broadcast', [KepalaTokoPelangganController::class,'broadcast'])->name('pelanggan.broadcast');
+
+    Route::get('/transaksi-servis/data', [KepalaTokoTransaksiServisController::class, 'getData'])->name('transaksi-servis.data');
+
     Route::resource('servis/transaksi-servis', KepalaTokoTransaksiServisController::class);
     Route::post('servis/transaksi-servis/{id}/update-pin-pola', [KepalaTokoTransaksiServisController::class, 'updatePinPola'])
     ->name('transaksi-servis.update-pin-pola');
@@ -296,7 +315,10 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::patch('/services/reject', [KepalaTokoSudahDiambilController::class, 'rejectSelected']);
     Route::resource('servis/transaksi-servis-approve', KepalaTokoApproveController::class);
     Route::resource('servis/servis-belum-disetujui-approve', KepalaTokoServisBelumDisetujuiApproveController::class);
+    Route::get('servis/transaksi-servis-bisa-diambil/data', [KepalaTokoBisaDiambilController::class,'getData'])->name('transaksi-servis-bisa-diambil.data');
     Route::resource('servis/transaksi-servis-bisa-diambil', KepalaTokoBisaDiambilController::class);
+
+    Route::get('servis/transaksi-servis-sudah-diambil/data', [KepalaTokoSudahDiambilController::class,'getData'])->name('transaksi-servis-sudah-diambil.data');
     Route::resource('servis/transaksi-servis-sudah-diambil', KepalaTokoSudahDiambilController::class);
     Route::resource('servis/transaksi-servis-belum-disetujui', KepalaTokoServisBelumDisetujuiController::class);
     Route::get('servis/log-servis', [KepalaTokoLogServisController::class, 'index'])->name('log-servis');
@@ -359,6 +381,9 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
 
     Route::resource('produk/pos', KepalaTokoPosController::class);
     Route::resource('produk/transaksi-penjualan-approve', KepalaTokoApprovePenjualanController::class);
+    Route::get('transaksi-produk/data', [App\Http\Controllers\KepalaToko\TransaksiProdukController::class, 'data'])->name('transaksi-produk.data');
+    Route::get('transaksi-produk/data/lunas', [App\Http\Controllers\KepalaToko\TransaksiProdukController::class, 'dataLunas'])->name('transaksi-produk.data.lunas');
+    Route::get('transaksi-produk/data/due', [App\Http\Controllers\KepalaToko\TransaksiProdukController::class, 'dataDue'])->name('transaksi-produk.data.due');
     Route::resource('produk/transaksi-produk', KepalaTokoTransaksiProdukController::class);
     Route::delete('/product-transactions/delete', [KepalaTokoTransaksiProdukController::class, 'deleteSelected']);
     Route::patch('/product-transactions/update', [KepalaTokoTransaksiProdukController::class, 'approveSelected']);
@@ -430,7 +455,6 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('servis/kembali-bisa-diambil{id}', [KepalaTokoSudahDiambilController::class, 'back'])->name('kembali-bisa-diambil');
 
     Route::get('nota-terima-termal/{id}', [KepalaTokoTransaksiServisController::class, 'cetaktermal'])->name('kepalatoko-cetak-termal');
-    Route::get('nota-terima-inkjet/{id}', [KepalaTokoTransaksiServisController::class, 'cetakinkjet'])->name('kepalatoko-cetak-inkjet');
     Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::class, 'cetakinkjet'])->name('kepalatoko-pengambilan-cetak-inkjet');
     Route::get('kepalatoko-nota-pengambilan-termal/{id}', [KepalaTokoSudahDiambilController::class, 'pengambilantermal'])->name('kepalatoko-nota-pengambilan-termal');
 
@@ -453,11 +477,10 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('/impor-tool', [KepalaTokoProdukToolController::class, 'import'])->name('impor-tool');
 });
 
-Route::resource('servis/admin-transaksi-servis', AdminTokoTransaksiServisController::class);
-Route::resource('servis/admin-servis-bisa-diambil', AdminTokoBisaDiambilController::class);
-Route::resource('servis/admin-servis-sudah-diambil', AdminTokoSudahDiambilController::class);
-Route::post('servis/admin-transaksi-servis/{id}/update-pin-pola', [AdminTokoTransaksiServisController::class, 'updatePinPola'])
-    ->name('transaksi-servis.update-pin-pola');
+Route::get('izin', [MasterIzinController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
+Route::get('nota-terima-inkjet/{id}', [KepalaTokoTransaksiServisController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
+Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::class, 'cetakinkjet'])->name('kepalatoko-pengambilan-cetak-inkjet');
+Route::get('transaksi-produk-inkjet/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakinkjet'])->name('lunas-cetak-inkjet');
 Route::post('/servis/admin-transaksi-servis-langsung', [AdminTokoTransaksiServisLangsungController::class, 'store'])->name('admin-servis-langsung');
 
 Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(function () {

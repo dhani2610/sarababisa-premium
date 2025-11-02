@@ -8,6 +8,7 @@ use App\Models\Brand;
 use App\Models\Worker;
 use App\Models\Capacity;
 use App\Models\Customer;
+use App\Models\StoreSetting;
 use App\Models\ModelSerie;
 use Illuminate\Http\Request;
 use App\Models\ServiceAction;
@@ -19,6 +20,7 @@ use App\Models\TipeOs;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Yajra\DataTables\Facades\DataTables;
 
 class TransaksiServisController extends Controller
 {
@@ -46,6 +48,357 @@ class TransaksiServisController extends Controller
             'jumlahbisadiambil'
         ));
     }
+
+    
+    public function getData(Request $request)
+    {
+        $query = ServiceTransaction::with(['customer'])
+        ->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])
+        ->orderByDesc('updated_at');
+
+        return DataTables::of($query)
+        ->addIndexColumn()
+
+        // Checkbox untuk bulk action
+        ->addColumn('checkbox', function ($row) {
+            // hanya tampilkan checkbox bila bukan investor (cek auth di blade juga)
+            return '<input type="checkbox" class="table-item form-checkbox" value="' . $row->id . '" />';
+        })
+
+        // Nomor Servis (link edit kalau bukan investor)
+        ->addColumn('nomor_servis', function ($row) {
+            if (auth()->user()->role != 'Investor') {
+                $link = route('transaksi-servis.edit', $row->id);
+                return '<a href="' . $link . '">
+                            <div class="flex items-center text-blue-600">
+                                <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                                    <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z"/>
+                                </svg>
+                                <div class="font-medium">' . e($row->nomor_servis) . '</div>
+                            </div>
+                        </a>';
+            }
+            return '<div class="font-medium">' . e($row->nomor_servis) . '</div>';
+        })
+
+        // Tanggal terima (created_at formatted)
+        ->editColumn('created_at', function ($row) {
+            return Carbon::parse($row->created_at)->format('d/m/Y');
+        })
+
+        // Penerima
+        ->addColumn('penerima', function ($row) {
+            return e($row->penerima);
+        })
+
+        // Pelanggan dengan fallback bila dihapus
+        ->addColumn('pelanggan', function ($row) {
+            if ($row->customer) {
+                // jika model customer masih ada
+                return '<div class="font-medium">' . e($row->customer->nama) . '</div>';
+            }
+            return '<div class="font-medium text-rose-600">Data pelanggan telah dihapus</div>';
+        })
+
+        // Hubungi (WA tombol + kirim Fontee)
+        ->addColumn('hubungi', function ($row) {
+            $nomor = $row->customer->nomor_hp ?? null;
+            $nomorwa = $nomor ? preg_replace('/^08/', '628', preg_replace('/\D+/', '', $nomor)) : null;
+            $fonteeToken = StoreSetting::first()->fonnte ?? null;
+            $toko = optional($row->customer)->nama ?? config('app.name');
+
+            $html = '<div class="flex space-x-1">';
+            if ($nomorwa) {
+                $html .= '
+                    <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                        <a href="https://api.whatsapp.com/send?phone=' . $nomorwa . '&text=" target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
+                                <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1" />
+                            </svg>
+                        </a>
+                    </div>';
+            }
+            // Kirim Fontee / manual WA button — gunakan JS function kirimFontee(...) di blade
+            $tokoName = e(config('app.name'));
+            $notaLink = route('kepalatoko-cetak-inkjet', $row->id);
+            $trackingLink = env('APP_URL') . '/tracking';
+            $message = rawurlencode("*Notifikasi Service*\n" . $tokoName . "\n\n" .
+                "No. Service : " . $row->nomor_servis . "\n" .
+                "Nama user : *" . $row->nama_pelanggan . "*\n" .
+                "Unit : " . $row->nama_barang . "\n" .
+                "Diterima : " . $row->penerima . "\n" .
+                "Tanggal : " . Carbon::parse($row->created_at)->translatedFormat('d F Y h:i') . "\n" .
+                "Kerusakan : " . $row->kerusakan . "\n\n" .
+                "Link tracking : " . $trackingLink . "\n" .
+                "Link nota : " . $notaLink . "\n\n" .
+                "Terimakasih");
+
+            if ($fonteeToken && $nomorwa) {
+                // call kirimFontee JS with token & number & message
+                $html .= '<div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                            <a href="javascript:void(0)" onclick="kirimFontee(\'' . e($fonteeToken) . '\', \'' . $nomorwa . '\', \'' . $message . '\')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke="#00abfb" fill="none" stroke-width="1.5">
+                                    <path d="M14 3v4a1 1 0 0 0 1 1h4"/>
+                                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/>
+                                    <line x1="9" y1="7" x2="10" y2="7"/>
+                                    <line x1="9" y1="13" x2="15" y2="13"/>
+                                    <line x1="13" y1="17" x2="15" y2="17"/>
+                                </svg>
+                            </a>
+                        </div>';
+            } elseif ($nomorwa) {
+                $html .= '<div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                            <a href="https://wa.me/' . $nomorwa . '/?text=' . $message . '" target="_blank">
+                                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" stroke="#00abfb" fill="none" stroke-width="1.5">
+                                    <path d="M14 3v4a1 1 0 0 0 1 1h4"/>
+                                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/>
+                                    <line x1="9" y1="7" x2="10" y2="7"/>
+                                    <line x1="9" y1="13" x2="15" y2="13"/>
+                                    <line x1="13" y1="17" x2="15" y2="17"/>
+                                </svg>
+                            </a>
+                        </div>';
+            }
+
+            $html .= '</div>';
+            return $html;
+        })
+
+        // Nama Barang
+        ->addColumn('nama_barang', function ($row) {
+            return '<div class="font-medium">' . e($row->nama_barang) . '</div>';
+        })
+
+        // Kelengkapan
+        ->addColumn('kelengkapan', function ($row) {
+            $k = $row->kelengkapan;
+            return '<div class="font-medium">' . ($k ? e($k) : 'Hanya Barang') . '</div>';
+        })
+
+        // Kerusakan
+        ->addColumn('kerusakan', function ($row) {
+            return '<div class="font-medium capitalize">' . e($row->kerusakan) . '</div>';
+        })
+
+        // Fungsi (qc_masuk)
+        ->addColumn('qc_masuk', function ($row) {
+            return '<div class="font-medium capitalize">' . e($row->qc_masuk) . '</div>';
+        })
+
+        // Uang muka
+        ->addColumn('uang_muka', function ($row) {
+            return '<div class="font-medium">Rp. ' . number_format($row->uang_muka) . '</div>';
+        })
+
+        // Estimasi biaya
+        ->addColumn('estimasi_biaya', function ($row) {
+            return '<div class="font-medium">Rp. ' . number_format($row->estimasi_biaya) . '</div>';
+        })
+
+        // Estimasi pengerjaan
+        ->addColumn('estimasi_pengerjaan', function ($row) {
+            return '<div class="font-medium">' . e($row->estimasi_pengerjaan) . '</div>';
+        })
+
+        // Status (warna dinamis -- sama seperti logic di blade lama)
+        ->addColumn('status', function ($row) {
+            $s = $row->status_servis;
+            if ($s === 'Sedang Dikerjakan') {
+                $status_color = 'bg-emerald-100 text-emerald-600';
+            } elseif ($s === 'Menunggu Sparepart') {
+                $status_color = 'bg-amber-100 text-amber-600';
+            } elseif ($s === 'Menunggu Konfirmasi') {
+                $status_color = 'bg-rose-100 text-rose-500';
+            } elseif ($s === 'Sedang Tes') {
+                $status_color = 'bg-blue-100 text-blue-600';
+            } else {
+                $status_color = 'bg-slate-100 text-slate-500';
+            }
+
+            $link = route('ubah-status-proses-edit', $row->id);
+
+            return '<a href="' . $link . '"><div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 ' . $status_color . '">' . e($s) . '</div></a>';
+        })
+
+        // Aksi lengkap (PIN modal, printer modal, delete modal, konfirmasi link, dll)
+        ->addColumn('aksi', function ($row) {
+            $id = $row->id;
+            $pinModalId = "pin-modal-{$id}";
+            $dangerModalId = "danger-modal-{$id}";
+            $printTermal = route('kepalatoko-cetak-termal', $id);
+            $printInkjet = route('kepalatoko-cetak-inkjet', $id);
+            $ubahBisaAmbil = route('ubah-bisa-diambil-edit', $id);
+            $deleteRoute = route('transaksi-servis.destroy', $id);
+
+            // Build aksi HTML mirip persis dengan blade kamu
+            $html = '<div class="space-x-1 flex">';
+
+            // PIN & Pola (menyertakan wire:click dari blade asli)
+            $html .= '
+                <div>
+                    <button wire:click="openPinModal(' . $id . ')" class="text-indigo-500 hover:text-indigo-600 rounded-full">
+                        <span class="sr-only">Service PIN & Pola</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-lock" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#6366f1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <rect x="5" y="11" width="14" height="10" rx="2" />
+                            <path d="M8 11v-4a4 4 0 0 1 8 0v4" />
+                        </svg>
+                    </button>
+                </div>
+            ';
+
+            // PIN modal (Alpine) - gunakan id unik jika perlu
+            $html .= '
+            <div x-data="{ open: false }"
+                x-show="open"
+                @open-pin-modal-' . $id . '.window="open = true"
+                @close-pin-modal-' . $id . '.window="open = false"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                x-cloak
+                @click.self="open = false">
+
+                <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+                    <div class="flex justify-between items-center border-b pb-2 mb-4">
+                        <h2 class="text-lg font-semibold text-gray-700">Service PIN & Pola</h2>
+                        <button @click="open=false" type="button" class="text-gray-400 hover:text-gray-600">&times;</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm font-medium text-gray-600">PIN</label> <br>
+                            <input type="number" value="' . e($row->pin) . '" id="pinInput-' . $id . '" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
+                        </div>
+
+                        <div>
+                            <label class="text-sm font-medium text-gray-600">Pola</label>
+                            <canvas id="sig-canvas-' . $id . '" class="sig-canvas border rounded w-full h-48 bg-gray-100"></canvas>
+                            <input type="hidden" id="polaInput-' . $id . '" class="polaInput">
+                            <small class="text-gray-400">Gambar pola (opsional)</small>
+                        </div>
+
+                        <button type="button" onclick="resetCanvas(' . $id . ')" class="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600">Reset Pola</button>
+                    </div>
+
+                    <div class="mt-6 flex justify-end space-x-2">
+                        <button onclick="saveCanvasAjax(' . $id . ')" class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Simpan</button>
+                    </div>
+
+                </div>
+            </div>
+            ';
+
+            // Konfirmasi -> ubah status jadi Bisa Diambil
+            $html .= '
+                <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                    <a href="' . $ubahBisaAmbil . '">
+                        <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah menjadi Bisa Diambil">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+                                <rect x="9" y="3" width="6" height="4" rx="2" />
+                                <path d="M9 14l2 2l4 -4" />
+                            </svg>
+                        </button>
+                    </a>
+                </div>
+            ';
+
+            // Printer modal
+            $html .= '
+            <div x-data="{ modalOpen: false }">
+                <button @click.prevent="modalOpen = true" aria-controls="basic-modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+                        <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+                        <rect x="7" y="13" width="10" height="8" rx="2" />
+                    </svg>
+                </button>
+
+                <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen" x-cloak></div>
+
+                <div id="basic-modal" class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="modalOpen" x-cloak>
+                    <div class="bg-white rounded shadow-lg overflow-auto max-w-xl w-full max-h-full" @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
+                        <div class="px-5 py-3 border-b border-slate-200">
+                            <div class="flex justify-between items-center">
+                                <div class="font-semibold text-slate-800">Pilih Jenis Printer</div>
+                                <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false"><div class="sr-only">Close</div><svg class="w-4 h-4 fill-current"><path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" /></svg></button>
+                            </div>
+                        </div>
+
+                        <div class="px-5 pt-4 pb-1">
+                            <div class="text-sm">
+                                <div class="space-y-2">
+                                    <p>Silahkan pilih printer untuk cetak Nota Tanda Terima Servis.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-5 py-4">
+                            <div class="flex flex-wrap justify-end space-x-2">
+                                <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" @click="modalOpen = false">Batal</button>
+                                <a href="' . $printTermal . '" target="_blank"><button class="btn-sm bg-orange-500 hover:bg-orange-600 text-white">Printer Termal</button></a>
+                                <a href="' . $printInkjet . '" target="_blank"><button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Printer Inkjet</button></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            ';
+
+            // Delete modal
+            $html .= '
+            <div x-data="{ deleteOpen: false }">
+                <button class="text-rose-500 hover:text-rose-600 rounded-full" @click.prevent="deleteOpen = true" aria-controls="danger-modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ff2825" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <line x1="4" y1="7" x2="20" y2="7" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                        <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                        <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                    </svg>
+                </button>
+
+                <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="deleteOpen" x-cloak></div>
+
+                <div id="danger-modal" class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="deleteOpen" x-cloak>
+                    <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="deleteOpen = false" @keydown.escape.window="deleteOpen = false">
+                        <div class="p-5 flex space-x-4">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
+                                <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16"><path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z"/></svg>
+                            </div>
+
+                            <div>
+                                <div class="mb-2"><div class="text-lg font-semibold text-slate-800">Apakah anda sudah yakin ?</div></div>
+                                <div class="text-sm mb-10"><div class="space-y-2"><p>Jika sudah terhapus, maka tidak bisa dikembalikan lagi.</p></div></div>
+                                <div class="flex flex-wrap justify-end space-x-2">
+                                    <form action="' . $deleteRoute . '" method="post">
+                                        ' . method_field('delete') . csrf_field() . '
+                                        <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            ';
+
+            $html .= '</div>';
+            return $html;
+        })
+
+        ->rawColumns([
+            'checkbox','nomor_servis','pelanggan','hubungi','nama_barang','kelengkapan','kerusakan','qc_masuk',
+            'uang_muka','estimasi_biaya','estimasi_pengerjaan','status','aksi'
+        ])
+        ->make(true);
+    }
+    
+
 
     public function updatePinPola(Request $request, $id)
     {
@@ -100,6 +453,8 @@ class TransaksiServisController extends Controller
 
         // Transaction create
         $transaksi = ServiceTransaction::create([
+            'admin_id' => Auth::user()->id,
+            'is_admin_toko' => Auth::user()->role == 'Admin Toko' ? 'Admin' : null,
             'nomor_servis' => $nomor_servis,
             'customers_id' => $request->customers_id,
             'nama_pelanggan' => $nama_pelanggan->nama,
@@ -153,12 +508,12 @@ class TransaksiServisController extends Controller
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;
-    
+
             if (!$botToken || !$chatId) {
                 \Log::warning('Telegram bot token atau chat_id belum diset di pengaturan toko.');
                 return;
             }
-    
+
             try {
                 Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                     'chat_id' => $chatId,
@@ -168,7 +523,7 @@ class TransaksiServisController extends Controller
             } catch (\Exception $e) {
                 \Log::error('Gagal kirim pesan Telegram: ' . $e->getMessage());
             }
-        } 
+        }
     }
 
     /**

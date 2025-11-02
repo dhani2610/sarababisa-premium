@@ -99,10 +99,28 @@ class GajiController extends Controller
                     $bonus = $rewardPenuhSale;
                 }
             } else {
-                $bonusadminservis = $user->adminservice->sum('profit') / 100;
-                $bonusadminsale = $user->adminsale->sum('profit') / 100;
-                $bonus = $bonusadminservis + $bonusadminsale;
-                $bonus *= $user->persen;
+                // $bonusadminservis = $user->adminservice->sum('profit') / 100;
+                // $bonusadminsale = $user->adminsale->sum('profit') / 100;
+                // $bonus = $bonusadminservis + $bonusadminsale;
+                // $bonus *= $user->persen;
+
+                $tipeBonusNota = $user->tipe_bonus_admin ?? 'Persen'; // default biar aman
+                $persen = $user->persen ?? 0;
+                $nominalBonus = $user->nominal_bonus_admin ?? 0;
+
+                $totalProfitService = $user->adminservice->sum('profit');
+                $totalProfitSale = $user->adminsale->sum('profit');
+                $totalNotaService = $user->adminservice->count();
+                $totalNotaSale = $user->adminsale->count();
+
+                if ($tipeBonusNota === 'Persen') {
+                    $bonus = (($totalProfitService + $totalProfitSale) / 100) * $persen;
+                } elseif ($tipeBonusNota === 'Tetap') {
+                    $totalNota = $totalNotaService + $totalNotaSale;
+                    $bonus = $totalNota * $nominalBonus;
+                } else {
+                    $bonus = 0;
+                }
             }
         } else {
             if ($user->role === 'Teknisi') {
@@ -110,10 +128,27 @@ class GajiController extends Controller
             } elseif ($user->role === 'Sales') {
                 $bonus = $rewardPenuhSale;
             } else {
-                $bonusadminservis = $user->adminservice->sum('profit') / 100;
-                $bonusadminsale = $user->adminsale->sum('profit') / 100;
-                $bonus = $bonusadminservis + $bonusadminsale;
-                $bonus *= $user->persen;
+                // $bonusadminservis = $user->adminservice->sum('profit') / 100;
+                // $bonusadminsale = $user->adminsale->sum('profit') / 100;
+                // $bonus = $bonusadminservis + $bonusadminsale;
+                // $bonus *= $user->persen;
+                $tipeBonusNota = $user->tipe_bonus_admin ?? 'Persen'; // default biar aman
+                $persen = $user->persen ?? 0;
+                $nominalBonus = $user->nominal_bonus_admin ?? 0;
+
+                $totalProfitService = $user->adminservice->sum('profit');
+                $totalProfitSale = $user->adminsale->sum('profit');
+                $totalNotaService = $user->adminservice->count();
+                $totalNotaSale = $user->adminsale->count();
+
+                if ($tipeBonusNota === 'Persen') {
+                    $bonus = (($totalProfitService + $totalProfitSale) / 100) * $persen;
+                } elseif ($tipeBonusNota === 'Tetap') {
+                    $totalNota = $totalNotaService + $totalNotaSale;
+                    $bonus = $totalNota * $nominalBonus;
+                } else {
+                    $bonus = 0;
+                }
             }
         }
 

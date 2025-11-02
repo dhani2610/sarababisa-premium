@@ -12,14 +12,14 @@
 
             <!-- Search form -->
             <x-search-form placeholder="Masukkan nama pelanggan/nomor invoice" />
-            
+
         </div>
 
     </div>
 
     <!-- More actions -->
     <div class="sm:flex sm:justify-between sm:items-center mb-5">
-    
+
         <!-- Left side -->
         <div class="mb-4 sm:mb-0">
             <ul class="flex flex-wrap -m-1">
@@ -54,7 +54,7 @@
                 </select>
             </div>
         </div>
-    
+
     </div>
 
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
@@ -295,7 +295,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>                                            
+                                                </div>
                                         </div>
                                         <!-- End Printer-->
                                         <!-- Start Remove -->
@@ -483,7 +483,7 @@
                     });
                 },
             }))
-        })    
+        })
     </script>
 
     <!-- Pagination -->

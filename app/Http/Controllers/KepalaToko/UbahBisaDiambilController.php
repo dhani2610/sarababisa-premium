@@ -90,25 +90,26 @@ class UbahBisaDiambilController extends Controller
         $profittransaksi = $biaya - $modalSparepart;
         $bagihasil = ($biaya - $modalSparepart) / 100;
 
+        $bonus_interface = 0;
         if ($request->kondisi_servis == 'Dibatalkan') {
             $finalModal = $request->total_modal_sparepart;
         }else{
             $finalModal = $modalSparepart;
-        }
-        $cekTeknisi = User::find($request->users_id);
-        if ($cekTeknisi->bagian_teknisi == 'Teknisi Interface') {
-            if ($request->tipe == 'Interface') {
-                $nama_model = ModelSerie::find($item->model_series_id);
-                if (!empty($nama_model)) {
-                    $bonus_interface = $nama_model->nominal_bonus; 
+            $cekTeknisi = User::find($request->users_id);
+            if ($cekTeknisi->bagian_teknisi == 'Teknisi Interface') {
+                if ($request->tipe == 'Interface') {
+                    $nama_model = ModelSerie::find($item->model_series_id);
+                    if (!empty($nama_model)) {
+                        $bonus_interface = $nama_model->nominal_bonus;
+                    }else{
+                    $bonus_interface = 0;
+                    }
                 }else{
-                $bonus_interface = 0; 
+                    $bonus_interface = 0;
                 }
             }else{
-                $bonus_interface = 0; 
+                $bonus_interface = 0;
             }
-        }else{
-            $bonus_interface = 0; 
         }
         // Transaction create
         $item->update([
@@ -238,12 +239,12 @@ class UbahBisaDiambilController extends Controller
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;
-    
+
             if (!$botToken || !$chatId) {
                 \Log::warning('Telegram bot token atau chat_id belum diset di pengaturan toko.');
                 return;
             }
-    
+
             try {
                 Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                     'chat_id' => $chatId,
@@ -253,6 +254,6 @@ class UbahBisaDiambilController extends Controller
             } catch (\Exception $e) {
                 \Log::error('Gagal kirim pesan Telegram: ' . $e->getMessage());
             }
-        } 
+        }
     }
 }

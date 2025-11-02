@@ -61,7 +61,7 @@ class LaporanAdminController extends Controller
             ->sum('profit');
 
         // Menghitung total bonus servis
-        $total_bonus_servis = $total_profit_servis / 100 * $admin->persen;
+        // $total_bonus_servis = $total_profit_servis / 100 * $admin->persen;
 
         // Mengambil data penjualan
         $orders = OrderDetail::with('order')->where('admin_id', $request->admin_id)
@@ -88,9 +88,28 @@ class LaporanAdminController extends Controller
             ->whereDate('created_at', '<=', $end_date)
             ->count();;
 
-        $total_bonus_penjualan = $total_profit_penjualan / 100 * $admin->persen;
+        // $total_bonus_penjualan = $total_profit_penjualan / 100 * $admin->persen;
 
-        $total_bonus_admin = $total_bonus_penjualan + $total_bonus_servis;
+        // $total_bonus_admin = $total_bonus_penjualan + $total_bonus_servis;
+
+
+        // === Hitung Bonus Berdasarkan Tipe ===
+        $tipeBonus = $admin->tipe_bonus_admin ?? 'Persen';
+        $persen = $admin->persen ?? 0;
+        $nominalTetap = $admin->nominal_bonus_admin ?? 0;
+
+        if ($tipeBonus === 'Persen') {
+            $total_bonus_servis = ($total_profit_servis / 100) * $persen;
+            $total_bonus_penjualan = ($total_profit_penjualan / 100) * $persen;
+        } elseif ($tipeBonus === 'Tetap') {
+            $total_bonus_servis = $total_tindakan * $nominalTetap;
+            $total_bonus_penjualan = $total_penjualan * $nominalTetap;
+        } else {
+            $total_bonus_servis = 0;
+            $total_bonus_penjualan = 0;
+        }
+
+        $total_bonus_admin = $total_bonus_servis + $total_bonus_penjualan;
 
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-admin', [
             'users' => $users,
