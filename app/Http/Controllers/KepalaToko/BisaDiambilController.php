@@ -15,6 +15,10 @@ use Illuminate\Http\Request;
 use App\Models\ServiceAction;
 use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
+use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
+use App\Models\StoreSetting;
+
 
 class BisaDiambilController extends Controller
 {
@@ -28,6 +32,262 @@ class BisaDiambilController extends Controller
 
         return view('pages/kepalatoko/servis/bisa-diambil');
     }
+
+    public function getData(Request $request)
+    {
+        $query = ServiceTransaction::with(['customer', 'user'])
+            ->where('status_servis', 'Bisa Diambil')
+            ->orderBy('created_at', 'desc');
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn('checkbox', function ($row) {
+                if (auth()->user()->role === 'Investor') return '';
+                return '
+                    <div class="flex items-center">
+                        <label class="inline-flex">
+                            <span class="sr-only">Select</span>
+                            <input class="table-item form-checkbox" type="checkbox" value="'.$row->id.'" @click="uncheckParent" />
+                        </label>
+                    </div>
+                ';
+            })
+            ->addColumn('nomor_servis', function ($row) {
+                if (auth()->user()->role !== 'Investor') {
+                    return '
+                        <a href="'.route('transaksi-servis-bisa-diambil.edit', $row->id).'">
+                            <div class="flex items-center text-blue-600">
+                                <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                                    <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
+                                </svg>
+                                <div class="font-medium">'.$row->nomor_servis.'</div>
+                            </div>
+                        </a>';
+                }
+                return '<div class="font-medium">'.$row->nomor_servis.'</div>';
+            })
+            ->addColumn('tgl_terima', fn($row) => Carbon::parse($row->created_at)->format('d/m/Y'))
+            ->addColumn('penerima', fn($row) => '<div class="font-medium">'.e($row->penerima).'</div>')
+            ->addColumn('pelanggan', function ($row) {
+                if (!$row->customer)
+                    return '<div class="font-medium text-rose-600">Data pelanggan telah dihapus</div>';
+                return '<div class="font-medium">'.e($row->customer->nama).'</div>';
+            })
+            ->addColumn('hubungi', function ($row) {
+                if (auth()->user()->role === 'Investor') return '';
+
+                $nomor = $row->customer->nomor_hp ?? null;
+                if (!$nomor) return '-';
+                $nomorwa = preg_replace('/^08/', '628', $nomor);
+                $toko = User::find(1);
+                $fonteeToken = StoreSetting::first()->fonnte ?? null;
+
+                $pesan = rawurlencode("*Notifikasi | {$toko->nama_toko}*%0ABarang Servis *{$row->nama_barang}*%0A"
+                    ."No. Servis *{$row->nomor_servis}*%0AKondisi: *{$row->kondisi_servis}*%0A"
+                    ."Tanggal: ".Carbon::parse($row->tgl_selesai)->translatedFormat('d F Y')."%0A"
+                    ."Status: *{$row->status_servis}*%0ABiaya: Rp. ".number_format($row->biaya)."%0A%0ATerima Kasih.");
+
+                return '
+                    <div class="flex space-x-1">
+                        <a href="https://api.whatsapp.com/send?phone='.$nomorwa.'&text=" target="_blank" title="Kirim manual">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#00b341" fill="none" viewBox="0 0 24 24">
+                                <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
+                                <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1" />
+                            </svg>
+                        </a>
+                        <a href="javascript:void(0)" onclick="
+                            '.($fonteeToken
+                                ? "kirimFontee('{$fonteeToken}', '{$nomorwa}', '{$pesan}')"
+                                : "window.open('https://wa.me/{$nomorwa}/?text={$pesan}', '_blank')"
+                            ).'
+                        ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#00abfb" fill="none" viewBox="0 0 24 24">
+                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                <line x1="9" y1="7" x2="10" y2="7" />
+                                <line x1="9" y1="13" x2="15" y2="13" />
+                                <line x1="13" y1="17" x2="15" y2="17" />
+                            </svg>
+                        </a>
+                    </div>';
+            })
+            ->addColumn('nama_barang', fn($r) => '<div class="font-medium">'.e($r->nama_barang).'</div>')
+            ->addColumn('kerusakan', fn($r) => '<div class="font-medium">'.e($r->kerusakan).'</div>')
+            ->addColumn('fungsi', fn($r) => '<div class="font-medium">'.e($r->qc_masuk).'</div>')
+            ->addColumn('kondisi', function ($row) {
+                $color = match ($row->kondisi_servis) {
+                    'Sudah jadi' => 'bg-emerald-100 text-emerald-600',
+                    'Menunggu konfirmasi' => 'bg-amber-100 text-amber-600',
+                    'Tidak bisa' => 'bg-rose-100 text-rose-500',
+                    default => 'bg-slate-100 text-slate-500',
+                };
+                return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 '.$color.'">'.e($row->kondisi_servis).'</div>';
+            })
+            ->addColumn('tindakan', fn($r) => '<div class="font-medium">'.implode(', ', json_decode($r->tindakan_servis) ?? []).'</div>')
+            ->addColumn('teknisi', function ($r) {
+                return $r->user
+                    ? '<div class="font-medium">'.e($r->user->name).'</div>'
+                    : '<div class="font-medium text-red-600">-</div>';
+            })
+            ->addColumn('modal_sparepart', function ($r) {
+                if (auth()->user()->role === 'Investor') return '';
+                return '<div class="font-medium">Rp. '.number_format($r->modal_sparepart).'</div>';
+            })
+            ->addColumn('biaya', fn($r) => '<div class="font-medium">Rp. '.number_format($r->biaya).'</div>')
+            ->addColumn('tgl_selesai', fn($r) => Carbon::parse($r->tgl_selesai)->format('d/m/Y'))
+            ->addColumn('aksi', function ($row) {
+                $delurl = route('transaksi-servis-bisa-diambil.destroy', $row->id);
+                if (auth()->user()->role === 'Investor') return '';
+
+                return '
+                    <div class="space-x-1 flex">
+                            <div>
+                                <button wire:click="openPinModal('.$row->id.')" class="text-indigo-500 hover:text-indigo-600 rounded-full">
+                                    <span class="sr-only">Service PIN & Pola</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-lock" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#6366f1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <rect x="5" y="11" width="14" height="10" rx="2" />
+                                        <path d="M8 11v-4a4 4 0 0 1 8 0v4" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div x-data="{ open: false }"
+                                x-show="open"
+                                @open-pin-modal-'.$row->id.'.window="open = true"
+                                @close-pin-modal-'.$row->id.'.window="open = false"
+                                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                                x-cloak
+                                @click.self="open = false">
+
+                                <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+                                    <div class="flex justify-between items-center border-b pb-2 mb-4">
+                                        <h2 class="text-lg font-semibold text-gray-700">Service PIN & Pola</h2>
+                                        <button @click="open=false" type="button" class="text-gray-400 hover:text-gray-600">&times;</button>
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <!-- PIN -->
+                                        <div>
+                                            <label class="text-sm font-medium text-gray-600">PIN</label> <br>
+                                            <input type="number" value="{{ $process->pin }}"
+                                                wire:model.defer="pin"  id="pinInput-'.$row->id.'"
+                                                class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
+                                        </div>
+
+                                        <!-- Pola -->
+                                        <div>
+                                            <label class="text-sm font-medium text-gray-600">Pola</label>
+                                            <canvas id="sig-canvas-'.$row->id.'" class="sig-canvas border rounded w-full h-48 bg-gray-100"></canvas>
+                                            <input type="hidden" id="polaInput-'.$row->id.'" wire:model.defer="pola" class="polaInput">
+                                            <small class="text-gray-400">Gambar pola (opsional)</small>
+                                        </div>
+
+                                        <button type="button" onclick="resetCanvas('.$row->id.')"
+                                            class="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600">
+                                            Reset Pola
+                                        </button>
+                                    </div>
+
+                                    <div class="mt-6 flex justify-end space-x-2">
+                                        <button onclick="saveCanvasAjax('.$row->id.')"
+                                            class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+                                            Simpan
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        <a href="'.route('ubah-sudah-diambil-edit', $row->id).'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#00b341" fill="none" viewBox="0 0 24 24">
+                                <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2v-1a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2v1z" />
+                                <path d="M9 14l2 2l4 -4" />
+                            </svg>
+                        </a>
+                        <a href="'.route('transaksi-servis-bisa-diambil.show', $row->id).'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#000" fill="none" viewBox="0 0 24 24">
+                                <path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" />
+                            </svg>
+                        </a>
+                   
+                        <div x-data="{ deleteOpen: false }">
+                            <button class="text-rose-500 hover:text-rose-600 rounded-full" @click.prevent="deleteOpen = true" aria-controls="danger-modal">
+                                <span class="sr-only">Delete</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ff2825" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <line x1="4" y1="7" x2="20" y2="7" />
+                                    <line x1="10" y1="11" x2="10" y2="17" />
+                                    <line x1="14" y1="11" x2="14" y2="17" />
+                                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                </svg>
+                            </button>
+                            <!-- Modal backdrop -->
+                            <div
+                                class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
+                                x-show="deleteOpen"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0"
+                                x-transition:enter-end="opacity-100"
+                                x-transition:leave="transition ease-out duration-100"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                                aria-hidden="true"
+                                x-cloak
+                            ></div>
+                            <!-- Modal dialog -->
+                            <div
+                                id="danger-modal"
+                                class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
+                                role="dialog"
+                                aria-modal="true"
+                                x-show="deleteOpen"
+                                x-transition:enter="transition ease-in-out duration-200"
+                                x-transition:enter-start="opacity-0 translate-y-4"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="transition ease-in-out duration-200"
+                                x-transition:leave-start="opacity-100 translate-y-0"
+                                x-transition:leave-end="opacity-0 translate-y-4"
+                                x-cloak
+                            >
+                                <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="deleteOpen = false" @keydown.escape.window="deleteOpen = false">
+                                    <div class="p-5 flex space-x-4">
+                                        <!-- Icon -->
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
+                                            <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16">
+                                                <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
+                                            </svg>
+                                        </div>
+                                        <!-- Content -->
+                                        <div>
+                                            <!-- Modal header -->
+                                            <div class="mb-2">
+                                                <div class="text-lg font-semibold text-slate-800">Apakah anda sudah yakin ?</div>
+                                            </div>
+                                            <!-- Modal content -->
+                                            <div class="text-sm mb-10">
+                                                <div class="space-y-2">
+                                                    <p>Jika sudah terhapus, maka tidak bisa dikembalikan lagi.</p>
+                                                </div>
+                                            </div>
+                                            <!-- Modal footer -->
+                                            <div class="flex flex-wrap justify-end space-x-2">
+                                                <form action="'.$delurl.' method="post">
+                                                ' . method_field('delete') . csrf_field() . '
+                                                    <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>';
+            })
+            ->rawColumns(['checkbox','nomor_servis','penerima','pelanggan','hubungi','nama_barang','kerusakan','fungsi','kondisi','tindakan','teknisi','modal_sparepart','biaya','tgl_selesai','aksi'])
+            ->make(true);
+    }
+
 
     /**
      * Show the form for creating a new resource.

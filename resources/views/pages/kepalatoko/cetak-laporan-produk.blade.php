@@ -130,7 +130,7 @@
 			@php
 				$i = 1
 			@endphp
-			@foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
+			@foreach ($products as $item)
 				<tr>
 					<td style="width: 10px;">{{ $i++ }}</td>
 					{{-- <td style="text-align: left; width: 90px;">

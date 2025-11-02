@@ -105,16 +105,16 @@ class AkunController extends Controller
             $request->validate([
                 'exp_date' => 'required|date',
             ]);
-    
+
             User::query()->update([
                 'exp_date' => $request->exp_date,
             ]);
-    
+
             return response()->json(['msg'=>'berhasil']);
         } catch (\Throwable $th) {
             return response()->json(['msg'=>'gagal','error'=> $th->getMessage()]);
         }
-        
+
     }
 
     // public function update(Request $request, $id)
@@ -149,6 +149,7 @@ class AkunController extends Controller
 
     public function store(UserRequest $request)
     {
+        // dd($request->all());
         $langganan = Auth::user()->exp_date;
 
         $data = [
@@ -163,6 +164,8 @@ class AkunController extends Controller
             'nomor_hp' => $request->nomor_hp,
             'alamat' => $request->alamat,
             'persen' => $request->persen,
+            'tipe_bonus_admin' => $request->tipe_bonus_admin,
+            'nominal_bonus_admin' => $request->nominal_bonus_admin,
             'exp_date' => $langganan,
         ];
 
@@ -199,6 +202,8 @@ class AkunController extends Controller
             'nomor_hp' => $request->nomor_hp,
             'alamat' => $request->alamat,
             'persen' => $request->persen,
+            'tipe_bonus_admin' => $request->tipe_bonus_admin,
+            'nominal_bonus_admin' => $request->nominal_bonus_admin,
             'exp_date' => $langganan,
         ];
 

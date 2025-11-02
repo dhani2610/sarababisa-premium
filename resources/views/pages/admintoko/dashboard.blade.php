@@ -5,7 +5,7 @@
 <x-admin-layout>
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
-        <!-- Page Intro -->                     
+        <!-- Page Intro -->
         <x-admintoko.header-admin :totalbonus="$totalbonus" :toko="$toko"/>
 
         <div class="space-y-3 my-6">
@@ -32,7 +32,7 @@
                             </svg>
                             <div class="font-medium">Ada {{ $reminders }} servis yang belum dikerjakan lebih dari 1 minggu nih, cek sekarang!</div>
                         </div>
-                        <a class="font-medium text-white ml-4 mt-[3px]" href="{{ route('admin-transaksi-servis.index') }}">-&gt;</a>
+                        <a class="font-medium text-white ml-4 mt-[3px]" href="{{ route('transaksi-servis.index') }}">-&gt;</a>
                     </div>
                 </div>
             @endif
@@ -53,7 +53,7 @@
             @endif
             <!-- Reminder Inventaris End -->
         </div>
-        
+
         <!-- Cards -->
         <div class="grid grid-cols-12 gap-6">
 
@@ -72,7 +72,7 @@
                         }
                     @endphp
 
-                    
+
                     <div class="inline-flex items-center justify-center overflow-hidden rounded-full">
                         <svg class="w-20 h-20">
                             <circle

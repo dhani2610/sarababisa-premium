@@ -127,7 +127,7 @@ class TransaksiServisLangsungController extends Controller
                 $transfer = $request->transfer;
             }
         }
-        
+
         // Cara pembayaran
         if ($request->cara_pembayaran === 'Tunai') {
             $tunai = $biayaFinal;
@@ -180,7 +180,7 @@ class TransaksiServisLangsungController extends Controller
         }else{
             $finalModal = $modalSparepart;
         }
-        // dd($profittransaksi,$request->all()); 
+        // dd($profittransaksi,$request->all());
         $ppn = 0;
         $cekppn = StoreSetting::find(1);
         if (!empty($cekppn)) {
@@ -195,15 +195,15 @@ class TransaksiServisLangsungController extends Controller
         if ($cekTeknisi->bagian_teknisi == 'Teknisi Interface') {
             if ($request->tipe == 'Interface') {
                 if (!empty($nama_model)) {
-                    $bonus_interface = $nama_model->nominal_bonus; 
+                    $bonus_interface = $nama_model->nominal_bonus;
                 }else{
-                $bonus_interface = 0; 
+                $bonus_interface = 0;
                 }
             }else{
-                $bonus_interface = 0; 
+                $bonus_interface = 0;
             }
         }else{
-            $bonus_interface = 0; 
+            $bonus_interface = 0;
         }
 
 
@@ -244,11 +244,13 @@ class TransaksiServisLangsungController extends Controller
             'garansi' => $request->garansi[0],
             'exp_garansi' => $expired[0],
             'exp_garansi_j' => json_encode($expired),
-            'is_approve' => 'Setuju',
+            'is_admin_toko' => Auth::user()->role == 'Admin Toko' ? 'Admin' : null,
+            'is_approve' => Auth::user()->role == 'Kepala Toko' ? 'Setuju' : null,
             'tgl_disetujui' => $request->tgl_disetujui,
             'tgl_ambil' => $request->tgl_ambil,
             'pengambil' => $nama_pelanggan->nama,
             'penyerah' => Auth::user()->name,
+            'admin_id' => Auth::user()->id,
             'pay' => $pay,
             'due' => $due,
             'tempo' => $tempo,
@@ -356,12 +358,12 @@ class TransaksiServisLangsungController extends Controller
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;
-    
+
             if (!$botToken || !$chatId) {
                 \Log::warning('Telegram bot token atau chat_id belum diset di pengaturan toko.');
                 return;
             }
-    
+
             try {
                 Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                     'chat_id' => $chatId,
@@ -371,6 +373,6 @@ class TransaksiServisLangsungController extends Controller
             } catch (\Exception $e) {
                 \Log::error('Gagal kirim pesan Telegram: ' . $e->getMessage());
             }
-        } 
+        }
     }
 }

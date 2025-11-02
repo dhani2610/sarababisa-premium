@@ -129,7 +129,7 @@ class UbahSudahDiambilController extends Controller
             $persen_teknisi = null;
         }
 
-      
+
         $ppn = 0;
         $cekppn = StoreSetting::find(1);
         if (!empty($cekppn) && $cekppn->is_tax == 1) {
@@ -167,7 +167,7 @@ class UbahSudahDiambilController extends Controller
                 $transfer = $request->transfer;
             }
         }
-        
+
         // Cara pembayaran
         if ($request->cara_pembayaran === 'Tunai') {
             $tunai = $biayaFinal;
@@ -232,7 +232,7 @@ class UbahSudahDiambilController extends Controller
             'exp_garansi_j' => json_encode($expired ?? []),
 
             'status_servis' => $request->status_servis,
-            'is_approve' => 'Setuju',
+            'is_approve' => Auth::user()->role == 'Kepala Toko' ? 'Setuju' : null,
             'tgl_disetujui' => $request->tgl_disetujui,
             'tgl_ambil' => $request->tgl_ambil,
             'pengambil' => $request->pengambil,
@@ -292,12 +292,12 @@ class UbahSudahDiambilController extends Controller
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;
-    
+
             if (!$botToken || !$chatId) {
                 \Log::warning('Telegram bot token atau chat_id belum diset di pengaturan toko.');
                 return;
             }
-    
+
             try {
                 Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                     'chat_id' => $chatId,
@@ -307,7 +307,7 @@ class UbahSudahDiambilController extends Controller
             } catch (\Exception $e) {
                 \Log::error('Gagal kirim pesan Telegram: ' . $e->getMessage());
             }
-        } 
+        }
     }
     /**
      * Remove the specified resource from storage.

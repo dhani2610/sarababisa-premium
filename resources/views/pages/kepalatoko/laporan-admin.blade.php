@@ -104,11 +104,11 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
 
         </div>
-     
+
         <!-- Table -->
         <x-kepalatoko.laporan-admin-table :users="$users"/>
 

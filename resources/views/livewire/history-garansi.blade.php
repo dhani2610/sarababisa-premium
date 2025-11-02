@@ -108,7 +108,7 @@
                     x-transition aria-hidden="true" x-cloak></div>
 
                 <!-- Modal dialog -->
-                <div id="tambah-modal"
+                <div id="tambah-modal-data"
                     class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
                     role="dialog" aria-modal="true" x-show="modalOpen" x-transition x-cloak>
                     <div class="bg-white rounded shadow-lg overflow-auto max-w-2xl w-full max-h-full"
@@ -132,7 +132,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Nomor Service <span
                                             class="text-rose-500">*</span></label>
-                                    <select name="service_id" id="service_id" class="form-select  w-full"
+                                    <select name="service_id" id="service_id" class="form-select select2  w-full"
                                         required>
                                         <option value="">-- Pilih Nomor Service --</option>
                                         @foreach ($serviceTransactions as $st)
@@ -328,7 +328,9 @@
                             <th class="px-2 py-3">Total Modal</th>
                             <th class="px-2 py-3">Catatan</th>
                             <th class="px-2 py-3">Status</th>
+                            @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                             <th class="px-2 py-3">Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody class="text-sm divide-y divide-slate-200">
@@ -406,6 +408,7 @@
                                 </td>
 
 
+                                @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                                 {{-- Aksi (popup hapus tetap) --}}
                                 <td class="px-2 py-3">
                                     <div class="flex space-x-2">
@@ -494,6 +497,7 @@
                                         </div>
                                     </div>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
@@ -515,7 +519,7 @@
             // aktifkan select2
             $('.select2').select2({
                 width: '100%', // biar full width
-                dropdownParent: $('#tambah-modal') // penting supaya muncul di dalam modal
+                dropdownParent: $('#tambah-modal-data') // penting supaya muncul di dalam modal
             });
 
             // update teknisi + garansi saat service_id berubah

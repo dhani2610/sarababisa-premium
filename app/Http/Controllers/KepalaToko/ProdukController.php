@@ -212,6 +212,7 @@ class ProdukController extends Controller
         }
 
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-produk', [
+        // return View('pages.kepalatoko.cetak-laporan-produk', [
             'users' => $users,
             'imagePath' => $imagePath,
             'products' => $products,

@@ -54,6 +54,18 @@
                             </div>
                         </a>
                     </li>
+                      <!-- Pelanggan -->
+                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'bg-slate-900' }}@endif">
+                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('master-absensi.index') }}">
+                            <div class="flex items-center">
+                                <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M18.974 8H22a2 2 0 012 2v6h-2v5a1 1 0 01-1 1h-2a1 1 0 01-1-1v-5h-2v-6a2 2 0 012-2h.974zM20 7a2 2 0 11-.001-3.999A2 2 0 0120 7zM2.974 8H6a2 2 0 012 2v6H6v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5H0v-6a2 2 0 012-2h.974zM4 7a2 2 0 11-.001-3.999A2 2 0 014 7z" />
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M12 6a3 3 0 110-6 3 3 0 010 6zm2 18h-4a1 1 0 01-1-1v-6H6v-6a3 3 0 013-3h6a3 3 0 013 3v6h-3v6a1 1 0 01-1 1z" />
+                                    </svg>
+                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Absensi</span>
+                            </div>
+                        </a>
+                    </li>
                     <!-- Pelanggan -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['teknisi-pelanggan'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['teknisi-pelanggan'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('teknisi-pelanggan.index') }}">
@@ -93,13 +105,13 @@
                         </a>
                     </li>
                     <!-- Transaksi Servis -->
-                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['admin-transaksi-servis.index', 'admin-servis-bisa-diambil.index', 'admin-servis-bisa-diambil.edit', 'admin-servis-sudah-diambil.index', 'admin-servis-sudah-diambil.edit', 'admin-transaksi-servis.edit', 'admin-transaksi-servis.show'])){{ 'bg-slate-900' }}@endif">
-                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['admin-transaksi-servis.index', 'admin-servis-bisa-diambil.index', 'admin-servis-bisa-diambil.edit', 'admin-servis-sudah-diambil.index', 'admin-servis-sudah-diambil.edit', 'admin-transaksi-servis.edit', 'admin-transaksi-servis.show'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('admin-transaksi-servis.index') }}">
+                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['transaksi-servis.index', 'admin-servis-bisa-diambil.index', 'admin-servis-bisa-diambil.edit', 'admin-servis-sudah-diambil.index', 'admin-servis-sudah-diambil.edit', 'transaksi-servis.edit', 'transaksi-servis.show'])){{ 'bg-slate-900' }}@endif">
+                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['transaksi-servis.index', 'admin-servis-bisa-diambil.index', 'admin-servis-bisa-diambil.edit', 'admin-servis-sudah-diambil.index', 'admin-servis-sudah-diambil.edit', 'transaksi-servis.edit', 'transaksi-servis.show'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('transaksi-servis.index') }}">
                             <div class="flex items-center">
                                 <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['admin-transaksi-servis'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M8 1v2H3v19h18V3h-5V1h7v23H1V1z" />
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['admin-transaksi-servis'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M1 1h22v23H1z" />
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['admin-transaksi-servis'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M15 10.586L16.414 12 11 17.414 7.586 14 9 12.586l2 2zM5 0h14v4H5z" />
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['transaksi-servis'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M8 1v2H3v19h18V3h-5V1h7v23H1V1z" />
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['transaksi-servis'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M1 1h22v23H1z" />
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['transaksi-servis'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M15 10.586L16.414 12 11 17.414 7.586 14 9 12.586l2 2zM5 0h14v4H5z" />
                                 </svg>
                                 <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Transaksi Servis</span>
                             </div>
