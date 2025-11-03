@@ -37,11 +37,17 @@ class TransaksiProdukController extends Controller
 
     public function data(Request $request)
     {
+        $limit = $request->get('limit', 200);
+        $offset = $request->get('offset', 0);
+    
         $orders = Order::select('orders.*', 'order_details.modal')
             ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
             ->with(['user', 'customer'])
             ->orderByRaw('is_approve IS NULL DESC')
-            ->latest();
+            ->latest()
+            ->skip($offset)
+            ->take($limit)
+            ->get();
 
         return DataTables::of($orders)
             ->addIndexColumn()
@@ -229,12 +235,19 @@ class TransaksiProdukController extends Controller
 
     public function dataLunas(Request $request)
     {
+
+        $limit = $request->get('limit', 200);
+        $offset = $request->get('offset', 0);
+
         $orders = Order::select('orders.*', 'order_details.modal')
             ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
             ->with(['user', 'customer'])
             ->where('due', '0')
             ->orderByRaw('is_approve IS NULL DESC')
-            ->latest();
+            ->latest()
+            ->skip($offset)
+            ->take($limit)
+            ->get();
 
         return DataTables::of($orders)
             ->addIndexColumn()

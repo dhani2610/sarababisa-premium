@@ -51,8 +51,8 @@ class MasterAbsensi extends Component
         }
 
         $users = $user->role === 'Kepala Toko'
-            ? User::select('id','name')->get()
-            : User::where('id', $user->id)->select('id','name')->get();
+            ? User::select('id','name')->whereIn('role',['Teknisi','Sales','Admin Toko'])->get()
+            : User::where('id', $user->id)->select('id','name')->whereIn('role',['Teknisi','Sales','Admin Toko'])->get();
 
 
         $totalMasuk = Attendance::where('type', 'masuk')->count();

@@ -18,6 +18,13 @@ class MasterIzinController extends Controller
     {
         $data = $request->validated();
         $data['nominal_potongan'] = str_replace('.', '', $data['nominal_potongan']);
+        
+        if ($request->hasFile('dokumen')) {
+            $file = $request->file('dokumen');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/izin'), $filename);
+            $data['dokumen'] = 'uploads/izin/' . $filename;
+        }
         Izin::create($data);
 
         toast('Data Izin berhasil disimpan.', 'success');
@@ -35,6 +42,15 @@ class MasterIzinController extends Controller
         $data = $request->validated();
         $data['nominal_potongan'] = str_replace('.', '', $data['nominal_potongan']);
         $item = Izin::findOrFail($id);
+        if ($request->hasFile('dokumen')) {
+            if ($item->dokumen && file_exists(public_path($item->dokumen))) {
+                unlink(public_path($item->dokumen));
+            }
+            $file = $request->file('dokumen');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/izin'), $filename);
+            $data['dokumen'] = 'uploads/izin/' . $filename;
+        }
         $item->update($data);
 
         toast('Data Izin berhasil diperbarui.', 'success');

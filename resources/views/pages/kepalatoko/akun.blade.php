@@ -139,7 +139,7 @@
                                             </div>
                                             <br>
 
-                                            <div x-data="{ showDetails: false }">
+                                            <div x-data="{ showDetails: false }" id="spesialis-input">
                                                 <label class="block text-sm font-medium mb-1" for="types_id">Jika
                                                     teknisi, apakah memiliki spesialisisasi jenis barang?</label>
                                                 <div class="flex flex-wrap items-center -m-3">
@@ -171,8 +171,8 @@
                                                         @endforeach
                                                     </select>
                                                 </div>
+                                                <br>
                                             </div>
-                                            <br>
 
                                             <div>
                                                 <label class="block text-sm font-medium" for="workers_id">Relasi Data
@@ -195,27 +195,36 @@
                                                     <label class="block text-sm font-medium mb-1" for="tipe_bonus_admin">
                                                         Tipe Bonus <span class="text-rose-500">*</span>
                                                     </label>
-                                                    <select id="tipe_bonus_admin" name="tipe_bonus_admin" class="form-select text-sm py-1 w-full">
+                                                    <select id="tipe_bonus_admin" name="tipe_bonus_admin"
+                                                        class="form-select text-sm py-1 w-full"
+                                                        onchange="toggleBonusType()">
                                                         <option value="">Pilih Tipe Bonus</option>
                                                         <option value="Persen">Persen</option>
                                                         <option value="Tetap">Tetap</option>
                                                     </select>
                                                 </div>
 
-                                                <div class="mt-3">
+                                                <!-- Input nominal (untuk bonus tetap) -->
+                                                <div id="bonus-tetap" class="mt-3" style="display: none;">
                                                     <label class="block text-sm font-medium mb-1" for="nominal_bonus_admin">
-                                                        Nominal Bonus per Nota <span class="text-rose-500">*Isi jika tipe bonus tetap</span>
+                                                        Nominal Bonus per Nota <span class="text-rose-500">*</span>
                                                     </label>
                                                     <input id="nominal_bonus_admin" name="nominal_bonus_admin"
-                                                        class="form-input w-full px-2 py-1" type="number" placeholder="Contoh: 5000" />
+                                                        class="form-input w-full px-2 py-1" type="number"
+                                                        placeholder="Contoh: 5000" />
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label class="block text-sm font-medium mb-1"
-                                                    for="persen">Persen</label>
+
+                                            <!-- Input persen -->
+                                            <div id="bonus-persen" style="display: none;">
+                                                <label class="block text-sm font-medium mb-1" for="persen">
+                                                    Persen <span class="text-rose-500">*</span>
+                                                </label>
                                                 <input id="persen" name="persen"
-                                                    class="form-input w-full px-2 py-1" type="number" />
+                                                    class="form-input w-full px-2 py-1" type="number"
+                                                    placeholder="Contoh: 10" />
                                             </div>
+
                                         </div>
 
                                     </div>
@@ -287,29 +296,55 @@ function toggleInputs() {
     const extraFields = document.getElementById('extra-fields');
     const uploadInvestor = document.getElementById('upload-investor');
     const bonusAdmin = document.getElementById('bonus-admin');
+    const spesialisInput = document.getElementById('spesialis-input');
+    const bonusPersen = document.getElementById('bonus-persen');
 
     if (role === 'Investor') {
         extraFields.style.display = 'none';
         uploadInvestor.style.display = 'block';
         bonusAdmin.style.display = 'none';
+        spesialisInput.style.display = 'none';
     } else if (role === 'Kepala Toko') {
         extraFields.style.display = 'none';
         uploadInvestor.style.display = 'none';
         bonusAdmin.style.display = 'none';
+        spesialisInput.style.display = 'none';
     } else if (role === 'Admin Toko') {
         extraFields.style.display = 'block';
         uploadInvestor.style.display = 'none';
         bonusAdmin.style.display = 'block';
+        spesialisInput.style.display = 'none';
     } else {
         extraFields.style.display = 'block';
         uploadInvestor.style.display = 'none';
         bonusAdmin.style.display = 'none';
+        spesialisInput.style.display = 'block';
+        bonusPersen.style.display = 'block';
     }
 }
 
 // Jalankan saat pertama kali halaman dimuat
 document.addEventListener('DOMContentLoaded', toggleInputs);
 document.getElementById('role').addEventListener('change', toggleInputs);
+</script>
+
+<script>
+function toggleBonusType() {
+    const tipe = document.getElementById('tipe_bonus_admin').value;
+    const bonusTetap = document.getElementById('bonus-tetap');
+    const bonusPersen = document.getElementById('bonus-persen');
+
+    bonusTetap.style.display = 'none';
+    bonusPersen.style.display = 'none';
+
+    if (tipe === 'Tetap') {
+        bonusTetap.style.display = 'block';
+    } else if (tipe === 'Persen') {
+        bonusPersen.style.display = 'block';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', toggleBonusType);
 </script>
 
 

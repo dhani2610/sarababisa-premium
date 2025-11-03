@@ -10,7 +10,7 @@ class Izin extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'tipe', 'keterangan', 'tanggal', 'nominal_potongan'
+        'user_id', 'tipe', 'keterangan', 'tanggal', 'nominal_potongan','tanggal_mulai','tanggal_selesai','dokumen'
     ];
 
     public function user()

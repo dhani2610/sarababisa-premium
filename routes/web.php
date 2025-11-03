@@ -266,6 +266,7 @@ Route::get('master/master-absensi', [AttendanceController::class, 'index'])->nam
 Route::post('master/master-absensi/store', [AttendanceController::class, 'store'])->name('master-absensi.store');
 Route::delete('master/master-absensi/delete-selected', [AttendanceController::class, 'deleteSelected'])->name('master-absensi.deleteSelected');
 Route::delete('master/master-absensi/{id}', [AttendanceController::class, 'destroy'])->name('master-absensi.destroy');
+Route::get('master/master-absensi/export', [AttendanceController::class, 'export'])->name('master-absensi.export');
 
 // routes/web.php
 // Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'yyy'])->name('service.show');
@@ -320,6 +321,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
 
     Route::get('servis/transaksi-servis-sudah-diambil/data', [KepalaTokoSudahDiambilController::class,'getData'])->name('transaksi-servis-sudah-diambil.data');
     Route::resource('servis/transaksi-servis-sudah-diambil', KepalaTokoSudahDiambilController::class);
+    
+    Route::get('servis/transaksi-servis-belum-disetujui/data', [KepalaTokoServisBelumDisetujuiController::class,'getData'])->name('transaksi-servis-belum-disetujui.data');
     Route::resource('servis/transaksi-servis-belum-disetujui', KepalaTokoServisBelumDisetujuiController::class);
     Route::get('servis/log-servis', [KepalaTokoLogServisController::class, 'index'])->name('log-servis');
     Route::post('servis/log-servis-destroy/{model}', [KepalaTokoLogServisController::class, 'destroy'])->name('log-servis-destroy');
@@ -477,8 +480,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('/impor-tool', [KepalaTokoProdukToolController::class, 'import'])->name('impor-tool');
 });
 
-Route::get('izin', [MasterIzinController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
-Route::get('nota-terima-inkjet/{id}', [KepalaTokoTransaksiServisController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
+// Route::get('izin', [MasterIzinController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
+Route::get('nota-terima-inkjet/{id}', [KepalaTokoTransaksiServisController::class, 'cetakinkjet'])->name('kepalatoko-cetak-inkjet');
 Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::class, 'cetakinkjet'])->name('kepalatoko-pengambilan-cetak-inkjet');
 Route::get('transaksi-produk-inkjet/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakinkjet'])->name('lunas-cetak-inkjet');
 Route::post('/servis/admin-transaksi-servis-langsung', [AdminTokoTransaksiServisLangsungController::class, 'store'])->name('admin-servis-langsung');

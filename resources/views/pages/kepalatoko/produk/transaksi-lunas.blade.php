@@ -260,7 +260,7 @@
 
             <script>
                 $(document).ready(function() {
-                    $('#transaksiTable').DataTable({
+                    let table = $('#transaksiTable').DataTable({
                         processing: true,
                         serverSide: false,
                         ajax: '{{ route('transaksi-produk.data.lunas') }}',
@@ -327,9 +327,7 @@
                                 }
                             @endif
                         ],
-                        order: [
-                            [2, 'desc']
-                        ],
+                        order: [],
                         language: {
                             url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
                         },
@@ -339,6 +337,33 @@
                             } // biar ga error kalau data null
                         ]
                     });
+
+                    
+                    // --- custom pagination load bertahap ---
+                    let batchSize = 100;
+                    let offset = 0;
+                    let loading = false;
+
+                    function loadBatch() {
+                        if (loading) return;
+                        loading = true;
+                        $.ajax({
+                            url: '{{ route('transaksi-produk.data.lunas') }}?offset=' + offset + '&limit=' + batchSize,
+                            success: function(response) {
+                                if (response.data.length > 0) {
+                                    table.rows.add(response.data).draw(false);
+                                    offset += batchSize;
+                                    loading = false;
+                                    // lanjut load batch berikutnya
+                                    setTimeout(loadBatch, 100);
+                                } else {
+                                    console.log('semua data sudah dimuat');
+                                }
+                            }
+                        });
+                    }
+                    loadBatch();
+
                     $('#parent-checkbox').on('click', function() {
                         const isChecked = $(this).is(':checked');
                         $('.table-item').prop('checked', isChecked);

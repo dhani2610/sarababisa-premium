@@ -308,6 +308,18 @@
         </div>
         @endif
 
+        <div class="flex items-center gap-2 mb-4">
+            <form method="GET" action="{{ route('master-absensi.export') }}">
+                <div class="flex items-center gap-2">
+                    <input type="month" name="bulan" class="form-input border rounded px-2 py-1" required>
+                    <button type="submit" class="btn bg-emerald-500 text-white">
+                        <i class="fas fa-file-excel mr-1"></i> Export Excel
+                    </button>
+                </div>
+            </form>
+        </div>
+                
+
         <div class="sm:flex sm:justify-between sm:items-center mb-3 gap-3">
             <div>
                 <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Absensi ✨</h1>
@@ -334,7 +346,16 @@
             @click.self="modalOpen = false" @keydown.escape.window="modalOpen = false" x-transition>
             <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 grid grid-cols-1 gap-4">
                 <div>
-                    <h2 class="font-semibold">Kamera</h2>
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="font-semibold text-lg">Kamera</h2>
+                        <button
+                            class="text-gray-500 hover:text-gray-700"
+                            @click="modalOpen = false"
+                            title="Tutup"
+                        >
+                            ✕
+                        </button>
+                    </div>
                     <video x-ref="video" class="w-full h-64 bg-black rounded" autoplay muted playsinline></video>
                     <div class="mt-2 ">
                         <button class="btn bg-indigo-500 text-white" @click="captureAndSubmit('masuk')">Absen
@@ -421,10 +442,36 @@
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     {{ ucfirst($att->type) }}</td>
-                                <td
-                                    class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
+                                @php
+                                    $setting = \App\Models\StoreSetting::first();
+                                    $jamMasuk = $setting?->jam_masuk ? \Carbon\Carbon::parse($setting->jam_masuk) : null;
+                                    $jamAbsen = \Carbon\Carbon::parse($att->created_at);
+                                
+                                    $status = 'Tidak Aktif';
+                                    $warna = 'text-slate-400 italic';
+                                
+                                    if ($setting && $setting->active_setting_absensi) {
+                                        if ($jamAbsen->gt($jamMasuk)) {
+                                            $status = 'Terlambat';
+                                            $warna = 'text-red-500 font-semibold';
+                                        } else {
+                                            $status = 'Tepat Waktu';
+                                            $warna = 'text-green-500 font-semibold';
+                                        }
+                                    }
+                                @endphp
+                                
+                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
                                     {{ \Carbon\Carbon::parse($att->created_at)->translatedFormat('l, d F Y H:i:s') }}
-
+                                    @if (ucfirst($att->type) == 'Masuk')
+                                        @if ($setting && $setting->active_setting_absensi)
+                                            <span class="ml-1 {{ $warna }}">| {{ $status }}</span>
+                                        @else
+                                            <span class="ml-1 {{ $warna }}">| {{ $status }}</span>
+                                        @endif
+                                    @endif
+                                </td>
+                                
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     @if ($att->lat && $att->lng)
