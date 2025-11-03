@@ -86,6 +86,33 @@
                     }
                 });
 
+                // --- custom pagination load bertahap ---
+                let batchSize = 100;
+                let offset = 0;
+                let loading = false;
+
+                function loadBatch() {
+                    if (loading) return;
+                    loading = true;
+                    $.ajax({
+                        url: '{{ route('transaksi-servis-belum-disetujui.data') }}?offset=' + offset + '&limit=' + batchSize,
+                        success: function(response) {
+                            if (response.data.length > 0) {
+                                table.rows.add(response.data).draw(false);
+                                offset += batchSize;
+                                loading = false;
+                                // lanjut load batch berikutnya
+                                setTimeout(loadBatch, 100);
+                            } else {
+                                console.log('semua data sudah dimuat');
+                            }
+                        }
+                    });
+                }
+
+                // mulai load pertama
+                loadBatch();
+
                 function attachCheckboxHandlers() {
                     $('#parent-checkbox').off('click').on('click', function() {
                         var checked = $(this).is(':checked');

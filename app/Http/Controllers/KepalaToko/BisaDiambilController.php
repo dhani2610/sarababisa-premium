@@ -35,9 +35,16 @@ class BisaDiambilController extends Controller
 
     public function getData(Request $request)
     {
+        $limit = $request->get('limit', 200);
+        $offset = $request->get('offset', 0);
+
         $query = ServiceTransaction::with(['customer', 'user'])
             ->where('status_servis', 'Bisa Diambil')
-            ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', 'desc')
+            ->latest()
+            ->skip($offset)
+            ->take($limit)
+            ->get();
 
         return DataTables::of($query)
             ->addIndexColumn()

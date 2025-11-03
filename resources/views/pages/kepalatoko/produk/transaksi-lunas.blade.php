@@ -362,6 +362,7 @@
                             }
                         });
                     }
+                    loadBatch();
 
                     $('#parent-checkbox').on('click', function() {
                         const isChecked = $(this).is(':checked');

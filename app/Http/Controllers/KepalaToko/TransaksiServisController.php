@@ -52,9 +52,15 @@ class TransaksiServisController extends Controller
     
     public function getData(Request $request)
     {
+        $limit = $request->get('limit', 200);
+        $offset = $request->get('offset', 0);
         $query = ServiceTransaction::with(['customer'])
         ->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])
-        ->orderByDesc('updated_at');
+        ->orderByDesc('updated_at')
+        ->latest()
+        ->skip($offset)
+        ->take($limit)
+        ->get();
 
         return DataTables::of($query)
         ->addIndexColumn()
