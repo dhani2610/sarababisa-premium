@@ -477,7 +477,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('/impor-tool', [KepalaTokoProdukToolController::class, 'import'])->name('impor-tool');
 });
 
-Route::get('izin', [MasterIzinController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
+// Route::get('izin', [MasterIzinController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
 Route::get('nota-terima-inkjet/{id}', [KepalaTokoTransaksiServisController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
 Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::class, 'cetakinkjet'])->name('kepalatoko-pengambilan-cetak-inkjet');
 Route::get('transaksi-produk-inkjet/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakinkjet'])->name('lunas-cetak-inkjet');
