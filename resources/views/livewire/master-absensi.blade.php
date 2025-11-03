@@ -442,10 +442,36 @@
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     {{ ucfirst($att->type) }}</td>
-                                <td
-                                    class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
+                                @php
+                                    $setting = \App\Models\StoreSetting::first();
+                                    $jamMasuk = $setting?->jam_masuk ? \Carbon\Carbon::parse($setting->jam_masuk) : null;
+                                    $jamAbsen = \Carbon\Carbon::parse($att->created_at);
+                                
+                                    $status = 'Tidak Aktif';
+                                    $warna = 'text-slate-400 italic';
+                                
+                                    if ($setting && $setting->active_setting_absensi) {
+                                        if ($jamAbsen->gt($jamMasuk)) {
+                                            $status = 'Terlambat';
+                                            $warna = 'text-red-500 font-semibold';
+                                        } else {
+                                            $status = 'Tepat Waktu';
+                                            $warna = 'text-green-500 font-semibold';
+                                        }
+                                    }
+                                @endphp
+                                
+                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
                                     {{ \Carbon\Carbon::parse($att->created_at)->translatedFormat('l, d F Y H:i:s') }}
-
+                                    @if (ucfirst($att->type) == 'Masuk')
+                                        @if ($setting && $setting->active_setting_absensi)
+                                            <span class="ml-1 {{ $warna }}">| {{ $status }}</span>
+                                        @else
+                                            <span class="ml-1 {{ $warna }}">| {{ $status }}</span>
+                                        @endif
+                                    @endif
+                                </td>
+                                
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     @if ($att->lat && $att->lng)
