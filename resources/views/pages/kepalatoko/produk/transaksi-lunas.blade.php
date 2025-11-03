@@ -340,7 +340,7 @@
 
                     
                     // --- custom pagination load bertahap ---
-                    let batchSize = 10;
+                    let batchSize = 100;
                     let offset = 0;
                     let loading = false;
 
@@ -355,7 +355,7 @@
                                     offset += batchSize;
                                     loading = false;
                                     // lanjut load batch berikutnya
-                                    setTimeout(loadBatch, 10);
+                                    setTimeout(loadBatch, 100);
                                 } else {
                                     console.log('semua data sudah dimuat');
                                 }
