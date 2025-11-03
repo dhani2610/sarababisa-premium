@@ -77,7 +77,7 @@ class ProsesData extends Component
         $model_series = ModelSerie::all();
         $users = User::where('role', 'Teknisi')->get();
         $sales = User::where('role', 'Sales')->get();
-        $penerima = User::all();
+        $penerima = User::whereNotIn('role',['Investor'])->get();
         $service_actions = ServiceAction::all();
         $products = Product::whereHas('subCategory', function ($query) {
             $query->whereHas('category', function ($subQuery) {

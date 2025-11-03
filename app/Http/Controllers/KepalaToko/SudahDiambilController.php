@@ -525,7 +525,7 @@ class SudahDiambilController extends Controller
         $model_series = ModelSerie::all();
         $service_actions = ServiceAction::all();
         $capacities = Capacity::all();
-        $penerima = User::all();
+        $penerima = User::whereNotIn('role',['Investor'])->get();
         $users = User::where('role', 'Teknisi')->get();
         $workers = Worker::where('jabatan', 'like', '%' . 'teknisi')->get();
         $products = Product::whereHas('subCategory', function ($query) {
