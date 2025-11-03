@@ -308,6 +308,18 @@
         </div>
         @endif
 
+        <div class="flex items-center gap-2 mb-4">
+            <form method="GET" action="{{ route('master-absensi.export') }}">
+                <div class="flex items-center gap-2">
+                    <input type="month" name="bulan" class="form-input border rounded px-2 py-1" required>
+                    <button type="submit" class="btn bg-emerald-500 text-white">
+                        <i class="fas fa-file-excel mr-1"></i> Export Excel
+                    </button>
+                </div>
+            </form>
+        </div>
+                
+
         <div class="sm:flex sm:justify-between sm:items-center mb-3 gap-3">
             <div>
                 <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Absensi ✨</h1>

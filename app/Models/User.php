@@ -10,6 +10,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -109,6 +110,10 @@ class User extends Authenticatable
             ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', $currentMonth);
+    }
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class, 'user_id', 'id');
     }
 
     public function prevservicetransaction()

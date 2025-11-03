@@ -8,6 +8,8 @@ use App\Models\Attendance;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Exports\AttendanceMatrixExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AttendanceController extends Controller
 {
@@ -16,6 +18,17 @@ class AttendanceController extends Controller
     {
         return view('pages.kepalatoko.attendance');
     }
+    public function export(Request $request)
+    {
+        $bulan = $request->get('bulan');
+        if (!$bulan) {
+            return back()->with('error', 'Pilih bulan terlebih dahulu.');
+        }
+
+        $fileName = 'Laporan_Absensi_' . date('F_Y', strtotime($bulan)) . '.xlsx';
+        return Excel::download(new AttendanceMatrixExport($bulan), $fileName);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

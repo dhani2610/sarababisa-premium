@@ -266,6 +266,7 @@ Route::get('master/master-absensi', [AttendanceController::class, 'index'])->nam
 Route::post('master/master-absensi/store', [AttendanceController::class, 'store'])->name('master-absensi.store');
 Route::delete('master/master-absensi/delete-selected', [AttendanceController::class, 'deleteSelected'])->name('master-absensi.deleteSelected');
 Route::delete('master/master-absensi/{id}', [AttendanceController::class, 'destroy'])->name('master-absensi.destroy');
+Route::get('master/master-absensi/export', [AttendanceController::class, 'export'])->name('master-absensi.export');
 
 // routes/web.php
 // Route::get('/service-transaction/{id}', [App\Http\Controllers\HistoryGaransiController::class, 'yyy'])->name('service.show');
