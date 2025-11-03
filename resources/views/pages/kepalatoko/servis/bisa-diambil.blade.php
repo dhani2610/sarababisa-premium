@@ -12,6 +12,10 @@
 
     @push('styles')
         <style>
+            div.dataTables_wrapper div.dataTables_length select {
+                width: 47%!important;
+                display: inline-block;
+            }
             .dataTables_wrapper .dataTables_length {
                 float: left;
                 padding-left: 2%;
