@@ -176,13 +176,13 @@
             @keydown.escape.window="modalOpen = false" @click.self="modalOpen = false" x-transition.opacity>
             <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6" x-transition.scale>
                 <h2 class="text-xl font-semibold mb-4">Tambah Izin</h2>
-                <form action="{{ route('master-izin.store') }}" method="POST">
+                <form action="{{ route('master-izin.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-sm font-medium mb-1">User</label>
+                            <label class="block text-sm font-medium mb-1">Karyawan</label>
                             <select name="user_id" class="form-select w-full" required>
-                                <option value="">-- Pilih User --</option>
+                                <option value="">-- Pilih Karyawan --</option>
                                 @foreach ($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endforeach
@@ -197,16 +197,34 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-1">Tanggal</label>
+                            <label class="block text-sm font-medium mb-1">Tanggal Dibuat</label>
                             <input type="date" name="tanggal" class="form-input w-full" required>
                         </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Dari Tanggal</label>
+                                <input type="date" name="tanggal_mulai" class="form-input w-full" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Sampai Tanggal</label>
+                                <input type="date" name="tanggal_selesai" class="form-input w-full" required>
+                            </div>
+                        </div>
+                        @if (Auth::user()->role == 'Kepala Toko')
                         <div>
                             <label class="block text-sm font-medium mb-1">Nominal Potongan</label>
                             <input type="text" name="nominal_potongan" class="form-input w-full sapator" required>
                         </div>
+                        @else
+                        <input type="hidden" name="nominal_potongan" value="0">
+                        @endif
                         <div>
                             <label class="block text-sm font-medium mb-1">Keterangan</label>
                             <textarea name="keterangan" class="form-input w-full" rows="2"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Upload Dokumen (Opsional)</label>
+                            <input type="file" name="dokumen" class="form-input w-full" accept=".jpg,.jpeg,.png,.pdf">
                         </div>
                     </div>
                     <div class="mt-5 flex justify-end space-x-2">
@@ -248,12 +266,17 @@
                                 </label>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">No</th>
-                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Nama User
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Nama Karyawan
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Tipe</th>
-                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Tanggal</th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Tanggal Dibuat</th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Periode</th>
+                            @if (Auth::user()->role == 'Kepala Toko')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Nominal</th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Keterangan
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Dokumen
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Aksi</th>
                         </tr>
@@ -273,10 +296,25 @@
                                 <td class="px-2 capitalize">{{ $izin->tipe }}</td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
                                     {{ \Carbon\Carbon::parse($izin->tanggal)->format('d/m/Y') }}</td>
+                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
+                                    {{ \Carbon\Carbon::parse($izin->tanggal_mulai)->format('d/m/Y') }} - 
+                                    {{ \Carbon\Carbon::parse($izin->tanggal_selesai)->format('d/m/Y') }}    
+                                </td>
+                                @if (Auth::user()->role == 'Kepala Toko')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Rp
                                     {{ number_format($izin->nominal_potongan, 0, ',', '.') }}</td>
+                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
                                     {{ $izin->keterangan }}</td>
+                                <td class="text-center">
+                                    @if ($izin->dokumen)
+                                        <a href="{{ asset($izin->dokumen) }}" target="_blank" class="text-indigo-600 hover:underline">
+                                            Lihat Dokumen
+                                        </a>
+                                    @else
+                                        <span class="text-slate-400">-</span>
+                                    @endif
+                                </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
                                     <div class="flex space-x-1">
                                         <button type="button" class="text-indigo-500 hover:text-indigo-700"
@@ -286,7 +324,9 @@
                                             tipe: '{{ $izin->tipe }}',
                                             tanggal: '{{ $izin->tanggal }}',
                                             nominal_potongan: '{{ $izin->nominal_potongan }}',
-                                            keterangan: '{{ $izin->keterangan }}'
+                                            keterangan: '{{ $izin->keterangan }}',
+                                            tanggal_mulai: '{{ $izin->tanggal_mulai }}',
+                                            tanggal_selesai: '{{ $izin->tanggal_selesai }}'
                                         })">Edit</button>
                                         <form action="{{ route('master-izin.destroy', $izin->id) }}" method="POST"
                                             onsubmit="return confirm('Yakin hapus?')">
@@ -309,13 +349,13 @@
             @keydown.escape.window="editModal = false" @click.self="editModal = false" x-transition.opacity>
             <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6" x-transition.scale>
                 <h2 class="text-xl font-semibold mb-4">Edit Izin</h2>
-                <form :action="'/master/master-izin/' + editData.id" method="POST">
+                <form :action="'/master/master-izin/' + editData.id" method="POST" enctype="multipart/form-data">
                     @csrf @method('PUT')
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-sm font-medium mb-1">User</label>
+                            <label class="block text-sm font-medium mb-1">Karyawan</label>
                             <select name="user_id" class="form-select w-full" x-model="editData.user_id" required>
-                                <option value="">-- Pilih User --</option>
+                                <option value="">-- Pilih Karyawan --</option>
                                 @foreach ($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endforeach
@@ -330,18 +370,36 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-1">Tanggal</label>
+                            <label class="block text-sm font-medium mb-1">Tanggal Dibuat</label>
                             <input type="date" name="tanggal" class="form-input w-full"
                                 x-model="editData.tanggal" required>
                         </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Dari Tanggal</label>
+                                <input type="date" x-model="editData.tanggal_mulai" name="tanggal_mulai" class="form-input w-full" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Sampai Tanggal</label>
+                                <input type="date" x-model="editData.tanggal_selesai" name="tanggal_selesai" class="form-input w-full" required>
+                            </div>
+                        </div>
+                        @if (Auth::user()->role == 'Kepala Toko')
                         <div>
                             <label class="block text-sm font-medium mb-1">Nominal Potongan</label>
                             <input type="text" name="nominal_potongan" class="form-input w-full sapator"
                                 x-model="editData.nominal_potongan" required>
                         </div>
+                        @else
+                        <input type="hidden" name="nominal_potongan" x-model="editData.nominal_potongan">
+                        @endif
                         <div>
                             <label class="block text-sm font-medium mb-1">Keterangan</label>
                             <textarea name="keterangan" class="form-input w-full" rows="2" x-model="editData.keterangan"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Upload Dokumen (Opsional)</label>
+                            <input type="file" name="dokumen" class="form-input w-full" accept=".jpg,.jpeg,.png,.pdf">
                         </div>
                     </div>
                     <div class="mt-5 flex justify-end space-x-2">

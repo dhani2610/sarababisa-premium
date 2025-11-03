@@ -37,25 +37,25 @@ class MasterIzin extends Component
         $user = Auth::user();
         $query = Izin::with('user')->latest();
 
-        // Filter user jika bukan kepala toko
+        // === Filter user jika bukan kepala toko ===
         if ($user->role !== 'Kepala Toko') {
             $query->where('user_id', $user->id);
         }
 
-        // Filter pencarian
+        // === Filter pencarian ===
         if ($this->search) {
             $query->whereHas('user', fn($q) =>
                 $q->where('name', 'like', "%{$this->search}%")
             );
         }
 
-        // Filter bulan (YYYY-MM)
+        // === Filter bulan (YYYY-MM) ===
         if ($this->filter_bulan) {
             $query->whereMonth('tanggal', Carbon::parse($this->filter_bulan)->month)
                   ->whereYear('tanggal', Carbon::parse($this->filter_bulan)->year);
         }
 
-        // Filter tipe
+        // === Filter tipe ===
         if ($this->filter_tipe) {
             $query->where('tipe', $this->filter_tipe);
         }
@@ -64,21 +64,30 @@ class MasterIzin extends Component
         $today = Carbon::today();
         $bulanIni = Carbon::parse($this->filter_bulan ?? Carbon::now());
 
+        // Buat query dasar untuk statistik
+        $statQuery = Izin::query();
+
+        // Filter sesuai role
+        if ($user->role !== 'Kepala Toko') {
+            $statQuery->where('user_id', $user->id);
+        }
+
         $stats = [
             'hariIni' => [
-                'izin' => Izin::whereDate('tanggal', $today)->where('tipe', 'izin')->count(),
-                'sakit' => Izin::whereDate('tanggal', $today)->where('tipe', 'sakit')->count(),
-                'alfa'  => Izin::whereDate('tanggal', $today)->where('tipe', 'alfa')->count(),
-                'total' => Izin::whereDate('tanggal', $today)->count(),
+                'izin' => (clone $statQuery)->whereDate('tanggal', $today)->where('tipe', 'izin')->count(),
+                'sakit' => (clone $statQuery)->whereDate('tanggal', $today)->where('tipe', 'sakit')->count(),
+                'alfa'  => (clone $statQuery)->whereDate('tanggal', $today)->where('tipe', 'alfa')->count(),
+                'total' => (clone $statQuery)->whereDate('tanggal', $today)->count(),
             ],
             'bulanIni' => [
-                'izin' => Izin::whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->where('tipe', 'izin')->count(),
-                'sakit' => Izin::whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->where('tipe', 'sakit')->count(),
-                'alfa'  => Izin::whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->where('tipe', 'alfa')->count(),
-                'total' => Izin::whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->count(),
+                'izin' => (clone $statQuery)->whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->where('tipe', 'izin')->count(),
+                'sakit' => (clone $statQuery)->whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->where('tipe', 'sakit')->count(),
+                'alfa'  => (clone $statQuery)->whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->where('tipe', 'alfa')->count(),
+                'total' => (clone $statQuery)->whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->count(),
             ],
         ];
 
+        // === Daftar user dropdown ===
         $users = $user->role === 'Kepala Toko'
             ? User::whereIn('role', ['Teknisi', 'Sales', 'Admin Toko'])->select('id', 'name')->get()
             : User::where('id', $user->id)->select('id', 'name')->get();
