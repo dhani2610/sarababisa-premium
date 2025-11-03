@@ -355,7 +355,7 @@
                                     offset += batchSize;
                                     loading = false;
                                     // lanjut load batch berikutnya
-                                    setTimeout(loadBatch, 300);
+                                    setTimeout(loadBatch, 10);
                                 } else {
                                     console.log('semua data sudah dimuat');
                                 }
