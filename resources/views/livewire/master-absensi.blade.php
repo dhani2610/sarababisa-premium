@@ -334,7 +334,16 @@
             @click.self="modalOpen = false" @keydown.escape.window="modalOpen = false" x-transition>
             <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 grid grid-cols-1 gap-4">
                 <div>
-                    <h2 class="font-semibold">Kamera</h2>
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="font-semibold text-lg">Kamera</h2>
+                        <button
+                            class="text-gray-500 hover:text-gray-700"
+                            @click="modalOpen = false"
+                            title="Tutup"
+                        >
+                            ✕
+                        </button>
+                    </div>
                     <video x-ref="video" class="w-full h-64 bg-black rounded" autoplay muted playsinline></video>
                     <div class="mt-2 ">
                         <button class="btn bg-indigo-500 text-white" @click="captureAndSubmit('masuk')">Absen
