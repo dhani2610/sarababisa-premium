@@ -26,6 +26,9 @@ class StoreSetting extends Model
         'chat_id',
         'report_time',
         'fonnte',
+        'active_setting_absensi',
+        'jam_masuk',
+        'jam_pulang',
     ];
 
 }

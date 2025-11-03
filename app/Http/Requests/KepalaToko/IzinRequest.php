@@ -15,10 +15,14 @@ class IzinRequest extends FormRequest
     {
         return [
             'user_id' => 'required|exists:users,id',
-            'tipe' => 'required|in:izin,sakit,alfa',
-            'keterangan' => 'nullable|string',
+            'tipe' => 'required|string|in:izin,sakit,alfa',
             'tanggal' => 'required|date',
-            'nominal_potongan' => 'required',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'nominal_potongan' => 'required|string',
+            'keterangan' => 'nullable|string',
+            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ];
     }
+    
 }

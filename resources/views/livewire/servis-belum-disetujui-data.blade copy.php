@@ -11,189 +11,7 @@
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan/IMEI" />
-
-            @if (Auth::user()->role != 'Investor')
-            <!-- Create invoice button -->
-            <div x-data="{ modalOpen: false }">
-                <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true" aria-controls="tambah-modal">
-                    <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
-                        <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-                    </svg>
-                    <span class="hidden xs:block ml-2">Tambah Transaksi Baru</span>
-                </button>
-                <!-- Modal backdrop -->
-                <div
-                    class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
-                    x-show="modalOpen"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="opacity-100"
-                    x-transition:leave="transition ease-out duration-100"
-                    x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0"
-                    aria-hidden="true"
-                    x-cloak
-                ></div>
-                <!-- Modal dialog -->
-                <div
-                    id="tambah-modal"
-                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                    role="dialog"
-                    aria-modal="true"
-                    x-show="modalOpen"
-                    x-transition:enter="transition ease-in-out duration-200"
-                    x-transition:enter-start="opacity-0 translate-y-4"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    x-transition:leave="transition ease-in-out duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0"
-                    x-transition:leave-end="opacity-0 translate-y-4"
-                    x-cloak
-                >
-                    <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full">
-                        <!-- Modal header -->
-                        <div class="px-5 py-3 border-b border-slate-200">
-                            <div class="flex justify-between items-center">
-                                <div class="font-semibold text-slate-800">Tambah Transaksi Baru</div>
-                                <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false">
-                                    <div class="sr-only">Close</div>
-                                    <svg class="w-4 h-4 fill-current">
-                                        <path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <!-- Modal content -->
-                        <form action="{{ route('transaksi-servis-sudah-diambil.store') }}" method="post">
-                            @csrf
-                            <input type="hidden" name="status_servis" value="Belum cek">
-                            <div class="px-5 py-4">
-                                <div class="space-y-3">
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="customers_id">Nama Pelanggan <span class="text-rose-500">*</span></label>
-                                        <select name="customers_id" class="form-select text-sm py-1 w-full" id="selectjs1" required style="width: 100%">
-                                            <option selected value="">Pilih Pelanggan</option>
-                                            @foreach ($customers as $item)
-                                                <option value="{{ $item->id }}">{{ $item->nama }} {{ $item->nomor_hp }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="types_id">Jenis Barang <span class="text-rose-500">*</span></label>
-                                        <select id="types_id" name="types_id" class="form-select text-sm py-1 w-full" required>
-                                            @foreach ($types as $type)
-                                                <option value="{{ $type->id }}">{{ $type->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="brands_id">Merek <span class="text-rose-500">*</span></label>
-                                        <select id="brands_id" name="brands_id" class="form-select text-sm py-1 w-full" required>
-                                            <option selected="">Pilih Merek</option>
-                                            @foreach ($brands as $brand)
-                                                <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="model_series_id">Model Seri <span class="text-rose-500">*</span></label>
-                                        <select id="model_series_id" name="model_series_id" class="form-select text-sm py-1 w-full selectjs2" required style="width: 100%">
-                                            <option selected="">Pilih Model Seri</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="imei">Nomor Imei <span class="text-rose-500">*</span></label>
-                                        <input id="imei" name="imei" class="form-input w-full px-2 py-1" type="text" required/>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="warna">Warna <span class="text-rose-500">*</span></label>
-                                        <input id="warna" name="warna" class="form-input w-full px-2 py-1" type="text" required/>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="capacities_id">Kapasitas <span class="text-rose-500">*</span></label>
-                                        <select id="capacities_id" name="capacities_id" class="form-select text-sm py-1 w-full" required>
-                                            @foreach ($capacities as $capacity)
-                                                <option value="{{ $capacity->id }}">{{ $capacity->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="kelengkapan">Kelengkapan</label>
-                                        <input id="kelengkapan" name="kelengkapan" class="form-input w-full px-2 py-1" type="text" placeholder="Kosongkan jika kelengkapannya hanya unit"/>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="kerusakan">Kerusakan <span class="text-rose-500">*</span></label>
-                                        <input id="kerusakan" name="kerusakan" class="form-input w-full px-2 py-1" type="text" required/>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="qc_masuk">Pengecekan Fungsi <span class="text-rose-500">*</span></label>
-                                        <input id="qc_masuk" name="qc_masuk" class="form-input w-full px-2 py-1" type="text" placeholder="Contoh: Tombol, Kamera, Speaker, dll" required/>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="estimasi_pengerjaan">Estimasi Pengerjaan</label>
-                                        <select id="estimasi_pengerjaan" name="estimasi_pengerjaan" class="form-select text-sm py-2 w-full">
-                                            <option selected value="">Pilih Estimasi Pengerjaan</option>
-                                            <option value="1 Hari">1 Hari</option>
-                                            <option value="2 Hari">2 Hari</option>
-                                            <option value="3 Hari">3 Hari</option>
-                                            <option value="4 Hari">4 Hari</option>
-                                            <option value="5 Hari">5 Hari</option>
-                                            <option value="6 Hari">6 Hari</option>
-                                            <option value="1 Minggu">1 Minggu</option>
-                                            <option value="2 Minggu">2 Minggu</option>
-                                            <option value="3 Minggu">3 Minggu</option>
-                                            <option value="1 Bulan">1 Bulan</option>
-                                            <option value="2 Bulan">2 Bulan</option>
-                                            <option value="3 Bulan">3 Bulan</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="estimasi_biaya">Estimasi Biaya Servis</label>
-                                        <div class="relative">
-                                            <input id="estimasi_biaya" name="estimasi_biaya" class="form-input w-full pl-10 px-2 py-1" type="number" placeholder="Kosongkan jika tidak ada"/>
-                                            <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
-                                                <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="uang_muka">DP/Uang Muka</label>
-                                        <div class="relative">
-                                            <input id="uang_muka" name="uang_muka" class="form-input w-full pl-10 px-2 py-1" type="number" placeholder="Kosongkan jika tidak ada"/>
-                                            <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
-                                                <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="penerima">Penerima</label>
-                                        <select id="penerima" name="penerima" class="form-select text-sm py-1 w-full" required>
-                                            @foreach ($workers as $worker)
-                                                <option value="{{ $worker->name }}">{{ $worker->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Modal footer -->
-                            <div class="px-5 py-4 border-t border-slate-200">
-                                <div class="flex flex-wrap justify-between space-x-2">
-                                    <a href="{{ route('pelanggan.index') }}" class="btn-sm bg-green-500 hover:bg-green-600 text-white">
-                                        Tambah Pelanggan Baru
-                                    </a>
-                                    <div>
-                                        <a href="{{ route('transaksi-servis-sudah-diambil.index') }}" class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600">
-                                            Batal
-                                        </a>
-                                        <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Simpan</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            @endif
+            <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan" />
 
         </div>
 
@@ -217,13 +35,13 @@
                 </li>
                 <li class="m-1">
                     <a href="{{ route('transaksi-servis-sudah-diambil.index') }}">
-                        <button class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-slate-200 hover:border-slate-300 shadow-sm bg-indigo-500 text-white duration-150 ease-in-out">Sudah Diambil <span class="ml-1 text-slate-400">{{ $jumlah_sudah_diambil }}</span></button>
+                        <button class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-transparent shadow-sm  bg-white text-slate-500 duration-150 ease-in-out">Sudah Diambil <span class="ml-1 text-slate-400">{{ $jumlah_sudah_diambil }}</span></button>
                     </a>
                 </li>
-                @if (Auth::user()->role == 'Kepala Toko' )
+                @if (Auth::user()->role != 'Investor' || Auth::user()->role != 'Admin Toko' )
                 <li class="m-1">
                     <a href="{{ route('transaksi-servis-belum-disetujui.index') }}">
-                        <button class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-transparent shadow-sm  bg-white text-slate-500 duration-150 ease-in-out">Belum Disetujui <span class="ml-1 text-slate-400">{{ $jumlah_belum_disetujui }}</span></button>
+                        <button class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-slate-200 hover:border-slate-300 shadow-sm bg-indigo-500 text-white duration-150 ease-in-out">Belum Disetujui <span class="ml-1 text-slate-400">{{ $jumlah_belum_disetujui }}</span></button>
                     </a>
                 </li>
                 @endif
@@ -296,8 +114,6 @@
             </div>
             <div class="mb-0">
                 <select wire:model="paginate" id="" class="form-select">
-                    <option value="10">10</option>
-                    <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                     <option value="250">250</option>
@@ -306,14 +122,13 @@
                 </select>
             </div>
         </div>
-
     </div>
 
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
         <div x-data="handleSelect">
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 {{-- Left side --}}
-                <h2 class="font-semibold text-slate-800">Sudah Diambil <span class="text-slate-400 font-medium">{{ $jumlah_sudah_diambil }}</span></h2>
+                <h2 class="font-semibold text-slate-800">Belum Disetujui <span class="text-slate-400 font-medium">{{ $jumlah_belum_disetujui }}</span></h2>
                 {{-- Right side --}}
                 <div class="relative inline-flex">
                     <div class="table-items-action hidden">
@@ -330,7 +145,7 @@
             </div>
             <!-- Table -->
             <div class="overflow-x-auto">
-                <table id="transaksi-servis-table" class="table-auto w-full">
+                <table class="table-auto w-full">
                     <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
@@ -359,11 +174,11 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Pelanggan</div>
                             </th>
-                            @if (Auth::user()->role != 'Investor')
+                            {{-- @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Hubungi</div>
                             </th>
-                            @endif
+                            @endif --}}
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Nama Barang</div>
                             </th>
@@ -385,11 +200,9 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Teknisi</div>
                             </th>
-                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Modal Sparepart</div>
                             </th>
-                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Biaya</div>
                             </th>
@@ -422,7 +235,7 @@
                         </tr>
                     </thead>
                     <!-- Table body -->
-                    {{-- <tbody class="text-sm divide-y divide-slate-200">
+                    <tbody class="text-sm divide-y divide-slate-200">
                         <!-- Row -->
                         @php
                             $i = 1
@@ -466,7 +279,7 @@
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     @if (Auth::user()->role != 'Investor')
-                                    <a href="{{ route('transaksi-servis-sudah-diambil.edit', $transaction->id) }}">
+                                    <a href="{{ route('transaksi-servis-belum-disetujui.edit', $transaction->id) }}">
                                         <div class="flex items-center text-blue-600">
                                             <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
                                                 <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
@@ -499,7 +312,7 @@
                                         <div></div>
                                     @endif
                                 </td>
-                                @if (Auth::user()->role != 'Investor')
+                                {{-- @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="flex space-x-1">
                                         @php
@@ -535,100 +348,132 @@
                                                         x-transition:leave-end="opacity-0"
                                                         x-cloak
                                                     >
-                                                        <div class="text-xs text-slate-
-                                                        200 whitespace-nowrap">Kirim pesan melalui Whatsapp</div>
+                                                        <div class="text-xs text-slate-200 whitespace-nowrap">Kirim pesan melalui Whatsapp</div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <!-- End -->
 
-                                            @php
-                                                $fonnteToken = \App\Models\StoreSetting::first()->fonnte ?? null;
-                                                $hasToken = !empty($fonnteToken);
-
-                                                if ($transaction->customer != null) {
-                                                    $nomor = $transaction->customer->nomor_hp;
-                                                    $nomorwa = preg_replace('/^08/', 628, $nomor);
-                                                }
-
-                                                // Pesan mentah untuk Fonnte
-                                                $message = "*Notifikasi Service*\n{$toko->nama_toko}\n\n"
-                                                    . "No. Service : {$transaction->nomor_servis}\n"
-                                                    . "Nama user : *{$transaction->nama_pelanggan}*\n"
-                                                    . "Unit : {$transaction->nama_barang}\n"
-                                                    . "Diambil : {$transaction->pengambil}\n"
-                                                    . "Tanggal : " . \Carbon\Carbon::parse($transaction->tgl_ambil)->translatedFormat('d F Y (H:i)') . "\n"
-                                                    . "Status : {$transaction->kondisi_servis}\n"
-                                                    . "Garansi sampai : " . ($transaction->exp_garansi ? \Carbon\Carbon::parse($transaction->exp_garansi)->translatedFormat('d F Y') : 'Tidak ada garansi') . "\n"
-                                                    . "Pembayaran : {$transaction->cara_pembayaran}\n\n"
-                                                    . "Link tracking : " . env('APP_URL') . "/tracking\n"
-                                                    . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $transaction->id)  . "\n\n"
-                                                    . "Terimakasih";
-
-                                                // Versi encoded untuk WhatsApp link
-                                                $waMessage = rawurlencode($message);
-                                            @endphp
-
-                                            <div class="flex space-x-1">
-                                                @if ($transaction->customer != null)
-                                                    <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-
-                                                        @if ($hasToken)
-                                                            <!-- ✅ Kirim otomatis via Fonnte -->
-                                                            <a href="javascript:void(0)"
-                                                            onclick="kirimFontee('{{ $fonnteToken }}', '{{ $nomorwa }}', `{!! str_replace('`', '\`', $message) !!}`)"
-                                                            title="Kirim otomatis via Fonnte">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                                                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                                                    <line x1="9" y1="7" x2="10" y2="7" />
-                                                                    <line x1="9" y1="13" x2="15" y2="13" />
-                                                                    <line x1="13" y1="17" x2="15" y2="17" />
-                                                                </svg>
-                                                            </a>
-                                                        @else
-                                                            <!-- 💬 Manual via WhatsApp -->
-                                                            <a href="https://wa.me/{{ $nomorwa }}/?text={{ $waMessage }}" target="_blank"
-                                                            title="Kirim manual via WhatsApp">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                                                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                                                    <line x1="9" y1="7" x2="10" y2="7" />
-                                                                    <line x1="9" y1="13" x2="15" y2="13" />
-                                                                    <line x1="13" y1="17" x2="15" y2="17" />
-                                                                </svg>
-                                                            </a>
-                                                        @endif
-
-                                                        <div class="z-10 absolute bottom-full left-1/2 -translate-x-1/2">
-                                                            <div class="min-w-56 bg-slate-800 p-2 rounded overflow-hidden mb-2"
-                                                                x-show="open"
-                                                                x-transition:enter="transition ease-out duration-200 transform"
-                                                                x-transition:enter-start="opacity-0 translate-y-2"
-                                                                x-transition:enter-end="opacity-100 translate-y-0"
-                                                                x-transition:leave="transition ease-out duration-200"
-                                                                x-transition:leave-start="opacity-100"
-                                                                x-transition:leave-end="opacity-0"
-                                                                x-cloak>
-                                                                <div class="text-xs text-slate-200">
-                                                                    Kirim Nota Pengambilan dan link untuk cek Status Garansi
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                            <!-- Start -->
+                                            <div
+                                                class="relative"
+                                                x-data="{ open: false }"
+                                                @mouseenter="open = true"
+                                                @mouseleave="open = false"
+                                            >
+                                                @if ($transaction->exp_garansi != null)
+                                                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20|%20{{ $toko->nama_toko }}*%20Barang Servis%20*{{ $transaction->type->name }}%20{{ $transaction->brand->name }}%20{{ $transaction->modelserie->name }}*%20dengan%20No.%20Servis%20*{{ $transaction->nomor_servis }}*%20{{ $transaction->status_servis }}%20dalam%20kondisi%20*{{ $transaction->kondisi_servis }}*%20pada%20tanggal%20{{ \Carbon\Carbon::parse($transaction->tgl_ambil)->translatedFormat('d F Y') }}%20oleh%20*{{ $transaction->pengambil }}*%20dengan%20pembayaran%20*{{ $transaction->cara_pembayaran }}*.%20Garansi%20akan%20berakhir%20pada%20tanggal%20*{{ \Carbon\Carbon::parse($transaction->exp_garansi)->translatedFormat('d F Y') }}*.%20Untuk%20Cek%20Status%20Garansi%20Servis%20Anda,%20silahkan%20buka%20Link%20berikut%20ini%20{{ env('APP_URL') }}/tracking.%20Terima%20Kasih%20atas%20kepercayaan%20Anda%20telah%20melakukan%20Servis%20di%20*{{ $toko->nama_toko }}*."  target="_blank">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                                        <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                                        <line x1="9" y1="7" x2="10" y2="7" />
+                                                        <line x1="9" y1="13" x2="15" y2="13" />
+                                                        <line x1="13" y1="17" x2="15" y2="17" />
+                                                        </svg>
+                                                    </a>
+                                                @else
+                                                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20|%20{{ $toko->nama_toko }}*%20Barang Servis%20*{{ $transaction->type->name }}%20{{ $transaction->brand->name }}%20{{ $transaction->modelserie->name }}*%20dengan%20No.%20Servis%20*{{ $transaction->nomor_servis }}*%20{{ $transaction->status_servis }}%20dalam%20kondisi%20*{{ $transaction->kondisi_servis }}*%20pada%20tanggal%20{{ \Carbon\Carbon::parse($transaction->tgl_ambil)->translatedFormat('d F Y') }}%20oleh%20*{{ $transaction->pengambil }}*%20dengan%20pembayaran%20*{{ $transaction->cara_pembayaran }}*.%20Item%20ini%20Tidak%20Ada%20Garansi.%20Terima%20Kasih%20atas%20kepercayaan%20Anda%20telah%20melakukan%20Servis%20di%20*{{ $toko->nama_toko }}*."  target="_blank">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                                        <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                                        <line x1="9" y1="7" x2="10" y2="7" />
+                                                        <line x1="9" y1="13" x2="15" y2="13" />
+                                                        <line x1="13" y1="17" x2="15" y2="17" />
+                                                        </svg>
+                                                    </a>
                                                 @endif
+                                                <div class="z-10 absolute bottom-full left-1/2 -translate-x-1/2">
+                                                    <div
+                                                        class="min-w-56 bg-slate-800 p-2 rounded overflow-hidden mb-2"
+                                                        x-show="open"
+                                                        x-transition:enter="transition ease-out duration-200 transform"
+                                                        x-transition:enter-start="opacity-0 translate-y-2"
+                                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                                        x-transition:leave="transition ease-out duration-200"
+                                                        x-transition:leave-start="opacity-100"
+                                                        x-transition:leave-end="opacity-0"
+                                                        x-cloak
+                                                    >
+                                                        <div class="text-xs text-slate-200">Kirim Nota Pengambilan dan link untuk cek Status Garansi</div>
+                                                    </div>
+                                                </div>
                                             </div>
+                                            <!-- End -->
+                                        @else
+                                            <!-- Start -->
+                                            <div
+                                                class="relative"
+                                                x-data="{ open: false }"
+                                                @mouseenter="open = true"
+                                                @mouseleave="open = false"
+                                            >
+                                                <a href="#">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                        <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
+                                                        <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1" />
+                                                    </svg>
+                                                </a>
+                                                <div class="z-10 absolute bottom-full left-1/2 -translate-x-1/2">
+                                                    <div
+                                                        class="bg-slate-800 p-2 rounded overflow-hidden mb-2"
+                                                        x-show="open"
+                                                        x-transition:enter="transition ease-out duration-200 transform"
+                                                        x-transition:enter-start="opacity-0 translate-y-2"
+                                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                                        x-transition:leave="transition ease-out duration-200"
+                                                        x-transition:leave-start="opacity-100"
+                                                        x-transition:leave-end="opacity-0"
+                                                        x-cloak
+                                                    >
+                                                        <div class="text-xs text-slate-200 whitespace-nowrap">Kirim pesan melalui Whatsapp</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- End -->
 
-
+                                            <!-- Start -->
+                                            <div
+                                                class="relative"
+                                                x-data="{ open: false }"
+                                                @mouseenter="open = true"
+                                                @mouseleave="open = false"
+                                            >
+                                                <a href="#">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                                    <line x1="9" y1="7" x2="10" y2="7" />
+                                                    <line x1="9" y1="13" x2="15" y2="13" />
+                                                    <line x1="13" y1="17" x2="15" y2="17" />
+                                                    </svg>
+                                                </a>
+                                                <div class="z-10 absolute bottom-full left-1/2 -translate-x-1/2">
+                                                    <div
+                                                        class="min-w-56 bg-slate-800 p-2 rounded overflow-hidden mb-2"
+                                                        x-show="open"
+                                                        x-transition:enter="transition ease-out duration-200 transform"
+                                                        x-transition:enter-start="opacity-0 translate-y-2"
+                                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                                        x-transition:leave="transition ease-out duration-200"
+                                                        x-transition:leave-start="opacity-100"
+                                                        x-transition:leave-end="opacity-0"
+                                                        x-cloak
+                                                    >
+                                                        <div class="text-xs text-slate-200">Kirim Nota Pengambilan dan link untuk cek Status Garansi</div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <!-- End -->
                                         @endif
                                     </div>
                                 </td>
-                                @endif
+                                @endif --}}
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $transaction->nama_barang }}</div>
+                                    <div class="font-medium">{{ $transaction->type->name }} {{ $transaction->brand->name }} {{ $transaction->modelserie->name }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium capitalize">{{ $transaction->kerusakan }}</div>
@@ -654,11 +499,9 @@
                                         <div class="font-medium text-red-600">Akun sudah dihapus</div>
                                     @endif
                                 </td>
-                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">Rp. {{ number_format($transaction->modal_sparepart) }}</div>
                                 </td>
-                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">Rp. {{ number_format($transaction->biaya) }}</div>
                                 </td>
@@ -669,7 +512,7 @@
                                     <div class="font-medium">{{ $transaction->cara_pembayaran }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ \Carbon\Carbon::parse($transaction->tgl_ambil)->format('d/m/Y H:i') }}</div>
+                                    <div class="font-medium">{{ $transaction->tgl_ambil }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $transaction->pengambil }}</div>
@@ -687,13 +530,8 @@
                                     @endif
                                 </td>
                             @if (Auth::user()->role != 'Investor')
-
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    @if (Auth::user()->role == 'Kepala Toko')
-                                    <a href="{{ route('transaksi-servis-approve.edit', $transaction->id) }}">
-                                    @else
-                                    <a href="#">
-                                    @endif
+                                    <a href="{{ route('servis-belum-disetujui-approve.edit', $transaction->id) }}">
                                         @if ($transaction->is_approve === null)
                                             <div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-amber-500 text-white">Belum Disetujui</div>
                                         @elseif ($transaction->is_approve === 'Setuju')
@@ -705,113 +543,6 @@
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="space-x-1 flex">
-                                        <!-- Start Printer -->
-                                        <div x-data="{ showPrint : false, printId: null }" x-show = "showPrint" x-on:open-print.window="showPrint = true; printId = $event.detail.id" x-on:close-print.window = "showPrint = false" x-on:keydown.escape.window = "showPrint = false" class="fixed z-50 inset-0">
-                                                <!-- Modal backdrop -->
-                                                <div x-on:click="showPrint = false" class="fixed inset-0 bg-slate-900 bg-opacity-40" x-cloak></div>
-                                                <!-- Modal dialog -->
-                                                <div
-                                                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                                                    x-show="showPrint"
-                                                    x-cloak
-                                                >
-                                                    <div class="bg-white rounded shadow-lg overflow-auto max-w-xl w-full max-h-full" x-on:keydown.escape.window="showPrint = false">
-                                                        <!-- Modal header -->
-                                                        <div class="px-5 py-3 border-b border-slate-200">
-                                                            <div class="flex justify-between items-center">
-                                                                <div class="font-semibold text-slate-800">Pilih Jenis Printer</div>
-                                                                <button class="text-slate-400 hover:text-slate-500" x-on:click="$dispatch('close-print')">
-                                                                    <div class="sr-only">Close</div>
-                                                                    <svg class="w-4 h-4 fill-current">
-                                                                        <path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
-                                                                    </svg>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <!-- Modal content -->
-                                                        <div class="px-5 pt-4 pb-1">
-                                                            <div class="text-sm">
-                                                                <div class="space-y-2">
-                                                                    <p>Silahkan pilih printer untuk cetak Nota Pengambilan Servis Selesai.</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- Modal footer -->
-                                                        <div class="px-5 py-4">
-                                                            <div class="flex flex-wrap justify-end space-x-2">
-                                                                <a x-bind:href="'{{ route('kepalatoko-nota-pengambilan-termal', '') }}/' + printId"  target="_blank">
-                                                                    <button class="btn-sm bg-orange-500 hover:bg-orange-600 text-white">
-                                                                        <span class="mr-1">
-                                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                                            <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
-                                                                            <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
-                                                                            <rect x="7" y="13" width="10" height="8" rx="2" />
-                                                                            </svg>
-                                                                        </span>
-                                                                        Printer Termal
-                                                                    </button>
-                                                                </a>
-                                                                <a x-bind:href="'{{ route('kepalatoko-pengambilan-cetak-inkjet', '') }}/' + printId"  target="_blank">
-                                                                    <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
-                                                                        <span class="mr-1">
-                                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                                            <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
-                                                                            <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
-                                                                            <rect x="7" y="13" width="10" height="8" rx="2" />
-                                                                            </svg>
-                                                                        </span>
-                                                                        Printer Inkjet
-                                                                    </button>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                        </div>
-                                        <!-- End Printer-->
-
-                                        <button x-data x-on:click="$dispatch('open-print', { id: {{ $transaction->id }} })">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
-                                                <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
-                                                <rect x="7" y="13" width="10" height="8" rx="2" />
-                                            </svg>
-                                        </button>
-
-                                        <!-- Start Cancel -->
-                                        <div
-                                            class="relative"
-                                            x-data="{ open: false }"
-                                            @mouseenter="open = true"
-                                            @mouseleave="open = false"
-                                        >
-                                            <a href="{{ route('transaksi-servis-sudah-diambil.show', $transaction->id) }}">
-                                                <button class="text-slate-400 hover:text-slate-500 rounded-full">
-                                                    <span class="sr-only">Cancel</span>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back-up" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" /></svg>
-                                                </button>
-                                            </a>
-                                            <div class="z-10 absolute right-full top-1/2 -translate-y-1/2">
-                                                <div
-                                                    class="bg-slate-800 p-2 rounded overflow-hidden mb-2"
-                                                    x-show="open"
-                                                    x-transition:enter="transition ease-out duration-200 transform"
-                                                    x-transition:enter-start="opacity-0 translate-y-2"
-                                                    x-transition:enter-end="opacity-100 translate-y-0"
-                                                    x-transition:leave="transition ease-out duration-200"
-                                                    x-transition:leave-start="opacity-100"
-                                                    x-transition:leave-end="opacity-0"
-                                                    x-cloak
-                                                >
-                                                    <div class="text-xs text-slate-200 whitespace-nowrap">Kembalikan status ke bisa diambil</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- End Cancel -->
-
                                         <!-- Start -->
                                         <div x-data="{ showDelete: false, deleteId: null }" x-show = "showDelete" x-on:open-delete.window="showDelete = true; deleteId = $event.detail.id" x-on:close-delete.window = "showDelete = false" x-on:keydown.escape.window = "showDelete = false" class="fixed z-50 inset-0">
                                             <!-- Modal backdrop -->
@@ -848,7 +579,7 @@
                                                             <!-- Modal footer -->
                                                             <div class="flex flex-wrap justify-end space-x-2">
                                                                 <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" x-on:click="$dispatch('close-delete')">Batal</button>
-                                                                <form x-bind:action="'{{ route('transaksi-servis-sudah-diambil.destroy', '') }}/' + deleteId" method="post">
+                                                                <form x-bind:action="'{{ route('transaksi-servis-belum-disetujui.destroy', '') }}/' + deleteId" method="post">
                                                                     @method('delete')
                                                                     @csrf
                                                                     <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
@@ -874,10 +605,10 @@
                                         </button>
                                     </div>
                                 </td>
-                            @endif
+                                @endif
                             </tr>
                         @endforeach
-                    </tbody> --}}
+                    </tbody>
                 </table>
 
             </div>
@@ -985,33 +716,8 @@
         })
     </script>
 
-    <script>
-    function kirimFontee(token, phone, message) {
-        fetch('https://api.fonnte.com/send', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            },
-            body: JSON.stringify({
-                target: phone,
-                message: decodeURIComponent(message)
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === true || data.success) {
-                alert('✅ Pesan berhasil dikirim ke Pelanggan!');
-            } else {
-                alert('⚠️ Gagal mengirim ke Pelanggan. Coba lagi.');
-            }
-        })
-        .catch(() => alert('❌ Terjadi kesalahan saat mengirim ke Fontee.'));
-    }
-    </script>
-
     <!-- Pagination -->
-    {{-- <div class="mt-8">
+    <div class="mt-8">
         {{ $service_transactions->links() }}
-    </div> --}}
+    </div>
 </div>

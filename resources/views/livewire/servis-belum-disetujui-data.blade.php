@@ -11,7 +11,7 @@
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan" />
+            <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan/IMEI" />
 
         </div>
 
@@ -114,6 +114,8 @@
             </div>
             <div class="mb-0">
                 <select wire:model="paginate" id="" class="form-select">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                     <option value="250">250</option>
@@ -122,6 +124,7 @@
                 </select>
             </div>
         </div>
+
     </div>
 
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
@@ -145,7 +148,7 @@
             </div>
             <!-- Table -->
             <div class="overflow-x-auto">
-                <table class="table-auto w-full">
+                <table id="transaksi-servis-table" class="table-auto w-full">
                     <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
@@ -174,11 +177,11 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Pelanggan</div>
                             </th>
-                            {{-- @if (Auth::user()->role != 'Investor')
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Hubungi</div>
                             </th>
-                            @endif --}}
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Nama Barang</div>
                             </th>
@@ -200,9 +203,11 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Teknisi</div>
                             </th>
+                            @if (Auth::user()->role != 'Investor')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Modal Sparepart</div>
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Biaya</div>
                             </th>
@@ -235,7 +240,7 @@
                         </tr>
                     </thead>
                     <!-- Table body -->
-                    <tbody class="text-sm divide-y divide-slate-200">
+                    {{-- <tbody class="text-sm divide-y divide-slate-200">
                         <!-- Row -->
                         @php
                             $i = 1
@@ -279,7 +284,7 @@
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     @if (Auth::user()->role != 'Investor')
-                                    <a href="{{ route('transaksi-servis-belum-disetujui.edit', $transaction->id) }}">
+                                    <a href="{{ route('transaksi-servis-sudah-diambil.edit', $transaction->id) }}">
                                         <div class="flex items-center text-blue-600">
                                             <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
                                                 <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
@@ -312,7 +317,7 @@
                                         <div></div>
                                     @endif
                                 </td>
-                                {{-- @if (Auth::user()->role != 'Investor')
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="flex space-x-1">
                                         @php
@@ -348,132 +353,100 @@
                                                         x-transition:leave-end="opacity-0"
                                                         x-cloak
                                                     >
-                                                        <div class="text-xs text-slate-200 whitespace-nowrap">Kirim pesan melalui Whatsapp</div>
+                                                        <div class="text-xs text-slate-
+                                                        200 whitespace-nowrap">Kirim pesan melalui Whatsapp</div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <!-- End -->
 
-                                            <!-- Start -->
-                                            <div
-                                                class="relative"
-                                                x-data="{ open: false }"
-                                                @mouseenter="open = true"
-                                                @mouseleave="open = false"
-                                            >
-                                                @if ($transaction->exp_garansi != null)
-                                                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20|%20{{ $toko->nama_toko }}*%20Barang Servis%20*{{ $transaction->type->name }}%20{{ $transaction->brand->name }}%20{{ $transaction->modelserie->name }}*%20dengan%20No.%20Servis%20*{{ $transaction->nomor_servis }}*%20{{ $transaction->status_servis }}%20dalam%20kondisi%20*{{ $transaction->kondisi_servis }}*%20pada%20tanggal%20{{ \Carbon\Carbon::parse($transaction->tgl_ambil)->translatedFormat('d F Y') }}%20oleh%20*{{ $transaction->pengambil }}*%20dengan%20pembayaran%20*{{ $transaction->cara_pembayaran }}*.%20Garansi%20akan%20berakhir%20pada%20tanggal%20*{{ \Carbon\Carbon::parse($transaction->exp_garansi)->translatedFormat('d F Y') }}*.%20Untuk%20Cek%20Status%20Garansi%20Servis%20Anda,%20silahkan%20buka%20Link%20berikut%20ini%20{{ env('APP_URL') }}/tracking.%20Terima%20Kasih%20atas%20kepercayaan%20Anda%20telah%20melakukan%20Servis%20di%20*{{ $toko->nama_toko }}*."  target="_blank">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                                        <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                                        <line x1="9" y1="7" x2="10" y2="7" />
-                                                        <line x1="9" y1="13" x2="15" y2="13" />
-                                                        <line x1="13" y1="17" x2="15" y2="17" />
-                                                        </svg>
-                                                    </a>
-                                                @else
-                                                    <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20|%20{{ $toko->nama_toko }}*%20Barang Servis%20*{{ $transaction->type->name }}%20{{ $transaction->brand->name }}%20{{ $transaction->modelserie->name }}*%20dengan%20No.%20Servis%20*{{ $transaction->nomor_servis }}*%20{{ $transaction->status_servis }}%20dalam%20kondisi%20*{{ $transaction->kondisi_servis }}*%20pada%20tanggal%20{{ \Carbon\Carbon::parse($transaction->tgl_ambil)->translatedFormat('d F Y') }}%20oleh%20*{{ $transaction->pengambil }}*%20dengan%20pembayaran%20*{{ $transaction->cara_pembayaran }}*.%20Item%20ini%20Tidak%20Ada%20Garansi.%20Terima%20Kasih%20atas%20kepercayaan%20Anda%20telah%20melakukan%20Servis%20di%20*{{ $toko->nama_toko }}*."  target="_blank">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                                        <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                                        <line x1="9" y1="7" x2="10" y2="7" />
-                                                        <line x1="9" y1="13" x2="15" y2="13" />
-                                                        <line x1="13" y1="17" x2="15" y2="17" />
-                                                        </svg>
-                                                    </a>
+                                            @php
+                                                $fonnteToken = \App\Models\StoreSetting::first()->fonnte ?? null;
+                                                $hasToken = !empty($fonnteToken);
+
+                                                if ($transaction->customer != null) {
+                                                    $nomor = $transaction->customer->nomor_hp;
+                                                    $nomorwa = preg_replace('/^08/', 628, $nomor);
+                                                }
+
+                                                // Pesan mentah untuk Fonnte
+                                                $message = "*Notifikasi Service*\n{$toko->nama_toko}\n\n"
+                                                    . "No. Service : {$transaction->nomor_servis}\n"
+                                                    . "Nama user : *{$transaction->nama_pelanggan}*\n"
+                                                    . "Unit : {$transaction->nama_barang}\n"
+                                                    . "Diambil : {$transaction->pengambil}\n"
+                                                    . "Tanggal : " . \Carbon\Carbon::parse($transaction->tgl_ambil)->translatedFormat('d F Y (H:i)') . "\n"
+                                                    . "Status : {$transaction->kondisi_servis}\n"
+                                                    . "Garansi sampai : " . ($transaction->exp_garansi ? \Carbon\Carbon::parse($transaction->exp_garansi)->translatedFormat('d F Y') : 'Tidak ada garansi') . "\n"
+                                                    . "Pembayaran : {$transaction->cara_pembayaran}\n\n"
+                                                    . "Link tracking : " . env('APP_URL') . "/tracking\n"
+                                                    . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $transaction->id)  . "\n\n"
+                                                    . "Terimakasih";
+
+                                                // Versi encoded untuk WhatsApp link
+                                                $waMessage = rawurlencode($message);
+                                            @endphp
+
+                                            <div class="flex space-x-1">
+                                                @if ($transaction->customer != null)
+                                                    <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+
+                                                        @if ($hasToken)
+                                                            <!-- ✅ Kirim otomatis via Fonnte -->
+                                                            <a href="javascript:void(0)"
+                                                            onclick="kirimFontee('{{ $fonnteToken }}', '{{ $nomorwa }}', `{!! str_replace('`', '\`', $message) !!}`)"
+                                                            title="Kirim otomatis via Fonnte">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                                                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                                                    <line x1="9" y1="7" x2="10" y2="7" />
+                                                                    <line x1="9" y1="13" x2="15" y2="13" />
+                                                                    <line x1="13" y1="17" x2="15" y2="17" />
+                                                                </svg>
+                                                            </a>
+                                                        @else
+                                                            <!-- 💬 Manual via WhatsApp -->
+                                                            <a href="https://wa.me/{{ $nomorwa }}/?text={{ $waMessage }}" target="_blank"
+                                                            title="Kirim manual via WhatsApp">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                                                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                                                    <line x1="9" y1="7" x2="10" y2="7" />
+                                                                    <line x1="9" y1="13" x2="15" y2="13" />
+                                                                    <line x1="13" y1="17" x2="15" y2="17" />
+                                                                </svg>
+                                                            </a>
+                                                        @endif
+
+                                                        <div class="z-10 absolute bottom-full left-1/2 -translate-x-1/2">
+                                                            <div class="min-w-56 bg-slate-800 p-2 rounded overflow-hidden mb-2"
+                                                                x-show="open"
+                                                                x-transition:enter="transition ease-out duration-200 transform"
+                                                                x-transition:enter-start="opacity-0 translate-y-2"
+                                                                x-transition:enter-end="opacity-100 translate-y-0"
+                                                                x-transition:leave="transition ease-out duration-200"
+                                                                x-transition:leave-start="opacity-100"
+                                                                x-transition:leave-end="opacity-0"
+                                                                x-cloak>
+                                                                <div class="text-xs text-slate-200">
+                                                                    Kirim Nota Pengambilan dan link untuk cek Status Garansi
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 @endif
-                                                <div class="z-10 absolute bottom-full left-1/2 -translate-x-1/2">
-                                                    <div
-                                                        class="min-w-56 bg-slate-800 p-2 rounded overflow-hidden mb-2"
-                                                        x-show="open"
-                                                        x-transition:enter="transition ease-out duration-200 transform"
-                                                        x-transition:enter-start="opacity-0 translate-y-2"
-                                                        x-transition:enter-end="opacity-100 translate-y-0"
-                                                        x-transition:leave="transition ease-out duration-200"
-                                                        x-transition:leave-start="opacity-100"
-                                                        x-transition:leave-end="opacity-0"
-                                                        x-cloak
-                                                    >
-                                                        <div class="text-xs text-slate-200">Kirim Nota Pengambilan dan link untuk cek Status Garansi</div>
-                                                    </div>
-                                                </div>
                                             </div>
-                                            <!-- End -->
-                                        @else
-                                            <!-- Start -->
-                                            <div
-                                                class="relative"
-                                                x-data="{ open: false }"
-                                                @mouseenter="open = true"
-                                                @mouseleave="open = false"
-                                            >
-                                                <a href="#">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                        <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
-                                                        <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1" />
-                                                    </svg>
-                                                </a>
-                                                <div class="z-10 absolute bottom-full left-1/2 -translate-x-1/2">
-                                                    <div
-                                                        class="bg-slate-800 p-2 rounded overflow-hidden mb-2"
-                                                        x-show="open"
-                                                        x-transition:enter="transition ease-out duration-200 transform"
-                                                        x-transition:enter-start="opacity-0 translate-y-2"
-                                                        x-transition:enter-end="opacity-100 translate-y-0"
-                                                        x-transition:leave="transition ease-out duration-200"
-                                                        x-transition:leave-start="opacity-100"
-                                                        x-transition:leave-end="opacity-0"
-                                                        x-cloak
-                                                    >
-                                                        <div class="text-xs text-slate-200 whitespace-nowrap">Kirim pesan melalui Whatsapp</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- End -->
 
-                                            <!-- Start -->
-                                            <div
-                                                class="relative"
-                                                x-data="{ open: false }"
-                                                @mouseenter="open = true"
-                                                @mouseleave="open = false"
-                                            >
-                                                <a href="#">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                                    <line x1="9" y1="7" x2="10" y2="7" />
-                                                    <line x1="9" y1="13" x2="15" y2="13" />
-                                                    <line x1="13" y1="17" x2="15" y2="17" />
-                                                    </svg>
-                                                </a>
-                                                <div class="z-10 absolute bottom-full left-1/2 -translate-x-1/2">
-                                                    <div
-                                                        class="min-w-56 bg-slate-800 p-2 rounded overflow-hidden mb-2"
-                                                        x-show="open"
-                                                        x-transition:enter="transition ease-out duration-200 transform"
-                                                        x-transition:enter-start="opacity-0 translate-y-2"
-                                                        x-transition:enter-end="opacity-100 translate-y-0"
-                                                        x-transition:leave="transition ease-out duration-200"
-                                                        x-transition:leave-start="opacity-100"
-                                                        x-transition:leave-end="opacity-0"
-                                                        x-cloak
-                                                    >
-                                                        <div class="text-xs text-slate-200">Kirim Nota Pengambilan dan link untuk cek Status Garansi</div>
-                                                    </div>
-                                                </div>
-                                            </div>
+
                                             <!-- End -->
                                         @endif
                                     </div>
                                 </td>
-                                @endif --}}
+                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $transaction->type->name }} {{ $transaction->brand->name }} {{ $transaction->modelserie->name }}</div>
+                                    <div class="font-medium">{{ $transaction->nama_barang }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium capitalize">{{ $transaction->kerusakan }}</div>
@@ -499,9 +472,11 @@
                                         <div class="font-medium text-red-600">Akun sudah dihapus</div>
                                     @endif
                                 </td>
+                                @if (Auth::user()->role != 'Investor')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">Rp. {{ number_format($transaction->modal_sparepart) }}</div>
                                 </td>
+                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">Rp. {{ number_format($transaction->biaya) }}</div>
                                 </td>
@@ -512,7 +487,7 @@
                                     <div class="font-medium">{{ $transaction->cara_pembayaran }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $transaction->tgl_ambil }}</div>
+                                    <div class="font-medium">{{ \Carbon\Carbon::parse($transaction->tgl_ambil)->format('d/m/Y H:i') }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $transaction->pengambil }}</div>
@@ -530,8 +505,13 @@
                                     @endif
                                 </td>
                             @if (Auth::user()->role != 'Investor')
+
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <a href="{{ route('servis-belum-disetujui-approve.edit', $transaction->id) }}">
+                                    @if (Auth::user()->role == 'Kepala Toko')
+                                    <a href="{{ route('transaksi-servis-approve.edit', $transaction->id) }}">
+                                    @else
+                                    <a href="#">
+                                    @endif
                                         @if ($transaction->is_approve === null)
                                             <div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-amber-500 text-white">Belum Disetujui</div>
                                         @elseif ($transaction->is_approve === 'Setuju')
@@ -543,6 +523,113 @@
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="space-x-1 flex">
+                                        <!-- Start Printer -->
+                                        <div x-data="{ showPrint : false, printId: null }" x-show = "showPrint" x-on:open-print.window="showPrint = true; printId = $event.detail.id" x-on:close-print.window = "showPrint = false" x-on:keydown.escape.window = "showPrint = false" class="fixed z-50 inset-0">
+                                                <!-- Modal backdrop -->
+                                                <div x-on:click="showPrint = false" class="fixed inset-0 bg-slate-900 bg-opacity-40" x-cloak></div>
+                                                <!-- Modal dialog -->
+                                                <div
+                                                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
+                                                    x-show="showPrint"
+                                                    x-cloak
+                                                >
+                                                    <div class="bg-white rounded shadow-lg overflow-auto max-w-xl w-full max-h-full" x-on:keydown.escape.window="showPrint = false">
+                                                        <!-- Modal header -->
+                                                        <div class="px-5 py-3 border-b border-slate-200">
+                                                            <div class="flex justify-between items-center">
+                                                                <div class="font-semibold text-slate-800">Pilih Jenis Printer</div>
+                                                                <button class="text-slate-400 hover:text-slate-500" x-on:click="$dispatch('close-print')">
+                                                                    <div class="sr-only">Close</div>
+                                                                    <svg class="w-4 h-4 fill-current">
+                                                                        <path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Modal content -->
+                                                        <div class="px-5 pt-4 pb-1">
+                                                            <div class="text-sm">
+                                                                <div class="space-y-2">
+                                                                    <p>Silahkan pilih printer untuk cetak Nota Pengambilan Servis Selesai.</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Modal footer -->
+                                                        <div class="px-5 py-4">
+                                                            <div class="flex flex-wrap justify-end space-x-2">
+                                                                <a x-bind:href="'{{ route('kepalatoko-nota-pengambilan-termal', '') }}/' + printId"  target="_blank">
+                                                                    <button class="btn-sm bg-orange-500 hover:bg-orange-600 text-white">
+                                                                        <span class="mr-1">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                            <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+                                                                            <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+                                                                            <rect x="7" y="13" width="10" height="8" rx="2" />
+                                                                            </svg>
+                                                                        </span>
+                                                                        Printer Termal
+                                                                    </button>
+                                                                </a>
+                                                                <a x-bind:href="'{{ route('kepalatoko-pengambilan-cetak-inkjet', '') }}/' + printId"  target="_blank">
+                                                                    <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
+                                                                        <span class="mr-1">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                            <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+                                                                            <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+                                                                            <rect x="7" y="13" width="10" height="8" rx="2" />
+                                                                            </svg>
+                                                                        </span>
+                                                                        Printer Inkjet
+                                                                    </button>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                        <!-- End Printer-->
+
+                                        <button x-data x-on:click="$dispatch('open-print', { id: {{ $transaction->id }} })">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+                                                <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+                                                <rect x="7" y="13" width="10" height="8" rx="2" />
+                                            </svg>
+                                        </button>
+
+                                        <!-- Start Cancel -->
+                                        <div
+                                            class="relative"
+                                            x-data="{ open: false }"
+                                            @mouseenter="open = true"
+                                            @mouseleave="open = false"
+                                        >
+                                            <a href="{{ route('transaksi-servis-sudah-diambil.show', $transaction->id) }}">
+                                                <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                                                    <span class="sr-only">Cancel</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back-up" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" /></svg>
+                                                </button>
+                                            </a>
+                                            <div class="z-10 absolute right-full top-1/2 -translate-y-1/2">
+                                                <div
+                                                    class="bg-slate-800 p-2 rounded overflow-hidden mb-2"
+                                                    x-show="open"
+                                                    x-transition:enter="transition ease-out duration-200 transform"
+                                                    x-transition:enter-start="opacity-0 translate-y-2"
+                                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                                    x-transition:leave="transition ease-out duration-200"
+                                                    x-transition:leave-start="opacity-100"
+                                                    x-transition:leave-end="opacity-0"
+                                                    x-cloak
+                                                >
+                                                    <div class="text-xs text-slate-200 whitespace-nowrap">Kembalikan status ke bisa diambil</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End Cancel -->
+
                                         <!-- Start -->
                                         <div x-data="{ showDelete: false, deleteId: null }" x-show = "showDelete" x-on:open-delete.window="showDelete = true; deleteId = $event.detail.id" x-on:close-delete.window = "showDelete = false" x-on:keydown.escape.window = "showDelete = false" class="fixed z-50 inset-0">
                                             <!-- Modal backdrop -->
@@ -579,7 +666,7 @@
                                                             <!-- Modal footer -->
                                                             <div class="flex flex-wrap justify-end space-x-2">
                                                                 <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" x-on:click="$dispatch('close-delete')">Batal</button>
-                                                                <form x-bind:action="'{{ route('transaksi-servis-belum-disetujui.destroy', '') }}/' + deleteId" method="post">
+                                                                <form x-bind:action="'{{ route('transaksi-servis-sudah-diambil.destroy', '') }}/' + deleteId" method="post">
                                                                     @method('delete')
                                                                     @csrf
                                                                     <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
@@ -605,10 +692,10 @@
                                         </button>
                                     </div>
                                 </td>
-                                @endif
+                            @endif
                             </tr>
                         @endforeach
-                    </tbody>
+                    </tbody> --}}
                 </table>
 
             </div>
@@ -716,8 +803,33 @@
         })
     </script>
 
+    <script>
+    function kirimFontee(token, phone, message) {
+        fetch('https://api.fonnte.com/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({
+                target: phone,
+                message: decodeURIComponent(message)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === true || data.success) {
+                alert('✅ Pesan berhasil dikirim ke Pelanggan!');
+            } else {
+                alert('⚠️ Gagal mengirim ke Pelanggan. Coba lagi.');
+            }
+        })
+        .catch(() => alert('❌ Terjadi kesalahan saat mengirim ke Fontee.'));
+    }
+    </script>
+
     <!-- Pagination -->
-    <div class="mt-8">
+    {{-- <div class="mt-8">
         {{ $service_transactions->links() }}
-    </div>
+    </div> --}}
 </div>

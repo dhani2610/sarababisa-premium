@@ -13,6 +13,7 @@
             <livewire:toggle-edit-transaksi></livewire:toggle-edit-transaksi>
             <livewire:toggle-edit-produk></livewire:toggle-edit-produk>
             <livewire:toggle-telegram-bot />
+            <livewire:toggle-absensi-setting />
         </div>
 
         <!-- Panel footer -->
