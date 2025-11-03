@@ -138,7 +138,7 @@
                                         </select>
                                     </div>
 
-                                    <div x-data="{ showDetails: false }">
+                                    <div x-data="{ showDetails: false }" id="spesialis-input">
                                         <label class="block text-sm font-medium mb-1" for="types_id">Jika teknisi,
                                             apakah memiliki spesialisasi jenis barang?</label>
                                         <div class="flex flex-wrap items-center -m-3">
@@ -157,7 +157,7 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        <div x-show="showDetails" class="mt-3">
+                                        <div x-show="showDetails" class="mt-3" >
                                             <label class="block text-sm font-medium mb-1" for="types_id">Spesialisasi
                                                 jenis barang</label>
                                             <select id="types_id" name="types_id"
@@ -198,16 +198,16 @@
                                             <label class="block text-sm font-medium mb-1" for="tipe_bonus_admin">
                                                 Tipe Bonus <span class="text-rose-500">*</span>
                                             </label>
-                                            <select id="tipe_bonus_admin" name="tipe_bonus_admin" class="form-select text-sm py-1 w-full">
+                                            <select id="tipe_bonus_admin" name="tipe_bonus_admin" onchange="toggleBonusType()" class="form-select text-sm py-1 w-full">
                                                 <option value="">Pilih Tipe Bonus</option>
                                                 <option value="Persen" {{ $item->tipe_bonus_admin == 'Persen' ? 'selected' : '' }}>Persen</option>
                                                 <option value="Tetap" {{ $item->tipe_bonus_admin == 'Tetap' ? 'selected' : '' }}>Tetap</option>
                                             </select>
                                         </div>
 
-                                        <div class="mt-3">
-                                            <label class="block text-sm font-medium mb-1" for="nominal_bonus_admin">
-                                                Nominal Bonus per Nota <span class="text-rose-500">*Isi jika tipe bonus tetap</span>
+                                        <div id="bonus-tetap" class="mt-3" style="display: none;">
+                                            <label id="bonus-tetap" class="block text-sm font-medium mb-1" for="nominal_bonus_admin">
+                                                Nominal Bonus per Nota <span class="text-rose-500">*</span>
                                             </label>
                                             <input id="nominal_bonus_admin" name="nominal_bonus_admin"
                                                 class="form-input w-full px-2 py-1" type="number" placeholder="Contoh: 5000"
@@ -215,10 +215,10 @@
                                         </div>
                                     </div>
 
-                                    <div>
+                                    <div id="bonus-persen" style="display: none;">
                                         <label class="block text-sm font-medium mb-1" for="persen">Persen</label>
                                         <input id="persen" name="persen" class="form-input w-full px-2 py-1"
-                                            type="number" value="{{ $item->persen }}" />
+                                            type="number" value="{{ $item->persen }}" placeholder="Contoh: 10" />
                                     </div>
                                 </div>
 
@@ -246,32 +246,61 @@ document.addEventListener('DOMContentLoaded', function() {
     const extraFields = document.getElementById('extra-fields');
     const uploadInvestor = document.getElementById('upload-investor');
     const bonusAdmin = document.getElementById('bonus-admin');
+    const spesialisInput = document.getElementById('spesialis-input');
+    const bonusPersen = document.getElementById('bonus-persen');
 
     function toggleInputs() {
         const role = roleSelect.value;
 
         if (role === 'Investor') {
+            extraFields.style.display = 'none';
             uploadInvestor.style.display = 'block';
-            extraFields.style.display = 'none';
             bonusAdmin.style.display = 'none';
+            spesialisInput.style.display = 'none';
         } else if (role === 'Kepala Toko') {
-            uploadInvestor.style.display = 'none';
             extraFields.style.display = 'none';
+            uploadInvestor.style.display = 'none';
             bonusAdmin.style.display = 'none';
+            spesialisInput.style.display = 'none';
         } else if (role === 'Admin Toko') {
-            uploadInvestor.style.display = 'none';
             extraFields.style.display = 'block';
+            uploadInvestor.style.display = 'none';
             bonusAdmin.style.display = 'block';
+            spesialisInput.style.display = 'none';
         } else {
-            uploadInvestor.style.display = 'none';
             extraFields.style.display = 'block';
+            uploadInvestor.style.display = 'none';
             bonusAdmin.style.display = 'none';
+            spesialisInput.style.display = 'block';
+            bonusPersen.style.display = 'block';
         }
     }
 
     toggleInputs();
     roleSelect.addEventListener('change', toggleInputs);
 });
+</script>
+
+<script>
+function toggleBonusType() {
+    const tipe = document.getElementById('tipe_bonus_admin').value;
+    console.log('====================================');
+    console.log(tipe);
+    console.log('====================================');
+    const bonusTetap = document.getElementById('bonus-tetap');
+    const bonusPersen = document.getElementById('bonus-persen');
+
+    bonusTetap.style.display = 'none';
+    bonusPersen.style.display = 'none';
+
+    if (tipe === 'Tetap') {
+        bonusTetap.style.display = 'block';
+    } else if (tipe === 'Persen') {
+        bonusPersen.style.display = 'block';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', toggleBonusType);
 </script>
 
 
