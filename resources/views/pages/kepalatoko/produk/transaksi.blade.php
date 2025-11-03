@@ -60,7 +60,7 @@
                         </li>
                     </ul>
                 </div>
-                <!-- Right side -->
+                {{-- <!-- Right side -->
                 <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
                     <div class="mb-0">
                         <select wire:model="paginate" id="" class="form-select">
@@ -73,7 +73,7 @@
                             <option value="1000">1000</option>
                         </select>
                     </div>
-                </div>
+                </div> --}}
 
             </div>
 
