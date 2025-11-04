@@ -29,6 +29,9 @@ class StoreSetting extends Model
         'active_setting_absensi',
         'jam_masuk',
         'jam_pulang',
+        'nominal_potongan_izin',
+        'nominal_potongan_alfa',
+        'nominal_potongan_sakit',
     ];
 
 }

@@ -17,7 +17,7 @@ class MasterIzinController extends Controller
 
     public function store(IzinRequest $request)
     {
-        // dd('MASUK KE STORE', $request->all());
+        dd('MASUK KE STORE', $request->all());
 
         try {
             $data = $request->validated();
@@ -52,22 +52,22 @@ class MasterIzinController extends Controller
                 // Jika user isi manual, pastikan format angka bersih dari titik
                 $data['nominal_potongan'] = str_replace('.', '', $data['nominal_potongan']);
             }
-            // dd($data);
+            dd($data);
 
             Izin::create($data);
 
             toast('Data Izin berhasil disimpan.', 'success');
             return redirect()->route('master-izin.index');
         } catch (\Throwable $e) {
-        // // Tampilkan semua informasi error
-        //     dd([
-        //         'message' => $e->getMessage(),
-        //         'file' => $e->getFile(),
-        //         'line' => $e->getLine(),
-        //         'trace' => $e->getTraceAsString(),
-        //         'data_yang_dikirim' => $request->all(),
-        //         'validated_data' => $data ?? null,
-        //     ]);
+        // Tampilkan semua informasi error
+            dd([
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'data_yang_dikirim' => $request->all(),
+                'validated_data' => $data ?? null,
+            ]);
 
             toast('Data Izin gagal disimpan.', 'error');
             return redirect()->route('master-izin.index');

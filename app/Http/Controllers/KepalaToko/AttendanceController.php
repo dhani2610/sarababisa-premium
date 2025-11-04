@@ -42,6 +42,34 @@ class AttendanceController extends Controller
         ]);
 
         $user = Auth::user();
+        $tanggal = Carbon::parse($request->tanggal)->toDateString();
+
+        // Cek apakah sudah absen masuk hari ini
+        $sudahMasuk = Attendance::where('user_id', $user->id)
+            ->where('tanggal', $tanggal)
+            ->where('type', 'masuk')
+            ->exists();
+
+        // Cek apakah sudah absen pulang hari ini
+        $sudahPulang = Attendance::where('user_id', $user->id)
+            ->where('tanggal', $tanggal)
+            ->where('type', 'pulang')
+            ->exists();
+
+        // Validasi logika absensi
+        if ($request->type === 'masuk' && $sudahMasuk) {
+            return redirect()->back()->with('error', 'Anda sudah absen masuk hari ini.');
+        }
+
+        if ($request->type === 'pulang') {
+            if (!$sudahMasuk) {
+                return redirect()->back()->with('error', 'Anda belum absen masuk, tidak bisa absen pulang.');
+            }
+
+            if ($sudahPulang) {
+                return redirect()->back()->with('error', 'Anda sudah absen pulang hari ini.');
+            }
+        }
 
         // handle file upload if photo_file provided
         $photoPath = null;

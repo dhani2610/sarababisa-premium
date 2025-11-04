@@ -250,6 +250,71 @@
         }
     }" x-init="$watch('modalOpen', value => { if (value) { $nextTick(() => startCamera()) } else { stopCamera() } })">
 
+            <!-- Tombol buka modal -->
+    <div class="flex justify-end mb-4">
+        <button
+            x-data
+            @click="$dispatch('open-filter-modal')"
+            class="btn bg-blue-500 text-white flex items-center px-3 py-2 rounded-lg shadow hover:bg-blue-600 transition">
+            <i class="fas fa-filter mr-1"></i> Filter Tanggal
+        </button>
+    </div>
+
+        <!-- Modal Popup -->
+        <div
+            x-data="{ open: false }"
+            x-on:open-filter-modal.window="open = true"
+            x-on:close-filter-modal.window="open = false"
+            x-show="open"
+            x-cloak
+            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50"
+        >
+            <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md relative">
+
+                <h2 class="text-lg font-semibold text-gray-700 mb-4">
+                    Filter Berdasarkan Range Tanggal
+                </h2>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Dari Tanggal</label>
+                        <input type="date" wire:model="start_date" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Sampai Tanggal</label>
+                        <input type="date" wire:model="end_date" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-2">
+                    <button
+                        @click="open = false"
+                        class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-700"
+                    >
+                        Batal
+                    </button>
+
+                    <button
+                        wire:click="$refresh"
+                        @click="open = false"
+                        class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                        Terapkan Filter
+                    </button>
+
+                    <button
+                        wire:click="$set('start_date', null); $set('end_date', null)"
+                        @click="open = false"
+                        class="px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600"
+                    >
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
         <!-- Header -->
         @if (Auth::user()->role == 'Kepala Toko')
         <!-- Statistik Absen -->
@@ -318,7 +383,7 @@
                 </div>
             </form>
         </div>
-                
+
 
         <div class="sm:flex sm:justify-between sm:items-center mb-3 gap-3">
             <div>
@@ -404,9 +469,11 @@
                 <table class="table-auto w-full">
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50">
                         <tr>
+                            @if (Auth::user()->role == 'Kepala Toko')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                 <input id="parent-checkbox" class="form-checkbox" type="checkbox">
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">No
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-left">User
@@ -421,19 +488,23 @@
                                 Foto</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                 Catatan</th>
+                            @if (Auth::user()->role == 'Kepala Toko')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                 Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody class="text-sm divide-y">
                         @php $no = ($attendances->currentPage()-1) * $attendances->perPage() + 1; @endphp
                         @foreach ($attendances as $att)
                             <tr>
+                                @if (Auth::user()->role == 'Kepala Toko')
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     <input class="form-checkbox table-item" type="checkbox"
                                         value="{{ $att->id }}">
                                 </td>
+                                @endif
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     {{ $no++ }}</td>
@@ -446,10 +517,10 @@
                                     $setting = \App\Models\StoreSetting::first();
                                     $jamMasuk = $setting?->jam_masuk ? \Carbon\Carbon::parse($setting->jam_masuk) : null;
                                     $jamAbsen = \Carbon\Carbon::parse($att->created_at);
-                                
+
                                     $status = 'Tidak Aktif';
                                     $warna = 'text-slate-400 italic';
-                                
+
                                     if ($setting && $setting->active_setting_absensi) {
                                         if ($jamAbsen->gt($jamMasuk)) {
                                             $status = 'Terlambat';
@@ -460,7 +531,7 @@
                                         }
                                     }
                                 @endphp
-                                
+
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
                                     {{ \Carbon\Carbon::parse($att->created_at)->translatedFormat('l, d F Y H:i:s') }}
                                     @if (ucfirst($att->type) == 'Masuk')
@@ -471,7 +542,7 @@
                                         @endif
                                     @endif
                                 </td>
-                                
+
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     @if ($att->lat && $att->lng)
@@ -503,6 +574,7 @@
                                         <span class="text-slate-400">-</span>
                                     @endif
                                 </td>
+                                @if (Auth::user()->role == 'Kepala Toko')
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     <form method="POST" action="{{ route('master-absensi.destroy', $att->id) }}"
@@ -511,6 +583,7 @@
                                         <button class="text-rose-500">Hapus</button>
                                     </form>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
