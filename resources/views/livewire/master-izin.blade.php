@@ -386,7 +386,7 @@
                         </div>
                         @if (Auth::user()->role == 'Kepala Toko')
                         <div>
-                            <label class="block text-sm font-medium mb-1">Nominal Potongan<small style="color:red">*jika tidak di isi maka akan otomatis dari pengaturan sistem</small></label>
+                            <label class="block text-sm font-medium mb-1">Nominal Potongan</label>
                             <input type="text" name="nominal_potongan" class="form-input w-full sapator"
                                 x-model="editData.nominal_potongan">
                         </div>
