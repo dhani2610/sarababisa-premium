@@ -212,8 +212,8 @@
                         </div>
                         @if (Auth::user()->role == 'Kepala Toko')
                         <div>
-                            <label class="block text-sm font-medium mb-1">Nominal Potongan</label>
-                            <input type="text" name="nominal_potongan" class="form-input w-full sapator" required>
+                            <label class="block text-sm font-medium mb-1">Nominal Potongan <small style="color:red">*jika tidak di isi maka akan otomatis dari pengaturan sistem</small> </label>
+                            <input type="text" name="nominal_potongan" class="form-input w-full sapator">
                         </div>
                         @else
                         <input type="hidden" name="nominal_potongan" value="0">
@@ -297,8 +297,8 @@
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
                                     {{ \Carbon\Carbon::parse($izin->tanggal)->format('d/m/Y') }}</td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
-                                    {{ \Carbon\Carbon::parse($izin->tanggal_mulai)->format('d/m/Y') }} - 
-                                    {{ \Carbon\Carbon::parse($izin->tanggal_selesai)->format('d/m/Y') }}    
+                                    {{ \Carbon\Carbon::parse($izin->tanggal_mulai)->format('d/m/Y') }} -
+                                    {{ \Carbon\Carbon::parse($izin->tanggal_selesai)->format('d/m/Y') }}
                                 </td>
                                 @if (Auth::user()->role == 'Kepala Toko')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Rp
@@ -386,9 +386,9 @@
                         </div>
                         @if (Auth::user()->role == 'Kepala Toko')
                         <div>
-                            <label class="block text-sm font-medium mb-1">Nominal Potongan</label>
+                            <label class="block text-sm font-medium mb-1">Nominal Potongan<small style="color:red">*jika tidak di isi maka akan otomatis dari pengaturan sistem</small></label>
                             <input type="text" name="nominal_potongan" class="form-input w-full sapator"
-                                x-model="editData.nominal_potongan" required>
+                                x-model="editData.nominal_potongan">
                         </div>
                         @else
                         <input type="hidden" name="nominal_potongan" x-model="editData.nominal_potongan">
