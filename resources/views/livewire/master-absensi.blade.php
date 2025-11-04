@@ -469,9 +469,11 @@
                 <table class="table-auto w-full">
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50">
                         <tr>
+                            @if (Auth::user()->role == 'Kepala Toko')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                 <input id="parent-checkbox" class="form-checkbox" type="checkbox">
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">No
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-left">User
@@ -496,11 +498,13 @@
                         @php $no = ($attendances->currentPage()-1) * $attendances->perPage() + 1; @endphp
                         @foreach ($attendances as $att)
                             <tr>
+                                @if (Auth::user()->role == 'Kepala Toko')
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     <input class="form-checkbox table-item" type="checkbox"
                                         value="{{ $att->id }}">
                                 </td>
+                                @endif
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     {{ $no++ }}</td>
