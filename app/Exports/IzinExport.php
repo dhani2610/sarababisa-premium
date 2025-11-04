@@ -6,8 +6,11 @@ use App\Models\Izin;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class IzinExport implements FromCollection, WithHeadings
+class IzinExport implements FromCollection, WithHeadings, WithStyles, WithColumnWidths
 {
     protected $start_date, $end_date, $filter_tipe;
 
@@ -53,5 +56,37 @@ class IzinExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return ['Nama', 'Tipe', 'Tanggal Dibuat', 'Periode', 'Keterangan'];
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 20, // Nama
+            'B' => 15, // Tipe
+            'C' => 18, // Tanggal Dibuat
+            'D' => 25, // Periode
+            'E' => 50, // Keterangan
+        ];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        // Terapkan border, wrap text, dan bold untuk heading
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:E1')->getAlignment()->setHorizontal('center');
+
+        // Auto wrap text untuk semua kolom
+        $sheet->getStyle('A:E')->getAlignment()->setWrapText(true);
+
+        // Border untuk semua sel
+        $lastRow = $sheet->getHighestRow();
+        $sheet->getStyle("A1:E{$lastRow}")
+            ->getBorders()
+            ->getAllBorders()
+            ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+        return [
+            1 => ['font' => ['bold' => true]],
+        ];
     }
 }
