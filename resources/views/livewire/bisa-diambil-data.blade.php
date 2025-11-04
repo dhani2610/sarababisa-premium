@@ -94,7 +94,7 @@
             @endif
 
             <!-- Search form -->
-            <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan/IMEI" />
+            {{-- <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan/IMEI" /> --}}
 
             @if (Auth::user()->role != 'Investor')
             <!-- Create invoice button -->

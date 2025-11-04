@@ -14,6 +14,7 @@
             <livewire:toggle-edit-produk></livewire:toggle-edit-produk>
             <livewire:toggle-telegram-bot />
             <livewire:toggle-absensi-setting />
+            <livewire:toggle-potongan-izin />
         </div>
 
         <!-- Panel footer -->

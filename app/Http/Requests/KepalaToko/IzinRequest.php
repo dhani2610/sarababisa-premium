@@ -6,10 +6,10 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class IzinRequest extends FormRequest
 {
-    public function authorize()
-    {
-        return true;
-    }
+    // public function authorize()
+    // {
+    //     return true;
+    // }
 
     public function rules()
     {
@@ -19,10 +19,10 @@ class IzinRequest extends FormRequest
             'tanggal' => 'required|date',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-            'nominal_potongan' => 'required|string',
+            'nominal_potongan' => 'nullable|string',
             'keterangan' => 'nullable|string',
-            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'dokumen' => 'nullable|file',
         ];
     }
-    
+
 }

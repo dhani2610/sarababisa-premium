@@ -35,9 +35,7 @@ class ToggleTelegramBot extends Component
             'fonnte' => $this->fonnte ?: null,
         ]);
 
-        $this->dispatchBrowserEvent('notify', [
-            'type' => 'success',
-            'message' => 'data berhasil diperbarui.'
-        ]);
+        session()->flash('success', 'data berhasil diperbarui.');
+        return redirect()->route('sistem');
     }
 }

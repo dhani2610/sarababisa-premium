@@ -11,7 +11,7 @@
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan/IMEI" />
+            {{-- <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan/IMEI" /> --}}
 
             @if (Auth::user()->role != 'Investor')
             <!-- Create invoice button -->
@@ -230,7 +230,7 @@
             </ul>
         </div>
         <!-- Right side -->
-        <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+        {{-- <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
             <!-- Filter button -->
             <div class="relative inline-flex" x-data="{ open: false }">
                 <button
@@ -305,7 +305,7 @@
                     <option value="1000">1000</option>
                 </select>
             </div>
-        </div>
+        </div> --}}
 
     </div>
 

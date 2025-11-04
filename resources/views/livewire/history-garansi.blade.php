@@ -186,7 +186,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Total Modal Tindakan</label>
                                     <input type="number" name="total_biaya_tindakan" id="total_biaya_tindakan"
-                                        value="0" class="form-input w-full" required>
+                                        value="0" class="form-input w-full" required onkeyup="updateTotalModal()">
                                 </div>
 
                                 <hr>
@@ -739,6 +739,10 @@ document.addEventListener('alpine:init', () => {
         });
     </script>
     <script>
+        function updateTotalModal() {
+            const tindakan = parseFloat(document.getElementById('total_biaya_tindakan').value) || 0;
+            document.getElementById('total_biaya').value = tindakan;
+        }
         document.addEventListener("DOMContentLoaded", function() {
             let tindakanList = @json($serviceActions); // pastikan kamu kirim $serviceActions dari controller
             let tindakanContainer = document.getElementById("tindakanContainer");

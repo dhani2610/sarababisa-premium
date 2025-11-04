@@ -32,8 +32,8 @@
                         $masuk = $record->firstWhere('type', 'masuk');
                         $pulang = $record->firstWhere('type', 'pulang');
                     @endphp
-                    <td>{{ $masuk ? \Carbon\Carbon::parse($masuk->waktu)->format('H:i') : '-' }}</td>
-                    <td>{{ $pulang ? \Carbon\Carbon::parse($pulang->waktu)->format('H:i') : '-' }}</td>
+                    <td>{{ $masuk ? \Carbon\Carbon::parse($masuk->created_at)->format('H:i') : '-' }} | {{ $masuk->note ?? '-' }} </td>
+                    <td>{{ $pulang ? \Carbon\Carbon::parse($pulang->created_at)->format('H:i') : '-' }} | {{ $pulang->note ?? '-' }}</td>
                 @endforeach
             </tr>
         @endforeach
