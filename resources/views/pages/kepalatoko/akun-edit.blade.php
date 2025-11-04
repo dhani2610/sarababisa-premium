@@ -123,7 +123,7 @@
 
                                 <!-- Semua field setelah role dibungkus -->
                                 <div id="extra-fields">
-                                    <div>
+                                    <div id="bonus-interface-input">
                                         <label class="block text-sm font-medium mb-1" for="role">Bonus
                                             Interface?</label>
                                         <select id="bagian_teknisi" name="bagian_teknisi"
@@ -248,31 +248,43 @@ document.addEventListener('DOMContentLoaded', function() {
     const bonusAdmin = document.getElementById('bonus-admin');
     const spesialisInput = document.getElementById('spesialis-input');
     const bonusPersen = document.getElementById('bonus-persen');
+    const bonusInterfaceInput = document.getElementById('bonus-interface-input');
 
     function toggleInputs() {
         const role = roleSelect.value;
 
-        if (role === 'Investor') {
+         if (role === 'Investor') {
             extraFields.style.display = 'none';
             uploadInvestor.style.display = 'block';
             bonusAdmin.style.display = 'none';
             spesialisInput.style.display = 'none';
+            bonusInterfaceInput.style.display = 'none';
         } else if (role === 'Kepala Toko') {
             extraFields.style.display = 'none';
             uploadInvestor.style.display = 'none';
             bonusAdmin.style.display = 'none';
             spesialisInput.style.display = 'none';
+            bonusInterfaceInput.style.display = 'none';
         } else if (role === 'Admin Toko') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
             bonusAdmin.style.display = 'block';
             spesialisInput.style.display = 'none';
-        } else {
+            bonusInterfaceInput.style.display = 'none';
+        } else if (role === 'Teknisi') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
             bonusAdmin.style.display = 'none';
             spesialisInput.style.display = 'block';
             bonusPersen.style.display = 'block';
+            bonusInterfaceInput.style.display = 'block';
+        } else if (role === 'Sales') {
+            extraFields.style.display = 'block';
+            uploadInvestor.style.display = 'none';
+            bonusAdmin.style.display = 'none';
+            spesialisInput.style.display = 'none';
+            bonusPersen.style.display = 'block';
+            bonusInterfaceInput.style.display = 'none';
         }
     }
 
