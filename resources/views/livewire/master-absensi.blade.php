@@ -260,59 +260,59 @@
         </button>
     </div>
 
-    <!-- Modal Popup -->
-    <div
-        x-data="{ open: false }"
-        x-on:open-filter-modal.window="open = true"
-        x-on:close-filter-modal.window="open = false"
-        x-show="open"
-        x-cloak
-        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50"
-    >
-        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md relative">
+        <!-- Modal Popup -->
+        <div
+            x-data="{ open: false }"
+            x-on:open-filter-modal.window="open = true"
+            x-on:close-filter-modal.window="open = false"
+            x-show="open"
+            x-cloak
+            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50"
+        >
+            <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md relative">
 
-            <h2 class="text-lg font-semibold text-gray-700 mb-4">
-                Filter Berdasarkan Range Tanggal
-            </h2>
+                <h2 class="text-lg font-semibold text-gray-700 mb-4">
+                    Filter Berdasarkan Range Tanggal
+                </h2>
 
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm text-gray-600 mb-1">Dari Tanggal</label>
-                    <input type="date" wire:model="start_date" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Dari Tanggal</label>
+                        <input type="date" wire:model="start_date" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Sampai Tanggal</label>
+                        <input type="date" wire:model="end_date" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm text-gray-600 mb-1">Sampai Tanggal</label>
-                    <input type="date" wire:model="end_date" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                <div class="mt-6 flex justify-end gap-2">
+                    <button
+                        @click="open = false"
+                        class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-700"
+                    >
+                        Batal
+                    </button>
+
+                    <button
+                        wire:click="$refresh"
+                        @click="open = false"
+                        class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                        Terapkan Filter
+                    </button>
+
+                    <button
+                        wire:click="$set('start_date', null); $set('end_date', null)"
+                        @click="open = false"
+                        class="px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600"
+                    >
+                        Reset
+                    </button>
                 </div>
-            </div>
-
-            <div class="mt-6 flex justify-end gap-2">
-                <button
-                    @click="open = false"
-                    class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-700"
-                >
-                    Batal
-                </button>
-
-                <button
-                    wire:click="$refresh"
-                    @click="open = false"
-                    class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
-                >
-                    Terapkan Filter
-                </button>
-
-                <button
-                    wire:click="$set('start_date', null); $set('end_date', null)"
-                    @click="open = false"
-                    class="px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600"
-                >
-                    Reset
-                </button>
             </div>
         </div>
-    </div>
 
 
         <!-- Header -->
