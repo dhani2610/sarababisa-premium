@@ -740,9 +740,6 @@ document.addEventListener('alpine:init', () => {
     </script>
     <script>
         function updateTotalModal() {
-            console.log('====================================');
-            console.log('onchange');
-            console.log('====================================');
             const tindakan = parseFloat(document.getElementById('total_biaya_tindakan').value) || 0;
             document.getElementById('total_biaya').value = tindakan;
         }

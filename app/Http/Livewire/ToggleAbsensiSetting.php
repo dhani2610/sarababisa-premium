@@ -43,9 +43,7 @@ class ToggleAbsensiSetting extends Component
             'jam_pulang' => $this->active_setting_absensi ? $this->jam_pulang : null,
         ]);
 
-        $this->dispatchBrowserEvent('notify', [
-            'type' => 'success',
-            'message' => 'Pengaturan absensi berhasil disimpan.'
-        ]);
+        session()->flash('success', 'Pengaturan absensi berhasil disimpan.');
+        return redirect()->route('sistem');
     }
 }

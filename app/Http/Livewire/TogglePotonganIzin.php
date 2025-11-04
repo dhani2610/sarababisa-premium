@@ -15,9 +15,9 @@ class TogglePotonganIzin extends Component
     {
         $setting = StoreSetting::find(1);
         if ($setting) {
-            $this->nominal_potongan_izin = $setting->nominal_potongan_izin;
-            $this->nominal_potongan_alfa = $setting->nominal_potongan_alfa;
-            $this->nominal_potongan_sakit = $setting->nominal_potongan_sakit;
+            $this->nominal_potongan_izin = number_format($setting->nominal_potongan_izin, 0, '', '.');
+            $this->nominal_potongan_alfa = number_format($setting->nominal_potongan_alfa, 0, '', '.');
+            $this->nominal_potongan_sakit = number_format($setting->nominal_potongan_sakit, 0, '', '.');
         }
     }
 
@@ -28,25 +28,26 @@ class TogglePotonganIzin extends Component
 
     public function saveSetting()
     {
+        $izin = (int) str_replace('.', '', $this->nominal_potongan_izin);
+        $alfa = (int) str_replace('.', '', $this->nominal_potongan_alfa);
+        $sakit = (int) str_replace('.', '', $this->nominal_potongan_sakit);
+
         $this->validate([
-            'nominal_potongan_izin' => 'nullable|integer|min:0',
-            'nominal_potongan_alfa' => 'nullable|integer|min:0',
-            'nominal_potongan_sakit' => 'nullable|integer|min:0',
+            'nominal_potongan_izin' => 'nullable',
+            'nominal_potongan_alfa' => 'nullable',
+            'nominal_potongan_sakit' => 'nullable',
         ]);
 
         $setting = StoreSetting::find(1);
-
         if ($setting) {
             $setting->update([
-                'nominal_potongan_izin' => $this->nominal_potongan_izin ?: 0,
-                'nominal_potongan_alfa' => $this->nominal_potongan_alfa ?: 0,
-                'nominal_potongan_sakit' => $this->nominal_potongan_sakit ?: 0,
-            ]);
-
-            $this->dispatchBrowserEvent('notify', [
-                'type' => 'success',
-                'message' => 'Pengaturan potongan berhasil diperbarui.'
+                'nominal_potongan_izin' => $izin,
+                'nominal_potongan_alfa' => $alfa,
+                'nominal_potongan_sakit' => $sakit,
             ]);
         }
+
+        session()->flash('success', 'Pengaturan potongan berhasil diperbarui.');
+        return redirect()->route('sistem');
     }
 }

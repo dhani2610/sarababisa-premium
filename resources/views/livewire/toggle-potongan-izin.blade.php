@@ -10,44 +10,37 @@
         <!-- Potongan Izin -->
         <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Potongan Izin</label>
-            <div class="relative">
-                <input
-                    type="number"
-                    wire:model.defer="nominal_potongan_izin"
-                    class="form-input w-full pl-8"
-                    placeholder="0"
-                >
-            </div>
+            <input
+                type="text"
+                wire:model.defer="nominal_potongan_izin"
+                class="form-input w-full sapator"
+                placeholder="0"
+            >
         </div>
 
         <!-- Potongan Alfa -->
         <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Potongan Alfa</label>
-            <div class="relative">
-                <input
-                    type="number"
-                    wire:model.defer="nominal_potongan_alfa"
-                    class="form-input w-full pl-8"
-                    placeholder="0"
-                >
-            </div>
+            <input
+                type="text"
+                wire:model.defer="nominal_potongan_alfa"
+                class="form-input w-full sapator"
+                placeholder="0"
+            >
         </div>
 
         <!-- Potongan Sakit -->
         <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Potongan Sakit</label>
-            <div class="relative">
-                <input
-                    type="number"
-                    wire:model.defer="nominal_potongan_sakit"
-                    class="form-input w-full pl-8"
-                    placeholder="0"
-                >
-            </div>
+            <input
+                type="text"
+                wire:model.defer="nominal_potongan_sakit"
+                class="form-input w-full sapator"
+                placeholder="0"
+            >
         </div>
     </div>
 
-    <!-- Tombol Simpan -->
     <div class="flex justify-end mt-5">
         <button
             wire:click="saveSetting"
@@ -57,3 +50,17 @@
         </button>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function formatNumber(input) {
+        let value = input.value.replace(/\D/g, '');
+        input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    document.querySelectorAll('.sapator').forEach(input => {
+        input.addEventListener('keyup', () => formatNumber(input));
+        formatNumber(input); // format saat load pertama
+    });
+});
+</script>
