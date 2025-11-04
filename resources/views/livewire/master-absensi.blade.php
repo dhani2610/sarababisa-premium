@@ -486,8 +486,10 @@
                                 Foto</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                 Catatan</th>
+                            @if (Auth::user()->role == 'Kepala Toko')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                 Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody class="text-sm divide-y">
@@ -568,6 +570,7 @@
                                         <span class="text-slate-400">-</span>
                                     @endif
                                 </td>
+                                @if (Auth::user()->role == 'Kepala Toko')
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     <form method="POST" action="{{ route('master-absensi.destroy', $att->id) }}"
@@ -576,6 +579,7 @@
                                         <button class="text-rose-500">Hapus</button>
                                     </form>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
