@@ -45,7 +45,7 @@
                 var table = $('#transaksi-servis-table').DataTable({
                     processing: false,
                     serverSide: false,
-                    ajax: '{{ route('transaksi-servis-bisa-diambil.data') }}',
+                    // ajax: '{{ route('transaksi-servis-bisa-diambil.data') }}',
                     columns: [
                         @if (Auth::user()->role == 'Investor')
                             {

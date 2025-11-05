@@ -259,7 +259,7 @@
             <script>
                 $(document).ready(function() {
                     $('#transaksiTable').DataTable({
-                        processing: true,
+                        processing: false,
                         serverSide: false,
                         ajax: '{{ route('transaksi-produk.data.due') }}',
                         columns: [

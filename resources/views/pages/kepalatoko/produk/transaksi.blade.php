@@ -161,7 +161,7 @@
                         },
                         toggleAll() {
                             console.log('klik');
-                            
+
                             this.selectall = !this.selectall;
                             checkboxes = document.querySelectorAll('input.table-item');
                             [...checkboxes].map((el) => {
@@ -262,9 +262,9 @@
             <script>
                 $(document).ready(function() {
                     let table = $('#transaksiTable').DataTable({
-                        processing: true,
+                        processing: false,
                         serverSide: false,
-                        ajax: '{{ route('transaksi-produk.data') }}',
+                        // ajax: '{{ route('transaksi-produk.data') }}',
                         columns: [
                             @if (Auth::user()->role == 'Kepala Toko')
                             {

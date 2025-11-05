@@ -39,7 +39,7 @@ class TransaksiProdukController extends Controller
     {
         $limit = $request->get('limit', 200);
         $offset = $request->get('offset', 0);
-    
+
         $orders = Order::select('orders.*', 'order_details.modal')
             ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
             ->with(['user', 'customer'])
