@@ -1,5 +1,5 @@
 <div>
-     
+
     <!-- Page header -->
     <div class="sm:flex sm:justify-between sm:items-center mb-3">
 
@@ -1015,7 +1015,7 @@
                             @endif
                         </tr>
                     </thead>
-                    
+
                 </table>
 
             </div>
@@ -1024,7 +1024,7 @@
 
 
 <script>
-    
+
 document.addEventListener('DOMContentLoaded', function () {
     // --- Inisialisasi select2 pada elemen awal ---
     $('#selectjs6').select2();

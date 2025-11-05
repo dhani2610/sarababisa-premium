@@ -53,88 +53,29 @@
         <script>
             $(document).ready(function() {
 
-                var table = $('#transaksi-servis-table').DataTable({
+                 var table = $('#transaksi-servis-table').DataTable({
                     processing: false,
                     serverSide: false,
-                    ajax: '{{ route('transaksi-servis.data') }}',
                     columns: [
                         @if (Auth::user()->role == 'Kepala Toko')
-                            {
-                                data: 'checkbox',
-                                name: 'checkbox',
-                                orderable: false,
-                                searchable: false
-                            },
-                        @endif {
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'nomor_servis',
-                            name: 'nomor_servis'
-                        },
-                        {
-                            data: 'created_at',
-                            name: 'created_at'
-                        },
-                        {
-                            data: 'penerima',
-                            name: 'penerima'
-                        },
-                        {
-                            data: 'pelanggan',
-                            name: 'pelanggan',
-                            orderable: false,
-                            searchable: true
-                        },
-                        {
-                            data: 'hubungi',
-                            name: 'hubungi',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'nama_barang',
-                            name: 'nama_barang'
-                        },
-                        {
-                            data: 'kelengkapan',
-                            name: 'kelengkapan'
-                        },
-                        {
-                            data: 'kerusakan',
-                            name: 'kerusakan'
-                        },
-                        {
-                            data: 'qc_masuk',
-                            name: 'qc_masuk'
-                        },
-                        {
-                            data: 'uang_muka',
-                            name: 'uang_muka'
-                        },
-                        {
-                            data: 'estimasi_biaya',
-                            name: 'estimasi_biaya'
-                        },
-                        {
-                            data: 'estimasi_pengerjaan',
-                            name: 'estimasi_pengerjaan'
-                        },
+                            { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
+                        @endif
+                        { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                        { data: 'nomor_servis', name: 'nomor_servis' },
+                        { data: 'created_at', name: 'created_at' },
+                        { data: 'penerima', name: 'penerima' },
+                        { data: 'pelanggan', name: 'pelanggan', orderable: false, searchable: true },
+                        { data: 'hubungi', name: 'hubungi', orderable: false, searchable: false },
+                        { data: 'nama_barang', name: 'nama_barang' },
+                        { data: 'kelengkapan', name: 'kelengkapan' },
+                        { data: 'kerusakan', name: 'kerusakan' },
+                        { data: 'qc_masuk', name: 'qc_masuk' },
+                        { data: 'uang_muka', name: 'uang_muka' },
+                        { data: 'estimasi_biaya', name: 'estimasi_biaya' },
+                        { data: 'estimasi_pengerjaan', name: 'estimasi_pengerjaan' },
                         @if (Auth::user()->role != 'Investor')
-                            {
-                                data: 'status',
-                                name: 'status',
-                                orderable: false,
-                                searchable: true
-                            }, {
-                                data: 'aksi',
-                                name: 'aksi',
-                                orderable: false,
-                                searchable: false
-                            }
+                            { data: 'status', name: 'status', orderable: false, searchable: true },
+                            { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
                         @endif
                     ],
                     order: [],
@@ -154,24 +95,144 @@
                 function loadBatch() {
                     if (loading) return;
                     loading = true;
+
                     $.ajax({
                         url: '{{ route('transaksi-servis.data') }}?offset=' + offset + '&limit=' + batchSize,
                         success: function(response) {
                             if (response.data.length > 0) {
-                                table.rows.add(response.data).draw(false);
+                                table.rows.add(response.data).draw(false); // tambahkan data batch
                                 offset += batchSize;
                                 loading = false;
-                                // lanjut load batch berikutnya
-                                setTimeout(loadBatch, 100);
+                                setTimeout(loadBatch, 100); // lanjut batch berikutnya
                             } else {
-                                console.log('semua data sudah dimuat');
+                                console.log('Semua data sudah dimuat');
                             }
                         }
                     });
                 }
 
-                    // mulai load pertama
+                // mulai load pertama
                 loadBatch();
+
+                // var table = $('#transaksi-servis-table').DataTable({
+                //     processing: false,
+                //     serverSide: false,
+                //     ajax: '{{ route('transaksi-servis.data') }}',
+                //     columns: [
+                //         @if (Auth::user()->role == 'Kepala Toko')
+                //             {
+                //                 data: 'checkbox',
+                //                 name: 'checkbox',
+                //                 orderable: false,
+                //                 searchable: false
+                //             },
+                //         @endif {
+                //             data: 'DT_RowIndex',
+                //             name: 'DT_RowIndex',
+                //             orderable: false,
+                //             searchable: false
+                //         },
+                //         {
+                //             data: 'nomor_servis',
+                //             name: 'nomor_servis'
+                //         },
+                //         {
+                //             data: 'created_at',
+                //             name: 'created_at'
+                //         },
+                //         {
+                //             data: 'penerima',
+                //             name: 'penerima'
+                //         },
+                //         {
+                //             data: 'pelanggan',
+                //             name: 'pelanggan',
+                //             orderable: false,
+                //             searchable: true
+                //         },
+                //         {
+                //             data: 'hubungi',
+                //             name: 'hubungi',
+                //             orderable: false,
+                //             searchable: false
+                //         },
+                //         {
+                //             data: 'nama_barang',
+                //             name: 'nama_barang'
+                //         },
+                //         {
+                //             data: 'kelengkapan',
+                //             name: 'kelengkapan'
+                //         },
+                //         {
+                //             data: 'kerusakan',
+                //             name: 'kerusakan'
+                //         },
+                //         {
+                //             data: 'qc_masuk',
+                //             name: 'qc_masuk'
+                //         },
+                //         {
+                //             data: 'uang_muka',
+                //             name: 'uang_muka'
+                //         },
+                //         {
+                //             data: 'estimasi_biaya',
+                //             name: 'estimasi_biaya'
+                //         },
+                //         {
+                //             data: 'estimasi_pengerjaan',
+                //             name: 'estimasi_pengerjaan'
+                //         },
+                //         @if (Auth::user()->role != 'Investor')
+                //             {
+                //                 data: 'status',
+                //                 name: 'status',
+                //                 orderable: false,
+                //                 searchable: true
+                //             }, {
+                //                 data: 'aksi',
+                //                 name: 'aksi',
+                //                 orderable: false,
+                //                 searchable: false
+                //             }
+                //         @endif
+                //     ],
+                //     order: [],
+                //     language: {
+                //         url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
+                //     },
+                //     drawCallback: function() {
+                //         attachCheckboxHandlers();
+                //     }
+                // });
+
+                // // --- custom pagination load bertahap ---
+                // let batchSize = 100;
+                // let offset = 0;
+                // let loading = false;
+
+                // function loadBatch() {
+                //     if (loading) return;
+                //     loading = true;
+                //     $.ajax({
+                //         url: '{{ route('transaksi-servis.data') }}?offset=' + offset + '&limit=' + batchSize,
+                //         success: function(response) {
+                //             if (response.data.length > 0) {
+                //                 table.rows.add(response.data).draw(false);
+                //                 offset += batchSize;
+                //                 loading = false;
+                //                 // lanjut load batch berikutnya
+                //                 setTimeout(loadBatch, 100);
+                //             } else {
+                //                 console.log('semua data sudah dimuat');
+                //             }
+                //         }
+                //     });
+                // }
+
+                //     // mulai load pertama
+                // loadBatch();
 
                 function attachCheckboxHandlers() {
                     $('#parent-checkbox').off('click').on('click', function() {

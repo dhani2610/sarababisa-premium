@@ -44,9 +44,9 @@
             $(document).ready(function() {
 
                 var table = $('#transaksi-servis-table').DataTable({
-                    processing: true,
+                    processing: false,
                     serverSide: false,
-                    ajax: '{{ route('transaksi-servis-sudah-diambil.data') }}',
+                    // ajax: '{{ route('transaksi-servis-sudah-diambil.data') }}',
                     columns: [
                         @if (Auth::user()->role != 'Investor')
                             {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},

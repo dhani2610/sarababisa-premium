@@ -261,9 +261,9 @@
             <script>
                 $(document).ready(function() {
                     let table = $('#transaksiTable').DataTable({
-                        processing: true,
+                        processing: false,
                         serverSide: false,
-                        ajax: '{{ route('transaksi-produk.data.lunas') }}',
+                        // ajax: '{{ route('transaksi-produk.data.lunas') }}',
                         columns: [
                             @if (Auth::user()->role == 'Kepala Toko')
                             {
@@ -338,7 +338,7 @@
                         ]
                     });
 
-                    
+
                     // --- custom pagination load bertahap ---
                     let batchSize = 100;
                     let offset = 0;
