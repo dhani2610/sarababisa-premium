@@ -507,6 +507,10 @@
                     <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
+                            @php
+                                $tokoSetting = \App\Models\StoreSetting::find(1);
+                            @endphp
+                            @if ((int) ($tokoSetting->is_edit_produk ?? 0) == 1 || Auth::user()->role == 'Kepala Toko')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="flex items-center">
                                     <label class="inline-flex">
@@ -515,6 +519,7 @@
                                     </label>
                                 </div>
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">No.</div>
                             </th>
@@ -561,6 +566,7 @@
                         @endphp
                         @foreach($products as $item)
                             <tr>
+                                @if ((int) ($tokoSetting->is_edit_produk ?? 0) == 1 || Auth::user()->role == 'Kepala Toko')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
                                         <label class="inline-flex">
@@ -569,6 +575,7 @@
                                         </label>
                                     </div>
                                 </td>
+                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $i++ }}</div>
                                 </td>
@@ -635,6 +642,7 @@
                                                 </svg>
                                             </button>
                                         </a>
+                                        @if ((int) ($tokoSetting->is_edit_produk ?? 0) == 1 || Auth::user()->role == 'Kepala Toko')
                                         <a href="{{ route('tool.edit', $item->id) }}">
                                             <button class="text-slate-400 hover:text-slate-500 rounded-full">
                                                 <span class="sr-only">Edit</span>
@@ -703,6 +711,7 @@
                                                 <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
                                             </svg>
                                         </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
