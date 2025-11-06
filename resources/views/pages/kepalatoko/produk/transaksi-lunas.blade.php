@@ -124,6 +124,7 @@
                                     @endif
                                     <th>No.</th>
                                     <th>Invoice</th>
+                                    <th width="30%">Item</th>
                                     <th>Tgl Transaksi</th>
                                     <th>Sales</th>
                                     <th>Pelanggan</th>
@@ -282,6 +283,12 @@
                             },
                             {
                                 data: 'invoice_no'
+                            },
+                             {
+                                data: 'item',
+                                render: function(data) {
+                                    return data ?? '';
+                                }
                             },
                             {
                                 data: 'tgl_transaksi'

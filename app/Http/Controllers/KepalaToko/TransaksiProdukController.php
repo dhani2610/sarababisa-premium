@@ -96,6 +96,32 @@ class TransaksiProdukController extends Controller
                 }
                 return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-600">Lunas</div>';
             })
+            ->addColumn('item', function ($row) {
+                $orderItem = OrderDetail::with('product')
+                    ->where('orders_id', $row->id)
+                    ->orderBy('id', 'DESC')
+                    ->get();
+
+                $produkDetails = '<ul class="list-disc pl-5 m-0">';
+                foreach ($orderItem as $item) {
+                    if ($item->product->categories_id === 1) {
+                        $produkDetails .= '<li>'
+                            . $item->product_name
+                            . ' IMEI: ' . $item->product->nomor_seri
+                            . '</li>';
+                    } else {
+                        $produkDetails .= '<li>'
+                            . $item->product_name
+                            . '</li>';
+                    }
+                }
+                $produkDetails .= '</ul>';
+
+                return '<div class="inline-flex font-medium rounded-lg text-left px-3 py-2 text-emerald-700">'
+                    . $produkDetails
+                    . '</div>';
+            })
+
             ->addColumn('status', function ($row) {
                 $route = route('transaksi-penjualan-approve.edit', $row->id);
 
@@ -229,7 +255,7 @@ class TransaksiProdukController extends Controller
                     </div>
                 </div>';
             })
-            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi'])
+            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi','item'])
             ->make(true);
     }
 
@@ -295,6 +321,31 @@ class TransaksiProdukController extends Controller
                 }
                 return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-600">Lunas</div>';
             })
+             ->addColumn('item', function ($row) {
+                $orderItem = OrderDetail::with('product')
+                    ->where('orders_id', $row->id)
+                    ->orderBy('id', 'DESC')
+                    ->get();
+
+                $produkDetails = '<ul class="list-disc pl-5 m-0">';
+                foreach ($orderItem as $item) {
+                    if ($item->product->categories_id === 1) {
+                        $produkDetails .= '<li>'
+                            . $item->product_name
+                            . ' IMEI: ' . $item->product->nomor_seri
+                            . '</li>';
+                    } else {
+                        $produkDetails .= '<li>'
+                            . $item->product_name
+                            . '</li>';
+                    }
+                }
+                $produkDetails .= '</ul>';
+
+                return '<div class="inline-flex font-medium rounded-lg text-left px-3 py-2 text-emerald-700">'
+                    . $produkDetails
+                    . '</div>';
+            })
             ->addColumn('status', function ($row) {
                 $route = route('transaksi-penjualan-approve.edit', $row->id);
 
@@ -428,7 +479,7 @@ class TransaksiProdukController extends Controller
                     </div>
                 </div>';
             })
-            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi'])
+            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi','item'])
             ->make(true);
     }
     public function dataDue(Request $request)
@@ -486,6 +537,31 @@ class TransaksiProdukController extends Controller
                 }
                 return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-600">Lunas</div>';
             })
+            ->addColumn('item', function ($row) {
+                $orderItem = OrderDetail::with('product')
+                    ->where('orders_id', $row->id)
+                    ->orderBy('id', 'DESC')
+                    ->get();
+
+                $produkDetails = '<ul class="list-disc pl-5 m-0">';
+                foreach ($orderItem as $item) {
+                    if ($item->product->categories_id === 1) {
+                        $produkDetails .= '<li>'
+                            . $item->product_name
+                            . ' IMEI: ' . $item->product->nomor_seri
+                            . '</li>';
+                    } else {
+                        $produkDetails .= '<li>'
+                            . $item->product_name
+                            . '</li>';
+                    }
+                }
+                $produkDetails .= '</ul>';
+
+                return '<div class="inline-flex font-medium rounded-lg text-left px-3 py-2 text-emerald-700">'
+                    . $produkDetails
+                    . '</div>';
+            })
             ->addColumn('status', function ($row) {
                 $route = route('transaksi-penjualan-approve.edit', $row->id);
 
@@ -619,7 +695,7 @@ class TransaksiProdukController extends Controller
                     </div>
                 </div>';
             })
-            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi'])
+            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi','item'])
             ->make(true);
     }
 
