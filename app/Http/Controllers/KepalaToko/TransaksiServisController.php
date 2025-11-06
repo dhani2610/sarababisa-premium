@@ -49,7 +49,7 @@ class TransaksiServisController extends Controller
         ));
     }
 
-    
+
     public function getData(Request $request)
     {
         $limit = $request->get('limit', 200);
@@ -74,15 +74,20 @@ class TransaksiServisController extends Controller
         // Nomor Servis (link edit kalau bukan investor)
         ->addColumn('nomor_servis', function ($row) {
             if (auth()->user()->role != 'Investor') {
-                $link = route('transaksi-servis.edit', $row->id);
-                return '<a href="' . $link . '">
-                            <div class="flex items-center text-blue-600">
-                                <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                                    <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z"/>
-                                </svg>
-                                <div class="font-medium">' . e($row->nomor_servis) . '</div>
-                            </div>
-                        </a>';
+                $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
+                $hariIni = \Carbon\Carbon::today();
+                $tokoSetting = \App\Models\StoreSetting::find(1);
+                if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
+                    $link = route('transaksi-servis.edit', $row->id);
+                    return '<a href="' . $link . '">
+                                <div class="flex items-center text-blue-600">
+                                    <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                                        <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z"/>
+                                    </svg>
+                                    <div class="font-medium">' . e($row->nomor_servis) . '</div>
+                                </div>
+                            </a>';
+                }
             }
             return '<div class="font-medium">' . e($row->nomor_servis) . '</div>';
         })
@@ -295,21 +300,26 @@ class TransaksiServisController extends Controller
             </div>
             ';
 
-            // Konfirmasi -> ubah status jadi Bisa Diambil
-            $html .= '
-                <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-                    <a href="' . $ubahBisaAmbil . '">
-                        <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah menjadi Bisa Diambil">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-                                <rect x="9" y="3" width="6" height="4" rx="2" />
-                                <path d="M9 14l2 2l4 -4" />
-                            </svg>
-                        </button>
-                    </a>
-                </div>
-            ';
+            $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
+            $hariIni = \Carbon\Carbon::today();
+            $tokoSetting = \App\Models\StoreSetting::find(1);
+            if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
+                // Konfirmasi -> ubah status jadi Bisa Diambil
+                $html .= '
+                    <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                        <a href="' . $ubahBisaAmbil . '">
+                            <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah menjadi Bisa Diambil">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+                                    <rect x="9" y="3" width="6" height="4" rx="2" />
+                                    <path d="M9 14l2 2l4 -4" />
+                                </svg>
+                            </button>
+                        </a>
+                    </div>
+                ';
+            }
 
             // Printer modal
             $html .= '
@@ -354,44 +364,46 @@ class TransaksiServisController extends Controller
             </div>
             ';
 
-            // Delete modal
-            $html .= '
-            <div x-data="{ deleteOpen: false }">
-                <button class="text-rose-500 hover:text-rose-600 rounded-full" @click.prevent="deleteOpen = true" aria-controls="danger-modal">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ff2825" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <line x1="4" y1="7" x2="20" y2="7" />
-                        <line x1="10" y1="11" x2="10" y2="17" />
-                        <line x1="14" y1="11" x2="14" y2="17" />
-                        <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                        <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                    </svg>
-                </button>
+            if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
+                // Delete modal
+                $html .= '
+                <div x-data="{ deleteOpen: false }">
+                    <button class="text-rose-500 hover:text-rose-600 rounded-full" @click.prevent="deleteOpen = true" aria-controls="danger-modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ff2825" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <line x1="4" y1="7" x2="20" y2="7" />
+                            <line x1="10" y1="11" x2="10" y2="17" />
+                            <line x1="14" y1="11" x2="14" y2="17" />
+                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                        </svg>
+                    </button>
 
-                <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="deleteOpen" x-cloak></div>
+                    <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="deleteOpen" x-cloak></div>
 
-                <div id="danger-modal" class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="deleteOpen" x-cloak>
-                    <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="deleteOpen = false" @keydown.escape.window="deleteOpen = false">
-                        <div class="p-5 flex space-x-4">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
-                                <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16"><path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z"/></svg>
-                            </div>
+                    <div id="danger-modal" class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="deleteOpen" x-cloak>
+                        <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="deleteOpen = false" @keydown.escape.window="deleteOpen = false">
+                            <div class="p-5 flex space-x-4">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
+                                    <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16"><path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z"/></svg>
+                                </div>
 
-                            <div>
-                                <div class="mb-2"><div class="text-lg font-semibold text-slate-800">Apakah anda sudah yakin ?</div></div>
-                                <div class="text-sm mb-10"><div class="space-y-2"><p>Jika sudah terhapus, maka tidak bisa dikembalikan lagi.</p></div></div>
-                                <div class="flex flex-wrap justify-end space-x-2">
-                                    <form action="' . $deleteRoute . '" method="post">
-                                        ' . method_field('delete') . csrf_field() . '
-                                        <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
-                                    </form>
+                                <div>
+                                    <div class="mb-2"><div class="text-lg font-semibold text-slate-800">Apakah anda sudah yakin ?</div></div>
+                                    <div class="text-sm mb-10"><div class="space-y-2"><p>Jika sudah terhapus, maka tidak bisa dikembalikan lagi.</p></div></div>
+                                    <div class="flex flex-wrap justify-end space-x-2">
+                                        <form action="' . $deleteRoute . '" method="post">
+                                            ' . method_field('delete') . csrf_field() . '
+                                            <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            ';
+                ';
+            }
 
             $html .= '</div>';
             return $html;
@@ -403,7 +415,7 @@ class TransaksiServisController extends Controller
         ])
         ->make(true);
     }
-    
+
 
 
     public function updatePinPola(Request $request, $id)
