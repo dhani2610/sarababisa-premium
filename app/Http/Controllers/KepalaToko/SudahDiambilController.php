@@ -244,7 +244,7 @@ class SudahDiambilController extends Controller
                 $hariIni = \Carbon\Carbon::today();
                 $tokoSetting = \App\Models\StoreSetting::find(1);
                 if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || auth()->user()->role == 'Kepala Toko'){
-                    $styleHide = 'display:none';
+                    $styleHide = '';
                 }else{
                     $styleHide = 'display:none!important';
                 }
