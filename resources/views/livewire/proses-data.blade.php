@@ -476,8 +476,8 @@
                                                     <select id="tipe" name="tipe"
                                                         class="form-select text-sm py-1 w-full">
                                                         <option selected value="">Pilih Tipe</option>
-                                                        <option value="Interface">Interface</option>
-                                                        <option value="Hardware">Hardware</option>
+                                                        <option value="Interface">Interface (bonus pertipe)</option>
+                                                        <option value="Hardware">Hardware & interface (bonus persen)</option>
                                                     </select>
                                                 </div>
                                                 <div x-data="{ showInputManual: false }">
