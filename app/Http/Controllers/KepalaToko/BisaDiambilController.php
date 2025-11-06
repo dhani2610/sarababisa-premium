@@ -18,7 +18,7 @@ use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use App\Models\StoreSetting;
-
+use Illuminate\Support\Facades\Auth;
 
 class BisaDiambilController extends Controller
 {
@@ -61,15 +61,20 @@ class BisaDiambilController extends Controller
             })
             ->addColumn('nomor_servis', function ($row) {
                 if (auth()->user()->role !== 'Investor') {
-                    return '
-                        <a href="'.route('transaksi-servis-bisa-diambil.edit', $row->id).'">
-                            <div class="flex items-center text-blue-600">
-                                <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                                    <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
-                                </svg>
-                                <div class="font-medium">'.$row->nomor_servis.'</div>
-                            </div>
-                        </a>';
+                    $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
+                    $hariIni = \Carbon\Carbon::today();
+                    $tokoSetting = \App\Models\StoreSetting::find(1);
+                    if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
+                        return '
+                            <a href="'.route('transaksi-servis-bisa-diambil.edit', $row->id).'">
+                                <div class="flex items-center text-blue-600">
+                                    <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                                        <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
+                                    </svg>
+                                    <div class="font-medium">'.$row->nomor_servis.'</div>
+                                </div>
+                            </a>';
+                    }
                 }
                 return '<div class="font-medium">'.$row->nomor_servis.'</div>';
             })
@@ -146,6 +151,14 @@ class BisaDiambilController extends Controller
                 $delurl = route('transaksi-servis-bisa-diambil.destroy', $row->id);
                 if (auth()->user()->role === 'Investor') return '';
 
+                $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
+                $hariIni = \Carbon\Carbon::today();
+                $tokoSetting = \App\Models\StoreSetting::find(1);
+                if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || auth()->user()->role == 'Kepala Toko'){
+                    $styleHide = 'display:none';
+                }else{
+                    $styleHide = 'display:none!important';
+                }
                 return '
                     <div class="space-x-1 flex">
                             <div>
@@ -205,18 +218,18 @@ class BisaDiambilController extends Controller
 
                                 </div>
                             </div>
-                        <a href="'.route('ubah-sudah-diambil-edit', $row->id).'">
+                        <a href="'.route('ubah-sudah-diambil-edit', $row->id).'" style="'.$styleHide.'">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#00b341" fill="none" viewBox="0 0 24 24">
                                 <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2v-1a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2v1z" />
                                 <path d="M9 14l2 2l4 -4" />
                             </svg>
                         </a>
-                        <a href="'.route('transaksi-servis-bisa-diambil.show', $row->id).'">
+                        <a href="'.route('transaksi-servis-bisa-diambil.show', $row->id).'" style="'.$styleHide.'">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#000" fill="none" viewBox="0 0 24 24">
                                 <path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" />
                             </svg>
                         </a>
-                   
+
                         <div x-data="{ deleteOpen: false }">
                             <button class="text-rose-500 hover:text-rose-600 rounded-full" @click.prevent="deleteOpen = true" aria-controls="danger-modal">
                                 <span class="sr-only">Delete</span>
