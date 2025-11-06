@@ -332,27 +332,31 @@
     });
 
     // auto fill teknisi ketika servis dipilih (create modal)
-    document.addEventListener('DOMContentLoaded', function() {
-        const servisSelect = document.getElementById('servis_select');
+   $(document).ready(function () {
         const teknisiNameInput = document.getElementById('teknisi_name');
         const NominalInput = document.getElementById('nominal_input');
 
-        if (servisSelect) {
-            servisSelect.addEventListener('change', function() {
-                const id = this.value;
-                teknisiNameInput.value = '';
-                if (!id) return;
+        $('#servis_select').on('select2:select change', function () {
+            const id = $(this).val();
+            teknisiNameInput.value = '';
+            NominalInput.value = '';
 
-                fetch('{{ url('refund/service') }}/' + id)
-                    .then(res => res.json())
-                    .then(data => {
-                        teknisiNameInput.value = data.teknisi_name ?? '';
-                        NominalInput.value = data.nominal ?? 0;
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    });
-            });
-        }
+            if (!id) return;
+
+            let url = '{{ url('refund/service') }}/' + id;
+            console.log(url);
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    teknisiNameInput.value = data.teknisi_name ?? '';
+                    NominalInput.value = data.nominal ?? 0;
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        });
     });
+
 </script>
