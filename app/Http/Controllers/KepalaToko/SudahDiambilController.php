@@ -38,7 +38,7 @@ class SudahDiambilController extends Controller
     {
         $limit = $request->get('limit', 200);
         $offset = $request->get('offset', 0);
-    
+
         $query = ServiceTransaction::with(['customer', 'user'])
             ->where('status_servis', 'Sudah Diambil')
             ->orderBy('created_at', 'desc')
@@ -240,6 +240,15 @@ class SudahDiambilController extends Controller
                 $termalBase  = route('kepalatoko-nota-pengambilan-termal', '');
                 $inkjetBase  = route('kepalatoko-pengambilan-cetak-inkjet', '');
 
+                $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
+                $hariIni = \Carbon\Carbon::today();
+                $tokoSetting = \App\Models\StoreSetting::find(1);
+                if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || auth()->user()->role == 'Kepala Toko'){
+                    $styleHide = '';
+                }else{
+                    $styleHide = 'display:none!important';
+                }
+
                 return '
                 <div class="space-x-1 flex">
 
@@ -315,7 +324,7 @@ class SudahDiambilController extends Controller
                         </svg>
                     </button>
 
-                    <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                    <div style="'.$styleHide.'" class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                         <a href="'.$showRoute.'">
                             <button class="text-slate-400 hover:text-slate-500 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#000" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
@@ -382,7 +391,7 @@ class SudahDiambilController extends Controller
                         </div>
                     </div>
 
-                    <button x-data x-on:click="$dispatch(\'open-delete\', { id: '.$row->id.' })"
+                    <button style="'.$styleHide.'" x-data x-on:click="$dispatch(\'open-delete\', { id: '.$row->id.' })"
                             class="text-rose-500 hover:text-rose-600 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#ff2825" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
