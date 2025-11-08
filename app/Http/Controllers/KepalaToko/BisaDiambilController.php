@@ -218,13 +218,13 @@ class BisaDiambilController extends Controller
 
                                 </div>
                             </div>
-                        <a href="'.route('ubah-sudah-diambil-edit', $row->id).'" style="'.$styleHide.'">
+                        <a href="'.route('ubah-sudah-diambil-edit', $row->id).'" >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#00b341" fill="none" viewBox="0 0 24 24">
                                 <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2v-1a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2v1z" />
                                 <path d="M9 14l2 2l4 -4" />
                             </svg>
                         </a>
-                        <a href="'.route('transaksi-servis-bisa-diambil.show', $row->id).'" style="'.$styleHide.'">
+                        <a href="'.route('transaksi-servis-bisa-diambil.show', $row->id).'" >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#000" fill="none" viewBox="0 0 24 24">
                                 <path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" />
                             </svg>
