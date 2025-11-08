@@ -358,7 +358,7 @@
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
                                     {{ $i++ }}</td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
-                                    {{ $izin->user->name }}</td>
+                                    {{ $izin->user->name ?? '-' }}</td>
                                 <td class="px-2 capitalize">{{ $izin->tipe }}</td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
                                     {{ \Carbon\Carbon::parse($izin->tanggal)->format('d/m/Y') }}</td>

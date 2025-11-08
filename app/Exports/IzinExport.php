@@ -44,7 +44,7 @@ class IzinExport implements FromCollection, WithHeadings, WithStyles, WithColumn
 
         return $query->get()->map(function ($izin) {
             return [
-                'Nama' => $izin->user->name,
+                'Nama' => $izin->user->name ?? '-',
                 'Tipe' => ucfirst($izin->tipe),
                 'Tanggal Dibuat' => $izin->tanggal,
                 'Periode' => "{$izin->tanggal_mulai} s/d {$izin->tanggal_selesai}",
