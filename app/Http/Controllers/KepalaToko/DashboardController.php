@@ -149,8 +149,8 @@ class DashboardController extends Controller
             ->whereDate('tgl_disetujui', today())
             ->get()
             ->sum('profit');
-        $hariprofitkotorpenjualan = OrderDetail::whereYear('tgl_disetujui', now()->year)
-            ->whereMonth('tgl_disetujui', now()->month)->whereDate('tgl_disetujui', today())
+        $hariprofitkotorpenjualan = OrderDetail::whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)->whereDate('created_at', today())
             ->get()
             ->sum('profit');
         $haritotalprofitkotor = $hariprofitkotorservis + $hariprofitkotorpenjualan;
