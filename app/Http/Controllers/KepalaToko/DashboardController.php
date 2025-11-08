@@ -137,20 +137,20 @@ class DashboardController extends Controller
             ->whereDate('tgl_ambil', today())
             ->get()
             ->sum('omzet');
-        $hariomzetpenjualan = OrderDetail::whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)->whereDate('created_at', today())
+        $hariomzetpenjualan = OrderDetail::whereYear('tgl_disetujui', now()->year)
+            ->whereMonth('tgl_disetujui', now()->month)->whereDate('tgl_disetujui', today())
             ->get()
             ->sum('total');
         $haritotalomzet = ($hariomzetservis + $hariomzetpenjualan);
 
         $hariprofitkotorservis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereYear('tgl_ambil', now()->year)
-            ->whereMonth('tgl_ambil', now()->month)
-            ->whereDate('tgl_ambil', today())
+            ->whereYear('tgl_disetujui', now()->year)
+            ->whereMonth('tgl_disetujui', now()->month)
+            ->whereDate('tgl_disetujui', today())
             ->get()
             ->sum('profit');
-        $hariprofitkotorpenjualan = OrderDetail::whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)->whereDate('created_at', today())
+        $hariprofitkotorpenjualan = OrderDetail::whereYear('tgl_disetujui', now()->year)
+            ->whereMonth('tgl_disetujui', now()->month)->whereDate('tgl_disetujui', today())
             ->get()
             ->sum('profit');
         $haritotalprofitkotor = $hariprofitkotorservis + $hariprofitkotorpenjualan;
