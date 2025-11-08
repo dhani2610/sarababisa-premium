@@ -216,7 +216,7 @@
                                     </div>
 
                                     <div id="bonus-persen" style="display: none;">
-                                        <label class="block text-sm font-medium mb-1" for="persen">Persen</label>
+                                        <label class="block text-sm font-medium mb-1" for="persen">Nominal Persentase</label>
                                         <input id="persen" name="persen" class="form-input w-full px-2 py-1"
                                             type="number" value="{{ $item->persen }}" placeholder="Contoh: 10" />
                                     </div>
@@ -296,19 +296,23 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 function toggleBonusType() {
     const tipe = document.getElementById('tipe_bonus_admin').value;
-    console.log('====================================');
-    console.log(tipe);
-    console.log('====================================');
-    const bonusTetap = document.getElementById('bonus-tetap');
-    const bonusPersen = document.getElementById('bonus-persen');
+    const roleAkun = document.getElementById('role');
 
-    bonusTetap.style.display = 'none';
-    bonusPersen.style.display = 'none';
-
-    if (tipe === 'Tetap') {
-        bonusTetap.style.display = 'block';
-    } else if (tipe === 'Persen') {
-        bonusPersen.style.display = 'block';
+    if (roleAkun == 'Admin TOko') {
+        console.log('====================================');
+        console.log(tipe);
+        console.log('====================================');
+        const bonusTetap = document.getElementById('bonus-tetap');
+        const bonusPersen = document.getElementById('bonus-persen');
+    
+        bonusTetap.style.display = 'none';
+        bonusPersen.style.display = 'none';
+    
+        if (tipe === 'Tetap') {
+            bonusTetap.style.display = 'block';
+        } else if (tipe === 'Persen') {
+            bonusPersen.style.display = 'block';
+        }
     }
 }
 

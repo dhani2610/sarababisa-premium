@@ -213,6 +213,16 @@
                                     </select>
                                 </div>
                                 <div>
+                                    <label class="block text-sm font-medium mb-1" for="tipe">Tipe Teknisi<span
+                                            class="text-rose-500">*</span></label>
+                                    <select id="tipe" name="tipe"
+                                        class="form-select text-sm py-1 w-full">
+                                        <option selected value="">Pilih Tipe</option>
+                                        <option value="Interface" {{ $item->tipe == 'Interface' ? 'selected' : '' }}>Interface (bonus pertipe)</option>
+                                        <option value="Hardware" {{ $item->tipe == 'Hardware' ? 'selected' : '' }}>Hardware & interface (bonus persen)</option>
+                                    </select>
+                                </div>
+                                <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Modal Sparepart </label>
                                         <p class="text-xs mt-1" style="color:red">
                                             ⚠️ Jika ingin mengubah nominal, cukup ubah angkanya saja.

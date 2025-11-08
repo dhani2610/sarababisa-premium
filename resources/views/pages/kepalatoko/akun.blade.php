@@ -218,7 +218,7 @@
                                             <!-- Input persen -->
                                             <div id="bonus-persen" style="display: none;">
                                                 <label class="block text-sm font-medium mb-1" for="persen">
-                                                    Persen <span class="text-rose-500">*</span>
+                                                   Nominal Persentase <span class="text-rose-500">*</span>
                                                 </label>
                                                 <input id="persen" name="persen"
                                                     class="form-input w-full px-2 py-1" type="number"
