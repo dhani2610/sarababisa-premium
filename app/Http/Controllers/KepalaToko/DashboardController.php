@@ -75,15 +75,15 @@ class DashboardController extends Controller
 
         $totalbudgets = Budget::all()->sum('total');
 
-        $bulanprofitbersihservis = ServiceTransaction::whereYear('tgl_ambil', now()->year)
-            ->whereMonth('tgl_ambil', now()->month)
+        $bulanprofitbersihservis = ServiceTransaction::whereYear('tgl_disetujui', now()->year)
+            ->whereMonth('tgl_disetujui', now()->month)
             ->where('is_approve', 'Setuju')
             ->get()
             ->sum('profittoko');
 
         $profitpenjualan = Order::whereHas('detailOrders', function ($query) {
-            $query->whereYear('created_at', now()->year)
-                ->whereMonth('created_at', now()->month)
+            $query->whereYear('tgl_disetujui', now()->year)
+                ->whereMonth('tgl_disetujui', now()->month)
                 ->where('is_approve', 'Setuju');
         })
             ->with(['detailOrders' => function ($query) {
@@ -99,15 +99,15 @@ class DashboardController extends Controller
 
         $bulantotalprofitbersih = ($bulanprofitbersihservis + $bulanprofitbersihpenjualan);
 
-        $bulanprofitkotorservis = ServiceTransaction::whereYear('tgl_ambil', now()->year)
-            ->whereMonth('tgl_ambil', now()->month)
+        $bulanprofitkotorservis = ServiceTransaction::whereYear('tgl_disetujui', now()->year)
+            ->whereMonth('tgl_disetujui', now()->month)
             ->where('is_approve', 'Setuju')
             ->get()
             ->sum('profit');
 
         $rumusprofitkotorpenjualan = Order::whereHas('detailOrders', function ($query) {
-            $query->whereYear('created_at', now()->year)
-                ->whereMonth('created_at', now()->month);
+            $query->whereYear('tgl_disetujui', now()->year)
+                ->whereMonth('tgl_disetujui', now()->month);
         })
             ->with(['detailOrders' => function ($query) {
                 $query->select('orders_id', DB::raw('SUM(profit) as total_profit'))
