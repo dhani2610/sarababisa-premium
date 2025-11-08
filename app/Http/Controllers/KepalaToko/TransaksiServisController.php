@@ -300,10 +300,7 @@ class TransaksiServisController extends Controller
             </div>
             ';
 
-            $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
-            $hariIni = \Carbon\Carbon::today();
-            $tokoSetting = \App\Models\StoreSetting::find(1);
-            if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
+           
                 // Konfirmasi -> ubah status jadi Bisa Diambil
                 $html .= '
                     <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
@@ -319,7 +316,6 @@ class TransaksiServisController extends Controller
                         </a>
                     </div>
                 ';
-            }
 
             // Printer modal
             $html .= '
@@ -364,7 +360,6 @@ class TransaksiServisController extends Controller
             </div>
             ';
 
-            if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
                 // Delete modal
                 $html .= '
                 <div x-data="{ deleteOpen: false }">
@@ -403,7 +398,6 @@ class TransaksiServisController extends Controller
                     </div>
                 </div>
                 ';
-            }
 
             $html .= '</div>';
             return $html;
