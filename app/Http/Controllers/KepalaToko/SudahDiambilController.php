@@ -324,7 +324,7 @@ class SudahDiambilController extends Controller
                         </svg>
                     </button>
 
-                    <div style="'.$styleHide.'" class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                    <div  class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                         <a href="'.$showRoute.'">
                             <button class="text-slate-400 hover:text-slate-500 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#000" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
@@ -391,7 +391,7 @@ class SudahDiambilController extends Controller
                         </div>
                     </div>
 
-                    <button style="'.$styleHide.'" x-data x-on:click="$dispatch(\'open-delete\', { id: '.$row->id.' })"
+                    <button  x-data x-on:click="$dispatch(\'open-delete\', { id: '.$row->id.' })"
                             class="text-rose-500 hover:text-rose-600 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#ff2825" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -925,7 +925,7 @@ class SudahDiambilController extends Controller
         ]);
 
         return redirect()->route('transaksi-servis-sudah-diambil.index');
-    }
+    }  
 
     public function cetakinkjet($id)
     {
