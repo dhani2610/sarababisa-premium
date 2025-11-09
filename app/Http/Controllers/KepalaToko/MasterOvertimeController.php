@@ -47,7 +47,7 @@ class MasterOvertimeController extends Controller
             'status' => 'pending',
         ]);
 
-        toast('Data Overtime berhasil disimpan.', 'success');
+        toast('Data Lembur berhasil disimpan.', 'success');
         return back();
     }
 
@@ -77,14 +77,14 @@ class MasterOvertimeController extends Controller
             'keterangan' => $request->keterangan,
         ]);
 
-        toast('Data Overtime berhasil diupdate.', 'success');
+        toast('Data Lembur berhasil diupdate.', 'success');
         return back();
     }
 
     public function destroy($id)
     {
         Overtime::findOrFail($id)->delete();
-        toast('Data Overtime berhasil dihapus.', 'success');
+        toast('Data Lembur berhasil dihapus.', 'success');
         return back();
     }
 

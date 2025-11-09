@@ -28,9 +28,9 @@
 
 
     <div class="flex justify-between mb-4">
-        <h1 class="text-2xl font-bold text-slate-800">Data Overtime ✨</h1>
+        <h1 class="text-2xl font-bold text-slate-800">Data Lembur ✨</h1>
         <button @click="modalOpen = true" class="btn bg-indigo-500 hover:bg-indigo-600 text-white">
-            + Tambah Overtime
+            + Tambah Lembur
         </button>
     </div>
     {{-- <!-- Filter Range & Export -->
@@ -95,7 +95,7 @@
     @if (Auth::user()->role == 'Kepala Toko')
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div class="bg-white border rounded-lg shadow p-4">
-                <h3 class="text-sm text-slate-500">Overtime Hari Ini</h3>
+                <h3 class="text-sm text-slate-500">Lembur Hari Ini</h3>
                 <div class="text-xl font-bold">{{ $stats['hariIni']['total'] }} Kali</div>
             </div>
             <div class="bg-white border rounded-lg shadow p-4">
@@ -104,7 +104,7 @@
                 </div>
             </div>
             <div class="bg-white border rounded-lg shadow p-4">
-                <h3 class="text-sm text-slate-500">Overtime Bulan Ini</h3>
+                <h3 class="text-sm text-slate-500">Lembur Bulan Ini</h3>
                 <div class="text-xl font-bold">{{ $stats['bulanIni']['total'] }} Kali</div>
             </div>
             <div class="bg-white border rounded-lg shadow p-4">
@@ -209,7 +209,7 @@
     <div x-show="modalOpen" x-cloak
         class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
         <div class="bg-white rounded-lg p-6 w-full max-w-lg">
-            <h2 class="text-lg font-semibold mb-4">Tambah Overtime</h2>
+            <h2 class="text-lg font-semibold mb-4">Tambah Lembur</h2>
             <form method="POST" action="{{ route('master-overtime.store') }}">
                 @csrf
                 <div class="space-y-3">
@@ -236,7 +236,7 @@
     <div x-show="editModal" x-cloak
         class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
         <div class="bg-white rounded-lg p-6 w-full max-w-lg">
-            <h2 class="text-lg font-semibold mb-4">Edit Overtime</h2>
+            <h2 class="text-lg font-semibold mb-4">Edit Lembur</h2>
             <form x-bind:action="'{{ url('master/master-overtime') }}/' + editData.id" method="POST">
                 @csrf @method('PUT')
                 <div class="space-y-3">
