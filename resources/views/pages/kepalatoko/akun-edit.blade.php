@@ -130,7 +130,7 @@
                                             class="form-select text-sm py-1 w-full">
                                             <option value="">Pilih</option>
                                             <option value="Teknisi Interface"
-                                                {{ $item->bagian_teknisi == 'Teknisi Interface' ? 'selected' : '' }}>Nominal
+                                                {{ $item->bagian_teknisi == 'Teknisi Interface' ? 'selected' : '' }}>Nominal Pertipe
                                             </option>
                                             <option value="Teknisi Hardware"
                                                 {{ $item->bagian_teknisi == 'Teknisi Hardware' ? 'selected' : '' }}>
@@ -296,9 +296,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 function toggleBonusType() {
     const tipe = document.getElementById('tipe_bonus_admin').value;
-    const roleAkun = document.getElementById('role');
-
-    if (roleAkun == 'Admin TOko') {
+    const roleAkun = document.getElementById('role').value;
+    console.log(roleAkun);
+    
+    if (roleAkun == 'Admin Toko') {
         console.log('====================================');
         console.log(tipe);
         console.log('====================================');

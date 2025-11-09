@@ -133,7 +133,7 @@
                                                 <select id="bagian_teknisi" name="bagian_teknisi"
                                                     class="form-select text-sm py-1 w-full">
                                                     <option value="">Pilih</option>
-                                                    <option value="Teknisi Interface">Nominal</option>
+                                                    <option value="Teknisi Interface">Nominal Pertipe</option>
                                                     <option value="Teknisi Hardware">Persentase</option>
                                                 </select>
                                             </div>
@@ -345,14 +345,17 @@ function toggleBonusType() {
     const tipe = document.getElementById('tipe_bonus_admin').value;
     const bonusTetap = document.getElementById('bonus-tetap');
     const bonusPersen = document.getElementById('bonus-persen');
+    const roleAkun = document.getElementById('role').value;
 
     bonusTetap.style.display = 'none';
     bonusPersen.style.display = 'none';
 
-    if (tipe === 'Tetap') {
-        bonusTetap.style.display = 'block';
-    } else if (tipe === 'Persen') {
-        bonusPersen.style.display = 'block';
+    if (roleAkun == 'Admin Toko') {
+        if (tipe === 'Tetap') {
+            bonusTetap.style.display = 'block';
+        } else if (tipe === 'Persen') {
+            bonusPersen.style.display = 'block';
+        }
     }
 }
 
