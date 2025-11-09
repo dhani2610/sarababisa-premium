@@ -543,7 +543,6 @@ class SudahDiambilController extends Controller
             });
         })->where('stok', '>=', 1)->get();
         $sales = User::where('role', 'Sales')->get();
-
         return view('pages.kepalatoko.servis.sudah-diambil-edit', [
             'item' => $item,
             'types' => $types,
@@ -881,6 +880,22 @@ class SudahDiambilController extends Controller
         foreach ($garansiList as $val) {
             $expired[] = Carbon::now()->addDays($val);
         }
+
+        $cekTeknisi = User::find($request->users_id);
+        if ($cekTeknisi->bagian_teknisi == 'Teknisi Interface') {
+            if ($request->tipe == 'Interface') {
+                if (!empty($nama_model)) {
+                    $bonus_interface = $nama_model->nominal_bonus;
+                }else{
+                $bonus_interface = 0;
+                }
+            }else{
+                $bonus_interface = 0;
+            }
+        }else{
+            $bonus_interface = 0;
+        }
+
         // Transaction create
         $item->update([
             'created_at' => $request->created_at,
@@ -892,6 +907,8 @@ class SudahDiambilController extends Controller
             'types_id' => $request->types_id,
             'brands_id' => $request->brands_id,
             'model_series_id' => $request->model_series_id,
+            'bonus_interface' => $bonus_interface,
+            'tipe' => $request->tipe,
             'nama_barang' => $nama_barang,
             'kerusakan' => $request->kerusakan,
             'qc_masuk' => $request->qc_masuk,

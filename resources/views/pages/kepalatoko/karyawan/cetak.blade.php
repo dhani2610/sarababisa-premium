@@ -129,7 +129,7 @@
 			</tr>
 			@endforeach
 			<tr>
-				<td>Overtime</td>
+				<td>Lembur</td>
 				<td class="text-right">Rp. {{ number_format($overtime) }}</td>
 			</tr>
 		</tbody>
