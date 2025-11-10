@@ -347,16 +347,25 @@
                 message: decodeURIComponent(message)
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === true || data.success) {
+        .then(async response => {
+            const data = await response.json().catch(() => ({}));
+
+            console.log("🔍 Response status:", response.status);
+            console.log("📦 Response data:", data);
+
+            if (response.ok && (data.status === true || data.success)) {
                 alert('✅ Pesan berhasil dikirim ke Pelanggan!');
             } else {
-                alert('⚠️ Gagal mengirim ke Pelanggan. Coba lagi.');
+                console.error("❌ Gagal mengirim pesan. Detail error:", data);
+                alert('⚠️ Gagal mengirim ke Pelanggan. Lihat console log untuk detail.');
             }
         })
-        .catch(() => alert('❌ Terjadi kesalahan saat mengirim ke Fontee.'));
+        .catch(error => {
+            console.error("🚨 Terjadi kesalahan koneksi ke Fonnte:", error);
+            alert('❌ Terjadi kesalahan saat mengirim ke Fontee.');
+        });
     }
     </script>
+
 
 </x-toko-layout>
