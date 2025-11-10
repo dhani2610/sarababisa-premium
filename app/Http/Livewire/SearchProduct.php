@@ -57,10 +57,30 @@ class SearchProduct extends Component
     }
 
 
+    public $customer_tipe = null; // default user
+
+    protected $listeners = ['updateCustomerType' => 'setCustomerType'];
+
+    public function setCustomerType($tipe)
+    {
+        $this->customer_tipe = $tipe;
+    }
+
     public function selectProduct($product)
     {
-        $this->emit('productSelected', $product);
+        if ($this->customer_tipe !== null) {
+            $product['customer_tipe'] = $this->customer_tipe;
+            $this->emit('productSelected', $product);
+        } else {
+            $this->alert('error', 'Pilih pelanggan terlebih dahulu!');
+        }
     }
+
+
+    // public function selectProduct($product)
+    // {
+    //     $this->emit('productSelected', $product);
+    // }
 
     public function getCategoriesProperty()
     {

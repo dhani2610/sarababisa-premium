@@ -27,7 +27,7 @@ class Index extends Component
     /** @var array<string> */
     public $listeners = [
         'refreshIndex' => '$refresh',
-        'refreshCustomers',
+        'refreshCustomers','updatedCustomerId'
     ];
 
     public $cart_instance;
@@ -83,6 +83,19 @@ class Index extends Component
     public $tunai = 0;
     public $transfer = 0;
 
+    public $customer_tipe;
+
+    public function updatedCustomerId($value)
+    {
+        $customer = Customer::find($value);
+
+        if ($customer) {
+            $this->customer_tipe = $customer->kategori;
+
+            // kirim event ke SearchProduct
+            $this->emit('updateCustomerType', $customer->kategori);
+        }
+    }
     public function rules(): array
     {
         return [
@@ -111,10 +124,7 @@ class Index extends Component
         $this->customers = Customer::all();
     }
 
-    public function updatedCustomerId($value)
-    {
-        $this->customer_id = $value;
-    }
+
 
     public function updatedPaymentMethod($value): void
     {

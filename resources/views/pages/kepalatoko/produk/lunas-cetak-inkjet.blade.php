@@ -88,13 +88,13 @@
 		}
 		return $temp;
 	}
- 
+
 	function terbilang($nilai) {
 		if($nilai<0) {
 			$hasil = "minus ". trim(penyebut($nilai));
 		} else {
 			$hasil = trim(penyebut($nilai));
-		}     		
+		}
 		return $hasil;
 	}
 	@endphp
@@ -232,7 +232,11 @@
             <td align="center">Rp. {{ number_format($item->product_discount_amount) }}</td>
         @endif
         {{-- Subtotal per item sudah termasuk pajak --}}
+        @if ($item->product_discount_amount <= 0)
         <td align="center">Rp. {{ number_format($item->sub_total) }}</td>
+        @else
+        <td align="center">Rp. {{ number_format($item->sub_total - $item->product_discount_amount) }}</td>
+        @endif
         @if ($toko->is_tax === 1)
           <td align="center">
             @if ($item->ppn > 0)

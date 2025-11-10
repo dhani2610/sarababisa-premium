@@ -5,7 +5,8 @@
 
         <div class="flex gap-4">
             <div class="w-full relative inline-flex">
-                <select id="customer_id" name="customer_id" wire:model="customer_id" class="form-select text-sm block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md">
+                <select id="customer_id" name="customer_id" wire:model="customer_id"
+                     class="form-select text-sm block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md">
                     <option value="">Pilih Pelanggan</option>
                     @foreach ($customers as $customer)
                         <option value="{{ $customer->id }}">{{ $customer->nama }} ({{ $customer->nomor_hp }})</option>
@@ -37,7 +38,7 @@
             aria-hidden="true"
             x-cloak
         ></div>
-        
+
         <div
             id="checkout-modal"
             class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
