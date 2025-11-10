@@ -158,6 +158,7 @@ use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTra
 use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as KepalaTokoServisBelumDisetujuiApproveController;
 use App\Http\Controllers\TipeOsController;
 use App\Http\Controllers\KepalaToko\MasterIzinController;
+use App\Http\Controllers\KepalaToko\MasterOvertimeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -256,6 +257,19 @@ Route::post('/history-garansi/bulk-delete', [HistoryGaransiController::class, 'b
 Route::delete('/master/master-izin/delete-selected', [MasterIzinController::class, 'deleteSelected'])
     ->name('master-izin.deleteSelected');
 Route::resource('master/master-izin', MasterIzinController::class);
+
+Route::post('master-overtime/{id}/approve', [\App\Http\Controllers\KepalaToko\MasterOvertimeController::class, 'approve'])->name('master-overtime.approve');
+
+Route::delete('master/master-overtime/delete-selected', [MasterOvertimeController::class, 'deleteSelected'])
+    ->name('master-overtime.deleteSelected');
+
+Route::post('master/master-overtime/approve-selected', [MasterOvertimeController::class, 'approveSelected'])
+    ->name('master-overtime.approveSelected');
+
+Route::post('master/master-overtime/reject-selected', [MasterOvertimeController::class, 'rejectSelected'])
+    ->name('master-overtime.rejectSelected');
+
+Route::resource('master/master-overtime', MasterOvertimeController::class);
 
 
 // Livewire page (index)

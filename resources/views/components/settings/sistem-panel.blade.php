@@ -15,6 +15,7 @@
             <livewire:toggle-telegram-bot />
             <livewire:toggle-absensi-setting />
             <livewire:toggle-potongan-izin />
+            <livewire:toggle-setting-overtime />
         </div>
 
         <!-- Panel footer -->

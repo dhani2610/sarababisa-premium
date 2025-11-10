@@ -15,8 +15,8 @@ class AkunController extends Controller
     public function index()
     {
         $types = Type::all();
-        $users = User::with('type')->paginate(10);
-        $users_count = User::all()->count();
+        $users = User::whereNull('deleted_at')->with('type')->paginate(10);
+        $users_count = User::whereNull('deleted_at')->get()->count();
         $workers = Worker::all();
         return view('pages/kepalatoko/akun', compact('users', 'users_count', 'types', 'workers'));
     }
@@ -36,7 +36,17 @@ class AkunController extends Controller
             return response()->json(['message' => 'Data Akun yang memiliki riwayat transaksi tidak bisa dihapus.']);
         }
 
-        User::whereIn('id', $selectedIds)->delete();
+        $usr = User::whereIn('id', $selectedIds)->get();
+
+        foreach ($usr as $key => $value) {
+            $item = User::findOrFail($value->id);
+            if (!empty($item)) {
+                $item->deleted_at = date('Y-m-d H:i:s');
+                $item->save();
+            }
+        }
+
+        // User::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data Akun berhasil dihapus.']);
     }
 
@@ -222,7 +232,8 @@ class AkunController extends Controller
     {
         $item = User::findOrFail($id);
 
-        $item->delete();
+        $item->deleted_at = date('Y-m-d H:i:s');
+        $item->save();
 
         toast('Data Akun berhasil dihapus.', 'success');
 

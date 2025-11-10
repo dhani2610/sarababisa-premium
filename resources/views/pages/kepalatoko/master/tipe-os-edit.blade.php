@@ -73,10 +73,11 @@ Edit Tipe OS
                                         <label class="block text-sm font-medium mb-1" for="name">Tipe OS <span class="text-rose-500">*</span></label>
                                         <input id="name" name="nama" value="{{ $item->nama }}" class="form-input w-full px-2 py-1" type="text" required />
                                     </div>
-                                    <div>
+                                    {{-- <div>
                                         <label class="block text-sm font-medium mb-1" for="name">Nominal Bonus <span class="text-rose-500">*</span></label>
                                         <input id="name" name="nominal_bonus" value="{{ $item->nominal_bonus }}" class="form-input w-full px-2 py-1" type="number" required />
-                                    </div>
+                                    </div> --}}
+                                    <input id=" " name="nominal_bonus" value="{{ $item->nominal_bonus }}" class="form-input w-full px-2 py-1" type="hidden" required />
                                 </div>
                             </div>
                         </div>

@@ -15,6 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\KepalaToko\WorkerRequest;
 use App\Models\Incident;
+use App\Models\Overtime;
 
 class KaryawanController extends Controller
 {
@@ -130,9 +131,12 @@ class KaryawanController extends Controller
 
         $izin = Izin::where('user_id',$user->id)->whereYear('tanggal', $date->year)
         ->whereMonth('tanggal', $date->month)->get()->sum('nominal_potongan');
+        $overtime = Overtime::where('id_user',$user->id)->whereYear('tanggal', $date->year)
+        ->whereMonth('tanggal', $date->month)->get()->sum('nominal_overtime');
 
         $pdf = PDF::loadView('pages.kepalatoko.karyawan.cetak', [
         // return View('pages.kepalatoko.karyawan.cetak', [
+            'overtime' => $overtime,
             'izin' => $izin,
             'tanggal' => $tanggal,
             'periode' => $periode,

@@ -71,10 +71,11 @@
                                         <label class="block text-sm font-medium mb-1" for="name">Tipe OS <span class="text-rose-500">*</span></label>
                                         <input id="name" name="nama" class="form-input w-full px-2 py-1" type="text" required />
                                     </div>
-                                    <div>
+                                    {{-- <div>
                                         <label class="block text-sm font-medium mb-1" for="name">Nominal Bonus <span class="text-rose-500">*</span></label>
                                         <input id="name" name="nominal_bonus" class="form-input w-full px-2 py-1" type="number" required />
-                                    </div>
+                                    </div> --}}
+                                    <input id="name" name="nominal_bonus" class="form-input w-full px-2 py-1" type="hidden" value="0" required />
                                 </div>
                             </div>
                             <!-- Modal footer -->
@@ -163,9 +164,9 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Tipe OS</div>
                             </th>
-                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            {{-- <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Nominal Bonus</div>
-                            </th>
+                            </th> --}}
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Aksi</div>
                             </th>
@@ -193,9 +194,9 @@
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $item->nama }}</div>
                                 </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                {{-- <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">Rp. {{ number_format($item->nominal_bonus) }}</div>
-                                </td>
+                                </td> --}}
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="space-x-1 flex">
                                         <a href="{{ route('master-tipe-os.edit', $item->id) }}">

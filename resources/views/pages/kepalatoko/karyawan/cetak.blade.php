@@ -128,6 +128,10 @@
 			<td class="text-right">Rp. {{ number_format($item->bonus) }}</td>
 			</tr>
 			@endforeach
+			<tr>
+				<td>Lembur</td>
+				<td class="text-right">Rp. {{ number_format($overtime) }}</td>
+			</tr>
 		</tbody>
 	</table>
 
@@ -135,7 +139,7 @@
 		<thead>
 			<tr>
 			<th scope="col">Total Penghasilan Bruto</th>
-			<th scope="col" class="text-right text-primary">Rp. {{ number_format($items->gaji + $items->absen + $items->bpjs + $bonus) }}</th>
+			<th scope="col" class="text-right text-primary">Rp. {{ number_format($items->gaji + $items->absen + $items->bpjs + $bonus + $overtime) }}</th>
 			</tr>
 		</thead>
 	</table>
@@ -195,7 +199,7 @@
 		<thead>
 			<tr>
 			<th scope="col">TOTAL DITERIMA KARYAWAN</th>
-			<th scope="col" class="text-right text-success">Rp. {{ number_format($items->gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal') - $izin) }}</th>
+			<th scope="col" class="text-right text-success">Rp. {{ number_format($items->gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal') - $izin + $overtime) }}</th>
 			</tr>
 		</thead>
 	</table>

@@ -133,8 +133,8 @@
                                                 <select id="bagian_teknisi" name="bagian_teknisi"
                                                     class="form-select text-sm py-1 w-full">
                                                     <option value="">Pilih</option>
-                                                    <option value="Teknisi Interface">Ya</option>
-                                                    <option value="Teknisi Hardware">Tidak</option>
+                                                    <option value="Teknisi Interface">Nominal Pertipe</option>
+                                                    <option value="Teknisi Hardware">Persentase</option>
                                                 </select>
                                             </div>
                                             <br>
@@ -218,7 +218,7 @@
                                             <!-- Input persen -->
                                             <div id="bonus-persen" style="display: none;">
                                                 <label class="block text-sm font-medium mb-1" for="persen">
-                                                    Persen <span class="text-rose-500">*</span>
+                                                   Bonus Hardware Persentase <span class="text-rose-500">*</span>
                                                 </label>
                                                 <input id="persen" name="persen"
                                                     class="form-input w-full px-2 py-1" type="number"
@@ -345,14 +345,17 @@ function toggleBonusType() {
     const tipe = document.getElementById('tipe_bonus_admin').value;
     const bonusTetap = document.getElementById('bonus-tetap');
     const bonusPersen = document.getElementById('bonus-persen');
+    const roleAkun = document.getElementById('role').value;
 
     bonusTetap.style.display = 'none';
     bonusPersen.style.display = 'none';
 
-    if (tipe === 'Tetap') {
-        bonusTetap.style.display = 'block';
-    } else if (tipe === 'Persen') {
-        bonusPersen.style.display = 'block';
+    if (roleAkun == 'Admin Toko') {
+        if (tipe === 'Tetap') {
+            bonusTetap.style.display = 'block';
+        } else if (tipe === 'Persen') {
+            bonusPersen.style.display = 'block';
+        }
     }
 }
 
