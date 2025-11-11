@@ -116,8 +116,11 @@
                                                         Rp. {{ number_format($item->price) }}
                                                     </td>
                                                     <td>
-                                                        Rp. {{ number_format($item->sub_total) }}
+                                                        Rp. {{ number_format($item->price * $item->quantity) }}
                                                     </td>
+                                                    {{-- <td>
+                                                        Rp. {{ number_format($item->sub_total) }}
+                                                    </td> --}}
                                                     @if ($toko->is_tax === 1)
                                                         <td>Rp. {{ number_format($item->ppn) }}</td>
                                                     @endif

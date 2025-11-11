@@ -105,8 +105,8 @@ class TransaksiProdukController extends Controller
         $invoiceNumber = $order->invoice_no;
         $namaPelanggan = $order->customer->nama;
 
-        // $pdf = PDF::loadView('pages.kepalatoko.produk.cetak-termal', [
-        return View('pages.kepalatoko.produk.cetak-termal', [
+        $pdf = PDF::loadView('pages.kepalatoko.produk.cetak-termal', [
+        // return View('pages.kepalatoko.produk.cetak-termal', [
             'order' => $order,
             'users' => $users,
             'orderItem' => $orderItem,
