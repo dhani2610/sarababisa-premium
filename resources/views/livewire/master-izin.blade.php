@@ -29,7 +29,7 @@
                 <div>
                     <button type="button" class="btn bg-slate-500 hover:bg-slate-600 text-white"
                         @click="$dispatch('open-filter-modal')">
-                        <i class="fa fa-filter mr-2"></i>Filter \ Export 
+                        <i class="fa fa-filter mr-2"></i>Filter \ Export
                     </button>
 
                     <!-- Modal Filter -->
@@ -259,6 +259,7 @@
                             <select name="tipe" class="form-select w-full" required>
                                 <option value="izin">Izin</option>
                                 <option value="sakit">Sakit</option>
+                                <option value="cuti">Cuti</option>
                                 <option value="alfa">Alfa</option>
                             </select>
                         </div>
@@ -344,6 +345,8 @@
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Dokumen
                             </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Status
+                            </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -379,6 +382,15 @@
                                         </a>
                                     @else
                                         <span class="text-slate-400">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
+                                    @if ($izin->status  == 1)
+                                        DiSetujui
+                                    @elseif ($izin->status == 0)
+                                        Pending
+                                    @elseif ($izin->status == 2)
+                                        Ditolak
                                     @endif
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
@@ -432,6 +444,7 @@
                             <select name="tipe" class="form-select w-full" x-model="editData.tipe" required>
                                 <option value="izin">Izin</option>
                                 <option value="sakit">Sakit</option>
+                                <option value="cuti">Cuti</option>
                                 <option value="alfa">Alfa</option>
                             </select>
                         </div>
@@ -455,6 +468,15 @@
                             <label class="block text-sm font-medium mb-1">Nominal Potongan</label>
                             <input type="text" name="nominal_potongan" class="form-input w-full sapator"
                                 x-model="editData.nominal_potongan">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Status</label>
+                            <select name="status" class="form-select w-full" x-model="editData.tipe" required>
+                                <option value="1">Disetujui</option>
+                                <option value="0">Pending</option>
+                                <option value="2">Ditolak</option>
+                            </select>
                         </div>
                         @else
                         <input type="hidden" name="nominal_potongan" x-model="editData.nominal_potongan">

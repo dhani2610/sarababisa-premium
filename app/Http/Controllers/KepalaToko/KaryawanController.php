@@ -129,7 +129,7 @@ class KaryawanController extends Controller
         $totalPotonganServis = $potonganServis;
         $namaKaryawan = $items->name;
 
-        $izin = Izin::where('user_id',$user->id)->whereYear('tanggal', $date->year)
+        $izin = Izin::where('status',1)->where('user_id',$user->id)->whereYear('tanggal', $date->year)
         ->whereMonth('tanggal', $date->month)->get()->sum('nominal_potongan');
         $overtime = Overtime::where('id_user',$user->id)->whereYear('tanggal', $date->year)
         ->whereMonth('tanggal', $date->month)->get()->sum('nominal_overtime');
