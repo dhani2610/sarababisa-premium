@@ -352,6 +352,11 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::get('refund/service/{id}', [RefundController::class, 'serviceDetail'])->name('refund.serviceDetail');
     Route::get('/refund-cetak', [RefundController::class, 'cetak'])->name('refunds.cetak');
 
+
+    Route::resource('shift', \App\Http\Controllers\KepalaToko\ShiftController::class)->names('shift');
+    Route::post('shift/delete-selected', [\App\Http\Controllers\KepalaToko\ShiftController::class, 'deleteSelected'])->name('shift.deleteSelected');
+
+
     Route::resource('master/master-merek', KepalaTokoMasterMerekController::class);
     Route::resource('master/master-kapasitas', KepalaTokoMasterKapasitasController::class);
     Route::resource('master/master-model-seri', KepalaTokoMasterModelSeriController::class);

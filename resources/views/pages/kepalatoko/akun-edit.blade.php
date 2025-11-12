@@ -96,6 +96,16 @@
                                     <textarea id="alamat" name="alamat" class="form-textarea w-full px-2 py-1" rows="4">{{ $item->alamat }}</textarea>
                                 </div>
                                 <div>
+                                    <label class="block text-sm font-medium mb-1" for="shift_id">Shift <span
+                                            class="text-rose-500">*</span></label>
+                                    <select id="shift_id" name="shift_id"
+                                        class="form-select text-sm py-1 w-full" required>
+                                        @foreach ($shift as $its)
+                                            <option value="{{ $its->id }}" {{ $item->shift_id == $its->id ? 'selected' : '' }}>{{ $its->nama_shift }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
                                     <label class="block text-sm font-medium mb-1" for="role">Role</label>
                                     <select id="role" name="role" class="form-select text-sm py-2 w-full">
                                         <option value="Kepala Toko" {{ $item->role == 'Kepala Toko' ? 'selected' : '' }}>Kepala Toko</option>
