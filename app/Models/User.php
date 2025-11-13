@@ -61,6 +61,7 @@ class User extends Authenticatable
         'foto_login',
         'tipe_bonus_admin',
         'nominal_bonus_admin',
+        'shift_id',
     ];
 
     /**
@@ -173,6 +174,10 @@ class User extends Authenticatable
     public function worker()
     {
         return $this->belongsTo(Worker::class, 'workers_id', 'id');
+    }
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class, 'shift_id', 'id');
     }
 
     public function adminservice()
