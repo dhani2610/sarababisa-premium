@@ -300,7 +300,7 @@ class TransaksiServisController extends Controller
             </div>
             ';
 
-           
+
                 // Konfirmasi -> ubah status jadi Bisa Diambil
                 $html .= '
                     <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">

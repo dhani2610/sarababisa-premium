@@ -238,6 +238,7 @@ class TransaksiServisLangsungController extends Controller
         // Transaction create
         $transaksi = ServiceTransaction::create([
             'nomor_servis' => $nomor_servis,
+            'nomor_servis' => $nomor_servis,
             'customers_id' => $request->customers_id,
             'nama_pelanggan' => $nama_pelanggan->nama,
             'types_id' => $request->types_id,
