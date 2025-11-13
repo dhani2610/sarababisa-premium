@@ -7,16 +7,16 @@
                 <button wire:click="resetQuery" type="button">X</button>
             </div>
         </div>
-        
+
         <div class="flex flex-wrap -mx-2 mb-3">
-       
-            
+
+
             <div class="lg:w-1/2 md:w-1/2 sm:w-1/2 px-2 mb-2">
                 <label class="block text-sm font-medium mb-1">Scan Barcode</label>
-                <input type="text" 
-                    id="barcode_input" 
+                <input type="text"
+                    id="barcode_input"
                     wire:model="barcode"
-                    placeholder="Scan Barcode di sini..." 
+                    placeholder="Scan Barcode di sini..."
                     autofocus
                     class="form-input w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
             </div>
@@ -41,8 +41,8 @@
         </div>
     </div>
 
-    
-    
+
+
     <div class="w-full px-2 mb-4 bg-white">
         <div class="flex flex-wrap w-full">
             <div
@@ -62,7 +62,11 @@
                                 @endif
                             </h6>
                             <p class="mb-0 text-center font-bold">
-                                 Rp. {{ number_format($product->harga_jual) }}
+                                @if ($customer_tipe === 'Toko')
+                                    Rp. {{ number_format($product->harga_jual_toko) }}
+                                @else
+                                    Rp. {{ number_format($product->harga_jual) }}
+                                @endif
                             </p>
                         </div>
                         <span

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\KepalaToko\UserRequest;
+use App\Models\Shift;
 
 class AkunController extends Controller
 {
@@ -18,7 +19,8 @@ class AkunController extends Controller
         $users = User::whereNull('deleted_at')->with('type')->paginate(10);
         $users_count = User::whereNull('deleted_at')->get()->count();
         $workers = Worker::all();
-        return view('pages/kepalatoko/akun', compact('users', 'users_count', 'types', 'workers'));
+        $shift = Shift::get();
+        return view('pages/kepalatoko/akun', compact('users', 'users_count', 'types', 'workers','shift'));
     }
 
     public function deleteSelected(Request $request)
@@ -79,13 +81,15 @@ class AkunController extends Controller
         $users = User::paginate(10);
         $users_count = User::all()->count();
         $workers = Worker::all();
+        $shift = Shift::get();
 
         return view('pages.kepalatoko.akun-edit', [
             'types' => $types,
             'item' => $item,
             'users' => $users,
             'workers' => $workers,
-            'users_count' => $users_count
+            'users_count' => $users_count,
+            'shift' => $shift
         ]);
     }
     public function setting()
@@ -176,6 +180,7 @@ class AkunController extends Controller
             'persen' => $request->persen,
             'tipe_bonus_admin' => $request->tipe_bonus_admin,
             'nominal_bonus_admin' => $request->nominal_bonus_admin,
+            'shift_id' => $request->shift_id,
             'exp_date' => $langganan,
         ];
 
@@ -214,6 +219,7 @@ class AkunController extends Controller
             'persen' => $request->persen,
             'tipe_bonus_admin' => $request->tipe_bonus_admin,
             'nominal_bonus_admin' => $request->nominal_bonus_admin,
+            'shift_id' => $request->shift_id,
             'exp_date' => $langganan,
         ];
 

@@ -307,7 +307,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::delete('/akun/{id}', [KepalaTokoAkunController::class, 'destroy'])->name('akun-destroy');
     Route::delete('/accounts/delete', [KepalaTokoAkunController::class, 'deleteSelected']);
     Route::post('/servis/transaksi-servis-langsung', [KepalaTokoTransaksiServisLangsungController::class, 'store'])->name('servis-langsung');
-    Route::resource('servis/tindakan-servis', KepalaTokoTindakanServisController::class);
+    // Route::resource('servis/tindakan-servis', KepalaTokoTindakanServisController::class);
     Route::resource('pelanggan', KepalaTokoPelangganController::class);
     Route::post('pelanggan-broadcast', [KepalaTokoPelangganController::class,'broadcast'])->name('pelanggan.broadcast');
 
@@ -351,6 +351,11 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('refund/delete-selected', [RefundController::class, 'deleteSelected'])->name('refund.deleteSelected');
     Route::get('refund/service/{id}', [RefundController::class, 'serviceDetail'])->name('refund.serviceDetail');
     Route::get('/refund-cetak', [RefundController::class, 'cetak'])->name('refunds.cetak');
+
+
+    Route::resource('shift', \App\Http\Controllers\KepalaToko\ShiftController::class)->names('shift');
+    Route::post('shift/delete-selected', [\App\Http\Controllers\KepalaToko\ShiftController::class, 'deleteSelected'])->name('shift.deleteSelected');
+
 
     Route::resource('master/master-merek', KepalaTokoMasterMerekController::class);
     Route::resource('master/master-kapasitas', KepalaTokoMasterKapasitasController::class);

@@ -102,14 +102,39 @@ class ProductCart extends Component
         return $this->calculatePrices($product);
     }
 
+    // private function calculatePrices($product)
+    // {
+    //     $price = $product['harga_jual'];
+    //     $unit_price = $price;
+    //     $sub_total = $price;
+
+    //     return ['price' => $price, 'unit_price' => $unit_price, 'sub_total' => $sub_total];
+    // }
     private function calculatePrices($product)
     {
-        $price = $product['harga_jual'];
-        $unit_price = $price;
-        $sub_total = $price;
+        $kategori = $product['customer_tipe'] ?? ($this->data->tipe ?? 'User');
 
-        return ['price' => $price, 'unit_price' => $unit_price, 'sub_total' => $sub_total];
+        switch ($kategori) {
+            case 'Toko':
+                $price = $product['harga_jual_toko'] ?? $product['harga_jual'];
+                break;
+            case 'Distributor':
+                $price = $product['harga_jual_distributor'] ?? $product['harga_jual'];
+                break;
+            default:
+                $price = $product['harga_jual'];
+        }
+
+        $unit_price = $price;
+        $sub_total  = $price;
+
+        return [
+            'price'      => $price,
+            'unit_price' => $unit_price,
+            'sub_total'  => $sub_total,
+        ];
     }
+
 
     private function updateQuantityAndCheckQuantity($productId, $quantity)
     {
@@ -121,11 +146,24 @@ class ProductCart extends Component
     {
         $calculation = $this->calculate($product);
 
+        $kategori = $product['customer_tipe'] ?? ($this->data->tipe ?? 'User');
+
+        switch ($kategori) {
+            case 'Toko':
+                $price = $product['harga_jual_toko'] ?? $product['harga_jual'];
+                break;
+            case 'Distributor':
+                $price = $product['harga_jual_distributor'] ?? $product['harga_jual'];
+                break;
+            default:
+                $price = $product['harga_jual'];
+        }
+
         return [
             'id'      => $product['id'],
             'name'    => $product['product_name'],
             'qty'     => 1,
-            'price'   => $product['harga_jual'],
+            'price'   =>$price,
             'weight'  => 1,
             'options' => array_merge($calculation, [
                 'product_discount'      => 0,

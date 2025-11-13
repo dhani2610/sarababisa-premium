@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
+
     <style type="text/css">
       html {
         margin: 0;
@@ -21,7 +21,7 @@
       .text-center {
         text-align: center;
       }
-      
+
       .resi {
         margin-top: 5px;
         width: 155px;
@@ -101,7 +101,11 @@
                 @endif
               </tr>
               <tr>
+                @if ($order->customer->kategori == 'Toko')
+                <td> {{ number_format($item->product->harga_jual_toko) }}</td>
+                @else
                 <td> {{ number_format($item->product->harga_jual) }}</td>
+                @endif
                 <td>X {{ $item->quantity }}</td>
                 {{-- <td>= {{ number_format($item->total - $item->ppn) }}</td> --}}
                 <td>= {{ number_format($item->sub_total - $item->ppn) }}</td>
@@ -109,7 +113,7 @@
           @endforeach
         </tbody>
       </table>
-      
+
       <hr style="border-top: 1px dotted;">
 
       <table>
@@ -168,7 +172,7 @@
           </tr>
           @endif
 
-          
+
           <tr>
             <td class="title">Total Pembayaran</td>
             <td class="value">: Rp. {{ number_format($order->pay) }}</td>

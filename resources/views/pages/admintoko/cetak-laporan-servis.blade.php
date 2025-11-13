@@ -223,19 +223,25 @@
                             @endif
                         </td>
 
+                        @php
+                            $biayaj_convert = is_array($biaya_j) ? ($biaya_j[0] ?? 0) : $biaya_j;
+                            $modal_convert = is_array($modal_j) ? ($modal_j[0] ?? 0) : $modal_j;
+                        @endphp
+
                         @if ($toko->is_bonus === 1)
                             <td style="width: 60px; text-align: right;">Rp.
-                                {{ number_format($modal_j[0]) }}
+                                {{ number_format($modal_convert) }}
                             </td>
                         @endif
                         {{-- <td style="width: 60px; text-align: right;">Rp.
                             {{ number_format($item->omzet) }}</td> --}}
+
                         <td style="width: 60px; text-align: right;">Rp.
-                            {{ number_format($biaya_j[0]) }}</td>
+                            {{ number_format($biayaj_convert) }}</td>
                         <td style="width: 50px; text-align: right;" rowspan="{{ count($tindakan_servis) }}">Rp. {{ number_format($item->diskon) }}</td>
                         @if ($toko->is_bonus === 1)
                             <td style="width: 60px; text-align: right;">Rp.
-                                {{ number_format($biaya_j[0] - $modal_j[0] - $item->diskon) }}
+                                {{ number_format($biayaj_convert - $modal_convert - $item->diskon) }}
                             </td>
                             {{-- <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($item->profit) }}
@@ -426,7 +432,7 @@
     </table>
 
     <hr>
-    
+
     <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
         Uang Muka
     </h4>
@@ -508,12 +514,12 @@
         </tbody>
     </table>
 
-    
+
     <hr>
     <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
         Pengeluaran
     </h4>
-    
+
     <table id="detail">
         <thead>
             <tr>

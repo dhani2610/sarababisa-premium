@@ -101,6 +101,16 @@
                                             <textarea id="alamat" name="alamat" class="form-textarea w-full px-2 py-1" rows="2" required></textarea>
                                         </div>
                                         <div>
+                                            <label class="block text-sm font-medium mb-1" for="shift_id">Shift <span
+                                                    class="text-rose-500">*</span></label>
+                                            <select id="shift_id" name="shift_id"
+                                                class="form-select text-sm py-1 w-full" required>
+                                                @foreach ($shift as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->nama_shift }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div>
                                             <label class="block text-sm font-medium mb-1" for="role">Role <span
                                                     class="text-rose-500">*</span></label>
                                             <select id="role" name="role"
