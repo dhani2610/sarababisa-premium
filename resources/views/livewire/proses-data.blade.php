@@ -171,7 +171,7 @@
                                                 id="selectjs1" required style="width: 100%">
                                                 <option selected value="">Pilih Pelanggan</option>
                                                 @foreach ($customers as $item)
-                                                    <option value="{{ $items->id }}">{{ $item->nama }}
+                                                    <option value="{{ $item->id }}">{{ $item->nama }}
                                                         {{ $item->nomor_hp }}</option>
                                                 @endforeach
                                             </select>
