@@ -181,7 +181,7 @@
 	<table class="table table-sm table-borderless">
 		<thead>
 			<tr>
-			<th scope="col">Izin/Sakit/Alfa</th>
+			<th scope="col">Izin/Sakit/Alfa/Cuti</th>
 			<th scope="col" class="text-right text-danger">Rp. {{ number_format($izin) }}</th>
 			</tr>
 		</thead>

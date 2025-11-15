@@ -141,8 +141,8 @@ class KaryawanController extends Controller
 
         $shift = Shift::where('id',$user->shift_id)->first();
 
-        // $pdf = PDF::loadView('pages.kepalatoko.karyawan.cetak', [
-        return View('pages.kepalatoko.karyawan.cetak', [
+        $pdf = PDF::loadView('pages.kepalatoko.karyawan.cetak', [
+        // return View('pages.kepalatoko.karyawan.cetak', [
             'overtime' => $overtime,
             'izin' => $izin,
             'tanggal' => $tanggal,
