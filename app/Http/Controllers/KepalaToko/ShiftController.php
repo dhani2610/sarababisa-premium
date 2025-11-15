@@ -22,6 +22,9 @@ class ShiftController extends Controller
             'nominal_gaji' => str_replace('.', '', $request->nominal_gaji),
             'potongan_terlambat' => str_replace('.', '', $request->potongan_terlambat),
             'potongan_tidak_masuk' => str_replace('.', '', $request->potongan_tidak_masuk),
+            'potongan_izin' => str_replace('.', '', $request->potongan_izin),
+            'potongan_cuti' => str_replace('.', '', $request->potongan_cuti),
+            'potongan_sakit' => str_replace('.', '', $request->potongan_sakit),
         ]);
         $validated = $request->validate([
             'nama_shift' => 'required|string|max:100',
@@ -30,6 +33,9 @@ class ShiftController extends Controller
             'nominal_gaji' => 'required|integer',
             'potongan_terlambat' => 'required|integer',
             'potongan_tidak_masuk' => 'required|integer',
+            'potongan_izin' => 'required|integer',
+            'potongan_cuti' => 'required|integer',
+            'potongan_sakit' => 'required|integer',
         ]);
 
         Shift::create($validated);
@@ -50,6 +56,9 @@ class ShiftController extends Controller
             'nominal_gaji' => str_replace('.', '', $request->nominal_gaji),
             'potongan_terlambat' => str_replace('.', '', $request->potongan_terlambat),
             'potongan_tidak_masuk' => str_replace('.', '', $request->potongan_tidak_masuk),
+            'potongan_izin' => str_replace('.', '', $request->potongan_izin),
+            'potongan_cuti' => str_replace('.', '', $request->potongan_cuti),
+            'potongan_sakit' => str_replace('.', '', $request->potongan_sakit),
         ]);
         $validated = $request->validate([
             'nama_shift' => 'required|string|max:100',
@@ -58,6 +67,9 @@ class ShiftController extends Controller
             'nominal_gaji' => 'required|integer',
             'potongan_terlambat' => 'required|integer',
             'potongan_tidak_masuk' => 'required|integer',
+            'potongan_izin' => 'required|integer',
+            'potongan_cuti' => 'required|integer',
+            'potongan_sakit' => 'required|integer',
         ]);
 
         $item = Shift::findOrFail($id);

@@ -112,7 +112,7 @@
 		<tbody>
 			<tr>
 			<td>Gaji Pokok</td>
-			<td class="text-right">Rp. {{ number_format($items->gaji) }}</td>
+			<td class="text-right">Rp. {{ number_format($shift->nominal_gaji) }}</td>
 			</tr>
 			<tr>
 			<td>Tunjangan Kehadiran</td>
@@ -139,7 +139,7 @@
 		<thead>
 			<tr>
 			<th scope="col">Total Penghasilan Bruto</th>
-			<th scope="col" class="text-right text-primary">Rp. {{ number_format($items->gaji + $items->absen + $items->bpjs + $bonus + $overtime) }}</th>
+			<th scope="col" class="text-right text-primary">Rp. {{ number_format($shift->nominal_gaji + $items->absen + $items->bpjs + $bonus + $overtime) }}</th>
 			</tr>
 		</thead>
 	</table>
@@ -189,8 +189,16 @@
 	<table class="table table-sm table-borderless">
 		<thead>
 			<tr>
+			<th scope="col">Terlambat</th>
+			<th scope="col" class="text-right text-danger">Rp. {{ number_format($potongan_telat) }}</th>
+			</tr>
+		</thead>
+	</table>
+	<table class="table table-sm table-borderless">
+		<thead>
+			<tr>
 			<th scope="col">Total Pengurangan</th>
-			<th scope="col" class="text-right text-danger">Rp. {{ number_format($totalkasbon + $totalinsiden +  $totalPotonganServis->sum('nominal') + $izin) }}</th>
+			<th scope="col" class="text-right text-danger">Rp. {{ number_format($totalkasbon + $totalinsiden +  $totalPotonganServis->sum('nominal') + $izin + $potongan_telat) }}</th>
 			</tr>
 		</thead>
 	</table>
@@ -199,14 +207,14 @@
 		<thead>
 			<tr>
 			<th scope="col">TOTAL DITERIMA KARYAWAN</th>
-			<th scope="col" class="text-right text-success">Rp. {{ number_format($items->gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal') - $izin + $overtime) }}</th>
+			<th scope="col" class="text-right text-success">Rp. {{ number_format($shift->nominal_gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal') - $izin + $overtime - $potongan_telat) }}</th>
 			</tr>
 		</thead>
 	</table>
 
 	<div class="text-center">
 		@php
-			$angka = $items->gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden;
+			$angka = $shift->nominal_gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden;
 		@endphp
 		<span class="badge badge-light px-4 py-3">
 			<p class="text-capitalize mb-0">

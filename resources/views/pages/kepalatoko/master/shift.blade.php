@@ -55,8 +55,30 @@
                                             </div>
                                             <div class="w-1/2">
                                                 <label class="block text-sm font-medium mb-1">Potongan Tidak
-                                                    Masuk</label>
+                                                    Masuk (Alfa)</label>
                                                 <input name="potongan_tidak_masuk" type="text"
+                                                    class="form-input w-full sapator" required>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-3">
+                                            <div class="w-1/2">
+                                                <label class="block text-sm font-medium mb-1">Potongan Tidak
+                                                    Masuk (Izin)</label>
+                                                <input name="potongan_izin" type="text"
+                                                    class="form-input w-full sapator" required>
+                                            </div>
+                                            <div class="w-1/2">
+                                                <label class="block text-sm font-medium mb-1">Potongan Tidak
+                                                    Masuk (Sakit)</label>
+                                                <input name="potongan_sakit" type="text"
+                                                    class="form-input w-full sapator" required>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-3">
+                                            <div class="w-1/2">
+                                                <label class="block text-sm font-medium mb-1">Potongan Tidak
+                                                    Masuk (Cuti)</label>
+                                                <input name="potongan_cuti" type="text"
                                                     class="form-input w-full sapator" required>
                                             </div>
                                         </div>
@@ -100,7 +122,10 @@
                             <th class="text-center px-2 py-3">Jam Pulang</th>
                             <th class="text-center px-2 py-3">Nominal Gaji</th>
                             <th class="text-center px-2 py-3">Potongan Terlambat</th>
-                            <th class="text-center px-2 py-3">Potongan Tidak Masuk</th>
+                            <th class="text-center px-2 py-3">Potongan Tidak Masuk (Alfa)</th>
+                            <th class="text-center px-2 py-3">Potongan Tidak Masuk (Izin)</th>
+                            <th class="text-center px-2 py-3">Potongan Tidak Masuk (Cuti)</th>
+                            <th class="text-center px-2 py-3">Potongan Tidak Masuk (Sakit)</th>
                             <th class="text-center px-2 py-3">Aksi</th>
                         </tr>
                     </thead>
@@ -118,6 +143,12 @@
                                     {{ number_format($shift->potongan_terlambat, 0, ',', '.') }}</td>
                                 <td class="text-center px-2 py-3">Rp
                                     {{ number_format($shift->potongan_tidak_masuk, 0, ',', '.') }}</td>
+                                <td class="text-center px-2 py-3">Rp
+                                    {{ number_format($shift->potongan_izin, 0, ',', '.') }}</td>
+                                <td class="text-center px-2 py-3">Rp
+                                    {{ number_format($shift->potongan_cuti, 0, ',', '.') }}</td>
+                                <td class="text-center px-2 py-3">Rp
+                                    {{ number_format($shift->potongan_sakit, 0, ',', '.') }}</td>
                                 <td class="text-center px-2 py-3">
                                     <div class="flex space-x-2 justify-center">
                                         <button type="button" class="text-indigo-500"
@@ -128,7 +159,10 @@
                                             jam_pulang: '{{ $shift->jam_pulang }}',
                                             nominal_gaji: '{{ number_format($shift->nominal_gaji, 0, ',', '.') }}',
                                             potongan_terlambat: '{{ number_format($shift->potongan_terlambat, 0, ',', '.') }}',
-                                            potongan_tidak_masuk: '{{ number_format($shift->potongan_tidak_masuk, 0, ',', '.') }}'
+                                            potongan_tidak_masuk: '{{ number_format($shift->potongan_tidak_masuk, 0, ',', '.') }}',
+                                            potongan_sakit: '{{ number_format($shift->potongan_sakit, 0, ',', '.') }}',
+                                            potongan_izin: '{{ number_format($shift->potongan_izin, 0, ',', '.') }}',
+                                            potongan_cuti: '{{ number_format($shift->potongan_cuti, 0, ',', '.') }}'
                                         })">
                                             Edit </button>
 
@@ -181,7 +215,7 @@
                                     <input name="nominal_gaji" type="text" x-model="editForm.nominal_gaji"
                                         class="form-input w-full sapator" required>
                                 </div>
-                                <div class="flex gap-3">
+                                {{-- <div class="flex gap-3">
                                     <div class="w-1/2">
                                         <label class="block text-sm font-medium mb-1">Potongan Terlambat</label>
                                         <input name="potongan_terlambat" type="text"
@@ -193,6 +227,41 @@
                                         <input name="potongan_tidak_masuk" type="text"
                                             x-model="editForm.potongan_tidak_masuk" class="form-input w-full sapator"
                                             required>
+                                    </div>
+                                </div> --}}
+                                 <div class="flex gap-3">
+                                    <div class="w-1/2">
+                                        <label class="block text-sm font-medium mb-1">Potongan Terlambat</label>
+                                        <input name="potongan_terlambat" type="text"
+                                            x-model="editForm.potongan_terlambat" class="form-input w-full sapator" required>
+                                    </div>
+                                    <div class="w-1/2">
+                                        <label class="block text-sm font-medium mb-1">Potongan Tidak
+                                            Masuk (Alfa)</label>
+                                        <input name="potongan_tidak_masuk" type="text"
+                                            x-model="editForm.potongan_tidak_masuk" class="form-input w-full sapator" required>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="w-1/2">
+                                        <label class="block text-sm font-medium mb-1">Potongan Tidak
+                                            Masuk (Izin)</label>
+                                        <input name="potongan_izin" type="text"
+                                            x-model="editForm.potongan_izin" class="form-input w-full sapator" required>
+                                    </div>
+                                    <div class="w-1/2">
+                                        <label class="block text-sm font-medium mb-1">Potongan Tidak
+                                            Masuk (Sakit)</label>
+                                        <input name="potongan_sakit" type="text"
+                                            x-model="editForm.potongan_sakit" class="form-input w-full sapator" required>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="w-1/2">
+                                        <label class="block text-sm font-medium mb-1">Potongan Tidak
+                                            Masuk (Cuti)</label>
+                                        <input name="potongan_cuti" type="text"
+                                            x-model="editForm.potongan_cuti" class="form-input w-full sapator" required>
                                     </div>
                                 </div>
                             </div>
