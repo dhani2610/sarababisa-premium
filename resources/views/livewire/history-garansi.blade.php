@@ -285,6 +285,7 @@
                             </th>
                             <th class="px-2 py-3">No.</th>
                             <th class="px-2 py-3">Tanggal</th>
+                            <th class="px-2 py-3">Tgl Selesai</th>
                             <th class="px-2 py-3">Nomor Servis</th>
                             <th class="px-2 py-3">Customer</th>
                             <th class="px-2 py-3">Penerima</th>
@@ -315,6 +316,7 @@
 
                                 <td class="px-2 py-3">{{ $i++ }}</td>
                                 <td class="px-2 py-3">{{ $item->date }}</td>
+                                <td class="px-2 py-3">{{ $item->tgl_selesai }}</td>
                                 <td class="px-2 py-3">{{ $item->service->nomor_servis ?? $item->service_id }}</td>
                                 <td class="px-2 py-3">{{ $item->service->customer->nama ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->penerima->name ?? '-' }}</td>
