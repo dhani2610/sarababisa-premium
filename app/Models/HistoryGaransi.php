@@ -17,7 +17,9 @@ class HistoryGaransi extends Model
         'tindakan',
         'sparepart',
         'total_biaya',
-        'catatan',
+        'keluhan',
+        'tgl_selesai',
+        'status',
     ];
 
     protected $casts = [

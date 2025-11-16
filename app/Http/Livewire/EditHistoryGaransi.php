@@ -8,35 +8,26 @@ use App\Models\ServiceAction;
 use App\Models\ServiceTransaction;
 use App\Models\User;
 use Livewire\Component;
-use Livewire\WithPagination;
 
-class HistoryGaransiTable extends Component
+class EditHistoryGaransi extends Component
 {
-    use WithPagination;
 
-    public $paginate = 10;
-    public $search;
 
-    protected $updatesQueryString = ['search'];
+    public $historyGaransi;
+        
+    public $modalOpen = false;
 
-    public function updatingSearch()
+    public function mount($historyGaransi)
     {
-        $this->resetPage();
-    }
+        $this->historyGaransi = $historyGaransi;
 
+        // begitu halaman dibuka, modal langsung ON
+        $this->modalOpen = true;
+    }
     public function render()
     {
-        $query = HistoryGaransi::with(['service', 'teknisi', 'penerima'])
-            ->latest();
-
-        if ($this->search) {
-            $query->whereHas('service', function ($q) {
-                $q->where('nomor_servis', 'like', '%' . $this->search . '%');
-            });
-        }
         // dd(auth()->user()->role);
         if (auth()->user()->role == 'Teknisi') {
-            $query->where('teknisi_id', auth()->user()->id);
             $users = User::where('id',auth()->user()->id)->get();
         }else{
             $users = User::all();
@@ -49,13 +40,11 @@ class HistoryGaransiTable extends Component
 
         $serviceActions = ServiceAction::all();
 
-        return view('livewire.history-garansi', [
-            'data' => $query->paginate($this->paginate),
+        return view('livewire.edit-history-garansi', [
             'serviceTransactions' => $serviceTransactions,
             'products' => $products,
             'serviceActions' => $serviceActions,
             'users' => $users,
-            'count' => $query->count(),
         ]);
     }
 }

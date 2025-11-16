@@ -1,3 +1,30 @@
+<style>
+.btn-status {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Menunggu Konfirmasi (Kuning) */
+.status-menunggu {
+    background-color: #FFF7D1;
+    color: #B58105;
+}
+
+/* Sudah Selesai (Hijau) */
+.status-selesai {
+    background-color: #D1FADF;
+    color: #027A48;
+}
+
+/* Dibatalkan (Merah) */
+.status-batal {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+}
+
+</style>
 <div>
     <!-- Page header -->
     <div class="sm:flex sm:justify-between sm:items-center mb-3">
@@ -160,73 +187,11 @@
                                     </select>
                                 </div>
 
-                                <!-- Teknisi -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Teknisi<span
+                                 <div>
+                                    <label class="block text-sm font-medium mb-1">Keluhan <span
                                             class="text-rose-500">*</span></label>
-                                    <select name="teknisi_id" class="form-select w-full " required>
-                                        <option value="">-- Pilih Teknisi --</option>
-                                        @foreach ($users as $u)
-                                            <option value="{{ $u->id }}">{{ $u->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <!-- Tindakan -->
-                                <div class="mb-3">
-                                    <label class="block text-sm font-medium mb-1">Tindakan</label>
-                                    <button type="button" id="addTindakanRow"
-                                        class="btn-sm bg-indigo-500 text-white mb-2">
-                                        + Tambah Tindakan
-                                    </button>
-                                    <div id="tindakanContainer"></div>
-                                </div>
-
-                                <!-- Total Biaya Servis -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Total Modal Tindakan</label>
-                                    <input type="number" name="total_biaya_tindakan" id="total_biaya_tindakan"
-                                        value="0" class="form-input w-full" required onkeyup="updateTotalModal()">
-                                </div>
-
-                                <hr>
-
-                                <!-- Checkbox sebelum sparepart -->
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="useSparepartCheckbox">
-                                    <label class="form-check-label" for="useSparepartCheckbox">
-                                        Apakah menggunakan stok sparepart toko?
-                                    </label>
-                                </div>
-                                <!-- Sparepart Dynamic -->
-                                <div id="sparepart_wrapper" style="display:none;">
-                                    <label class="block text-sm font-medium mb-1">Sparepart</label>
-                                    <button type="button" id="addSparepartRow" class="btn-sm bg-indigo-500 text-white">
-                                        + Tambah Sparepart
-                                    </button>
-                                    <div class="mt-2" id="rowContainer"></div>
-                                </div>
-
-                                <!-- Total Biaya -->
-                                <div style="display:none;" id="modal_sparepart_wrapper">
-                                    <label class="block text-sm font-medium mb-1">Modal Sparepart<span
-                                            class="text-rose-500">*</span></label>
-                                    <input type="number" name="modal_sparepart" id="modal_sparepart" value="0"
-                                        class="form-input w-full">
-                                </div>
-                                <!-- Total Biaya -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Total Modal<span
-                                            class="text-rose-500">*</span></label>
-                                    <input type="number" name="total_biaya" id="total_biaya" value="0"
-                                        class="form-input w-full">
-                                </div>
-
-                                <!-- Catatan -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Catatan<span
-                                            class="text-rose-500">*</span></label>
-                                    <textarea name="catatan" class="form-input w-full" required></textarea>
+                                    <input type="text" name="keluhan" class="form-input w-full"
+                                        required>
                                 </div>
 
                             </div>
@@ -238,6 +203,7 @@
                         </form>
                     </div>
                 </div>
+              
             </div>
 
 
@@ -322,6 +288,7 @@
                             <th class="px-2 py-3">Nomor Servis</th>
                             <th class="px-2 py-3">Customer</th>
                             <th class="px-2 py-3">Penerima</th>
+                            <th class="px-2 py-3">Keluhan</th>
                             <th class="px-2 py-3">Teknisi</th>
                             <th class="px-2 py-3">Tindakan</th>
                             <th class="px-2 py-3">Sparepart</th>
@@ -351,10 +318,12 @@
                                 <td class="px-2 py-3">{{ $item->service->nomor_servis ?? $item->service_id }}</td>
                                 <td class="px-2 py-3">{{ $item->service->customer->nama ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->penerima->name ?? '-' }}</td>
+                                <td class="px-2 py-3">{{ $item->keluhan ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->teknisi->name ?? '-' }}</td>
 
                                 {{-- Tindakan --}}
                                 <td class="px-2 py-3">
+                                    @if (!empty($item->tindakan))
                                     @php
                                         $tindakans = json_decode($item->tindakan, true) ?? [];
                                     @endphp
@@ -369,22 +338,29 @@
                                             </li>
                                         @endforeach
                                     </ul>
+                                    @else
+                                        -
+                                    @endif
                                 </td>
 
                                 {{-- Sparepart --}}
                                 <td class="px-2 py-3">
-                                    @php $spareparts = json_decode($item->sparepart, true); @endphp
-                                    @if ($spareparts)
-                                        <ul class="list-disc ml-4">
-                                            @foreach ($spareparts as $sp)
-                                                @php $prd = \App\Models\Product::find($sp['id']); @endphp
-                                                <li>
-                                                    {{ $prd->product_name ?? 'Produk ID ' . $sp['id'] }}
-                                                    (x{{ $sp['qty'] }})
-                                                    - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
-                                                </li>
-                                            @endforeach
-                                        </ul>
+                                    @if (!empty($item->tindakan))
+                                        @php $spareparts = json_decode($item->sparepart, true); @endphp
+                                        @if ($spareparts)
+                                            <ul class="list-disc ml-4">
+                                                @foreach ($spareparts as $sp)
+                                                    @php $prd = \App\Models\Product::find($sp['id']); @endphp
+                                                    <li>
+                                                        {{ $prd->product_name ?? 'Produk ID ' . $sp['id'] }}
+                                                        (x{{ $sp['qty'] }})
+                                                        - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            -
+                                        @endif
                                     @else
                                         -
                                     @endif
@@ -393,107 +369,120 @@
                                 <td class="px-2 py-3">Rp{{ number_format($item->total_biaya, 0, ',', '.') }}</td>
                                 <td class="px-2 py-3">{{ $item->catatan }}</td>
                                 <td class="px-2 py-3">
-                                    <button
-                                        class="toggle-status px-2 py-1 rounded
-                                        {{ $item->status == 1 ? 'bg-yellow-100 text-yellow-700' : ($item->status == 2 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') }}"
-                                        data-id="{{ $item->id }}">
-                                        @if ($item->status == 1)
-                                            Diproses
-                                        @elseif ($item->status == 2)
-                                            Selesai
-                                        @elseif ($item->status == 3)
-                                            Dibatalkan
-                                        @endif
-                                    </button>
+                                    <center>
+                                        <button
+                                                class="btn-status 
+                                                {{ $item->status == 1 ? 'status-menunggu' : ($item->status == 2 ? 'status-selesai' : 'status-batal') }}"
+                                                data-id="{{ $item->id }}">
+    
+                                                @if ($item->status == 1)
+                                                    Menunggu Konfirmasi
+                                                @elseif ($item->status == 2)
+                                                    Sudah Selesai
+                                                @elseif ($item->status == 3)
+                                                    Dibatalkan
+                                                @endif
+    
+                                            </button>
+                                    </center>
+
+
                                 </td>
 
 
                                 @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                                 {{-- Aksi (popup hapus tetap) --}}
                                 <td class="px-2 py-3">
-                                    <div class="flex space-x-2">
-                                        {{-- <a href="{{ route('history-garansi.edit', $item->id) }}">
-                                            <button class="text-slate-400 hover:text-slate-500 rounded-full">
-                                                <span class="sr-only">Edit</span>
-                                                <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                                    <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
-                                                </svg>
-                                            </button>
-                                        </a> --}}
-                                        <div x-data="{ modalOpen: false }">
-                                            <button class="text-rose-500 hover:text-rose-600 rounded-full"
-                                                @click.prevent="modalOpen = true" aria-controls="danger-modal">
-                                                <span class="sr-only">Delete</span>
-                                                <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                                    <path d="M13 15h2v6h-2zM17 15h2v6h-2z" />
-                                                    <path
-                                                        d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z" />
-                                                </svg>
-                                            </button>
-                                            <!-- Modal backdrop -->
-                                            <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
-                                                x-show="modalOpen"
-                                                x-transition:enter="transition ease-out duration-200"
-                                                x-transition:enter-start="opacity-0"
-                                                x-transition:enter-end="opacity-100"
-                                                x-transition:leave="transition ease-out duration-100"
-                                                x-transition:leave-start="opacity-100"
-                                                x-transition:leave-end="opacity-0" aria-hidden="true" x-cloak></div>
-                                            <!-- Modal dialog -->
-                                            <div id="danger-modal"
-                                                class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                                                role="dialog" aria-modal="true" x-show="modalOpen"
-                                                x-transition:enter="transition ease-in-out duration-200"
-                                                x-transition:enter-start="opacity-0 translate-y-4"
-                                                x-transition:enter-end="opacity-100 translate-y-0"
-                                                x-transition:leave="transition ease-in-out duration-200"
-                                                x-transition:leave-start="opacity-100 translate-y-0"
-                                                x-transition:leave-end="opacity-0 translate-y-4" x-cloak>
-                                                <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full"
-                                                    @keydown.escape.window="modalOpen = false">
-                                                    <div class="p-5 flex space-x-4">
-                                                        <!-- Icon -->
-                                                        <div
-                                                            class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
-                                                            <svg class="w-4 h-4 shrink-0 fill-current text-rose-500"
-                                                                viewBox="0 0 16 16">
-                                                                <path
-                                                                    d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
-                                                            </svg>
-                                                        </div>
-                                                        <!-- Content -->
-                                                        <div>
-                                                            <!-- Modal header -->
-                                                            <div class="mb-2">
-                                                                <div class="text-lg font-semibold text-slate-800">
-                                                                    Apakah anda sudah yakin ?</div>
+                                    <div class="space-x-1 flex">
+                                        <div class="flex space-x-2">
+                                           
+                                            <a href="{{ route('history-garansi.edit', $item->id) }}">
+                                                <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                        <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+                                                        <rect x="9" y="3" width="6" height="4" rx="2" />
+                                                        <path d="M9 14l2 2l4 -4" />
+                                                    </svg>
+                                                </button>
+                                            </a>
+                                        </div>
+                                            <div x-data="{ modalOpen: false }">
+                                                <button class="text-rose-500 hover:text-rose-600 rounded-full"
+                                                    @click.prevent="modalOpen = true" aria-controls="danger-modal">
+                                                    <span class="sr-only">Delete</span>
+                                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                                                        <path d="M13 15h2v6h-2zM17 15h2v6h-2z" />
+                                                        <path
+                                                            d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z" />
+                                                    </svg>
+                                                </button>
+                                                <!-- Modal backdrop -->
+                                                <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
+                                                    x-show="modalOpen"
+                                                    x-transition:enter="transition ease-out duration-200"
+                                                    x-transition:enter-start="opacity-0"
+                                                    x-transition:enter-end="opacity-100"
+                                                    x-transition:leave="transition ease-out duration-100"
+                                                    x-transition:leave-start="opacity-100"
+                                                    x-transition:leave-end="opacity-0" aria-hidden="true" x-cloak></div>
+                                                <!-- Modal dialog -->
+                                                <div id="danger-modal"
+                                                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
+                                                    role="dialog" aria-modal="true" x-show="modalOpen"
+                                                    x-transition:enter="transition ease-in-out duration-200"
+                                                    x-transition:enter-start="opacity-0 translate-y-4"
+                                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                                    x-transition:leave="transition ease-in-out duration-200"
+                                                    x-transition:leave-start="opacity-100 translate-y-0"
+                                                    x-transition:leave-end="opacity-0 translate-y-4" x-cloak>
+                                                    <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full"
+                                                        @keydown.escape.window="modalOpen = false">
+                                                        <div class="p-5 flex space-x-4">
+                                                            <!-- Icon -->
+                                                            <div
+                                                                class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
+                                                                <svg class="w-4 h-4 shrink-0 fill-current text-rose-500"
+                                                                    viewBox="0 0 16 16">
+                                                                    <path
+                                                                        d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
+                                                                </svg>
                                                             </div>
-                                                            <!-- Modal content -->
-                                                            <div class="text-sm mb-10">
-                                                                <div class="space-y-2">
-                                                                    <p>Jika sudah terhapus, maka tidak bisa dikembalikan
-                                                                        lagi.</p>
+                                                            <!-- Content -->
+                                                            <div>
+                                                                <!-- Modal header -->
+                                                                <div class="mb-2">
+                                                                    <div class="text-lg font-semibold text-slate-800">
+                                                                        Apakah anda sudah yakin ?</div>
                                                                 </div>
-                                                            </div>
-                                                            <!-- Modal footer -->
-                                                            <div class="flex flex-wrap justify-end space-x-2">
-                                                                <button
-                                                                    class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600"
-                                                                    @click="modalOpen = false">Batal</button>
-                                                                <form
-                                                                    action="{{ route('history-garansi.destroy', $item->id) }}"
-                                                                    method="post">
-                                                                    @method('delete')
-                                                                    @csrf
+                                                                <!-- Modal content -->
+                                                                <div class="text-sm mb-10">
+                                                                    <div class="space-y-2">
+                                                                        <p>Jika sudah terhapus, maka tidak bisa dikembalikan
+                                                                            lagi.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Modal footer -->
+                                                                <div class="flex flex-wrap justify-end space-x-2">
                                                                     <button
-                                                                        class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya,
-                                                                        Hapus</button>
-                                                                </form>
+                                                                        class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600"
+                                                                        @click="modalOpen = false">Batal</button>
+                                                                    <form
+                                                                        action="{{ route('history-garansi.destroy', $item->id) }}"
+                                                                        method="post">
+                                                                        @method('delete')
+                                                                        @csrf
+                                                                        <button
+                                                                            class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya,
+                                                                            Hapus</button>
+                                                                    </form>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
                                         </div>
                                     </div>
                                 </td>
