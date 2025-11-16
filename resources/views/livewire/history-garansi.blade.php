@@ -327,7 +327,7 @@
                                 <td class="px-2 py-3">
                                     @if (!empty($item->tindakan))
                                     @php
-                                        $tindakans = json_decode($item->tindakan, true) ?? [];
+                                        $tindakans = json_decode(json: $item->tindakan, true) ?? [];
                                     @endphp
 
                                     <ul class="list-disc ml-4">

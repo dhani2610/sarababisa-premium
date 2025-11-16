@@ -189,6 +189,7 @@
 
                     {{-- Tindakan --}}
                     <td style="text-align:left">
+                        @if (!empty($item->tindakan))
                         @php
                             $tindakans = json_decode($item->tindakan, true) ?? [];
                         @endphp
@@ -205,27 +206,34 @@
                                 <br>
                                 <br>
                             @endforeach
+                        @else
+                        -
+                        @endif
                         {{-- </ul> --}}
                     </td>
 
                     {{-- Sparepart --}}
                     <td style="text-align:left">
-                        @php $spareparts = json_decode($item->sparepart, true); @endphp
-                        @if ($spareparts)
-                            {{-- <ul class=""> --}}
-                                @foreach ($spareparts as $sp)
-                                    @php $prd = \App\Models\Product::find($sp['id']); @endphp
-                                    {{-- <li> --}}
-                                        - {{ $prd->product_name ?? 'Produk ID ' . $sp['id'] }}
-                                        (x{{ $sp['qty'] }})
-                                        - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
-                                    {{-- </li> --}}
-                                    <br>
-                                    <br> 
-                                @endforeach
-                            {{-- </ul> --}}
+                        @if (!empty($item->tindakan))
+                            @php $spareparts = json_decode($item->sparepart, true); @endphp
+                            @if ($spareparts)
+                                {{-- <ul class=""> --}}
+                                    @foreach ($spareparts as $sp)
+                                        @php $prd = \App\Models\Product::find($sp['id']); @endphp
+                                        {{-- <li> --}}
+                                            - {{ $prd->product_name ?? 'Produk ID ' . $sp['id'] }}
+                                            (x{{ $sp['qty'] }})
+                                            - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
+                                        {{-- </li> --}}
+                                        <br>
+                                        <br> 
+                                    @endforeach
+                                {{-- </ul> --}}
+                            @else
+                                -
+                            @endif
                         @else
-                            -
+                        -
                         @endif
                     </td>
 
