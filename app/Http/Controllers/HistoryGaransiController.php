@@ -65,25 +65,7 @@ class HistoryGaransiController extends Controller
         $filename = 'Laporan History Garansi ' . $start_date . ' sd ' . $end_date . '.pdf';
         return $pdf->stream($filename);
     }
-    public function edit($id)
-    {
-        $serviceTransactions = ServiceTransaction::all();
-        $products = Product::whereHas('subCategory.category', function ($q) {
-            $q->where('category_name', 'Sparepart');
-        })->where('stok', '>=', 1)->get();
-
-        $serviceActions = ServiceAction::all();
-        $users = User::all();
-        $item = HistoryGaransi::find($id);
-
-        return view('pages.kepalatoko.history.edit', compact(
-            'item',
-            'serviceTransactions',
-            'products',
-            'serviceActions',
-            'users'
-        ));
-    }
+  
     public function bulkDelete(Request $request)
     {
         $ids = $request->ids;
@@ -108,25 +90,55 @@ class HistoryGaransiController extends Controller
             'date'          => 'required|date',
             'service_id'    => 'required|exists:service_transactions,id',
             'penerima_id'   => 'required|exists:users,id',
-            'teknisi_id'    => 'required|exists:users,id',
-            'tindakan'      => 'required|array',
-            'sparepart'     => 'nullable|array',
-            'total_biaya'   => 'required|numeric',
-            'catatan'       => 'nullable|string',
+            'keluhan'    => 'required|string',
         ]);
 
         $data = new HistoryGaransi();
         $data->date        = $request->date;
         $data->service_id  = $request->service_id;
         $data->penerima_id = $request->penerima_id;
+        $data->teknisi_id  = 0;
+        $data->keluhan  = $request->keluhan;
+        $data->tindakan    = [];
+        $data->sparepart   =  [];
+        $data->modal_sparepart = 0;
+        $data->total_biaya_tindakan = 0;
+        $data->total_biaya = 0;
+        $data->catatan     = '-';
+        $data->status     = 1;
+        $data->save();
+
+        toast('Data berhasil disimpan.', 'success');
+        return redirect()->route('history-garansi.index')->with('success', 'Data berhasil disimpan');
+    }
+    public function update(Request $request,$id)
+    {
+        // dd($request->all());
+        $request->validate([
+            'date'          => 'required|date',
+            'service_id'    => 'required|exists:service_transactions,id',
+            'penerima_id'   => 'required|exists:users,id',
+            'keluhan'       => 'required|string',
+        ]);
+
+        $data = HistoryGaransi::find($id);
+        $data->date        = $request->date;
+        if ($request->status == 2) {
+            $data->tgl_selesai = date('Y-m-d');
+        }else{
+            $data->tgl_selesai = null;
+        }
+        $data->service_id  = $request->service_id;
+        $data->penerima_id = $request->penerima_id;
         $data->teknisi_id  = $request->teknisi_id;
-        $data->tindakan    = json_encode($request->tindakan);
-        $data->sparepart   =  !empty($request->sparepart) ? json_encode($request->sparepart) : null;
+        $data->tindakan   =  !empty($request->tindakan) ? json_encode($request->tindakan) : [];
+        $data->sparepart   =  !empty($request->sparepart) ? json_encode($request->sparepart) : [];
         $data->modal_sparepart = $request->modal_sparepart ?? 0;
         $data->total_biaya_tindakan = $request->total_biaya_tindakan;
         $data->total_biaya = $request->total_biaya;
         $data->catatan     = $request->catatan;
-        $data->status     = 1;
+        $data->keluhan     = $request->keluhan;
+        $data->status     = $request->status;
         $data->save();
 
         if (!empty($request->sparepart)) {
@@ -163,53 +175,6 @@ class HistoryGaransiController extends Controller
                     continue; // skip kalau stok tidak cukup
                 }
 
-                // // Harga jual
-                // $harga_jual = $spareparts->harga_jual ?? 0;
-
-                // // Buat Order
-                // $order = new Order();
-                // $order->customers_id   = $service->customers_id;
-                // $order->users_id       = $request->teknisi_id ?? null;
-                // $order->order_date     = Carbon::today()->locale('id')->translatedFormat('d F Y');
-                // $order->total_products = 1;
-                // $order->sub_total      = $harga_jual;
-                // $order->invoice_no     = '' . mt_rand(date('Ymd00'), date('Ymd99'));
-                // $order->nama_pelanggan = $customer->nama;
-                // $order->payment_method = "Tunai";
-                // $order->pay            = $harga_jual;
-                // $order->due            = 0;
-                // $order->is_approve     = 'Setuju';
-                // $order->tgl_disetujui  = Carbon::today();
-                // $order->save();
-
-                // // Hitung persen sales (cek dulu user nya ada/tidak)
-                // $persen_sales = null;
-                // if (!empty($request->teknisi_id) && $request->teknisi_id != 1) {
-                //     $user = User::find($request->teknisi_id);
-                //     if ($user) {
-                //         $persen_sales = $user->persen;
-                //     }
-                // }
-
-                // // Buat Order Detail
-                // $orderDetail = new OrderDetail();
-                // $orderDetail->orders_id   = $order->id;
-                // $orderDetail->users_id    = $request->teknisi_id ?? null;
-                // $orderDetail->products_id = $spareparts->id;
-                // $orderDetail->product_name= $spareparts->product_name;
-                // $orderDetail->quantity    = (int)$row['qty'];
-                // $orderDetail->price       = $harga_jual;
-                // $orderDetail->total       = $harga_jual;
-                // $orderDetail->sub_total   = $harga_jual;
-                // $orderDetail->modal       = $spareparts->harga_modal;
-                // $orderDetail->profit      = $harga_jual - $spareparts->harga_modal;
-                // $orderDetail->persen_sales= $persen_sales;
-                // $orderDetail->profit_toko = $persen_sales
-                //     ? ($harga_jual - $spareparts->harga_modal) - (($spareparts->harga_jual - $spareparts->harga_modal) / 100 * $persen_sales)
-                //     : $harga_jual - $spareparts->harga_modal;
-                // $orderDetail->garansi     = date('Y-m-d');
-                // $orderDetail->product_discount_amount = 0;
-                // $orderDetail->save();
             }
         }
 
@@ -220,7 +185,7 @@ class HistoryGaransiController extends Controller
                 'users_id' => auth()->user()->id
             ]);
         }
-
+        toast('Data berhasil disimpan.', 'success');
 
         return redirect()->route('history-garansi.index')->with('success', 'Data berhasil disimpan');
     }
@@ -248,33 +213,6 @@ class HistoryGaransiController extends Controller
     }
 
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'date' => 'required|date',
-            'service_id' => 'required',
-            'penerima_id' => 'required',
-            'teknisi_id' => 'required',
-            'status' => 'required|in:1,2,3',
-        ]);
-
-        $item = HistoryGaransi::findOrFail($id);
-
-        $item->update([
-            'date' => $request->date,
-            'service_id' => $request->service_id,
-            'penerima_id' => $request->penerima_id,
-            'teknisi_id' => $request->teknisi_id,
-            'tindakan' => json_encode($request->tindakan ?? []),
-            'sparepart' => json_encode($request->sparepart ?? []),
-            'total_biaya' => $request->total_biaya ?? 0,
-            'catatan' => $request->catatan,
-            'status' => $request->status,
-        ]);
-
-        return redirect()->route('history-garansi.index')->with('success', 'History Garansi berhasil diupdate!');
-    }
-
     public function destroy($id)
     {
         $history = HistoryGaransi::findOrFail($id);
@@ -294,7 +232,25 @@ class HistoryGaransiController extends Controller
 
         // hapus data history garansi
         $history->delete();
+        toast('Data berhasil dihapus & stok sparepart dikembalikan.', 'success');
 
         return redirect()->route('history-garansi.index')->with('success', 'Data berhasil dihapus & stok sparepart dikembalikan');
     }
+
+
+    public function edit($id)
+    {
+        $historyGaransi = HistoryGaransi::findOrFail($id);
+        $serviceTransactions = ServiceTransaction::orderBy('created_at', 'desc')->get();
+        $products = Product::whereHas('subCategory.category', function ($q) {
+            $q->where('category_name', 'Sparepart');
+        })->where('stok', '>=', 1)->get();
+
+        $serviceActions = ServiceAction::all();
+        $users = User::all();
+        return view('pages.kepalatoko.history.edit', compact(
+            'users','historyGaransi','serviceTransactions','products','serviceActions'
+        ));
+    }
+
 }

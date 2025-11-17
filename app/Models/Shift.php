@@ -16,5 +16,8 @@ class Shift extends Model
         'nominal_gaji',
         'potongan_terlambat',
         'potongan_tidak_masuk',
+        'potongan_izin',
+        'potongan_cuti',
+        'potongan_sakit',
     ];
 }

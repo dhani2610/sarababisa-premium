@@ -131,7 +131,7 @@ use App\Http\Controllers\KepalaToko\ProdukHandphoneController as KepalaTokoProdu
 use App\Http\Controllers\KepalaToko\ProdukSparepartController as KepalaTokoProdukSparepartController;
 use App\Http\Controllers\KepalaToko\PurchaseProductController as KepalaTokoPurchaseProductController;
 use App\Http\Controllers\KepalaToko\TransaksiProdukController as KepalaTokoTransaksiProdukController;
-use App\Http\Controllers\KepalaToko\TransaksiServisController as KepalaTokoTransaksiServisController;
+use App\Http\Controllers\KepalaToko\TransaksiServisControllers as KepalaTokoTransaksiServisController;
 // Sales
 use App\Http\Controllers\KepalaToko\UbahBisaDiambilController as KepalaTokoUbahBisaDiambilController;
 use App\Http\Controllers\AdminToko\MasterJenisBarangController as AdminTokoMasterJenisBarangController;

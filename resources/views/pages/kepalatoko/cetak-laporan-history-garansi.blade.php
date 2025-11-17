@@ -143,7 +143,7 @@
                 <th>:{{ $totalSelesai }}</th>
             </tr>
             <tr>
-                <th>Total Proses</th>
+                <th>Total Menunggu Konfirmasi</th>
                 <th>:{{ $totalProses }}</th>
                 <th>Total Batal</th>
                 <th>:{{ $totalBatal }}</th>
@@ -162,6 +162,7 @@
             <tr>
                 <th style="width:30%">No.</th>
                 <th class="">Tanggal</th>
+                <th class="">Tgl Selesai</th>
                 <th class="">Nomor Servis</th>
                 <th class="">Customer</th>
                 <th class="">Penerima</th>
@@ -169,6 +170,7 @@
                 <th class="">Tindakan</th>
                 <th class="">Sparepart</th>
                 <th class="">Total Modal</th>
+                <th class="">Keluhan</th>
                 <th class="">Catatan</th>
                 <th class="">Status</th>
             </tr>
@@ -179,6 +181,7 @@
                 <tr>
                     <td style="width:30%">{{ $i++ }}</td>
                     <td class="">{{ $item->date }}</td>
+                    <td class="">{{ $item->tgl_selesai ?? '-' }}</td>
                     <td class="">{{ $item->service->nomor_servis ?? $item->service_id }}</td>
                     <td class="">{{ $item->service->customer->nama ?? '-' }}</td>
                     <td class="">{{ $item->penerima->name ?? '-' }}</td>
@@ -186,6 +189,7 @@
 
                     {{-- Tindakan --}}
                     <td style="text-align:left">
+                        @if (!empty($item->tindakan))
                         @php
                             $tindakans = json_decode($item->tindakan, true) ?? [];
                         @endphp
@@ -202,37 +206,45 @@
                                 <br>
                                 <br>
                             @endforeach
+                        @else
+                        -
+                        @endif
                         {{-- </ul> --}}
                     </td>
 
                     {{-- Sparepart --}}
                     <td style="text-align:left">
-                        @php $spareparts = json_decode($item->sparepart, true); @endphp
-                        @if ($spareparts)
-                            {{-- <ul class=""> --}}
-                                @foreach ($spareparts as $sp)
-                                    @php $prd = \App\Models\Product::find($sp['id']); @endphp
-                                    {{-- <li> --}}
-                                        - {{ $prd->product_name ?? 'Produk ID ' . $sp['id'] }}
-                                        (x{{ $sp['qty'] }})
-                                        - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
-                                    {{-- </li> --}}
-                                    <br>
-                                    <br> 
-                                @endforeach
-                            {{-- </ul> --}}
+                        @if (!empty($item->tindakan))
+                            @php $spareparts = json_decode($item->sparepart, true); @endphp
+                            @if ($spareparts)
+                                {{-- <ul class=""> --}}
+                                    @foreach ($spareparts as $sp)
+                                        @php $prd = \App\Models\Product::find($sp['id']); @endphp
+                                        {{-- <li> --}}
+                                            - {{ $prd->product_name ?? 'Produk ID ' . $sp['id'] }}
+                                            (x{{ $sp['qty'] }})
+                                            - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
+                                        {{-- </li> --}}
+                                        <br>
+                                        <br> 
+                                    @endforeach
+                                {{-- </ul> --}}
+                            @else
+                                -
+                            @endif
                         @else
-                            -
+                        -
                         @endif
                     </td>
 
                     <td class="">Rp{{ number_format($item->total_biaya, 0, ',', '.') }}</td>
+                    <td class="">{{ $item->keluhan }}</td>
                     <td class="">{{ $item->catatan }}</td>
                     <td class="">
                             @if ($item->status == 1)
-                                Diproses
+                                Menunggu Konfirmasi
                             @elseif ($item->status == 2)
-                                Selesai
+                                Sudah Selesai
                             @elseif ($item->status == 3)
                                 Dibatalkan
                             @endif

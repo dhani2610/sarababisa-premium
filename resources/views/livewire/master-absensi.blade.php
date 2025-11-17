@@ -476,12 +476,16 @@
                             @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">No
                             </th>
-                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-left">User
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-left">Karyawan
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                 Tipe</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                 Waktu</th>
+                            @if (auth()->user()->role == 'Kepala Toko')
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
+                                Potongan Terlambat</th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                 Lokasi</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
@@ -514,34 +518,26 @@
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">
                                     {{ ucfirst($att->type) }}</td>
                                 @php
-                                    $setting = \App\Models\StoreSetting::first();
-                                    $jamMasuk = $setting?->jam_masuk ? \Carbon\Carbon::parse($setting->jam_masuk) : null;
-                                    $jamAbsen = \Carbon\Carbon::parse($att->created_at);
-
-                                    $status = 'Tidak Aktif';
-                                    $warna = 'text-slate-400 italic';
-
-                                    if ($setting && $setting->active_setting_absensi) {
-                                        if ($jamAbsen->gt($jamMasuk)) {
-                                            $status = 'Terlambat';
-                                            $warna = 'text-red-500 font-semibold';
-                                        } else {
-                                            $status = 'Tepat Waktu';
-                                            $warna = 'text-green-500 font-semibold';
-                                        }
+                                    if ($att->telat == 1) {
+                                        $status = 'Terlambat';
+                                        $warna = 'text-red-500 font-semibold';
+                                    }else{
+                                        $status = 'Tepat Waktu';
+                                        $warna = 'text-green-500 font-semibold';
                                     }
                                 @endphp
 
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center">
                                     {{ \Carbon\Carbon::parse($att->created_at)->translatedFormat('l, d F Y H:i:s') }}
                                     @if (ucfirst($att->type) == 'Masuk')
-                                        @if ($setting && $setting->active_setting_absensi)
                                             <span class="ml-1 {{ $warna }}">| {{ $status }}</span>
-                                        @else
-                                            <span class="ml-1 {{ $warna }}">| {{ $status }}</span>
-                                        @endif
                                     @endif
                                 </td>
+
+                                @if (auth()->user()->role == 'Kepala Toko')
+                                <td class="text-center px-2 py-3">Rp
+                                    {{ number_format($att->nominal_potongan, 0, ',', '.') }}</td>
+                                @endif
 
                                 <td
                                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px text-center text-center">

@@ -14,8 +14,10 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\KepalaToko\WorkerRequest;
+use App\Models\Attendance;
 use App\Models\Incident;
 use App\Models\Overtime;
+use App\Models\Shift;
 
 class KaryawanController extends Controller
 {
@@ -131,8 +133,13 @@ class KaryawanController extends Controller
 
         $izin = Izin::where('status',1)->where('user_id',$user->id)->whereYear('tanggal', $date->year)
         ->whereMonth('tanggal', $date->month)->get()->sum('nominal_potongan');
+        // dd($izin);
         $overtime = Overtime::where('id_user',$user->id)->whereYear('tanggal', $date->year)
         ->whereMonth('tanggal', $date->month)->get()->sum('nominal_overtime');
+        $potongan_telat = Attendance::where('user_id',$user->id)->whereYear('tanggal', $date->year)
+        ->whereMonth('tanggal', $date->month)->where('telat',1)->get()->sum('nominal_potongan');
+
+        $shift = Shift::where('id',$user->shift_id)->first();
 
         $pdf = PDF::loadView('pages.kepalatoko.karyawan.cetak', [
         // return View('pages.kepalatoko.karyawan.cetak', [
@@ -146,9 +153,11 @@ class KaryawanController extends Controller
             'bonus' => $bonus,
             'debts' => $debts,
             'incidents' => $incidents,
+            'shift' => $shift,
             'totalkasbon' => $totalkasbon,
             'totalPotonganServis' => $totalPotonganServis,
-            'totalinsiden' => $totalinsiden
+            'totalinsiden' => $totalinsiden,
+            'potongan_telat' => $potongan_telat,
         ]);
 
         $filename = 'Slip Gaji ' . $namaKaryawan . ' ' . '(' . $namaBulanFile . ')' . '.pdf';

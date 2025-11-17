@@ -99,7 +99,7 @@
 
             <!-- Tabs tipe -->
             <div class="flex space-x-3 border-b border-slate-200 mb-2">
-                @foreach (['izin', 'sakit', 'alfa'] as $tipe)
+                @foreach (['izin', 'sakit', 'alfa','cuti'] as $tipe)
                     <button wire:click="$set('filter_tipe', '{{ $tipe }}')"
                         class="py-2 px-4 text-sm font-medium border-b-2 transition-all duration-200
                     {{ $filter_tipe === $tipe ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
@@ -163,55 +163,7 @@
                 </div>
             </div>
 
-            <!-- Baris 2: Bulan Ini -->
-            {{-- <div class="flex flex-wrap gap-4">
-                <div class="flex-1 min-w-[200px] bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
-                    <div class="p-3 bg-purple-100 text-purple-600 rounded-full">
-                        <i class="fas fa-calendar-alt text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-semibold text-slate-500">Bulan Ini</h3>
-                        <div class="text-lg font-bold text-slate-800">
-                            {{ \Carbon\Carbon::parse($filter_bulan)->translatedFormat('F Y') }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
-                    <div class="p-3 bg-green-100 text-green-600 rounded-full"><i class="fas fa-user-check text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-semibold text-slate-500">Izin Bulan Ini</h3>
-                        <div class="text-lg font-bold text-slate-800">{{ $stats['bulanIni']['izin'] }} Orang</div>
-                    </div>
-                </div>
-
-                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
-                    <div class="p-3 bg-yellow-100 text-yellow-600 rounded-full"><i class="fas fa-user-md text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-semibold text-slate-500">Sakit Bulan Ini</h3>
-                        <div class="text-lg font-bold text-slate-800">{{ $stats['bulanIni']['sakit'] }} Orang</div>
-                    </div>
-                </div>
-
-                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
-                    <div class="p-3 bg-red-100 text-red-600 rounded-full"><i class="fas fa-user-times text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-semibold text-slate-500">Alfa Bulan Ini</h3>
-                        <div class="text-lg font-bold text-slate-800">{{ $stats['bulanIni']['alfa'] }} Orang</div>
-                    </div>
-                </div>
-
-                <div class="flex-1 bg-white border rounded-lg shadow p-4 flex items-center space-x-3">
-                    <div class="p-3 bg-blue-100 text-blue-600 rounded-full"><i class="fas fa-users text-xl"></i></div>
-                    <div>
-                        <h3 class="text-sm font-semibold text-slate-500">Total Bulan Ini</h3>
-                        <div class="text-lg font-bold text-slate-800">{{ $stats['bulanIni']['total'] }} Orang</div>
-                    </div>
-                </div>
-            </div> --}}
+        
         </div>
 
 
@@ -304,6 +256,18 @@
             </div>
         </div>
 
+        @if (auth()->user()->role == 'Kepala Toko')
+        <div class="px-4 py-2 rounded-sm text-sm bg-amber-100 border border-amber-200 text-amber-600">
+               <div class="flex w-full justify-between items-start">
+                   <div class="flex">
+                       <svg class="w-4 h-4 shrink-0 fill-current opacity-80 mt-[3px] mr-3" viewBox="0 0 16 16">
+                           <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm1 12H7V7h2v5zM8 6c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z" />
+                       </svg>
+                       <div class="font-medium">Data izin yang sudah di setujui oleh kepala toko di popup edit maka akan ada potongan gaji dari nominal potongan.</div>
+                   </div>
+               </div>
+        </div>
+        @endif
         {{-- Tabel --}}
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8" x-data="handleSelect">
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
