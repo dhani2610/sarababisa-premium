@@ -14,19 +14,21 @@ class LaporanPenjualanController extends Controller
 {
     public function index()
     {
-        $product_transactions = OrderDetail::with('product', 'user')->get();
-        $count = OrderDetail::all()->count();
+        $cabang_id = getCabangId();
+        $product_transactions = OrderDetail::where('cabang_id',$cabang_id)->with('product', 'user')->get();
+        $count = OrderDetail::where('cabang_id',$cabang_id)->get()->count();
 
-        $rumusomzethari = Order::whereHas('detailOrders', function ($query) {
+        $rumusomzethari = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
             $currentMonth = now()->month;
             $currentYear = now()->year;
             $query->where('is_approve', 'Setuju')
                 ->whereYear('tgl_disetujui', $currentYear)
                 ->whereMonth('tgl_disetujui', $currentMonth)
-                ->whereDate('tgl_disetujui', today());
+                ->whereDate('tgl_disetujui', today())
+                ->where('cabang_id',$cabang_id);
         })
-            ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(total) as total_omzet'))
+            ->with(['detailOrders' => function ($query) use ($cabang_id) {
+                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(total) as total_omzet'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -36,17 +38,18 @@ class LaporanPenjualanController extends Controller
             return $order->detailOrders->sum('total_omzet');
         });
 
-        $rumusprofithari = Order::whereHas('detailOrders', function ($query) {
+        $rumusprofithari = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
             $currentMonth = now()->month;
             $currentYear = now()->year;
 
             $query->where('is_approve', 'Setuju')
                 ->whereYear('tgl_disetujui', $currentYear)
                 ->whereMonth('tgl_disetujui', $currentMonth)
-                ->whereDate('tgl_disetujui', today());
+                ->whereDate('tgl_disetujui', today())
+                ->where('cabang_id',$cabang_id);
         })
-            ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
+            ->with(['detailOrders' => function ($query) use ($cabang_id) {
+                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -56,13 +59,14 @@ class LaporanPenjualanController extends Controller
             return $order->detailOrders->sum('total_profit');
         });
 
-        $rumusomzetbulan = Order::whereHas('detailOrders', function ($query) {
+        $rumusomzetbulan = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
             $query->where('is_approve', 'Setuju')
                 ->whereYear('tgl_disetujui', now()->year)
-                ->whereMonth('tgl_disetujui', now()->month);
+                ->whereMonth('tgl_disetujui', now()->month)
+                ->where('cabang_id',$cabang_id);
         })
-            ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(total) as total_omzet'))
+            ->with(['detailOrders' => function ($query) use ($cabang_id) {
+                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(total) as total_omzet'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -72,13 +76,14 @@ class LaporanPenjualanController extends Controller
             return $order->detailOrders->sum('total_omzet');
         });
 
-        $rumusprofitbulan = Order::whereHas('detailOrders', function ($query) {
+        $rumusprofitbulan = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
             $query->where('is_approve', 'Setuju')
                 ->whereYear('tgl_disetujui', now()->year)
-                ->whereMonth('tgl_disetujui', now()->month);
+                ->whereMonth('tgl_disetujui', now()->month)
+                ->where('cabang_id',$cabang_id);
         })
-            ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
+            ->with(['detailOrders' => function ($query) use ($cabang_id) {
+                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -88,12 +93,13 @@ class LaporanPenjualanController extends Controller
             return $order->detailOrders->sum('total_profit');
         });
 
-        $rumusomzettahun = Order::whereHas('detailOrders', function ($query) {
+        $rumusomzettahun = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
             $query->where('is_approve', 'Setuju')
-                ->whereYear('tgl_disetujui', now()->year);
+                ->whereYear('tgl_disetujui', now()->year)
+                ->where('cabang_id',$cabang_id);
         })
-            ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(total) as total_omzet'))
+            ->with(['detailOrders' => function ($query) use ($cabang_id) {
+                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(total) as total_omzet'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -103,12 +109,13 @@ class LaporanPenjualanController extends Controller
             return $order->detailOrders->sum('total_omzet');
         });
 
-        $rumusprofittahun = Order::whereHas('detailOrders', function ($query) {
+        $rumusprofittahun = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
             $query->where('is_approve', 'Setuju')
-                ->whereYear('tgl_disetujui', now()->year);
+                ->whereYear('tgl_disetujui', now()->year)
+                ->where('cabang_id',$cabang_id);
         })
-            ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
+            ->with(['detailOrders' => function ($query) use ($cabang_id) {
+                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -122,10 +129,10 @@ class LaporanPenjualanController extends Controller
     }
     public function indexPajak()
     {
-        $product_transactions = OrderDetail::with('product', 'user')->get();
-        $count = OrderDetail::all()->count();
+        $product_transactions = OrderDetail::where('cabang_id', getCabangId())->with('product', 'user')->get();
+        $count = OrderDetail::where('cabang_id', getCabangId())->get()->count();
 
-        $rumusomzethari = Order::whereHas('detailOrders', function ($query) {
+        $rumusomzethari = Order::where('cabang_id', getCabangId())->whereHas('detailOrders', function ($query) {
             $currentMonth = now()->month;
             $currentYear = now()->year;
             $query->where('is_approve', 'Setuju')
@@ -134,7 +141,7 @@ class LaporanPenjualanController extends Controller
                 ->whereDate('tgl_disetujui', today());
         })
             ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(total) as total_omzet'))
+                $query->where('cabang_id', getCabangId())->select('orders_id', DB::raw('SUM(total) as total_omzet'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -144,7 +151,7 @@ class LaporanPenjualanController extends Controller
             return $order->detailOrders->sum('total_omzet');
         });
 
-        $rumusprofithari = Order::whereHas('detailOrders', function ($query) {
+        $rumusprofithari = Order::where('cabang_id', getCabangId())->whereHas('detailOrders', function ($query) {
             $currentMonth = now()->month;
             $currentYear = now()->year;
 
@@ -155,7 +162,7 @@ class LaporanPenjualanController extends Controller
                 ->whereDate('tgl_disetujui', today());
         })
             ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(ppn) as total_ppn'))
+                $query->where('cabang_id', getCabangId())->select('orders_id', DB::raw('SUM(ppn) as total_ppn'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -165,13 +172,13 @@ class LaporanPenjualanController extends Controller
             return $order->detailOrders->sum('total_ppn');
         });
 
-        $rumusomzetbulan = Order::whereHas('detailOrders', function ($query) {
+        $rumusomzetbulan = Order::where('cabang_id', getCabangId())->whereHas('detailOrders', function ($query) {
             $query->where('is_approve', 'Setuju')
                 ->whereYear('tgl_disetujui', now()->year)
                 ->whereMonth('tgl_disetujui', now()->month);
         })
             ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(total) as total_omzet'))
+                $query->where('cabang_id', getCabangId())->select('orders_id', DB::raw('SUM(total) as total_omzet'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -181,13 +188,13 @@ class LaporanPenjualanController extends Controller
             return $order->detailOrders->sum('total_omzet');
         });
 
-        $rumusprofitbulan = Order::whereHas('detailOrders', function ($query) {
+        $rumusprofitbulan = Order::where('cabang_id', getCabangId())->whereHas('detailOrders', function ($query) {
             $query->where('is_approve', 'Setuju')
                 ->whereYear('tgl_disetujui', now()->year)
                 ->whereMonth('tgl_disetujui', now()->month);
         })
             ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(ppn) as total_ppn'))
+                $query->where('cabang_id', getCabangId())->select('orders_id', DB::raw('SUM(ppn) as total_ppn'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -197,13 +204,13 @@ class LaporanPenjualanController extends Controller
             return $order->detailOrders->sum('total_ppn');
         });
 
-        $rumusomzettahun = Order::whereHas('detailOrders', function ($query) {
+        $rumusomzettahun = Order::where('cabang_id', getCabangId())->whereHas('detailOrders', function ($query) {
             $query->where('is_approve', 'Setuju')
                 ->where('ppn', '!=','0')
                 ->whereYear('tgl_disetujui', now()->year);
         })
             ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(total) as total_omzet'))
+                $query->where('cabang_id', getCabangId())->select('orders_id', DB::raw('SUM(total) as total_omzet'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -213,12 +220,12 @@ class LaporanPenjualanController extends Controller
             return $order->detailOrders->sum('total_omzet');
         });
 
-        $rumusprofittahun = Order::whereHas('detailOrders', function ($query) {
+        $rumusprofittahun = Order::where('cabang_id', getCabangId())->whereHas('detailOrders', function ($query) {
             $query->where('is_approve', 'Setuju')
                 ->whereYear('tgl_disetujui', now()->year);
         })
             ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(ppn) as total_ppn'))
+                $query->where('cabang_id', getCabangId())->select('orders_id', DB::raw('SUM(ppn) as total_ppn'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -246,51 +253,61 @@ class LaporanPenjualanController extends Controller
         // Mengambil data penjualan
         $orders = OrderDetail::with('order')->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->orderBy('created_at', 'asc')
             ->get();
 
         // Menghitung total biaya
         $total_biaya = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('total');
 
         // Menghitung total profit
         $total_profit = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('profit');
 
         // Menghitung total item penjualan
         $total_penjualan = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('quantity');;
 
         // Menghitung total modal
         $total_modal = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('modal');
 
         // Menghitung total diskon
         $total = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('total');
         $sub_total = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('sub_total');
         $total_diskon = $sub_total - $total;
 
         // Menghitung total pembayaran tunai
         $total_tunai = Order::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('tunai');
 
         // Menghitung total pembayaran transfer
         $total_transfer = Order::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('transfer');
 
         // Menghitung total pembayaran kredit
         $total_kredit = Order::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('due');
 
             // dd($orders);
@@ -331,51 +348,61 @@ class LaporanPenjualanController extends Controller
         // Mengambil data penjualan
         $orders = OrderDetail::with('order')->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->orderBy('created_at', 'asc')
             ->get();
 
         // Menghitung total biaya
         $total_biaya = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('total');
 
         // Menghitung total profit
         $total_profit = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('ppn');
 
         // Menghitung total item penjualan
         $total_penjualan = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('quantity');;
 
         // Menghitung total modal
         $total_modal = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('modal');
 
         // Menghitung total diskon
         $total = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('total');
         $sub_total = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('sub_total');
         $total_diskon = $sub_total - $total;
 
         // Menghitung total pembayaran tunai
         $total_tunai = Order::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('tunai');
 
         // Menghitung total pembayaran transfer
         $total_transfer = Order::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('transfer');
 
         // Menghitung total pembayaran kredit
         $total_kredit = Order::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('due');
 
         $pdf = Pdf::loadView('pages.kepalatoko.cetak-laporan-penjualan-pajak', [

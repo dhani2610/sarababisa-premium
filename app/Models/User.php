@@ -62,6 +62,7 @@ class User extends Authenticatable
         'tipe_bonus_admin',
         'nominal_bonus_admin',
         'shift_id',
+        'cabang_id',
     ];
 
     /**
@@ -108,6 +109,7 @@ class User extends Authenticatable
         $currentMonth = now()->month;
 
         return $this->hasMany(ServiceTransaction::class, 'users_id', 'id')
+            ->where('cabang_id', getCabangId())
             ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', $currentMonth);
@@ -123,6 +125,7 @@ class User extends Authenticatable
 
         return $this->hasMany(ServiceTransaction::class, 'users_id', 'id')
             ->where('is_approve', 'Setuju')
+            ->where('cabang_id', getCabangId())
             ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', $lastMonth);
     }
@@ -139,6 +142,7 @@ class User extends Authenticatable
         return $this->hasMany(OrderDetail::class, 'users_id', 'id')
             ->whereHas('order', function ($query) use ($currentMonth) {
                 $query->where('is_approve', 'Setuju')
+                    ->where('cabang_id', getCabangId())
                     ->whereYear('tgl_disetujui', now()->year)
                     ->whereMonth('tgl_disetujui', $currentMonth);
             });
@@ -151,6 +155,7 @@ class User extends Authenticatable
         return $this->hasMany(OrderDetail::class, 'users_id', 'id')
             ->whereHas('order', function ($query) use ($lastMonth) {
                 $query->where('is_approve', 'Setuju')
+                    ->where('cabang_id', getCabangId())
                     ->whereYear('tgl_disetujui', now()->year)
                     ->whereMonth('tgl_disetujui', $lastMonth);
             });
@@ -186,6 +191,7 @@ class User extends Authenticatable
 
         return $this->hasMany(ServiceTransaction::class, 'admin_id', 'id')
             ->where('is_approve', 'Setuju')
+            ->where('cabang_id', getCabangId())
             ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', $currentMonth);
     }
@@ -196,6 +202,7 @@ class User extends Authenticatable
 
         return $this->hasMany(ServiceTransaction::class, 'admin_id', 'id')
             ->where('is_approve', 'Setuju')
+            ->where('cabang_id', getCabangId())
             ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', $lastMonth);
     }
@@ -207,6 +214,7 @@ class User extends Authenticatable
         return $this->hasMany(OrderDetail::class, 'admin_id', 'id')
             ->whereHas('order', function ($query) use ($currentMonth) {
                 $query->where('is_approve', 'Setuju')
+                    ->where('cabang_id', getCabangId())
                     ->whereYear('tgl_disetujui', now()->year)
                     ->whereMonth('tgl_disetujui', $currentMonth);
             });
@@ -219,6 +227,7 @@ class User extends Authenticatable
         return $this->hasMany(OrderDetail::class, 'admin_id', 'id')
             ->whereHas('order', function ($query) use ($lastMonth) {
                 $query->where('is_approve', 'Setuju')
+                    ->where('cabang_id', getCabangId())
                     ->whereYear('tgl_disetujui', now()->year)
                     ->whereMonth('tgl_disetujui', $lastMonth);
             });
@@ -230,6 +239,7 @@ class User extends Authenticatable
 
         return $this->hasMany(TeknisiTarget::class, 'users_id', 'id')
             ->whereYear('created_at', now()->year)
+            ->where('cabang_id', getCabangId())
             ->whereMonth('created_at', $currentMonth);
     }
 
@@ -239,6 +249,7 @@ class User extends Authenticatable
 
         return $this->hasMany(SalesTarget::class, 'users_id', 'id')
             ->whereYear('created_at', now()->year)
+            ->where('cabang_id', getCabangId())
             ->whereMonth('created_at', $currentMonth);
     }
 }

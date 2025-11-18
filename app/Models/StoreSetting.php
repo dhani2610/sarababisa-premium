@@ -33,6 +33,7 @@ class StoreSetting extends Model
         'nominal_potongan_alfa',
         'nominal_potongan_sakit',
         'nominal_overtime',
+        'cabang_id',
     ];
 
 }

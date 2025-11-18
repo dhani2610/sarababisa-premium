@@ -20,7 +20,7 @@ class OvertimeExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        $query = Overtime::with('user')
+        $query = Overtime::where('cabang_id',getCabangId())->with('user')
             ->when(
                 $this->start && $this->end,
                 fn($q) =>

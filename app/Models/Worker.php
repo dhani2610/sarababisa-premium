@@ -17,7 +17,8 @@ class Worker extends Model
         'bulankerja',
         'gaji',
         'absen',
-        'bpjs'
+        'bpjs',
+        'cabang_id',
     ];
 
     // many to many

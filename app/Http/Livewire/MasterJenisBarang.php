@@ -27,12 +27,12 @@ class MasterJenisBarang extends Component
 
     public function render()
     {
-        $types_count = Type::all()->count();
+        $types_count = Type::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.master-jenis-barang', [
             'types_count' => $types_count,
             'types' => $this->search === null ?
-                Type::latest()->paginate($this->paginate) :
-                Type::latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Type::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                Type::where('cabang_id',getCabangId())->latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

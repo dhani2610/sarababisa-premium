@@ -29,7 +29,7 @@ class MasterRincianInvest extends Component
 
     public function render()
     {
-        $query = RincianInvest::with('investor');
+        $query = RincianInvest::where('cabang_id',getCabangId())->with('investor');
 
         if (auth()->user()->role == 'Investor') {
             $query->where('id_investor', auth()->id());
@@ -48,15 +48,15 @@ class MasterRincianInvest extends Component
         $data = $query->latest()->paginate($this->paginate);
 
         $totals = [
-            'masuk' => RincianInvest::where('tipe', 1)->sum('nominal'),
-            'pembagian' => RincianInvest::where('tipe', 2)->sum('nominal'),
-            'lain' => RincianInvest::where('tipe', 3)->sum('nominal'),
+            'masuk' => RincianInvest::where('cabang_id',getCabangId())->where('tipe', 1)->sum('nominal'),
+            'pembagian' => RincianInvest::where('cabang_id',getCabangId())->where('tipe', 2)->sum('nominal'),
+            'lain' => RincianInvest::where('cabang_id',getCabangId())->where('tipe', 3)->sum('nominal'),
         ];
 
         return view('livewire.master-rincian-invest', [
             'rincian' => $data,
             'totals' => $totals,
-            'investors' => User::where('role', 'Investor')->get(), // untuk dropdown filter
+            'investors' => User::where('cabang_id',getCabangId())->where('role', 'Investor')->get(), // untuk dropdown filter
         ]);
     }
 }

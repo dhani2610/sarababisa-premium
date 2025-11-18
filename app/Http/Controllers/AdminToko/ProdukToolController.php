@@ -119,7 +119,7 @@ class ProdukToolController extends Controller
     {
         $item = Product::findOrFail($id);
         $spareparts = SubCategory::where('categories_id', '=', '4')->get();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages.admintoko.produk.tool-edit', [
             'item' => $item,

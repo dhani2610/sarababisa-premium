@@ -347,7 +347,7 @@
 
                                 {{-- Sparepart --}}
                                 <td class="px-2 py-3">
-                                    @if (!empty($item->tindakan))
+                                    @if (!empty($item->sparepart))
                                         @php $spareparts = json_decode($item->sparepart, true); @endphp
                                         @if ($spareparts)
                                             <ul class="list-disc ml-4">

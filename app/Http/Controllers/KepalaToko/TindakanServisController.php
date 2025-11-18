@@ -41,6 +41,7 @@ class TindakanServisController extends Controller
     {
         $data = $request->all();
 
+        $data['cabang_id'] = getCabangId();
         ServiceAction::create($data);
 
         return redirect()->route('tindakan-servis.index');

@@ -130,7 +130,7 @@ class TransaksiProdukController extends Controller
         $subtotal = $orderItem->sum('sub_total');
         $users = User::find(1);
         $terms = Term::find(3);
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);

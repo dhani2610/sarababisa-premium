@@ -77,7 +77,8 @@ class ProdukToolController extends Controller
             'harga_jual_toko' => $request->harga_jual_toko,
             'keterangan' => $request->keterangan,
             'garansi' => $request->garansi,
-            'ppn' => $request->ppn
+            'ppn' => $request->ppn,
+            'cabang_id' => getCabangId(),
         ]);
 
         // return redirect()->route('tool.index');
@@ -118,9 +119,9 @@ class ProdukToolController extends Controller
      */
     public function edit($id)
     {
-        $item = Product::findOrFail($id);
-        $spareparts = SubCategory::where('categories_id', '=', '4')->get();
-        $toko = StoreSetting::find(1);
+        $item = Product::where('cabang_id',getCabangId())->findOrFail($id);
+        $spareparts = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '4')->get();
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages.kepalatoko.produk.tool-edit', [
             'item' => $item,

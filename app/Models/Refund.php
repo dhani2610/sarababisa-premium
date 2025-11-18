@@ -14,6 +14,7 @@ class Refund extends Model
         'nominal',
         'teknisi_id',
         'period',
+        'cabang_id',
     ];
 
     protected $dates = ['period'];

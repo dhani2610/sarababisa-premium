@@ -18,7 +18,8 @@ class Purchase extends Model
         'quantity',
         'product_price',
         'total_price',
-        'date'
+        'date',
+        'cabang_id',
     ];
 
     public function supplier()

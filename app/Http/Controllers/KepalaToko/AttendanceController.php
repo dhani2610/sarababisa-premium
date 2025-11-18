@@ -126,6 +126,7 @@ class AttendanceController extends Controller
             'note' => $request->note,
             'nominal_potongan' => $potonganTelat,
             'telat' => $telat,
+            'cabang_id' => getCabangId(),
         ]);
 
         toast('Absensi tersimpan.', 'success');

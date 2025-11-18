@@ -11,7 +11,7 @@ class ToggleBonus extends Component
 
     public function mount()
     {
-        $storeSettings = StoreSetting::find(1); // Ganti 1 dengan ID yang sesuai
+        $storeSettings = StoreSetting::where('cabang_id',getCabangId())->first(); // Ganti 1 dengan ID yang sesuai
         $this->bonusApplied = $storeSettings->is_bonus;
     }
 
@@ -22,7 +22,7 @@ class ToggleBonus extends Component
 
     public function updatedBonusApplied()
     {
-        $storeSettings = StoreSetting::find(1); // Ganti 1 dengan ID yang sesuai
+        $storeSettings = StoreSetting::where('cabang_id',getCabangId())->first(); // Ganti 1 dengan ID yang sesuai
         $storeSettings->update([
             'is_bonus' => $this->bonusApplied,
         ]);

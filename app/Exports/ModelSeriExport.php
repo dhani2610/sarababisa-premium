@@ -17,7 +17,7 @@ class ModelSeriExport implements FromCollection, WithMapping, WithHeadings, Shou
      */
     public function collection()
     {
-        return ModelSerie::with('brand')->get();
+        return ModelSerie::where('cabang_id',getCabangId())->with('brand')->get();
     }
 
     public function map($modelserie): array

@@ -29,13 +29,13 @@ class SubKategoriData extends Component
     public function render()
     {
         $categories = Category::whereNot('category_name', 'Handphone')->get();
-        $sub_categories_count = SubCategory::all()->count();
+        $sub_categories_count = SubCategory::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.sub-kategori-data', [
             'categories' => $categories,
             'sub_categories_count' => $sub_categories_count,
             'sub_categories' => $this->search === null ?
-                SubCategory::latest()->paginate($this->paginate) :
-                SubCategory::latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                SubCategory::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                SubCategory::where('cabang_id',getCabangId())->latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

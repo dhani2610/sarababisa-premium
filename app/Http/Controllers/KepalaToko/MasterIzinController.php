@@ -34,7 +34,7 @@ class MasterIzinController extends Controller
             }
 
             // Ambil setting potongan dari store_settings (id = 1)
-            $store = StoreSetting::find(1);
+            $store = StoreSetting::where('cabang_id',getCabangId())->first();
             $user = User::find($request->user_id);
             $shift = Shift::where('id',$user->shift_id)->first();
 
@@ -62,7 +62,7 @@ class MasterIzinController extends Controller
                 $data['nominal_potongan'] = str_replace('.', '', $data['nominal_potongan']);
             }
             // dd($data);
-
+            $data['cabang_id'] = getCabangId();
             $izin = Izin::create($data);
 
             try {
@@ -173,7 +173,7 @@ class MasterIzinController extends Controller
 
     public function sendMessage($message)
     {
-        $storeSetting = \App\Models\StoreSetting::find(1);
+        $storeSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;

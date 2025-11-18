@@ -119,7 +119,7 @@ class ProdukHandphoneController extends Controller
         $model_series = ModelSerie::all();
         $capacities = Capacity::all();
         $colors = Color::all();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages.admintoko.produk.handphone-edit', [
             'item' => $item,

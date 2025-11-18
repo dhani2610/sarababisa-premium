@@ -120,30 +120,17 @@ class ProdukSparepartData extends Component
 
     public function render()
     {
-        $spareparts = SubCategory::where('categories_id', '=', '2')->get();
-        $model_series = ModelSerie::all();
-        $toko = StoreSetting::find(1);
-        $spareparts_count = Product::where('categories_id', '=', '2')->count();
-        $sparepartitemready = Product::where('categories_id', 2)->where('stok', '>', 0)->count();
-        $sparepartstokready = Product::where('categories_id', 2)->where('stok', '>', 0)->sum('stok');
-        $sparepartmodalready = Product::where('categories_id', 2)->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
-        $sparepartstokhabis = Product::where('categories_id', 2)->where('stok', 0)->count();
-        $sparepartnominalterjual = Product::where('categories_id', 2)->where('stok', 0)->sum('harga_jual');
+        $spareparts = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '2')->get();
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $spareparts_count = Product::where('cabang_id',getCabangId())->where('categories_id', '=', '2')->count();
+        $sparepartitemready = Product::where('cabang_id',getCabangId())->where('categories_id', 2)->where('stok', '>', 0)->count();
+        $sparepartstokready = Product::where('cabang_id',getCabangId())->where('categories_id', 2)->where('stok', '>', 0)->sum('stok');
+        $sparepartmodalready = Product::where('cabang_id',getCabangId())->where('categories_id', 2)->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
+        $sparepartstokhabis = Product::where('cabang_id',getCabangId())->where('categories_id', 2)->where('stok', 0)->count();
+        $sparepartnominalterjual = Product::where('cabang_id',getCabangId())->where('categories_id', 2)->where('stok', 0)->sum('harga_jual');
 
-        $topProducts = OrderDetail::select(
-            'order_details.products_id',
-            'products.product_name',
-            'products.harga_jual',
-            DB::raw('SUM(order_details.quantity) as total_terjual'),
-            DB::raw('SUM(order_details.quantity * products.harga_jual) as omzet')
-        )
-        ->join('products', 'products.id', '=', 'order_details.products_id')
-        ->groupBy('order_details.products_id', 'products.product_name', 'products.harga_jual')
-        ->orderByDesc('total_terjual')
-->limit('5')
-        ->where('products.categories_id', 2)
-        
-        ->get();
+        $topProducts =[];
 
 
         return view('livewire.produk-sparepart-data', [
@@ -158,8 +145,8 @@ class ProdukSparepartData extends Component
             'sparepartstokhabis' => $sparepartstokhabis,
             'sparepartnominalterjual' => $sparepartnominalterjual,
             'products' => $this->search === null ?
-                Product::latest()->where('categories_id', '=', '2')->paginate($this->paginate) :
-                Product::latest()->where('categories_id', '=', '2')->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '2')->paginate($this->paginate) :
+                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '2')->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

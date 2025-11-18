@@ -68,7 +68,8 @@ class ReturProductController extends Controller
             'status' => $request->status,
             'retur_quantity' => $request->retur_quantity,
             'retur_credit' => $purchase->product_price * $request->retur_quantity,
-            'date' => $request->date
+            'date' => $request->date,
+            'cabang_id' => getCabangId(),
         ]);
 
         $products = Product::find($purchase->products_id);

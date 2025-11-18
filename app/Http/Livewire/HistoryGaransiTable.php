@@ -26,7 +26,7 @@ class HistoryGaransiTable extends Component
 
     public function render()
     {
-        $query = HistoryGaransi::with(['service', 'teknisi', 'penerima'])
+        $query = HistoryGaransi::where('cabang_id',getCabangId())->with(['service', 'teknisi', 'penerima'])
             ->latest();
 
         if ($this->search) {
@@ -37,17 +37,17 @@ class HistoryGaransiTable extends Component
         // dd(auth()->user()->role);
         if (auth()->user()->role == 'Teknisi') {
             $query->where('teknisi_id', auth()->user()->id);
-            $users = User::where('id',auth()->user()->id)->get();
+            $users = User::where('cabang_id',getCabangId())->where('id',auth()->user()->id)->get();
         }else{
-            $users = User::all();
+            $users = User::where('cabang_id',getCabangId())->get();
         }
 
-        $serviceTransactions = ServiceTransaction::orderBy('created_at', 'desc')->get();
-        $products = Product::whereHas('subCategory.category', function ($q) {
+        $serviceTransactions = ServiceTransaction::where('cabang_id',getCabangId())->orderBy('created_at', 'desc')->get();
+        $products = Product::where('cabang_id',getCabangId())->whereHas('subCategory.category', function ($q) {
             $q->where('category_name', 'Sparepart');
         })->where('stok', '>=', 1)->get();
 
-        $serviceActions = ServiceAction::all();
+        $serviceActions = ServiceAction::where('cabang_id',getCabangId())->get();
 
         return view('livewire.history-garansi', [
             'data' => $query->paginate($this->paginate),

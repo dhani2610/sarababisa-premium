@@ -119,7 +119,7 @@ class DashboardController extends Controller
 
         $inventories = Inventory::where('masa_penggantian', '<', $currentDate)->count();
 
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages/admintoko/dashboard', compact(
             'totalbiayaservis',

@@ -10,7 +10,7 @@ class Attendance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id','type','tanggal','waktu','photo','lat','lng','note','telat','nominal_potongan'
+        'user_id','type','tanggal','waktu','photo','lat','lng','note','telat','nominal_potongan','cabang_id'
     ];
 
     public function user()

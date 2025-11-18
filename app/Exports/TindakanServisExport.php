@@ -17,7 +17,7 @@ class TindakanServisExport implements FromCollection, WithMapping, WithHeadings,
      */
     public function collection()
     {
-        return ServiceAction::all();
+        return ServiceAction::where('cabang_id',getCabangId())->get();
     }
 
     public function map($serviceaction): array

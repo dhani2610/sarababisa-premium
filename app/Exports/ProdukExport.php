@@ -17,7 +17,7 @@ class ProdukExport implements FromCollection, WithMapping, WithHeadings, ShouldA
      */
     public function collection()
     {
-        return Product::all();
+        return Product::where('cabang_id',getCabangId())->get();
     }
 
     public function map($product): array

@@ -24,6 +24,7 @@ class BrandImport implements ToModel, WithHeadingRow, WithBatchInserts
             [
                 'id'   => $row['ID Merek'],
                 'name' => $row['Nama Merek'],
+                'cabang_id'   => getCabangId(),
             ]
         );
 

@@ -36,7 +36,8 @@ class SupplierController extends Controller
         Supplier::create([
             'name' => $request->name,
             'phone_number' => $request->phone_number,
-            'address' => $request->address
+            'address' => $request->address,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('supplier.index');

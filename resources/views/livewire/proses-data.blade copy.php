@@ -553,7 +553,7 @@
                                                                 modalSparepart = selected.dataset.hargaModal || 0;
                                                             ">
                                                             <option selected value="">Pilih Sparepart</option>
-                                                            @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
+                                                            @foreach (App\Models\Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get() as $item)
                                                                 <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">
                                                                     {{ $item->product_name }}
                                                                 </option>
@@ -1091,7 +1091,7 @@
                                         @php
                                             $nomor = $process->customer->nomor_hp;
                                             $nomorwa = preg_replace('/^08/', '628', $nomor);
-                                            $fonteeToken = \App\Models\StoreSetting::first()->fonnte ?? null;
+                                            $fonteeToken = getStoreSettingByCabang()->fonnte ?? null;
                                         @endphp
 
                                         {{-- TOMBOL WHATSAPP --}}
@@ -1868,7 +1868,7 @@ $(document).ready(function () {
 
 @php
     $ppn = 0;
-    $cekPPN = \App\Models\StoreSetting::find(1);
+    $cekPPN = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
     if (!empty($cekPPN)) {
         if ($cekPPN->is_tax == 1 && $cekPPN->ppn != 0) {
             $ppn = $cekPPN->ppn;

@@ -28,7 +28,7 @@ class PosController extends Controller
     public function index()
     {
 
-         $toko = StoreSetting::find(1);
+         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         $brands = Brand::all();
         $capacities = Capacity::all();
         $model_series = ModelSerie::all();

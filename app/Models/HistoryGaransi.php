@@ -20,6 +20,7 @@ class HistoryGaransi extends Model
         'keluhan',
         'tgl_selesai',
         'status',
+        'cabang_id',
     ];
 
     protected $casts = [

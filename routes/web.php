@@ -131,7 +131,7 @@ use App\Http\Controllers\KepalaToko\ProdukHandphoneController as KepalaTokoProdu
 use App\Http\Controllers\KepalaToko\ProdukSparepartController as KepalaTokoProdukSparepartController;
 use App\Http\Controllers\KepalaToko\PurchaseProductController as KepalaTokoPurchaseProductController;
 use App\Http\Controllers\KepalaToko\TransaksiProdukController as KepalaTokoTransaksiProdukController;
-use App\Http\Controllers\KepalaToko\TransaksiServisControllers as KepalaTokoTransaksiServisController;
+use App\Http\Controllers\KepalaToko\TransaksiServisController as KepalaTokoTransaksiServisController;
 // Sales
 use App\Http\Controllers\KepalaToko\UbahBisaDiambilController as KepalaTokoUbahBisaDiambilController;
 use App\Http\Controllers\AdminToko\MasterJenisBarangController as AdminTokoMasterJenisBarangController;
@@ -157,6 +157,7 @@ use App\Http\Controllers\KepalaToko\TransaksiServisLangsungController as KepalaT
 use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTransaksiServisLangsungController;
 use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as KepalaTokoServisBelumDisetujuiApproveController;
 use App\Http\Controllers\TipeOsController;
+use App\Http\Controllers\CabangController;
 use App\Http\Controllers\KepalaToko\MasterIzinController;
 use App\Http\Controllers\KepalaToko\MasterOvertimeController;
 
@@ -272,6 +273,17 @@ Route::post('master/master-overtime/reject-selected', [MasterOvertimeController:
 Route::resource('master/master-overtime', MasterOvertimeController::class);
 
 
+Route::post('/set-cabang', function () {
+    $id = request('cabang_id');
+
+    $user = Auth::user();
+    $user->cabang_id = $id;
+    $user->save();
+
+    return back();
+})->name('set.cabang');
+
+
 // Livewire page (index)
 // Route::get('master/master-absensi', MasterAbsensi::class)->name('master-absensi.index');
 
@@ -345,6 +357,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
     Route::resource('master/master-tipe-os', TipeOsController::class);
     Route::resource('master/master-gallery', GalleryController::class);
+    Route::resource('master/master-cabang', CabangController::class);
 
 
     Route::resource('refund', RefundController::class)->names('refund');

@@ -62,6 +62,7 @@ class InventarisController extends Controller
             'supplier' => $request->supplier,
             'masa_penggantian' => $expired,
             'created_at' => $request->created_at,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('inventaris.index');

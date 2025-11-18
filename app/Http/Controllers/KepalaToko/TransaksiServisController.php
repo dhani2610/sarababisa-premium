@@ -54,7 +54,7 @@ class TransaksiServisController extends Controller
     {
         $limit = $request->get('limit', 200);
         $offset = $request->get('offset', 0);
-        $query = ServiceTransaction::with(['customer'])
+        $query = ServiceTransaction::where('cabang_id',getCabangId())->with(['customer'])
         ->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])
         ->orderByDesc('updated_at')
         ->latest()
@@ -76,7 +76,7 @@ class TransaksiServisController extends Controller
             if (auth()->user()->role != 'Investor') {
                 $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
                 $hariIni = \Carbon\Carbon::today();
-                $tokoSetting = \App\Models\StoreSetting::find(1);
+                $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
                 if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
                     $link = route('transaksi-servis.edit', $row->id);
                     return '<a href="' . $link . '">
@@ -484,7 +484,8 @@ class TransaksiServisController extends Controller
             'estimasi_biaya' => $request->estimasi_biaya,
             'uang_muka' => $request->uang_muka,
             'status_servis' => $request->status_servis,
-            'penerima' => $request->penerima
+            'penerima' => $request->penerima,
+            'cabang_id' => getCabangId(),
         ]);
 
         try {
@@ -516,7 +517,7 @@ class TransaksiServisController extends Controller
     }
     public function sendMessage($message)
     {
-        $storeSetting = \App\Models\StoreSetting::find(1);
+        $storeSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;

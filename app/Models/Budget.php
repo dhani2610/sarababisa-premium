@@ -11,6 +11,7 @@ class Budget extends Model
         'name',
         'quantity',
         'price',
-        'total'
+        'total',
+        'cabang_id',
     ];
 }

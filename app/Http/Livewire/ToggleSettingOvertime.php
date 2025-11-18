@@ -11,7 +11,7 @@ class ToggleSettingOvertime extends Component
 
     public function mount()
     {
-        $setting = StoreSetting::find(1);
+        $setting = StoreSetting::where('cabang_id',getCabangId())->first();
         if ($setting) {
             $this->nominal_overtime = number_format($setting->nominal_overtime, 0, '', '.');
         }
@@ -30,7 +30,7 @@ class ToggleSettingOvertime extends Component
             'nominal_overtime' => 'nullable',
         ]);
 
-        $setting = StoreSetting::find(1);
+        $setting = StoreSetting::where('cabang_id',getCabangId())->first();
         if ($setting) {
             $setting->update([
                 'nominal_overtime' => $izin,

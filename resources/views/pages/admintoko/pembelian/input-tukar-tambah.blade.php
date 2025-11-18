@@ -43,7 +43,7 @@
                         <label class="block text-sm font-medium mb-1" for="products_id">Produk yang dijual <span class="text-rose-500">*</span></label>
                         <select id="products_id" name="product_sale_id" class="form-select text-sm py-1 w-full selectjs2" required style="width: 100%">
                             <option selected="">Pilih Produk</option>
-                            @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
+                            @foreach (App\Models\Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get() as $item)
                                 <option value="{{ $item->id }}">{{ $item->product_name }} ({{ $item->nomor_seri }})</option>
                             @endforeach
                         </select>

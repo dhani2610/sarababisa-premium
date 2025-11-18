@@ -27,12 +27,12 @@ class TargetData extends Component
 
     public function render()
     {
-        $targets_count = Target::all()->count();
+        $targets_count = Target::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.target-data', [
             'targets_count' => $targets_count,
             'targets' => $this->search === null ?
-                Target::latest()->paginate($this->paginate) :
-                Target::latest()->where('created_at', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Target::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                Target::where('cabang_id',getCabangId())->latest()->where('created_at', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

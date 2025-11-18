@@ -11,7 +11,8 @@ class Brand extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name'
+        'name',
+        'cabang_id',
     ];
 
     public function modelserie()

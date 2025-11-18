@@ -12,7 +12,7 @@ class LaporanTeknisiController extends Controller
 {
     public function index()
     {
-        $users = User::with('servicetransaction')
+        $users = User::where('cabang_id',getCabangId())->with('servicetransaction')
             ->where('role', 'Teknisi')
             ->get();
 
@@ -38,6 +38,7 @@ class LaporanTeknisiController extends Controller
         $services = ServiceTransaction::with('brand', 'modelserie')->where('users_id', $request->users_id)->where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->orderBy('tgl_ambil', 'asc')
             ->get();
 
@@ -45,6 +46,7 @@ class LaporanTeknisiController extends Controller
         $total_biaya = ServiceTransaction::where('status_servis', 'Sudah Diambil')->where('users_id', $request->users_id)
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->sum('biaya');
 
         
@@ -53,12 +55,14 @@ class LaporanTeknisiController extends Controller
         $total_tindakan = ServiceTransaction::where('users_id', $request->users_id)->where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
             ->count();;
 
         // Menghitung total bonus
             $total_profit_interface = ServiceTransaction::where('users_id', $request->users_id)->where('status_servis', 'Sudah Diambil')
                 ->whereDate('tgl_ambil', '>=', $start_date)
                 ->whereDate('tgl_ambil', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
                 ->where('tipe', 'Interface')
                 ->where('is_approve', 'Setuju')
                 ->sum('bonus_interface');
@@ -66,6 +70,7 @@ class LaporanTeknisiController extends Controller
             $total_profit = ServiceTransaction::where('users_id', $request->users_id)->where('status_servis', 'Sudah Diambil')
                 ->whereDate('tgl_ambil', '>=', $start_date)
                 ->whereDate('tgl_ambil', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
                 ->where('is_approve', 'Setuju')
                 ->where('tipe', 'Hardware')
                 ->sum('profit');

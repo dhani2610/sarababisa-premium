@@ -37,6 +37,7 @@ class ServisBelumDisetujuiController extends Controller
 
         $query = ServiceTransaction::with(['customer', 'user'])
             ->where('status_servis', 'Sudah Diambil')->where('is_approve', null)
+            ->where('cabang_id', getCabangId())
             ->orderBy('created_at', 'desc')
             ->latest()
             ->skip($offset)
@@ -435,7 +436,7 @@ class ServisBelumDisetujuiController extends Controller
 
 
         $ppn = 0;
-        $cekppn = StoreSetting::find(1);
+        $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
         if (!empty($cekppn) && $cekppn->is_tax == 1) {
             $ppn = $cekppn->ppn;
         }

@@ -646,7 +646,7 @@
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
                             @php
-                                $tokoSetting = \App\Models\StoreSetting::find(1);
+                                $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
                             @endphp
                             @if ((int) ($tokoSetting->is_edit_produk ?? 0) == 1 || Auth::user()->role == 'Kepala Toko')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">

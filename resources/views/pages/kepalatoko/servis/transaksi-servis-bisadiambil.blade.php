@@ -214,7 +214,7 @@
                                                 <label class="block text-sm font-medium mb-1" for="products_id">Sparepart Toko yg Digunakan</label>
                                                 <select id="selectjs6" name="products_id[]" class="form-select text-sm py-1 w-full selectAction2" style="width: 100%;">
                                                     <option selected value="">Pilih Sparepart</option>
-                                                    @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
+                                                    @foreach (App\Models\Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get() as $item)
                                                         <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ $item->product_name }}</option>
                                                     @endforeach
                                                 </select>
@@ -405,7 +405,7 @@
                         <select class="selectAction2" name="products_id[]"
                             class="form-select text-sm py-1 w-full" style="width: 100%;">
                             <option selected value="">Pilih Sparepart</option>
-                            @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
+                            @foreach (App\Models\Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get() as $item)
                                 <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ $item->product_name }}
                                 </option>
                             @endforeach

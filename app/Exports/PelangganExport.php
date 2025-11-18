@@ -18,7 +18,7 @@ class PelangganExport implements FromCollection, WithMapping, WithHeadings, Shou
      */
     public function collection()
     {
-        return Customer::all();
+        return Customer::where('cabang_id',getCabangId())->get();
     }
 
     public function map($customer): array

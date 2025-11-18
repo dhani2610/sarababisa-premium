@@ -29,14 +29,14 @@ class TargetTeknisiData extends Component
 
     public function render()
     {
-        $targets_count = TeknisiTarget::all()->count();
-        $teknisi = User::where('role', 'Teknisi')->get();
+        $targets_count = TeknisiTarget::where('cabang_id',getCabangId())->where('cabang_id',getCabangId())->get()->count();
+        $teknisi = User::where('cabang_id',getCabangId())->where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
         return view('livewire.target-teknisi-data', [
             'targets_count' => $targets_count,
             'teknisi' => $teknisi,
             'targets' => $this->search === null ?
-                TeknisiTarget::latest()->paginate($this->paginate) :
-                TeknisiTarget::latest()->where('teknisi_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                TeknisiTarget::where('cabang_id',getCabangId())->where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                TeknisiTarget::where('cabang_id',getCabangId())->where('cabang_id',getCabangId())->latest()->where('teknisi_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

@@ -25,7 +25,7 @@ class ProsesData extends Component
 
     public function mount()
     {
-        $this->type = Type::pluck('id')->toArray();
+        $this->type = Type::where('cabang_id',getCabangId())->pluck('id')->toArray();
     }
 
     public $status = [
@@ -70,26 +70,26 @@ class ProsesData extends Component
     public function render()
     {
         $toko = User::find(1);
-        $customers = Customer::all();
-        $types = Type::all();
-        $brands = Brand::all();
-        $capacities = Capacity::all();
-        $model_series = ModelSerie::all();
-        $users = User::where('role', 'Teknisi')->get();
-        $sales = User::where('role', 'Sales')->get();
-        $penerima = User::whereNotIn('role',['Investor'])->get();
-        $service_actions = ServiceAction::all();
-        $products = Product::whereHas('subCategory', function ($query) {
+        $customers = Customer::where('cabang_id',getCabangId())->get();
+        $types = Type::where('cabang_id',getCabangId())->get();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
+        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $penerima = User::where('cabang_id',getCabangId())->whereNotIn('role',['Investor'])->get();
+        $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
+        $products = Product::where('cabang_id',getCabangId())->whereHas('subCategory', function ($query) {
             $query->whereHas('category', function ($subQuery) {
                 $subQuery->where('category_name', 'Sparepart');
             });
         })->where('stok', '>=', 1)->get();
-        $processes_count = ServiceTransaction::whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
-        $jumlah_bisa_diambil = ServiceTransaction::where('status_servis', 'Bisa Diambil')->count();
-        $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->count();
-        $jumlah_belum_disetujui = ServiceTransaction::where('status_servis', 'Sudah Diambil')->where('is_approve', '=', null)->count();
+        $processes_count = ServiceTransaction::where('cabang_id',getCabangId())->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
+        $jumlah_bisa_diambil = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Bisa Diambil')->count();
+        $jumlah_sudah_diambil = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Sudah Diambil')->count();
+        $jumlah_belum_disetujui = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Sudah Diambil')->where('is_approve', '=', null)->count();
 
-        $process = ServiceTransaction::when($this->search, function ($q) {
+        $process = ServiceTransaction::where('cabang_id',getCabangId())->when($this->search, function ($q) {
                 $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('nama_barang', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orWhere('imei', 'like', '%' . $this->search . '%')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil']);
             })->when($this->type, function ($q) {
                 $q->whereIn('types_id', $this->type);

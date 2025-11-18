@@ -84,7 +84,7 @@ class LaporanTeknisiController extends Controller
             ->sum('profit');
         $profittahun = $profittahun + $profittahunInterface;
 
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         return view('pages/teknisi/laporan-teknisi', compact('services', 'services_count', 'servishari', 'profithari', 'servisbulan', 'profitbulan', 'servistahun', 'profittahun', 'toko'));
     }
 }

@@ -55,6 +55,7 @@ class TargetSalesController extends Controller
             'users_id' => $request->users_id,
             'item' => $request->item,
             'sales_name' => $sales_name->name,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('target-sales.index');
@@ -80,7 +81,7 @@ class TargetSalesController extends Controller
     public function edit($id)
     {
         $item = SalesTarget::findOrFail($id);
-        $sales = User::where('role', 'Sales')->get();
+        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
 
         return view('pages.kepalatoko.target-sales.edit', [
             'item' => $item,

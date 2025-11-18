@@ -19,7 +19,7 @@ class HistoryGaransiController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = User::where('cabang_id',getCabangId())->get();
         return view('pages.kepalatoko.history.garansi', compact(
             'users'
         ));
@@ -37,7 +37,7 @@ class HistoryGaransiController extends Controller
         $end_date = $request->end_date;
 
         // Ambil data history garansi berdasarkan periode
-        $data = HistoryGaransi::with(['service', 'teknisi', 'penerima'])
+        $data = HistoryGaransi::where('cabang_id',getCabangId())->with(['service', 'teknisi', 'penerima'])
             ->whereBetween('date', [$start_date, $end_date])
             ->orderBy('date', 'desc')
             ->get();
@@ -65,7 +65,7 @@ class HistoryGaransiController extends Controller
         $filename = 'Laporan History Garansi ' . $start_date . ' sd ' . $end_date . '.pdf';
         return $pdf->stream($filename);
     }
-  
+
     public function bulkDelete(Request $request)
     {
         $ids = $request->ids;
@@ -106,6 +106,7 @@ class HistoryGaransiController extends Controller
         $data->total_biaya = 0;
         $data->catatan     = '-';
         $data->status     = 1;
+        $data->cabang_id     = getCabangId();
         $data->save();
 
         toast('Data berhasil disimpan.', 'success');
@@ -241,13 +242,13 @@ class HistoryGaransiController extends Controller
     public function edit($id)
     {
         $historyGaransi = HistoryGaransi::findOrFail($id);
-        $serviceTransactions = ServiceTransaction::orderBy('created_at', 'desc')->get();
-        $products = Product::whereHas('subCategory.category', function ($q) {
+        $serviceTransactions = ServiceTransaction::where('cabang_id',getCabangId())->orderBy('created_at', 'desc')->get();
+        $products = Product::where('cabang_id',getCabangId())->whereHas('subCategory.category', function ($q) {
             $q->where('category_name', 'Sparepart');
         })->where('stok', '>=', 1)->get();
 
-        $serviceActions = ServiceAction::all();
-        $users = User::all();
+        $serviceActions = ServiceAction::where('cabang_id',getCabangId())->get();
+        $users = User::where('cabang_id',getCabangId())->get();
         return view('pages.kepalatoko.history.edit', compact(
             'users','historyGaransi','serviceTransactions','products','serviceActions'
         ));

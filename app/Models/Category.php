@@ -10,6 +10,7 @@ class Category extends Model
     protected $fillable = [
         'category_name',
         'show_portal',
+        'cabang_id',
     ];
 
     public function product()

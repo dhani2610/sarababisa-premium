@@ -28,18 +28,19 @@ class LaporanPenjualanData extends Component
 
     public function render()
     {
-        $jumlah = OrderDetail::whereHas('order', function ($query) {
+        $jumlah = OrderDetail::where('cabang_id',getCabangId())->whereHas('order', function ($query) {
             $query->where('is_approve', 'Setuju');
         })->sum('quantity');
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        // dd($toko);
         return view('livewire.laporan-penjualan-data', [
             'toko' => $toko,
             'jumlah' => $jumlah,
             'product_transactions' => $this->search === null ?
-                OrderDetail::whereHas('order', function ($query) {
+                OrderDetail::where('cabang_id',getCabangId())->whereHas('order', function ($query) {
                     $query->where('is_approve', 'Setuju');
                 })->latest()->paginate($this->paginate) :
-                OrderDetail::whereHas('order', function ($query) {
+                OrderDetail::where('cabang_id',getCabangId())->whereHas('order', function ($query) {
                     $query->where('is_approve', 'Setuju');
                 })->latest()->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);

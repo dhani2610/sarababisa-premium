@@ -20,7 +20,7 @@ class AdminProdukAksesorisData extends Component
     public $paginate = 10;
     public $search;
 
-    
+
     public $fotoProduk, $produkId;
     public $showFotoModal = false;
 
@@ -86,7 +86,7 @@ class AdminProdukAksesorisData extends Component
         $this->resetPage();
     }
 
-    
+
     public $barcode;
     public $modalOpen = false;
 
@@ -119,7 +119,7 @@ class AdminProdukAksesorisData extends Component
     {
         $accessories = SubCategory::where('categories_id', '=', '3')->get();
         $model_series = ModelSerie::all();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         $accessories_count = Product::where('categories_id', '=', '3')->count();
 
 
@@ -135,7 +135,7 @@ class AdminProdukAksesorisData extends Component
         ->where('products.categories_id', '=', '3')
         ->orderByDesc('total_terjual')
 ->limit('5')
-        
+
         ->get();
 
         return view('livewire.admin-produk-aksesoris-data', [

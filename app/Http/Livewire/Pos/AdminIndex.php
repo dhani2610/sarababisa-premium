@@ -132,7 +132,7 @@ class AdminIndex extends Component
     public function render()
     {
         $cart_items = Cart::instance($this->cart_instance)->content();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         $users = User::where('role', 'Sales')->get();
 
         return view('livewire.pos.admin-index', [
@@ -195,7 +195,7 @@ class AdminIndex extends Component
                 $tempo = null;
             }
 
-            $toko = StoreSetting::find(1);
+            $toko = StoreSetting::where('cabang_id',getCabangId())->first();
             $cartTax = Cart::instance($this->cart_instance)->tax(); // Pajak dari Cart
 
             $sale = Order::create([
@@ -287,7 +287,7 @@ class AdminIndex extends Component
                     . "🏦 *Metode Pembayaran:* {$sale->payment_method}\n\n";
 
                 // Kirim ke Telegram
-                $storeSetting = \App\Models\StoreSetting::find(1);
+                $storeSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
                 if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
                     Http::post("https://api.telegram.org/bot{$storeSetting->token_bot}/sendMessage", [
                         'chat_id' => $storeSetting->chat_id,

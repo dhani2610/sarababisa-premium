@@ -36,7 +36,7 @@ class PortalController extends Controller
         $data['products'] = $query->paginate($perPage)->appends($request->all());
 
         $data['total_products'] = Product::where('is_portal',1)->whereIn('categories_id', $data['productCategory']->pluck('id'))->count();
-        $data['toko_setting'] = StoreSetting::find(1);
+        $data['toko_setting'] = StoreSetting::where('cabang_id',getCabangId())->first();
         $data['kepala_toko_setting'] = User::find(1);
         $data['pelanggan'] = Customer::count();
         $data['galleries'] = Gallery::orderBy('created_at', 'desc')->get();
@@ -45,7 +45,7 @@ class PortalController extends Controller
     }
     public function installAppIOS(Request $request)
     {
-        
+
           $data['productCategory'] = Category::where('show_portal', 1)
             ->orderBy('created_at', 'asc')
             ->get();
@@ -68,7 +68,7 @@ class PortalController extends Controller
         $data['products'] = $query->paginate($perPage)->appends($request->all());
 
         $data['total_products'] = Product::where('is_portal',1)->whereIn('categories_id', $data['productCategory']->pluck('id'))->count();
-        $data['toko_setting'] = StoreSetting::find(1);
+        $data['toko_setting'] = StoreSetting::where('cabang_id',getCabangId())->first();
         $data['kepala_toko_setting'] = User::find(1);
         $data['pelanggan'] = Customer::count();
         $data['galleries'] = Gallery::orderBy('created_at', 'desc')->get();

@@ -82,7 +82,8 @@ class ProdukSparepartController extends Controller
             'harga_jual_toko' => $request->harga_jual_toko,
             'keterangan' => $request->keterangan,
             'garansi' => $request->garansi,
-            'ppn' => $request->ppn
+            'ppn' => $request->ppn,
+            'cabang_id' => getCabangId(),
         ]);
 
         // return redirect()->route('sparepart.index');
@@ -126,21 +127,21 @@ class ProdukSparepartController extends Controller
         $pilihan = $request->stok;
 
         // Mengambil data produk habis
-        $empty_products = Product::where('categories_id', 2)->where('stok', 0)->get();
+        $empty_products = Product::where('cabang_id',getCabangId())->where('categories_id', 2)->where('stok', 0)->get();
 
         // Menghitung data produk habis
-        $jumlah_item_habis = Product::where('categories_id', 2)->where('stok', 0)->count();
+        $jumlah_item_habis = Product::where('cabang_id',getCabangId())->where('categories_id', 2)->where('stok', 0)->count();
 
         // Mengambil data produk tersedia
-        $available_products = Product::where('categories_id', 2)->where('stok', '>', 0)->get();
+        $available_products = Product::where('cabang_id',getCabangId())->where('categories_id', 2)->where('stok', '>', 0)->get();
 
         // Menghitung data produk tersedia
-        $jumlah_item_tersedia = Product::where('categories_id', 2)->where('stok', '>', 0)->count();
+        $jumlah_item_tersedia = Product::where('cabang_id',getCabangId())->where('categories_id', 2)->where('stok', '>', 0)->count();
 
-        $modal_stok_tersedia = Product::where('categories_id', 2)->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
+        $modal_stok_tersedia = Product::where('cabang_id',getCabangId())->where('categories_id', 2)->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
 
         // Menghitung stok produk tersedia
-        $jumlah_stok_tersedia = Product::where('categories_id', 2)->where('stok', '>', 0)->sum('stok');
+        $jumlah_stok_tersedia = Product::where('cabang_id',getCabangId())->where('categories_id', 2)->where('stok', '>', 0)->sum('stok');
 
         if ($pilihan === "tersedia") {
             $products = $available_products;
@@ -172,10 +173,10 @@ class ProdukSparepartController extends Controller
      */
     public function edit($id)
     {
-        $item = Product::findOrFail($id);
-        $spareparts = SubCategory::where('categories_id', '=', '2')->get();
-        $model_series = ModelSerie::all();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $item = Product::where('cabang_id',getCabangId())->findOrFail($id);
+        $spareparts = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '2')->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
 
         return view('pages.kepalatoko.produk.sparepart-edit', [
             'item' => $item,

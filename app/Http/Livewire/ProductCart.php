@@ -44,8 +44,8 @@ class ProductCart extends Component
         $this->cart_instance = $cartInstance;
         $this->discount_type = [];
         $this->item_discount = [];
-        $this->global_tax = optional(StoreSetting::find(1))->is_tax
-        ? StoreSetting::find(1)->ppn
+        $this->global_tax = optional(StoreSetting::where('cabang_id',getCabangId())->first())->is_tax
+        ? StoreSetting::where('cabang_id',getCabangId())->first()->ppn
         : 0;
 
         if ($data) {
@@ -300,7 +300,7 @@ class ProductCart extends Component
 
     public function render()
     {
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         $cart_items = Cart::instance($this->cart_instance)->content();
 
         // foreach ($cart_items as $index => $cart_item) {

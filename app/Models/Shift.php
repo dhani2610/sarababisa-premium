@@ -19,5 +19,6 @@ class Shift extends Model
         'potongan_izin',
         'potongan_cuti',
         'potongan_sakit',
+        'cabang_id',
     ];
 }

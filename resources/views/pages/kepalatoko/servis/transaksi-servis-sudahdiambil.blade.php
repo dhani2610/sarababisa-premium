@@ -25,12 +25,12 @@
                         <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                     </svg>
                     <span class="hidden xs:block ml-2">Tambah Transaksi Baru</span>
-                </button>                        
-                
+                </button>
+
             </div>
 
         </div>
-     
+
         <div x-data="{ modalOpen: true }">
             <!-- Modal backdrop -->
             <div
@@ -206,7 +206,7 @@
                                     </div>
                                 </div>
                                 @endif
-                               
+
                                 @if ($item->kondisi_servis != 'Sudah jadi')
                                 @else
                                     @if (json_decode($item->tindakan_servis) == null)
@@ -305,7 +305,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {{-- @php
     $ppn = 0;
-    $cekPPN = \App\Models\StoreSetting::find(1);
+    $cekPPN = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
     if (!empty($cekPPN)) {
         if ($cekPPN->is_tax == 1) {
             $ppn = $cekPPN->ppn;
@@ -318,11 +318,11 @@
     $(document).ready(function () {
         // Ambil total dari input yang disabled (karena kamu format pakai number_format)
         let totalBiaya = parseInt($('#total_biaya').val()) || 0;
-        
+
 
         function updateSisa(from, to) {
             let diskon = parseInt($('#diskon').val()) || 0;
-            
+
             let fromVal = parseInt($(from).val()) || 0;
             let finalvalTotal = totalBiaya - diskon;
             if (fromVal > finalvalTotal) {
@@ -346,7 +346,7 @@
 
 @php
     $ppn = 0;
-    $cekPPN = \App\Models\StoreSetting::find(1);
+    $cekPPN = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
     if (!empty($cekPPN)) {
         if ($cekPPN->is_tax == 1 && $cekPPN->ppn != 0) {
             $ppn = $cekPPN->ppn;

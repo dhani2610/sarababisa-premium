@@ -19,7 +19,7 @@ class RefundController extends Controller
         $perPage = $request->get('per_page', 25);
 
         // Query dasar
-        $query = Refund::with(['ServiceTransaction', 'teknisi'])
+        $query = Refund::where('cabang_id',getCabangId())->with(['ServiceTransaction', 'teknisi'])
             ->orderBy('created_at', 'desc');
 
         // Jika role user adalah Teknisi, filter berdasarkan teknisi_id
@@ -30,7 +30,7 @@ class RefundController extends Controller
         $refunds = $query->paginate($perPage);
 
         // Untuk dropdown servis
-        $servis = ServiceTransaction::with('user')->orderBy('id', 'desc')->get();
+        $servis = ServiceTransaction::where('cabang_id',getCabangId())->with('user')->orderBy('id', 'desc')->get();
 
         return view('pages.kepalatoko.master.refund', [
             'refunds' => $refunds,
@@ -50,7 +50,7 @@ class RefundController extends Controller
         $end_date = $request->end_date;
 
         // Query data refund berdasarkan periode
-        $query = Refund::with(['ServiceTransaction.user', 'teknisi'])
+        $query = Refund::where('cabang_id',getCabangId())->with(['ServiceTransaction.user', 'teknisi'])
             ->whereBetween('created_at', [$start_date, Carbon::parse($end_date)->endOfDay()])
             ->orderBy('created_at', 'desc');
 
@@ -116,7 +116,7 @@ class RefundController extends Controller
             // jika field di servis bernama users_id
             $data['teknisi_id'] = $servis->users_id ?? $servis->user_id ?? null;
         }
-
+        $data['cabang_id'] = getCabangId();
         Refund::create($data);
 
         toast('Refund berhasil ditambahkan.', 'success');

@@ -47,7 +47,7 @@ class MasterIzin extends Component
     public function render()
     {
         $user = Auth::user();
-        $query = Izin::with('user')->latest();
+        $query = Izin::where('cabang_id',getCabangId())->with('user')->latest();
 
         // Filter user jika bukan kepala toko
         if ($user->role !== 'Kepala Toko') {
@@ -81,6 +81,7 @@ class MasterIzin extends Component
         $statQuery = Izin::query();
         if ($user->role !== 'Kepala Toko') {
             $statQuery->where('user_id', $user->id);
+            $statQuery->where('cabang_id',getCabangId());
         }
 
         $stats = [
@@ -93,13 +94,13 @@ class MasterIzin extends Component
         ];
 
         $users = $user->role === 'Kepala Toko'
-            ? User::whereIn('role', ['Teknisi', 'Sales', 'Admin Toko'])->select('id', 'name')->get()
-            : User::where('id', $user->id)->select('id', 'name')->get();
+            ? User::where('cabang_id',getCabangId())->whereIn('role', ['Teknisi', 'Sales', 'Admin Toko'])->select('id', 'name')->get()
+            : User::where('cabang_id',getCabangId())->where('id', $user->id)->select('id', 'name')->get();
 
         return view('livewire.master-izin', [
             'izins' => $query->paginate($this->paginate),
             'users' => $users,
-            'count' => Izin::count(),
+            'count' => Izin::where('cabang_id',getCabangId())->count(),
             'stats' => $stats,
         ]);
     }

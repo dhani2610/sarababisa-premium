@@ -30,7 +30,7 @@ class SalesPosData extends Component
     public function render()
     {
         $products_count = Product::all()->count();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         $customers = Customer::all();
 
         return view('livewire.sales-pos-data', [

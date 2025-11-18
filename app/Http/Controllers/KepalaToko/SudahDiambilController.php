@@ -41,6 +41,7 @@ class SudahDiambilController extends Controller
 
         $query = ServiceTransaction::with(['customer', 'user'])
             ->where('status_servis', 'Sudah Diambil')
+            ->where('cabang_id', getCabangId())
             ->orderBy('created_at', 'desc')
             ->latest()
             ->skip($offset)
@@ -242,7 +243,7 @@ class SudahDiambilController extends Controller
 
                 $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
                 $hariIni = \Carbon\Carbon::today();
-                $tokoSetting = \App\Models\StoreSetting::find(1);
+                $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
                 if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || auth()->user()->role == 'Kepala Toko'){
                     $styleHide = '';
                 }else{
@@ -628,7 +629,7 @@ class SudahDiambilController extends Controller
 
 
     //     $ppn = 0;
-    //     $cekppn = StoreSetting::find(1);
+    //     $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
     //     if (!empty($cekppn) && $cekppn->is_tax == 1) {
     //         $ppn = $cekppn->ppn;
     //     }
@@ -719,7 +720,7 @@ class SudahDiambilController extends Controller
     //     }
     //     // dd($profittransaksi,$request->all());
     //     $ppn = 0;
-    //     $cekppn = StoreSetting::find(1);
+    //     $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
     //     if (!empty($cekppn)) {
     //         if ($cekppn->is_tax == 1) {
     //             $ppn = $cekppn->ppn;
@@ -807,7 +808,7 @@ class SudahDiambilController extends Controller
 
 
         $ppn = 0;
-        $cekppn = StoreSetting::find(1);
+        $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
         if (!empty($cekppn) && $cekppn->is_tax == 1) {
             $ppn = $cekppn->ppn;
         }
@@ -942,7 +943,7 @@ class SudahDiambilController extends Controller
         ]);
 
         return redirect()->route('transaksi-servis-sudah-diambil.index');
-    }  
+    }
 
     public function cetakinkjet($id)
     {

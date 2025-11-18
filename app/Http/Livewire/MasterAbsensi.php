@@ -47,7 +47,7 @@ class MasterAbsensi extends Component
     public function render()
     {
         $user = Auth::user();
-        $query = Attendance::with('user')->latest();
+        $query = Attendance::where('cabang_id',getCabangId())->with('user')->latest();
 
         // Filter berdasarkan role
         if ($user->role !== 'Kepala Toko') {
@@ -73,16 +73,16 @@ class MasterAbsensi extends Component
         }
 
         $users = $user->role === 'Kepala Toko'
-            ? User::select('id','name')->whereIn('role',['Teknisi','Sales','Admin Toko'])->get()
-            : User::where('id', $user->id)->select('id','name')->whereIn('role',['Teknisi','Sales','Admin Toko'])->get();
+            ? User::where('cabang_id',getCabangId())->select('id','name')->whereIn('role',['Teknisi','Sales','Admin Toko'])->get()
+            : User::where('cabang_id',getCabangId())->where('id', $user->id)->select('id','name')->whereIn('role',['Teknisi','Sales','Admin Toko'])->get();
 
         $totalMasuk = Attendance::where('type', 'masuk')->count();
         $totalPulang = Attendance::where('type', 'pulang')->count();
         $totalAbsen = $totalMasuk + $totalPulang;
 
         $today = Carbon::today();
-        $hariIniMasuk = Attendance::where('type', 'masuk')->whereDate('created_at', $today)->count();
-        $hariIniPulang = Attendance::where('type', 'pulang')->whereDate('created_at', $today)->count();
+        $hariIniMasuk = Attendance::where('cabang_id',getCabangId())->where('type', 'masuk')->whereDate('created_at', $today)->count();
+        $hariIniPulang = Attendance::where('cabang_id',getCabangId())->where('type', 'pulang')->whereDate('created_at', $today)->count();
         $hariIniTotal = $hariIniMasuk + $hariIniPulang;
 
         return view('livewire.master-absensi', [

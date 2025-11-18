@@ -17,9 +17,9 @@ class TransaksiProdukPaidController extends Controller
      */
     public function index()
     {
-        $jumlah_semua = Order::all()->count();
-        $jumlah_lunas = Order::where('due', '0')->count();
-        $jumlah_tidaklunas = Order::where('due', '>', '0')->count();
+        $jumlah_semua = Order::where('cabang_id',getCabangId())->get()->count();
+        $jumlah_lunas = Order::where('cabang_id',getCabangId())->where('due', '0')->count();
+        $jumlah_tidaklunas = Order::where('cabang_id',getCabangId())->where('due', '>', '0')->count();
 
         return view('pages/kepalatoko/produk/transaksi-lunas', compact(
             'jumlah_semua',

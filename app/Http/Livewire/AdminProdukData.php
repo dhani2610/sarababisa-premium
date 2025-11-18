@@ -24,7 +24,7 @@ class AdminProdukData extends Component
     public $paginate = 10;
     public $search;
 
-    
+
     public $fotoProduk, $produkId;
     public $showFotoModal = false;
 
@@ -129,8 +129,8 @@ class AdminProdukData extends Component
         $colors = Color::all();
         $model_series = ModelSerie::all();
         $products_count = Product::all()->count();
-        $toko = StoreSetting::find(1);
-        $tokoSetting = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $tokoSetting = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $topProducts = OrderDetail::select(
             'order_details.products_id',
@@ -143,7 +143,7 @@ class AdminProdukData extends Component
         ->groupBy('order_details.products_id', 'products.product_name', 'products.harga_jual')
         ->orderByDesc('total_terjual')
 ->limit('5')
-        
+
         ->get();
 
         return view('livewire.admin-produk-data', [

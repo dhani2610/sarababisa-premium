@@ -30,6 +30,7 @@ class ToolImport implements ToModel, WithHeadingRow, WithBatchInserts, WithUpser
                 'keterangan'        => $row['Keterangan'],
                 'garansi'           => $row['Garansi Produk (Hari)'],
                 'ppn'               => $row['PPN 11%'],
+                'cabang_id'   => getCabangId(),
             ]
         );
 

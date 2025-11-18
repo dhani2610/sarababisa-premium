@@ -15,6 +15,7 @@ class ServiceAction extends Model
         'harga_toko',
         'harga_pelanggan',
         'garansi',
+        'cabang_id',
     ];
 
     public function servicetransaction()
