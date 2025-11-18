@@ -347,6 +347,7 @@
                 </ul>
             </div>
             <!-- More group -->
+            @if (Auth::user()->role != 'Investor')
             <div>
                 <h3 class="text-xs uppercase text-slate-500 font-semibold pl-3">
                     <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">•••</span>
@@ -401,6 +402,7 @@
                     </li>
                 </ul>
             </div>
+            @endif
             <!-- More group -->
             <div>
                 <h3 class="text-xs uppercase text-slate-500 font-semibold pl-3">
