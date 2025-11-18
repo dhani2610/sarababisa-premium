@@ -18,6 +18,7 @@ class Type extends Model
             ->whereYear('tgl_ambil', now()->year)
             ->whereMonth('tgl_ambil', now()->month)
             ->whereNot('is_approve', 'Ditolak');
+            ->where('cabang_id', getCabang());
     }
 
     public function relasiService()
