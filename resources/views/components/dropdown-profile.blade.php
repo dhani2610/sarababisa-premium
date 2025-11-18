@@ -42,6 +42,7 @@
             {{-- <li>
                 <a class="font-medium text-sm text-indigo-500 hover:text-indigo-600 flex items-center py-1 px-3" href="{{ route('profile.show') }}" @click="open = false" @focus="open = true" @focusout="open = false">Pengaturan</a>
             </li> --}}
+            @if (Auth::user()->role == 'Kepala Toko')
             <li class="px-3 py-2 border-b border-slate-200">
                 <form action="{{ route('set.cabang') }}" method="POST">
                     @csrf
@@ -58,6 +59,7 @@
                     </select>
                 </form>
             </li>
+            @endif
 
             <li>
                 <form method="POST" action="{{ route('logout') }}" x-data>
