@@ -17,8 +17,7 @@ class Type extends Model
         return $this->hasMany(ServiceTransaction::class, 'types_id', 'id')
             ->whereYear('tgl_ambil', now()->year)
             ->whereMonth('tgl_ambil', now()->month)
-            ->whereNot('is_approve', 'Ditolak')
-            ->where('cabang_id', getCabangId());
+            ->whereNot('is_approve', 'Ditolak');
     }
 
     public function relasiService()
