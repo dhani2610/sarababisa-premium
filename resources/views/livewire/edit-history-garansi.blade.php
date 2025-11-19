@@ -186,8 +186,8 @@
 
                             </div>
                             <div class="px-5 py-4 border-t flex justify-end space-x-2">
-                                <button type="button" class="btn-sm border-slate-200"
-                                    @click="modalOpen=false">Batal</button>
+                                <a type="button" class="btn-sm border-slate-200"
+                                    href="{{  route('history-garansi.index')  }}">Batal</a>
                                 <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Simpan</button>
                             </div>
                         </form>
