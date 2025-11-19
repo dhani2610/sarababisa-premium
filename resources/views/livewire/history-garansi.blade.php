@@ -165,14 +165,16 @@
                                         @foreach ($serviceTransactions as $st)
                                             <option value="{{ $st->id }}"
                                                 data-teknisi="{{ $st->user->name ?? '' }}"
-                                                data-expired="{{ $st->exp_garansi }}">
+                                                data-expired="{{ $st->exp_garansi }}"
+                                                data-nota="{{ route('kepalatoko-pengambilan-cetak-inkjet', $st->id) }}">
                                                 {{ $st->nomor_servis }}
                                             </option>
                                         @endforeach
                                     </select>
                                     <small class="text-slate-500">Teknisi sebelumnya: <span
                                             id="prev_teknisi"></span></small><br>
-                                    <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small>
+                                    <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small> <br>
+                                    <small class="text-slate-500">Link Nota: <span id="link_nota"></span></small>
                                 </div>
 
                                 <!-- Penerima -->
@@ -203,7 +205,7 @@
                         </form>
                     </div>
                 </div>
-              
+
             </div>
 
 
@@ -373,10 +375,10 @@
                                 <td class="px-2 py-3">
                                     <center>
                                         <button
-                                                class="btn-status 
+                                                class="btn-status
                                                 {{ $item->status == 1 ? 'status-menunggu' : ($item->status == 2 ? 'status-selesai' : 'status-batal') }}"
                                                 data-id="{{ $item->id }}">
-    
+
                                                 @if ($item->status == 1)
                                                     Menunggu Konfirmasi
                                                 @elseif ($item->status == 2)
@@ -384,7 +386,7 @@
                                                 @elseif ($item->status == 3)
                                                     Dibatalkan
                                                 @endif
-    
+
                                             </button>
                                     </center>
 
@@ -397,7 +399,7 @@
                                 <td class="px-2 py-3">
                                     <div class="space-x-1 flex">
                                         <div class="flex space-x-2">
-                                           
+
                                             <a href="{{ route('history-garansi.edit', $item->id) }}">
                                                 <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -518,6 +520,15 @@
                 let selected = $(this).find(':selected');
                 $('#prev_teknisi').text(selected.data('teknisi'));
                 $('#exp_garansi').text(selected.data('expired'));
+
+                let notaUrl = selected.data('nota');
+                if (notaUrl) {
+                    $('#link_nota').html(
+                        `<a href="${notaUrl}" target="_blank" class="text-blue-600 underline">Lihat Nota</a>`
+                    );
+                } else {
+                    $('#link_nota').html('');
+                }
             });
         });
     </script>

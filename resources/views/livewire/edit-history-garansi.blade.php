@@ -52,14 +52,16 @@
                                         @foreach ($serviceTransactions as $st)
                                             <option value="{{ $st->id }}" {{  $historyGaransi->service_id == $st->id ? 'selected' : ''  }}
                                                 data-teknisi="{{ $st->user->name ?? '' }}"
-                                                data-expired="{{ $st->exp_garansi }}">
+                                                data-expired="{{ $st->exp_garansi }}"
+                                                data-nota="{{ route('kepalatoko-pengambilan-cetak-inkjet', $st->id) }}">
                                                 {{ $st->nomor_servis }}
                                             </option>
                                         @endforeach
                                     </select>
                                     <small class="text-slate-500">Teknisi sebelumnya: <span
                                             id="prev_teknisi"></span></small><br>
-                                    <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small>
+                                    <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small> <br>
+                                    <small class="text-slate-500">Link Nota: <span id="link_nota"></span></small>
                                 </div>
 
                                 <!-- Penerima -->
@@ -80,7 +82,7 @@
                                     <input type="text" name="keluhan" value="{{  $historyGaransi->keluhan  }}" class="form-input w-full"
                                         required>
                                 </div>
-                             
+
                                 <div x-data="{ showDetails: true }">
                                     <label class="block text-sm font-medium mb-1" for="kondisi_servis">Kondisi Servis <span class="text-rose-500">*</span></label>
                                     <div class="flex flex-wrap items-center">
@@ -110,7 +112,7 @@
                                         </div>
                                     </div>
 
-                                    
+
                                     <div x-show="showDetails" class="mt-3 space-y-3">
 
                                         <!-- Teknisi -->
@@ -133,16 +135,16 @@
                                             </button>
                                             <div id="tindakanContainer"></div>
                                         </div>
-    
+
                                         <!-- Total Biaya Servis -->
                                         <div>
                                             <label class="block text-sm font-medium mb-1">Total Modal Tindakan</label>
                                             <input type="number" name="total_biaya_tindakan" id="total_biaya_tindakan"
                                                 value="0" class="form-input w-full" onkeyup="updateTotalModal()">
                                         </div>
-    
+
                                         <hr>
-    
+
                                         <!-- Checkbox sebelum sparepart -->
                                         <div class="form-check mb-3">
                                             <input class="form-check-input" type="checkbox" id="useSparepartCheckbox">
@@ -158,7 +160,7 @@
                                             </button>
                                             <div class="mt-2" id="rowContainer"></div>
                                         </div>
-    
+
                                         <!-- Total Biaya -->
                                         <div style="display:none;" id="modal_sparepart_wrapper">
                                             <label class="block text-sm font-medium mb-1">Modal Sparepart<span
@@ -244,7 +246,16 @@
                 let selected = $(this).find(':selected');
                 $('#prev_teknisi').text(selected.data('teknisi'));
                 $('#exp_garansi').text(selected.data('expired'));
+                let notaUrl = selected.data('nota');
+                if (notaUrl) {
+                    $('#link_nota').html(
+                        `<a href="${notaUrl}" target="_blank" class="text-blue-600 underline">Lihat Nota</a>`
+                    );
+                } else {
+                    $('#link_nota').html('');
+                }
             });
+
         });
     </script>
 
