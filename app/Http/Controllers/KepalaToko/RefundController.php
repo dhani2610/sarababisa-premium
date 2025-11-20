@@ -77,6 +77,7 @@ class RefundController extends Controller
             'totalData' => $totalData,
             'start_date' => $start_date,
             'end_date' => $end_date,
+            'totalRefundServis' => $totalRefundServis,
         ]);
 
         $filename = 'Laporan Refund ' . $start_date . ' sd ' . $end_date . '.pdf';
