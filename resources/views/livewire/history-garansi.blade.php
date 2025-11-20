@@ -31,14 +31,14 @@
 
         <!-- Left: Title -->
         <div class="mb-4 sm:mb-0">
-            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Riwayat Garansi Service ✨</h1>
+            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Riwayat Garansi ✨</h1>
         </div>
 
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Cari berdasarkan nama Nomor Service" />
+            <x-search-form placeholder="Cari berdasarkan nama Nomor Servia" />
 
             <!-- Print button -->
             @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
@@ -157,7 +157,7 @@
 
                                 <!-- Pilih Service -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Nomor Service <span
+                                    <label class="block text-sm font-medium mb-1">Nomor Servis <span
                                             class="text-rose-500">*</span></label>
                                     <select name="service_id" id="service_id" class="form-select select2  w-full"
                                         required>
@@ -356,7 +356,7 @@
         <div x-data="handleSelect">
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 {{-- Left side --}}
-                <h2 class="font-semibold text-slate-800">Semua Riwayat Service <span
+                <h2 class="font-semibold text-slate-800">Semua Riwayat Garansi <span
                         class="text-slate-400 font-medium">{{ $count }}</span></h2>
                 <div class="relative inline-flex">
                     <div class="table-items-action hidden">
