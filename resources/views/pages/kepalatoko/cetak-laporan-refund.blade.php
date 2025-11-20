@@ -57,7 +57,8 @@
                 <th>Nomor Servis</th>
                 <th>Customer</th>
                 <th>Teknisi</th>
-                <th>Nominal Refund</th>
+                <th>Nominal Potongan Teknisi</th>
+                <th>Nominal Potongan Servis</th>
                 <th>Bulan/Tahun</th>
             </tr>
         </thead>
@@ -71,6 +72,7 @@
                     <td>{{ $r->ServiceTransaction->user->name ?? '-' }}</td>
                     <td>{{ $r->teknisi->name ?? '-' }}</td>
                     <td>Rp {{ number_format($r->nominal, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($r->nominal_servis, 0, ',', '.') }}</td>
                     <td>{{ $r->period ? $r->period->format('F Y') : '-' }}</td>
                 </tr>
             @endforeach

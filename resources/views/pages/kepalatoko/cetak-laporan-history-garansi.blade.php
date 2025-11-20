@@ -226,7 +226,7 @@
                                             - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
                                         {{-- </li> --}}
                                         <br>
-                                        <br> 
+                                        <br>
                                     @endforeach
                                 {{-- </ul> --}}
                             @else
@@ -246,7 +246,7 @@
                             @elseif ($item->status == 2)
                                 Sudah Selesai
                             @elseif ($item->status == 3)
-                                Dibatalkan
+                                Dibatalkan / Refund
                             @endif
                     </td>
                 </tr>
