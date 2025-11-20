@@ -181,6 +181,16 @@
 
                                 <!-- Penerima -->
                                 <div>
+                                    <label class="block text-sm font-medium mb-1">Pelanggan <span
+                                            class="text-rose-500">*</span></label>
+                                    <select name="id_customer" class="form-select select2 w-full " required>
+                                        <option value="">-- Pilih Pelanggan --</option>
+                                        @foreach ($customer as $cs)
+                                            <option value="{{ $cs->id }}">{{ $cs->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
                                     <label class="block text-sm font-medium mb-1">Penerima <span
                                             class="text-rose-500">*</span></label>
                                     <select name="penerima_id" class="form-select w-full " required>
@@ -322,7 +332,7 @@
                                 <td class="px-2 py-3">{{ $item->date }}</td>
                                 <td class="px-2 py-3">{{ $item->tgl_selesai }}</td>
                                 <td class="px-2 py-3">{{ $item->service->nomor_servis ?? $item->service_id }}</td>
-                                <td class="px-2 py-3">{{ $item->service->customer->nama ?? '-' }}</td>
+                                <td class="px-2 py-3">{{ $item->pelanggan->nama ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->penerima->name ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->keluhan ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->teknisi->name ?? '-' }}</td>

@@ -127,6 +127,17 @@
                                         </div>
                                     </div>
                                     <!-- Catatan -->
+
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Pelanggan <span
+                                                class="text-rose-500">*</span></label>
+                                        <select name="id_customer" class="form-select select2 w-full " required>
+                                            <option value="">-- Pilih Pelanggan --</option>
+                                            @foreach ($customer as $cs)
+                                                <option value="{{ $cs->id }}" {{  $historyGaransi->id_customer == $cs->id ? 'selected' : ''  }}>{{ $cs->nama }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                     <div>
                                         <label class="block text-sm font-medium mb-1">Catatan<span
                                                 class="text-rose-500">*</span></label>

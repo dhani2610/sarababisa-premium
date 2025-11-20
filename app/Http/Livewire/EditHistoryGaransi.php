@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ServiceAction;
 use App\Models\ServiceTransaction;
 use App\Models\User;
+use App\Models\Customer;
 use Livewire\Component;
 
 class EditHistoryGaransi extends Component
@@ -39,12 +40,14 @@ class EditHistoryGaransi extends Component
         })->where('stok', '>=', 1)->get();
 
         $serviceActions = ServiceAction::where('cabang_id',getCabangId())->get();
+        $customer = Customer::get();
 
         return view('livewire.edit-history-garansi', [
             'serviceTransactions' => $serviceTransactions,
             'products' => $products,
             'serviceActions' => $serviceActions,
             'users' => $users,
+            'customer' => $customer,
         ]);
     }
 }

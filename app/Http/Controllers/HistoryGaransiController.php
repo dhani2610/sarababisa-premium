@@ -98,6 +98,7 @@ class HistoryGaransiController extends Controller
         $data->date        = $request->date;
         $data->service_id  = $request->service_id;
         $data->penerima_id = $request->penerima_id;
+        $data->id_customer = $request->id_customer;
         $data->teknisi_id  = 0;
         $data->keluhan  = $request->keluhan;
         $data->tindakan    = [];
@@ -122,6 +123,7 @@ class HistoryGaransiController extends Controller
         }else{
             $data->tgl_selesai = null;
         }
+        $data->id_customer  = $request->id_customer;
         $data->teknisi_id  = $request->teknisi_id;
         $data->tindakan   =  !empty($request->tindakan) ? json_encode($request->tindakan) : [];
         $data->sparepart   =  !empty($request->sparepart) ? json_encode($request->sparepart) : [];
@@ -272,10 +274,12 @@ class HistoryGaransiController extends Controller
             $q->where('category_name', 'Sparepart');
         })->where('stok', '>=', 1)->get();
 
+        $customer = Customer::get();
+
         $serviceActions = ServiceAction::where('cabang_id',getCabangId())->get();
         $users = User::where('cabang_id',getCabangId())->where('role','!=','Investor')->get();
         return view('pages.kepalatoko.history.edit', compact(
-            'users','historyGaransi','serviceTransactions','products','serviceActions'
+            'users','historyGaransi','serviceTransactions','products','serviceActions','customer'
         ));
     }
 
