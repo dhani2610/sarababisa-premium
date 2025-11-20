@@ -228,7 +228,7 @@
 
         </tbody>
         @if ($history->status == 1)
-          <tfoot>
+           <tfoot>
             <tr>
                 <td style="padding-bottom: 0;"></td>
                 <td></td>
