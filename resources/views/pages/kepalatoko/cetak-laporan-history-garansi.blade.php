@@ -152,7 +152,7 @@
             </tr>
             <tr>
                 <th>Total Modal</th>
-                <th>:{{ $totalModal }}</th>
+                <th>: Rp{{ number_format($totalModal, 0, ',', '.') }}</th>
             </tr>
         </tbody>
     </table>
