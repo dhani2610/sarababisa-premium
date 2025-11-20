@@ -33,56 +33,6 @@
                             @method('PUT')
                             <div class="px-5 py-4 space-y-4">
 
-
-                                <!-- Penerima -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Tanggal <span
-                                            class="text-rose-500">*</span></label>
-                                    <input type="date" value="{{  $historyGaransi->date }}" name="date" id="date" class="form-input w-full"
-                                        required>
-                                </div>
-
-                                <!-- Pilih Service -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Nomor Service <span
-                                            class="text-rose-500">*</span></label>
-                                    <select name="service_id" id="service_id" class="form-select select2  w-full"
-                                        required>
-                                        <option value="">-- Pilih Nomor Service --</option>
-                                        @foreach ($serviceTransactions as $st)
-                                            <option value="{{ $st->id }}" {{  $historyGaransi->service_id == $st->id ? 'selected' : ''  }}
-                                                data-teknisi="{{ $st->user->name ?? '' }}"
-                                                data-expired="{{ $st->exp_garansi }}"
-                                                data-nota="{{ route('kepalatoko-pengambilan-cetak-inkjet', $st->id) }}">
-                                                {{ $st->nomor_servis }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <small class="text-slate-500">Teknisi sebelumnya: <span
-                                            id="prev_teknisi"></span></small><br>
-                                    <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small> <br>
-                                    <small class="text-slate-500">Link Nota: <span id="link_nota"></span></small>
-                                </div>
-
-                                <!-- Penerima -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Penerima <span
-                                            class="text-rose-500">*</span></label>
-                                    <select name="penerima_id" class="form-select w-full " required>
-                                        <option value="">-- Pilih Penerima --</option>
-                                        @foreach ($users as $u)
-                                            <option value="{{ $u->id }}" {{ $historyGaransi->penerima_id == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Keluhan <span
-                                            class="text-rose-500">*</span></label>
-                                    <input type="text" name="keluhan" value="{{  $historyGaransi->keluhan  }}" class="form-input w-full"
-                                        required>
-                                </div>
-
                                 <div x-data="{ showDetails: true }">
                                     <label class="block text-sm font-medium mb-1" for="kondisi_servis">Kondisi Servis <span class="text-rose-500">*</span></label>
                                     <div class="flex flex-wrap items-center">
@@ -106,7 +56,7 @@
                                             <!-- Start -->
                                             <label class="flex items-center">
                                                 <input type="radio" name="status" value="3" class="form-radio" x-on:click="showDetails = false"/>
-                                                <span class="text-sm ml-2">Dibatalkan</span>
+                                                <span class="text-sm ml-2">Dibatalkan / Refund</span>
                                             </label>
                                             <!-- End -->
                                         </div>
@@ -373,16 +323,16 @@ document.addEventListener('alpine:init', () => {
 
                 div.innerHTML = `
                         <select name="sparepart[${rowId}][id]"
-                                class="form-select sparepartSelect select2 w-full" required>
+                                class="form-select sparepartSelect select2 w-full" >
                             <option value="">-- Pilih Sparepart --</option>
                             ${products.map(p => `<option value="${p.id}" data-harga="${p.harga_modal}">${p.product_name}</option>`).join("")}
                         </select>
 
                         <input type="number" name="sparepart[${rowId}][harga]"
-                            class="form-input harga w-full" placeholder="Harga" required>
+                            class="form-input harga w-full" placeholder="Harga" >
 
                         <input type="number" name="sparepart[${rowId}][qty]"
-                            class="form-input qty w-full" placeholder="Qty" value="1" min="1" required>
+                            class="form-input qty w-full" placeholder="Qty" value="1" min="1" >
 
                         <button type="button"
                                 class="btn-sm bg-rose-500 text-white w-full md:w-auto removeRow">
@@ -485,7 +435,7 @@ document.addEventListener('alpine:init', () => {
                 div.classList.add("grid", "grid-cols-1", "md:grid-cols-3", "gap-2", "items-center", "mb-2");
                 div.innerHTML = `
                 <select name="tindakan[${tindakanRowId}][id]"
-                        class="form-select tindakanSelect w-full" required>
+                        class="form-select tindakanSelect w-full" >
                     <option value="">-- Pilih Tindakan --</option>
                     ${tindakanList.map(t => `<option value="${t.id}" data-harga="${t.harga_pelanggan}">${t.nama_tindakan}</option>`).join("")}
                 </select>
@@ -497,7 +447,7 @@ document.addEventListener('alpine:init', () => {
                 </div>
 
                 <input type="number" name="tindakan[${tindakanRowId}][harga]"
-                       class="form-input tindakanHarga w-full" placeholder="Harga" value="0" required>
+                       class="form-input tindakanHarga w-full" placeholder="Harga" value="0" >
                 <button type="button" class="btn-sm bg-rose-500 text-white removeTindakan w-full md:w-auto">✕</button>
             `;
 

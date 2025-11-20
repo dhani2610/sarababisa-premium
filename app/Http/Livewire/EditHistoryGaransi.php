@@ -14,7 +14,7 @@ class EditHistoryGaransi extends Component
 
 
     public $historyGaransi;
-        
+
     public $modalOpen = false;
 
     public function mount($historyGaransi)
@@ -28,9 +28,9 @@ class EditHistoryGaransi extends Component
     {
         // dd(auth()->user()->role);
         if (auth()->user()->role == 'Teknisi') {
-            $users = User::where('cabang_id',getCabangId())->where('id',auth()->user()->id)->get();
+            $users = User::where('cabang_id',getCabangId())->where('id',auth()->user()->id)->where('role','!=','Investor')->get();
         }else{
-            $users = User::where('cabang_id',getCabangId())->get();
+            $users = User::where('cabang_id',getCabangId())->where('role','!=','Investor')->get();
         }
 
         $serviceTransactions = ServiceTransaction::where('cabang_id',getCabangId())->orderBy('created_at', 'desc')->get();

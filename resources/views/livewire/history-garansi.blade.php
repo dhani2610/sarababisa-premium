@@ -174,7 +174,9 @@
                                     <small class="text-slate-500">Teknisi sebelumnya: <span
                                             id="prev_teknisi"></span></small><br>
                                     <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small> <br>
-                                    <small class="text-slate-500">Link Nota: <span id="link_nota"></span></small>
+                                    <small class="text-slate-500">Link Nota: <span id="link_nota"></span></small> <br>
+                                    <div id="history_garansi" class="mt-2 text-sm text-slate-700"></div>
+
                                 </div>
 
                                 <!-- Penerima -->
@@ -286,7 +288,7 @@
                                 </div>
                             </th>
                             <th class="px-2 py-3">No.</th>
-                            <th class="px-2 py-3">Tanggal</th>
+                            <th class="px-2 py-3">Tgl Masuk</th>
                             <th class="px-2 py-3">Tgl Selesai</th>
                             <th class="px-2 py-3">Nomor Servis</th>
                             <th class="px-2 py-3">Customer</th>
@@ -384,7 +386,7 @@
                                                 @elseif ($item->status == 2)
                                                     Sudah Selesai
                                                 @elseif ($item->status == 3)
-                                                    Dibatalkan
+                                                    Dibatalkan / Refund
                                                 @endif
 
                                             </button>
@@ -529,7 +531,63 @@
                 } else {
                     $('#link_nota').html('');
                 }
+
+                // =======================
+                // AMBIL HISTORY GARANSI
+                // =======================
+                let service_id = $(this).val();
+                let historyBox = $('#history_garansi');
+                historyBox.html('<span class="text-gray-500">Memuat...</span>');
+
+                let url = `/history-garansi/list-data/${service_id}`
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function(response) {
+
+
+                        console.log(url);
+                        console.log(service_id);
+                        console.log(response);
+
+                        if (response.length === 0) {
+                            historyBox.html('<span class="text-gray-500">Tidak ada riwayat garansi.</span>');
+                            return;
+                        }
+
+                        let html = '';
+                        response.forEach((item, index) => {
+
+                            let tindakanHTML = '-';
+                            if (item.tindakan_list && item.tindakan_list.length > 0) {
+                                tindakanHTML = '<ul class="list-disc ml-4">';
+                                item.tindakan_list.forEach(t => {
+                                    tindakanHTML += `<li>${t.nama} - Rp${new Intl.NumberFormat().format(t.harga)}</li>`;
+                                });
+                                tindakanHTML += '</ul>';
+                            }
+
+                            html += `
+                                <div class="mb-2 p-2 border rounded bg-slate-50">
+                                    <div class="font-semibold">Klaim Garansi ${index + 1}</div>
+                                    <div>Tgl Klaim: <b>${item.date || '-'}</b></div>
+                                    <div>Tgl Selesai: <b>${item.tgl_selesai || '-'}</b></div>
+                                    <div>Tindakan: ${tindakanHTML}</div>
+                                    <div>Keluhan: ${item.keluhan || '-'}</div>
+                                    <div>Total Biaya: Rp${item.total_biaya}</div>
+                                </div>
+                            `;
+                        });
+
+
+                        historyBox.html(html);
+                    },
+                    error: function() {
+                        historyBox.html('<span class="text-red-500">Error mengambil data.</span>');
+                    }
+                });
             });
+
         });
     </script>
 

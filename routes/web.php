@@ -253,6 +253,7 @@ Route::get('/history-garansi/cetak', [HistoryGaransiController::class, 'cetak'])
 Route::resource('history-garansi', HistoryGaransiController::class);
 Route::patch('/history-garansi/{id}/toggle-status', [HistoryGaransiController::class, 'toggleStatus'])
     ->name('history-garansi.toggleStatus');
+Route::get('/history-garansi/list-data/{id}', [HistoryGaransiController::class, 'getDetailHistory'])->name('history-garansi.list-data');
 Route::post('/history-garansi/bulk-delete', [HistoryGaransiController::class, 'bulkDelete'])->name('history-garansi.bulkDelete');
 
 Route::delete('/master/master-izin/delete-selected', [MasterIzinController::class, 'deleteSelected'])

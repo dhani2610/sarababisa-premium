@@ -10,6 +10,7 @@ use App\Models\OrderDetail;
 use App\Models\ServiceTransaction;
 use App\Models\Product;
 use App\Models\ServiceAction;
+use App\Models\Refund;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -114,23 +115,13 @@ class HistoryGaransiController extends Controller
     }
     public function update(Request $request,$id)
     {
-        // dd($request->all());
-        $request->validate([
-            'date'          => 'required|date',
-            'service_id'    => 'required|exists:service_transactions,id',
-            'penerima_id'   => 'required|exists:users,id',
-            'keluhan'       => 'required|string',
-        ]);
 
         $data = HistoryGaransi::find($id);
-        $data->date        = $request->date;
         if ($request->status == 2) {
             $data->tgl_selesai = date('Y-m-d');
         }else{
             $data->tgl_selesai = null;
         }
-        $data->service_id  = $request->service_id;
-        $data->penerima_id = $request->penerima_id;
         $data->teknisi_id  = $request->teknisi_id;
         $data->tindakan   =  !empty($request->tindakan) ? json_encode($request->tindakan) : [];
         $data->sparepart   =  !empty($request->sparepart) ? json_encode($request->sparepart) : [];
@@ -141,6 +132,38 @@ class HistoryGaransiController extends Controller
         $data->keluhan     = $request->keluhan;
         $data->status     = $request->status;
         $data->save();
+
+        if ($data->status == 3) {
+            $servis = ServiceTransaction::with('user')->find($data->service_id);
+
+            // if (!$servis) {
+
+                if ($servis->tipe == 'Interface') {
+                    $bonus = $servis->bonus_interface;
+                } else {
+                    $bonus = $servis->profit / 100;
+                    $bonus *= $servis->persen_teknisi;
+                }
+
+                // dd($servis,$bonus);
+
+                $tambahrefund = new Refund();
+                $tambahrefund->servis_transaction_id = $servis->id;
+                $tambahrefund->nominal = $bonus;
+                $tambahrefund->nominal_servis = $servis->biaya ?? $servis->pay;
+                $tambahrefund->teknisi_id = $servis->users_id ?? 0;
+                $tambahrefund->cabang_id = getCabangId();
+                $tambahrefund->save();
+
+                if ($servis->biaya > 0) {
+                    Expense::create([
+                        'name' => 'Refund #'. $servis->nomor_servis,
+                        'price' => $servis->biaya,
+                        'users_id' => auth()->user()->id
+                    ]);
+                }
+            // }
+        }
 
         if (!empty($request->sparepart)) {
             foreach ($request->sparepart as $row) {
@@ -248,10 +271,51 @@ class HistoryGaransiController extends Controller
         })->where('stok', '>=', 1)->get();
 
         $serviceActions = ServiceAction::where('cabang_id',getCabangId())->get();
-        $users = User::where('cabang_id',getCabangId())->get();
+        $users = User::where('cabang_id',getCabangId())->where('role','!=','Investor')->get();
         return view('pages.kepalatoko.history.edit', compact(
             'users','historyGaransi','serviceTransactions','products','serviceActions'
         ));
     }
+
+    public function getDetailHistory($id)
+    {
+        try {
+            $data = HistoryGaransi::where('service_id', $id)
+                ->with(['service', 'teknisi', 'penerima'])
+                ->get();
+            // return response()->json($data);
+
+            // Tambahkan nama tindakan langsung di sini
+            $data->transform(function ($item) {
+
+                if (!empty($item->tindakan)) {
+                    $tindakans = json_decode($item->tindakan, true) ?? [];
+
+                    $listTindakan = [];
+                    foreach ($tindakans as $t) {
+
+                        $action = \App\Models\ServiceAction::find($t['id']);
+
+                        $listTindakan[] = [
+                            'nama' => $action->nama_tindakan ?? $t['id_manual'],
+                            'harga' => $t['harga'],
+                        ];
+                    }
+
+                    $item->tindakan_list = $listTindakan;
+                    return $item;
+                }else{
+                    $item->tindakan_list = [];
+                }
+                return $item;
+            });
+
+            return response()->json($data);
+
+        } catch (\Throwable $th) {
+            return response()->json([]);
+        }
+    }
+
 
 }
