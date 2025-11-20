@@ -125,7 +125,7 @@
                                     <path class="fill-current @if(in_array(Request::segment(1), ['history-garansi'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M1 1h22v23H1z" />
                                     <path class="fill-current @if(in_array(Request::segment(1), ['history-garansi'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M15 10.586L16.414 12 11 17.414 7.586 14 9 12.586l2 2zM5 0h14v4H5z" />
                                 </svg>
-                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">History Garansi</span>
+                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Riwayat Garansi</span>
                             </div>
                         </a>
                     </li>
