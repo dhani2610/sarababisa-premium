@@ -86,7 +86,7 @@ class HistoryGaransiController extends Controller
 
     public function cetakinkjet($id)
     {
-        $history = HistoryGaransi::find($id);
+        $history = HistoryGaransi::where('id',$id)->with(['pelanggan'])->first();
         $items = ServiceTransaction::with('customer')->findOrFail($history->service_id);
         $users = User::find(1);
         $terms = Term::find(2);

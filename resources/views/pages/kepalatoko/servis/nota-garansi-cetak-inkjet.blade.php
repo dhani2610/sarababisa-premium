@@ -128,7 +128,7 @@
         <tbody>
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Nama</th>
-                <td id="data" class="capital">: {{ $items->customer->nama }}</td>
+                <td id="data" class="capital">: {{ $history->pelanggan->nama }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">Jenis Barang</th>
                 <td id="data" class="capital">: {{ $items->type->name }}</td>
                 <td id="data" scope="row">IMEI/SN</th>
@@ -136,7 +136,7 @@
             </tr>
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Nomor HP</th>
-                <td id="data">: {{ $items->customer->nomor_hp }}</td>
+                <td id="data">: {{ $history->pelanggan->nomor_hp }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">Merek</th>
                 <td id="data" class="capital">: {{ $items->brand->name }}</td>
                 <td id="data" scope="row">Kelengkapan</th>
@@ -148,7 +148,7 @@
             </tr>
             <tr style="border-bottom-style: solid; border-right-style: solid;">
                 <td scope="row" style="border-left-style: solid;">Alamat</th>
-                <td class="capital">: {{ $items->customer->alamat }}</td>
+                <td class="capital">: {{ $history->pelanggan->alamat }}</td>
                 <td scope="row" style="border-left-style: solid;">Model Seri</th>
                 <td class="capital">: {{ $items->modelserie->name }}</td>
                 <td scope="row">Warna/Kapasitas</th>
@@ -207,9 +207,62 @@
             @endif
 
         </tbody>
-
+        @if ($history->status == 1)
+         <tfoot>
+            <tr>
+                <td style="padding-bottom: 0;"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th colspan="6" style="text-align: left">Syarat & Ketentuan</th>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: justify">
+                    {!! $terms->description !!}
+                </td>
+            </tr>
+            <tr>
+                <td style="padding-bottom: 4px;"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th></th>
+                <th>PIN</th>
+                <th class="text-center">Pola</th>
+                <th class="text-center">Pelanggan</th>
+                <th class="text-center">Diterima</th>
+                <th></th>
+            </tr>
+            <tr>
+                @if ($items->pin != null)
+                <td>
+                      <th class="text-center">{{ $items->pin }}</th>
+                </td>
+                @else
+                <td></td>
+                <td>
+                    <hr style="border-top: 1px dashed;">
+                </td>
+                @endif
+                <td class="text-center"><img src="{{ $items->pola != null ? $items->pola : asset('images/pola.png') }}" alt=""
+                        style="height: 40"></td>
+                <td class="text-center capital" style="padding-top: 36px;">{{ $history->pelanggan->nama }}</td>
+                <td class="text-center capital" style="padding-top: 36px;">{{ $items->penerima }}</td>
+                <td></td>
+            </tr>
+        </tfoot>
+        @endif
         </tbody>
     </table>
+    @if ($history->status == 2)
     <table class="w-100">
         <tbody>
 
@@ -264,6 +317,7 @@
             </tr>
         </tbody>
     </table>
+    @endif
 </body>
 
 </html>
