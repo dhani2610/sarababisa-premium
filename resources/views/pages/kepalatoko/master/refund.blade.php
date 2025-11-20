@@ -244,7 +244,7 @@
                                     </td>
                                     @endif
                                     <td class="text-center px-2 py-3">{{ $i++ }}</td>
-                                    <td class="text-center px-2 py-3">#{{ $r->ServiceTransaction->nomor_servis }}</td>
+                                    <td class="text-center px-2 py-3">#{{ $r->ServiceTransaction->nomor_servis ?? '-' }}</td>
                                     <td class="text-center px-2 py-3">Rp {{ number_format($r->nominal, 2, ',', '.') }}</td>
                                     @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                                     <td class="text-center px-2 py-3">Rp {{ number_format($r->nominal_servis, 2, ',', '.') }}</td>
