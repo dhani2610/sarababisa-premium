@@ -213,7 +213,7 @@
                 : {{ $history->fungsi_keluar }}
             </td>
 
-            <td id="data" class="capital" style="border-left-style: solid;border-right: 2px solid black;border-bottom: 2px solid black" ">
+            <td id="data" class="capital" style="border-left-style: solid;border-right: 2px solid black;border-bottom: 2px solid black" colspan="2">
                 @if ($history->status == 1)
                     Diproses
                 @elseif ($history->status == 2)
