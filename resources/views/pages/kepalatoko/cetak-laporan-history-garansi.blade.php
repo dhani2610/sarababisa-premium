@@ -158,7 +158,7 @@
     </table>
 
     <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
-        Detail History
+        Detail Riwayat
     </h4>
     <br>
     <table class="table-auto w-full" id="detail">
