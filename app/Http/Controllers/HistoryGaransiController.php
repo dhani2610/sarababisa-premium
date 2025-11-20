@@ -89,7 +89,12 @@ class HistoryGaransiController extends Controller
         $history = HistoryGaransi::where('id',$id)->with(['pelanggan'])->first();
         $items = ServiceTransaction::with('customer')->findOrFail($history->service_id);
         $users = User::find(1);
-        $terms = Term::find(1);
+        if ($history->status == 1) {
+            $terms = Term::find(1);
+        }else{
+            $terms = Term::find(2);
+
+        }
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
