@@ -390,7 +390,7 @@
                             <th class="px-2 py-3">Tgl Masuk</th>
                             <th class="px-2 py-3">Tgl Selesai</th>
                             <th class="px-2 py-3">Nomor Servis</th>
-                            <th class="px-2 py-3">Customer</th>
+                            <th class="px-2 py-3">Pelanggan</th>
                             <th class="px-2 py-3">Penerima</th>
                             <th class="px-2 py-3">Keluhan</th>
                             <th class="px-2 py-3">Teknisi</th>
