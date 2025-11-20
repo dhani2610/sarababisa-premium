@@ -37,7 +37,7 @@ class TransaksiServisController extends Controller
         $jumlahbisadiambil = ServiceTransaction::with('customer', 'serviceaction')->where('status_servis', 'Bisa Diambil')->count();
         $jumlah_bisa_diambil = ServiceTransaction::where('status_servis', 'Bisa Diambil')->count();
         $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->count();
-        $jumlah_semua = ServiceTransaction::alls()->count();
+        $jumlah_semua = ServiceTransaction::all()->count();
         return view('pages/kepalatoko/servis/transaksi-servis', compact(
             'processes',
             'processes_count',
