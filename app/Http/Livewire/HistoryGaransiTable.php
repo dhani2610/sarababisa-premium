@@ -114,6 +114,7 @@ class HistoryGaransiTable extends Component
             'count'         => $baseCounter->count(),
             'prosesCount'   => $baseCounter->clone()->where('status', 1)->count(),
             'selesaiCount'  => $baseCounter->clone()->where('status', 2)->count(),
+            'dibatalkanCount'  => $baseCounter->clone()->where('status', 3)->count(),
         ]);
     }
 }
