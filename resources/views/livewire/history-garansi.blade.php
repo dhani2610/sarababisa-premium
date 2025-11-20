@@ -227,6 +227,65 @@
 
     <!-- More actions -->
     <div class="sm:flex sm:justify-between sm:items-center mb-5">
+           <!-- Left side -->
+        <div class="mb-4 sm:mb-0">
+            <ul class="flex flex-wrap -m-1">
+
+                {{-- SEMUA --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == '' ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Semua
+                            <span class="ml-1 text-slate-400">{{ $count }}</span>
+                        </button>
+                    </a>
+                </li>
+
+                {{-- PROSES (status = 1) --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=1') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == 1 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Proses
+                            <span class="ml-1 text-slate-400">{{ $prosesCount }}</span>
+                        </button>
+                    </a>
+                </li>
+
+                {{-- SELESAI (status = 2) --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=2') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == 2 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Selesai
+                            <span class="ml-1 text-slate-400">{{ $selesaiCount }}</span>
+                        </button>
+                    </a>
+                </li>
+
+                {{-- DIBATALKAN (status = 3) bila ada --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=3') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == 3 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Dibatalkan / Refund
+                            <span class="ml-1 text-slate-400">{{ $dibatalkanCount ?? 0 }}</span>
+                        </button>
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
         <!-- Left side -->
         <div class="mb-0">
             <select wire:model="paginate" id="" class="form-select">
@@ -264,6 +323,7 @@
     @endif
 
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
+
         <div x-data="handleSelect">
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 {{-- Left side --}}
@@ -392,7 +452,7 @@
                                                 data-id="{{ $item->id }}">
 
                                                 @if ($item->status == 1)
-                                                    Menunggu Konfirmasi
+                                                    Diproses
                                                 @elseif ($item->status == 2)
                                                     Sudah Selesai
                                                 @elseif ($item->status == 3)
