@@ -56,7 +56,7 @@
                                             <!-- Start -->
                                             <label class="flex items-center">
                                                 <input type="radio" name="status" value="3" class="form-radio" x-on:click="showDetails = false"/>
-                                                <span class="text-sm ml-2">Dibatalkan / Refund</span>
+                                                <span class="text-sm ml-2">Dibatalkan / Pengembalian Dana</span>
                                             </label>
                                             <!-- End -->
                                         </div>

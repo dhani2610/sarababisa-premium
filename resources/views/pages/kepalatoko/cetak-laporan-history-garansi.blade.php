@@ -144,9 +144,9 @@
                
             </tr>
             <tr>
-                <th>Total Menunggu Konfirmasi</th>
+                <th>Total Diproses</th>
                 <th>:{{ $totalProses }}</th>
-                <th>Total Batal</th>
+                <th>Total Batal / Pengembalian Dana</th>
                 <th>:{{ $totalBatal }}</th>
                
             </tr>
@@ -252,7 +252,7 @@
                             @elseif ($item->status == 2)
                                 Sudah Selesai
                             @elseif ($item->status == 3)
-                                Dibatalkan / Refund
+                                Dibatalkan / Pengembalian Dana
                             @endif
                     </td>
                 </tr>

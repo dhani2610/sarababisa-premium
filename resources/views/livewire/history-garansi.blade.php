@@ -306,7 +306,7 @@
                             class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
                             border shadow-sm
                             {{ request('status') == 3 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
-                            Dibatalkan / Refund
+                            Dibatalkan / Pengembalian Dana
                             <span class="ml-1 text-slate-400">{{ $dibatalkanCount ?? 0 }}</span>
                         </button>
                     </a>
@@ -485,7 +485,7 @@
                                                 @elseif ($item->status == 2)
                                                     Sudah Selesai
                                                 @elseif ($item->status == 3)
-                                                    Dibatalkan / Refund
+                                                    Dibatalkan / Pengembalian Dana
                                                 @endif
 
                                             </button>
