@@ -38,7 +38,7 @@ class HistoryGaransiController extends Controller
         $end_date = $request->end_date;
 
         // Ambil data history garansi berdasarkan periode
-        $data = HistoryGaransi::where('cabang_id',getCabangId())->with(['service', 'teknisi', 'penerima'])
+        $data = HistoryGaransi::where('cabang_id',getCabangId())->with(['service', 'teknisi', 'penerima','pelanggan'])
             ->whereBetween('date', [$start_date, $end_date])
             ->orderBy('date', 'desc')
             ->get();

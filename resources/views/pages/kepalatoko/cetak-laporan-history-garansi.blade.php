@@ -164,7 +164,7 @@
                 <th class="">Tanggal</th>
                 <th class="">Tgl Selesai</th>
                 <th class="">Nomor Servis</th>
-                <th class="">Customer</th>
+                <th class="">Pelanggan</th>
                 <th class="">Penerima</th>
                 <th class="">Teknisi</th>
                 <th class="">Tindakan</th>
@@ -183,7 +183,7 @@
                     <td class="">{{ $item->date }}</td>
                     <td class="">{{ $item->tgl_selesai ?? '-' }}</td>
                     <td class="">{{ $item->service->nomor_servis ?? $item->service_id }}</td>
-                    <td class="">{{ $item->service->customer->nama ?? '-' }}</td>
+                    <td class="">{{ $item->pelanggan->nama ?? '-' }}</td>
                     <td class="">{{ $item->penerima->name ?? '-' }}</td>
                     <td class="">{{ $item->teknisi->name ?? '-' }}</td>
 
