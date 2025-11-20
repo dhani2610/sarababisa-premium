@@ -173,15 +173,22 @@
             <tbody>
 
          {{-- ROW 1 --}}
+         @php
+            //  if ($history->status == 1) {
+                $style = 'border-bottom: 2px solid black';
+            //  } else{
+                // $style = '';
+            //  }
+         @endphp
         @if ($history->status != 2)
         <tr style="border-right-style: solid;">
-            <td id="data" scope="row" style="border-left-style: solid;">Keluhan</td>
-            <td id="data">: {{ $history->keluhan }}</td>
+            <td id="data" scope="row" style="border-left-style: solid;{{ $style  }}">Keluhan</td>
+            <td id="data" style="{{$style }}">: {{ $history->keluhan }}</td>
 
-            <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Masuk)</td>
-            <td id="data">: {{ $history->fungsi_masuk }}</td>
+            <td id="data" scope="row" style="border-left-style: solid;{{ $style }}">Fungsi (Masuk)</td>
+            <td id="data" style="{{$style }}">: {{ $history->fungsi_masuk }}</td> 
 
-            <td id="data" style="border-left-style: solid;">
+            <td id="data" class="capital" style="border-left-style: solid;border-right: 2px solid black;border-bottom: 2px solid black" colspan="2">
                 @if ($history->status == 1)
                     Diproses
                 @elseif ($history->status == 2)
@@ -193,13 +200,20 @@
         </tr>
         @else
         <tr style="border-right-style: solid;">
-            <td id="data" scope="row" style="border-left-style: solid;">Keluhan</td>
-            <td id="data">: {{ $history->keluhan }}</td>
+            <td id="data" scope="row" style="border-left-style: solid;{{$style }}">Keluhan</td>
+            <td id="data" style="{{$style }}">: {{ $history->keluhan }}</td>
 
-            <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</td>
-            <td id="data">: {{ $history->fungsi_keluar }}</td>
+            <td id="data" scope="row" style="border-left-style: solid;{{$style }}">
+                Fungsi (Masuk) <br> <br>
+                Fungsi (Keluar)
+            </td>
+            <td id="data" style="{{$style }}">
+                : {{ $history->fungsi_masuk }}
+                <br><br>
+                : {{ $history->fungsi_keluar }}
+            </td>
 
-            <td id="data" style="border-left-style: solid;border-right-style: solid;border-bottom-style: solid">
+            <td id="data" class="capital" style="border-left-style: solid;border-right: 2px solid black;border-bottom: 2px solid black" ">
                 @if ($history->status == 1)
                     Diproses
                 @elseif ($history->status == 2)
@@ -214,7 +228,7 @@
 
         </tbody>
         @if ($history->status == 1)
-         <tfoot>
+          <tfoot>
             <tr>
                 <td style="padding-bottom: 0;"></td>
                 <td></td>
@@ -260,7 +274,7 @@
                 @endif
                 <td class="text-center"><img src="{{ $items->pola != null ? $items->pola : asset('images/pola.png') }}" alt=""
                         style="height: 40"></td>
-                <td class="text-center capital" style="padding-top: 36px;">{{ $history->pelanggan->nama }}</td>
+                <td class="text-center capital" style="padding-top: 36px;">{{ $items->customer->nama }}</td>
                 <td class="text-center capital" style="padding-top: 36px;">{{ $items->penerima }}</td>
                 <td></td>
             </tr>
