@@ -104,8 +104,12 @@
     </table>
 
     <hr style="border-top: 1px dashed;">
-
+    
+    @if ($history->status == 1)
+    <h4 class="text-center" style="margin-bottom: 6px; margin-top: 6px;">NOTA TANDA TERIMA KLAIM GARANSI</h4>
+    @else
     <h4 class="text-center" style="margin-bottom: 6px; margin-top: 6px;">NOTA PENGAMBILAN KLAIM GARANSI</h4>
+    @endif
 
     <table class="w-100">
         <tr>
