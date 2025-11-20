@@ -199,7 +199,7 @@
             <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</td>
             <td id="data">: {{ $history->fungsi_keluar }}</td>
 
-            <td id="data" style="border-left-style: solid;">
+            <td id="data" style="border-left-style: solid;border-right-style: solid;border-bottom-style: solid">
                 @if ($history->status == 1)
                     Diproses
                 @elseif ($history->status == 2)
