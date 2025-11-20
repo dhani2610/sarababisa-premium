@@ -168,6 +168,7 @@
             <tbody>
 
             {{-- ROW 1 --}}
+            @if ($history->status != 2)
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Keluhan</td>
                 <td id="data">: {{ $history->keluhan }}</td>
@@ -175,24 +176,33 @@
                 <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Masuk)</td>
                 <td id="data">: {{ $history->fungsi_masuk }}</td>
             </tr>
+            @elseif ($history->status == 2)
+                
+            <tr style="border-right-style: solid;">
+                <td id="data" scope="row" style="border-left-style: solid;">Keluhan</td>
+                <td id="data">: {{ $history->keluhan }}</td>
+
+                <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</td>
+                    <td id="data">: {{ $history->fungsi_keluar }}</td>
+            </tr>
+            @endif
 
             {{-- ROW 2 = estimasi + fungsi keluar --}}
             @if ($history->status != 2)
-                <tr style="border-right-style: solid;">
+                <tr style="border-right-style: solid;border-bottom-style: solid;">
                     <td id="data" scope="row" style="border-left-style: solid;">Estimasi Pengerjaan</td>
                     <td id="data">: {{ $history->estimasi_pengerjaan }}</td>
 
-                    <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</td>
-                    <td id="data">: {{ $history->fungsi_keluar }}</td>
-                </tr>
-            @else
-                {{-- Status = 2 → hanya tampil fungsi keluar --}}
-                <tr style="border-right-style: solid;">
                     <td id="data" scope="row" style="border-left-style: solid;"></td>
                     <td id="data"></td>
-
-                    <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</td>
-                    <td id="data">: {{ $history->fungsi_keluar }}</td>
+                </tr>
+            @elseif ($history->status == 2)
+                {{-- Status = 2 → hanya tampil fungsi keluar --}}
+                <tr style="border-right-style: solid;border-bottom-style: solid;">
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data"></td>
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data"></td>
                 </tr>
             @endif
 
