@@ -98,8 +98,8 @@ class HistoryGaransiController extends Controller
         $invoiceNumber = $items->nomor_servis;
         $namaPelanggan = $items->customer->nama;
 
-        // $pdf = PDF::loadView('pages.kepalatoko.servis.nota-garansi-cetak-inkjet', [
-        return View('pages.kepalatoko.servis.nota-garansi-cetak-inkjet', [
+        $pdf = PDF::loadView('pages.kepalatoko.servis.nota-garansi-cetak-inkjet', [
+        // return View('pages.kepalatoko.servis.nota-garansi-cetak-inkjet', [
             'users' => $users,
             'items' => $items,
             'terms' => $terms,
