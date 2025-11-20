@@ -14,7 +14,7 @@
             <div x-data="{ modalOpen: @entangle('modalOpen') }">
 
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
-                    + Tambah History Garansi
+                    Edit History Garansi
                 </button>
 
                 <!-- Modal backdrop -->

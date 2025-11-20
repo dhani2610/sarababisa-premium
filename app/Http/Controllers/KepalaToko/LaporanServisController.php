@@ -106,7 +106,7 @@ class LaporanServisController extends Controller
             $ppn = !empty($trx->ppn) ? $trx->ppn : 0;
             return $trx->biaya * $ppn / 100;
         });
-        
+
         $omzettahun = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', $currentYear)
@@ -147,7 +147,7 @@ class LaporanServisController extends Controller
             ->orderBy('tgl_ambil', 'asc')
             ->get();
         // dd($services);
-        
+
 
         // Menghitung total item servis
         $daftar_servis = ServiceTransaction::select('tindakan_servis')->where('status_servis', 'Sudah Diambil')
@@ -209,7 +209,7 @@ class LaporanServisController extends Controller
             ServiceTransaction::where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
-            ->where('cabang_id',getCabangId())
+            ->where('service_transactions.cabang_id',getCabangId())
             ->select('brands.name as brand_name')
             ->join('brands', 'service_transactions.brands_id', '=', 'brands.id')
             ->groupBy('brand_name')
@@ -222,7 +222,7 @@ class LaporanServisController extends Controller
             ServiceTransaction::where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
-            ->where('cabang_id',getCabangId())
+            ->where('service_transactions.cabang_id',getCabangId())
             ->select('model_series.name as model_name')
             ->join('model_series', 'service_transactions.model_series_id', '=', 'model_series.id')
             ->groupBy('model_name')
@@ -235,7 +235,7 @@ class LaporanServisController extends Controller
             ServiceTransaction::where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
-            ->where('cabang_id',getCabangId())
+            ->where('service_transactions.cabang_id',getCabangId())
             ->select('service_actions.nama_tindakan as action_name')
             ->join('service_actions', 'service_transactions.service_actions_id', '=', 'service_actions.id')
             ->groupBy('action_name')
@@ -354,7 +354,7 @@ class LaporanServisController extends Controller
             ->where('ppn','>',0)
             ->get();
         // dd($services);
-        
+
 
         // Menghitung total item servis
         $daftar_servis = ServiceTransaction::select('tindakan_servis')->where('status_servis', 'Sudah Diambil')
