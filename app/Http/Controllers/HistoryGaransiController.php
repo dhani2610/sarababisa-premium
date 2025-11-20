@@ -66,7 +66,7 @@ class HistoryGaransiController extends Controller
             'totalModal' => $totalModal,
         ]);
 
-        $filename = 'Laporan History Garansi ' . $start_date . ' sd ' . $end_date . '.pdf';
+        $filename = 'Laporan Riwayat Garansi ' . $start_date . ' sd ' . $end_date . '.pdf';
         return $pdf->stream($filename);
     }
 
@@ -114,7 +114,7 @@ class HistoryGaransiController extends Controller
             'history' => $history,
         ]);
 
-        $filename = 'Nota Pengambilan ' . $invoiceNumber . ' ' . '(' . $namaPelanggan . ')' . '.pdf';
+        $filename = 'Nota Riwayat Garansi.pdf';
 
         return $pdf->setOption('isRemoteEnabled', true)->stream($filename);
     }

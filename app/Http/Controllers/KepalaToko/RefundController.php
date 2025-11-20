@@ -50,7 +50,7 @@ class RefundController extends Controller
         $start_date = $request->start_date;
         $end_date = $request->end_date;
 
-        // Query data refund berdasarkan periode
+        // Query data pengembalian dana berdasarkan periode
         $query = Refund::where('cabang_id',getCabangId())->with(['ServiceTransaction.user', 'teknisi'])
             ->whereBetween('created_at', [$start_date, Carbon::parse($end_date)->endOfDay()])
             ->orderBy('created_at', 'desc');
@@ -80,7 +80,7 @@ class RefundController extends Controller
             'totalRefundServis' => $totalRefundServis,
         ]);
 
-        $filename = 'Laporan Refund ' . $start_date . ' sd ' . $end_date . '.pdf';
+        $filename = 'Laporan Pengembalian Dana ' . $start_date . ' sd ' . $end_date . '.pdf';
         return $pdf->stream($filename);
     }
 
@@ -101,7 +101,7 @@ class RefundController extends Controller
 
         Refund::whereIn('id', $selectedIds)->delete();
 
-        return response()->json(['message' => 'Data refund berhasil dihapus.']);
+        return response()->json(['message' => 'Data pengembalian dana berhasil dihapus.']);
     }
 
     public function store(RefundRequest $request)

@@ -1,5 +1,5 @@
 @section('title')
-    History Garansi
+    Riwayat Garansi
 @endsection
 
 <x-toko-layout>
