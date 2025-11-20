@@ -214,7 +214,7 @@
 
                     {{-- Sparepart --}}
                     <td style="text-align:left">
-                        @if (!empty($item->tindakan))
+                        @if (!empty($item->sparepart))
                             @php $spareparts = json_decode($item->sparepart, true); @endphp
                             @if ($spareparts)
                                 {{-- <ul class=""> --}}
