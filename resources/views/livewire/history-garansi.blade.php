@@ -31,7 +31,7 @@
 
         <!-- Left: Title -->
         <div class="mb-4 sm:mb-0">
-            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">History Garansi Service ✨</h1>
+            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Riwayat Garansi Service ✨</h1>
         </div>
 
         <!-- Right: Actions -->
@@ -87,7 +87,7 @@
                         <!-- Modal header -->
                         <div class="px-5 py-3 border-b border-slate-200">
                             <div class="flex justify-between items-center">
-                                <div class="font-semibold text-slate-800">Atur Pencetakan History Garansi</div>
+                                <div class="font-semibold text-slate-800">Atur Pencetakan Riwayat Garansi</div>
                                 <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false">
                                     <div class="sr-only">Close</div>
                                     <svg class="w-4 h-4 fill-current">
@@ -127,7 +127,7 @@
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
-                    + Tambah History Garansi
+                    + Tambah Riwayat Garansi
                 </button>
 
                 <!-- Modal backdrop -->
@@ -356,7 +356,7 @@
         <div x-data="handleSelect">
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 {{-- Left side --}}
-                <h2 class="font-semibold text-slate-800">Semua History Service <span
+                <h2 class="font-semibold text-slate-800">Semua Riwayat Service <span
                         class="text-slate-400 font-medium">{{ $count }}</span></h2>
                 <div class="relative inline-flex">
                     <div class="table-items-action hidden">

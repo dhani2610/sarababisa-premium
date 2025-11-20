@@ -1,10 +1,10 @@
-@section('title', 'Refund')
+@section('title', 'Pengembalian Dana')
 
 <x-toko-layout>
     <div class=" px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
         <div class="sm:flex sm:justify-between sm:items-center mb-3">
             <div class="mb-4 sm:mb-0">
-                <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Refund ✨</h1>
+                <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Pengembalian Dana ✨</h1>
             </div>
 
 
@@ -184,7 +184,7 @@
                         <svg class="w-4 h-4 shrink-0 fill-current opacity-80 mt-[3px] mr-3" viewBox="0 0 16 16">
                             <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm1 12H7V7h2v5zM8 6c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z" />
                         </svg>
-                        <div class="font-medium">menu transaksi refund ini untuk perhitungan transaksi yang masih garansi apabila ada pemotongan ke teknisi yang sudah mendapatkan bonus transaksi tersebut.</div>
+                        <div class="font-medium">menu transaksi Pengembalian Dana ini untuk perhitungan transaksi yang masih garansi apabila ada pemotongan ke teknisi yang sudah mendapatkan bonus transaksi tersebut.</div>
                     </div>
                 </div>
             </div>
@@ -193,7 +193,7 @@
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
             <div x-data="handleSelect()">
                 <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
-                    <h2 class="font-semibold text-slate-800">Semua Refund <span
+                    <h2 class="font-semibold text-slate-800">Semua Pengembalian Dana <span
                             class="text-slate-400 font-medium">{{ $refunds->total() }}</span></h2>
                     <div class="relative inline-flex">
                         <div class="table-items-action hidden">

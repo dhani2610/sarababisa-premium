@@ -121,7 +121,7 @@
 
     <div class="text-center">
         <h4 style="margin-bottom: 6px; margin-top: 5px;">
-            LAPORAN HISTORY GARANSI
+            LAPORAN RIWAYAT GARANSI
         </h4>
         <p style="margin-top: 0">Periode : {{ \Carbon\Carbon::parse($start_date)->format('d-m-Y') }} s/d
             {{ \Carbon\Carbon::parse($end_date)->format('d-m-Y') }}</p>

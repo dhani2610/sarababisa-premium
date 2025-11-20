@@ -33,7 +33,7 @@
     <hr style="border-top: 1px dashed;">
 
     <div class="text-center">
-        <h4>LAPORAN REFUND</h4>
+        <h4>LAPORAN PENGEMBALIAN DANA</h4>
         <p>Periode: {{ \Carbon\Carbon::parse($start_date)->format('d-m-Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->format('d-m-Y') }}</p>
     </div>
 
@@ -50,7 +50,7 @@
         </tr>
     </table>
 
-    <h4 style="text-decoration: underline;">Detail Refund</h4>
+    <h4 style="text-decoration: underline;">Detail Pengembalian Dana</h4>
 
     <table id="detail">
         <thead>
@@ -58,7 +58,7 @@
                 <th>No</th>
                 <th>Tanggal</th>
                 <th>Nomor Servis</th>
-                <th>Customer</th>
+                <th>Pelanggan</th>
                 <th>Teknisi</th>
                 <th>Nominal Potongan Teknisi</th>
                 <th>Pengembalian Biaya</th>

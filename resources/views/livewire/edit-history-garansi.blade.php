@@ -4,7 +4,7 @@
 
         <!-- Left: Title -->
         <div class="mb-4 sm:mb-0">
-            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Edit History Garansi Service ✨</h1>
+            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Edit Riwayat Garansi Service ✨</h1>
         </div>
 
         <!-- Right: Actions -->
@@ -14,7 +14,7 @@
             <div x-data="{ modalOpen: @entangle('modalOpen') }">
 
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
-                    Edit History Garansi
+                    Edit Riwayat Garansi
                 </button>
 
                 <!-- Modal backdrop -->
