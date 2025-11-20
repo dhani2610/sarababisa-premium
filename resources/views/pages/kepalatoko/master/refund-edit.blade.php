@@ -28,7 +28,7 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium mb-1">Nominal Potongan Service<span
+                <label class="block text-sm font-medium mb-1">Pengembalian Biaya<span
                         class="text-rose-500">*</span></label>
                 <input name="nominal_servis" type="number" id="nominal_input_servis" value="{{ $item->nominal_servis }}"
                     class="form-input w-full disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" readonly style="background: rgb(223, 221, 221)" />

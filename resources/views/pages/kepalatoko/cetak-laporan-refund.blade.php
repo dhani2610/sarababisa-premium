@@ -58,7 +58,7 @@
                 <th>Customer</th>
                 <th>Teknisi</th>
                 <th>Nominal Potongan Teknisi</th>
-                <th>Nominal Potongan Servis</th>
+                <th>Pengembalian Biaya</th>
                 <th>Bulan/Tahun</th>
             </tr>
         </thead>

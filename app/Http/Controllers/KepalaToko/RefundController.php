@@ -120,6 +120,15 @@ class RefundController extends Controller
         $data['cabang_id'] = getCabangId();
         Refund::create($data);
 
+
+        if ($servis->biaya > 0) {
+            Expense::create([
+                'name' => 'Refund #'. $servis->nomor_servis,
+                'price' => $servis->biaya,
+                'users_id' => auth()->user()->id
+            ]);
+        }
+
         toast('Refund berhasil ditambahkan.', 'success');
 
         return redirect()->route('refund.index');

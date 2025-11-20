@@ -202,9 +202,11 @@ class HistoryGaransiController extends Controller
             }
         }
 
+        $servis2 = ServiceTransaction::with('user')->find($data->service_id);
+
         if ($request->total_biaya > 0) {
             Expense::create([
-                'name' => $request->catatan,
+                'name' => 'Klaim Garansi #'. $servis2->nomor_servis,
                 'price' => $request->total_biaya,
                 'users_id' => auth()->user()->id
             ]);
