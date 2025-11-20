@@ -43,7 +43,10 @@
             <td>Total Data</td><td>: {{ $totalData }}</td>
         </tr>
         <tr>
-            <td>Total Refund</td><td>: Rp {{ number_format($totalRefund, 0, ',', '.') }}</td>
+            <td>Total Potongan Teknisi</td><td>: Rp {{ number_format($totalRefund, 0, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td>Total Pengembalian Biaya</td><td>: Rp {{ number_format($totalRefundServis, 0, ',', '.') }}</td>
         </tr>
     </table>
 

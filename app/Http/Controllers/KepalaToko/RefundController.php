@@ -64,6 +64,7 @@ class RefundController extends Controller
 
         // Hitung total
         $totalRefund = $refunds->sum('nominal');
+        $totalRefundServis = $refunds->sum('nominal_servis');
         $totalData = $refunds->count();
 
         // Generate PDF
