@@ -117,7 +117,7 @@ class HistoryGaransiController extends Controller
     {
 
         $data = HistoryGaransi::find($id);
-        if ($request->status == 2) {
+        if ($request->status == 2 || $request->status == 3) {
             $data->tgl_selesai = date('Y-m-d');
         }else{
             $data->tgl_selesai = null;
