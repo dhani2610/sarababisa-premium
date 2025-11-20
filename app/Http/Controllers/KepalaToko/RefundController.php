@@ -5,6 +5,7 @@ namespace App\Http\Controllers\KepalaToko;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\KepalaToko\RefundRequest;
 use App\Models\Refund;
+use App\Models\Expense;
 use App\Models\ServiceTransaction;
 use App\Models\User;
 use Illuminate\Http\Request;
