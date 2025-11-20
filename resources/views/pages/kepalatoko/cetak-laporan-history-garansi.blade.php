@@ -242,7 +242,7 @@
                     <td class="">{{ $item->catatan }}</td>
                     <td class="">
                             @if ($item->status == 1)
-                                Menunggu Konfirmasi
+                                Diproses
                             @elseif ($item->status == 2)
                                 Sudah Selesai
                             @elseif ($item->status == 3)

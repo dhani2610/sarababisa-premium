@@ -162,49 +162,51 @@
                 <th id="data" colspan="2" class="text-left" style="border-left-style: solid;">Klaim Garansi</th>
                 <th id="data" colspan="2" class="text-left" style="border-left-style: solid;">Pengecekan
                     (Tombol, Kamera, dll)</th>
+                    <th id="data" colspan="2" class="text-left" style="border-left-style: solid;">Status klaim garansi</th>
             </tr>
         </thead>
         <tbody>
             <tbody>
 
-            {{-- ROW 1 --}}
-            @if ($history->status != 2)
-            <tr style="border-right-style: solid;">
-                <td id="data" scope="row" style="border-left-style: solid;">Keluhan</td>
-                <td id="data">: {{ $history->keluhan }}</td>
+         {{-- ROW 1 --}}
+        @if ($history->status != 2)
+        <tr style="border-right-style: solid;">
+            <td id="data" scope="row" style="border-left-style: solid;">Keluhan</td>
+            <td id="data">: {{ $history->keluhan }}</td>
 
-                <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Masuk)</td>
-                <td id="data">: {{ $history->fungsi_masuk }}</td>
-            </tr>
-            @elseif ($history->status == 2)
-                
-            <tr style="border-right-style: solid;">
-                <td id="data" scope="row" style="border-left-style: solid;">Keluhan</td>
-                <td id="data">: {{ $history->keluhan }}</td>
+            <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Masuk)</td>
+            <td id="data">: {{ $history->fungsi_masuk }}</td>
 
-                <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</td>
-                    <td id="data">: {{ $history->fungsi_keluar }}</td>
-            </tr>
-            @endif
+            <td id="data" style="border-left-style: solid;">
+                @if ($history->status == 1)
+                    Diproses
+                @elseif ($history->status == 2)
+                    Sudah Selesai
+                @elseif ($history->status == 3)
+                    Dibatalkan / Refund
+                @endif
+            </td>
+        </tr>
+        @else
+        <tr style="border-right-style: solid;">
+            <td id="data" scope="row" style="border-left-style: solid;">Keluhan</td>
+            <td id="data">: {{ $history->keluhan }}</td>
 
-            {{-- ROW 2 = estimasi + fungsi keluar --}}
-            @if ($history->status != 2)
-                <tr style="border-right-style: solid;border-bottom-style: solid;">
-                    <td id="data" scope="row" style="border-left-style: solid;">Estimasi Pengerjaan</td>
-                    <td id="data">: {{ $history->estimasi_pengerjaan }}</td>
+            <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</td>
+            <td id="data">: {{ $history->fungsi_keluar }}</td>
 
-                    <td id="data" scope="row" style="border-left-style: solid;"></td>
-                    <td id="data"></td>
-                </tr>
-            @elseif ($history->status == 2)
-                {{-- Status = 2 → hanya tampil fungsi keluar --}}
-                <tr style="border-right-style: solid;border-bottom-style: solid;">
-                    <td id="data" scope="row" style="border-left-style: solid;"></td>
-                    <td id="data"></td>
-                    <td id="data" scope="row" style="border-left-style: solid;"></td>
-                    <td id="data"></td>
-                </tr>
-            @endif
+            <td id="data" style="border-left-style: solid;">
+                @if ($history->status == 1)
+                    Diproses
+                @elseif ($history->status == 2)
+                    Sudah Selesai
+                @elseif ($history->status == 3)
+                    Dibatalkan / Refund
+                @endif
+            </td>
+        </tr>
+        @endif
+
 
         </tbody>
         @if ($history->status == 1)
