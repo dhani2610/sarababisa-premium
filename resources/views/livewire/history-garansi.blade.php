@@ -511,7 +511,7 @@
                                                     </svg>
                                                 </button>
                                             </a>
-                                            <a href="{{ route('history-garansi.cetak-inject', $item->id) }}">
+                                            <a href="{{ route('history-garansi.cetak-inject', $item->id) }}" target="_blank">
                                                 <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
