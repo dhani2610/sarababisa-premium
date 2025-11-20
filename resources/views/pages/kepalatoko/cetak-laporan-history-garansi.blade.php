@@ -134,19 +134,25 @@
     </h4>
 
 
-    <table id="ringkasan">
+    <table id="ringkasan" >
         <tbody>
             <tr>
                 <th>Total Data</th>
                 <th>:{{ $totalData }}</th>
                 <th>Total Selesai</th>
                 <th>:{{ $totalSelesai }}</th>
+               
             </tr>
             <tr>
                 <th>Total Menunggu Konfirmasi</th>
                 <th>:{{ $totalProses }}</th>
                 <th>Total Batal</th>
                 <th>:{{ $totalBatal }}</th>
+               
+            </tr>
+            <tr>
+                <th>Total Modal</th>
+                <th>:{{ $totalModal }}</th>
             </tr>
         </tbody>
     </table>

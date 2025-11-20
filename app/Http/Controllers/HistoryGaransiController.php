@@ -49,6 +49,7 @@ class HistoryGaransiController extends Controller
         $totalSelesai = $data->where('status', 2)->count();
         $totalProses = $data->where('status', 1)->count();
         $totalBatal = $data->where('status', 3)->count();
+        $totalModal = $data->sum('total_biaya');
 
         // Buat PDF
         // return View('pages.kepalatoko.cetak-laporan-history-garansi', [
@@ -62,6 +63,7 @@ class HistoryGaransiController extends Controller
             'totalSelesai' => $totalSelesai,
             'totalProses' => $totalProses,
             'totalBatal' => $totalBatal,
+            'totalModal' => $totalModal,
         ]);
 
         $filename = 'Laporan History Garansi ' . $start_date . ' sd ' . $end_date . '.pdf';
