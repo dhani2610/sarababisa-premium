@@ -132,15 +132,22 @@
                                             </div>
 
                                             <div>
-                                                <label class="block text-sm font-medium mb-1">Nominal <span
+                                                <label class="block text-sm font-medium mb-1">Nominal Potongan Bonus Teknisi<span
                                                         class="text-rose-500">*</span></label>
                                                 <input name="nominal" type="number" id="nominal_input"
-                                                    class="form-input w-full" required />
+                                                    class="form-input w-full disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" readonly style="background: rgb(223, 221, 221)" />
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1">Nominal Potongan Service<span
+                                                        class="text-rose-500">*</span></label>
+                                                <input name="nominal_servis" type="number" id="nominal_input_servis"
+                                                    class="form-input w-full disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" readonly style="background: rgb(223, 221, 221)" />
                                             </div>
 
                                             <div>
                                                 <label class="block text-sm font-medium mb-1">Teknisi (otomatis)</label>
-                                                <input id="teknisi_name" type="text" class="form-input w-full"
+                                                <input id="teknisi_name" type="text" class="form-input w-full" style="background: rgb(223, 221, 221)"
                                                     readonly />
                                             </div>
 
@@ -205,7 +212,7 @@
                         <thead
                             class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                             <tr>
-                                    @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
+                                @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                                 <th class="text-center px-2 py-3 w-px">
                                     <input id="parent-checkbox" class="form-checkbox" type="checkbox"
                                         @click="toggleAll" />
@@ -213,7 +220,10 @@
                                 @endif
                                 <th class="text-center px-2 py-3">No</th>
                                 <th class="text-center px-2 py-3">Nomor Servis</th>
-                                <th class="text-center px-2 py-3">Nominal</th>
+                                <th class="text-center px-2 py-3">Nominal Potongan Teknisi</th>
+                                @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
+                                <th class="text-center px-2 py-3">Nominal Potongan Servis</th>
+                                @endif
                                 <th class="text-center px-2 py-3">Teknisi</th>
                                 <th class="text-center px-2 py-3">Bulan/Tahun</th>
                                 @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
@@ -236,6 +246,9 @@
                                     <td class="text-center px-2 py-3">{{ $i++ }}</td>
                                     <td class="text-center px-2 py-3">#{{ $r->ServiceTransaction->nomor_servis }}</td>
                                     <td class="text-center px-2 py-3">Rp {{ number_format($r->nominal, 2, ',', '.') }}</td>
+                                    @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
+                                    <td class="text-center px-2 py-3">Rp {{ number_format($r->nominal_servis, 2, ',', '.') }}</td>
+                                    @endif
                                     <td class="text-center px-2 py-3">{{ optional($r->teknisi)->name }}</td>
                                     <td class="text-center px-2 py-3">{{ $r->period ? $r->period->format('F Y') : '-' }}
                                     </td>
@@ -346,6 +359,7 @@
    $(document).ready(function () {
         const teknisiNameInput = document.getElementById('teknisi_name');
         const NominalInput = document.getElementById('nominal_input');
+        const NominalInputServis = document.getElementById('nominal_input_servis');
 
         $('#servis_select').on('select2:select change', function () {
             const id = $(this).val();
@@ -363,6 +377,7 @@
                     console.log(data);
                     teknisiNameInput.value = data.teknisi_name ?? '';
                     NominalInput.value = data.nominal ?? 0;
+                    NominalInputServis.value = data.nominal_servis ?? 0;
                 })
                 .catch(err => {
                     console.error(err);

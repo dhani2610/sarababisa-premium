@@ -19,14 +19,24 @@
                 </select>
             </div>
 
+
             <div>
-                <label class="block text-sm font-medium mb-1">Nominal</label>
-                <input name="nominal" type="number" class="form-input w-full" value="{{ $item->nominal }}" required />
+                <label class="block text-sm font-medium mb-1">Nominal Potongan Bonus Teknisi<span
+                        class="text-rose-500">*</span></label>
+                <input name="nominal" type="number" id="nominal_input" value="{{ $item->nominal }}"
+                    class="form-input w-full disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" readonly style="background: rgb(223, 221, 221)" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Nominal Potongan Service<span
+                        class="text-rose-500">*</span></label>
+                <input name="nominal_servis" type="number" id="nominal_input_servis" value="{{ $item->nominal_servis }}"
+                    class="form-input w-full disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" readonly style="background: rgb(223, 221, 221)" />
             </div>
 
             <div>
                 <label class="block text-sm font-medium mb-1">Teknisi</label>
-                <input id="teknisi_name_edit" type="text" class="form-input w-full" readonly value="{{ optional($item->teknisi)->name }}" />
+                <input id="teknisi_name_edit" type="text" class="form-input w-full" style="background: rgb(223, 221, 221)" readonly value="{{ optional($item->teknisi)->name }}" />
             </div>
 
             <div>
@@ -48,6 +58,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     const servisSelect = document.getElementById('servis_select_edit');
     const teknisiInput = document.getElementById('teknisi_name_edit');
+    const NominalInputServis = document.getElementById('nominal_input_servis');
+    const NominalInput = document.getElementById('nominal_input');
 
     if (servisSelect) {
         servisSelect.addEventListener('change', function () {
@@ -55,10 +67,12 @@ document.addEventListener('DOMContentLoaded', function () {
             teknisiInput.value = '';
             if (!id) return;
 
-            fetch('{{ url("kepalatoko/refund/service") }}/' + id)
+            fetch('{{ url("refund/service") }}/' + id)
                 .then(res => res.json())
                 .then(data => {
                     teknisiInput.value = data.teknisi_name ?? '';
+                    NominalInput.value = data.nominal ?? 0;
+                    NominalInputServis.value = data.nominal_servis ?? 0;
                 }).catch(err => console.error(err));
         });
     }

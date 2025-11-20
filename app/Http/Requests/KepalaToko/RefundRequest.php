@@ -16,7 +16,8 @@ class RefundRequest extends FormRequest
     {
         return [
             'servis_transaction_id' => 'required|exists:service_transactions,id',
-            'nominal' => 'required|numeric|min:0',
+            'nominal' => 'required',
+            'nominal_servis' => 'required',
             // period will be input type month like "2025-10" -> convert in controller
             'period' => 'nullable|date_format:Y-m',
         ];
@@ -28,7 +29,7 @@ class RefundRequest extends FormRequest
             'servis_transaction_id.required' => 'Nomor servis harus diisi.',
             'servis_transaction_id.exists' => 'Nomor servis tidak valid.',
             'nominal.required' => 'Nominal harus diisi.',
-            'nominal.numeric' => 'Nominal harus angka.',
+            'nominal_servis.required' => 'Nominal Servis harus diisi.',
             'period.date_format' => 'Format bulan/tahun harus yyyy-mm (input type="month").',
         ];
     }

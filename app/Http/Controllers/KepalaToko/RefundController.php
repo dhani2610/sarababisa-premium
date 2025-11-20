@@ -103,6 +103,7 @@ class RefundController extends Controller
 
     public function store(RefundRequest $request)
     {
+        // dd($request->all());
         $data = $request->validated();
 
         // convert period from "YYYY-MM" to YYYY-MM-01 (date)
@@ -187,6 +188,7 @@ class RefundController extends Controller
             'teknisi_id' => $servis->users_id ?? $servis->user_id ?? null,
             'teknisi_name' => optional($servis->user)->name ?? null,
             'nominal' => $bonus,
+            'nominal_servis' => $servis->biaya ?? $servis->pay ?? null,
         ]);
     }
 }
