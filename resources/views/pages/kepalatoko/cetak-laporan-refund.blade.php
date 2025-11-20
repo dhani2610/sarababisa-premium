@@ -69,7 +69,7 @@
                     <td>{{ $i++ }}</td>
                     <td>{{ \Carbon\Carbon::parse($r->created_at)->format('d-m-Y') }}</td>
                     <td>#{{ $r->ServiceTransaction->nomor_servis ?? '-' }}</td>
-                    <td>{{ $r->ServiceTransaction->user->name ?? '-' }}</td>
+                    <td>{{ $r->ServiceTransaction->customer->nama ?? '-' }}</td>
                     <td>{{ $r->teknisi->name ?? '-' }}</td>
                     <td>Rp {{ number_format($r->nominal, 0, ',', '.') }}</td>
                     <td>Rp {{ number_format($r->nominal_servis, 0, ',', '.') }}</td>
