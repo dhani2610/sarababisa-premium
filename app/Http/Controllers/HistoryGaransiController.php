@@ -162,7 +162,6 @@ class HistoryGaransiController extends Controller
         $data->total_biaya_tindakan = $request->total_biaya_tindakan;
         $data->total_biaya = $request->total_biaya;
         $data->catatan     = $request->catatan;
-        $data->keluhan     = $request->keluhan;
         $data->status     = $request->status;
         $data->fungsi_keluar = $request->fungsi_keluar;
         $data->save();

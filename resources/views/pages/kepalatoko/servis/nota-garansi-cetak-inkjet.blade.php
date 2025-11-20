@@ -156,7 +156,7 @@
             </tr>
         </tbody>
     </table>
-    <table class="w-100" style="padding-top: 0px;">
+    <table class="w-100"  style="padding-top: 0px;">
         <thead>
             <tr style="border-top-style: solid; border-right-style: solid;">
                 <th id="data" colspan="2" class="text-left" style="border-left-style: solid;">Klaim Garansi</th>
@@ -165,20 +165,39 @@
             </tr>
         </thead>
         <tbody>
-            <tr style="border-right-style: solid;">
-                <td id="data" scope="row" style="border-left-style: solid;">Keluhan</th>
-                <td id="data" class="">: {{ $history->keluhan }}</td>
-                <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Masuk)</th>
-                <td id="data" class="">: {{ $history->fungsi_masuk }}</td>
+            <tbody>
 
+            {{-- ROW 1 --}}
+            <tr style="border-right-style: solid;">
+                <td id="data" scope="row" style="border-left-style: solid;">Keluhan</td>
+                <td id="data">: {{ $history->keluhan }}</td>
+
+                <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Masuk)</td>
+                <td id="data">: {{ $history->fungsi_masuk }}</td>
             </tr>
 
-            <tr style="border-right-style: solid;">
-                <td id="data" scope="row" style="border-left-style: solid;">Estimasi Pengerjaan</th>
-                <td id="data" class="">: {{ $history->estimasi_pengerjaan }}</td>
-                <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</th>
-                <td id="data" class="">: {{ $history->fungsi_keluar }}</td>
-            </tr>
+            {{-- ROW 2 = estimasi + fungsi keluar --}}
+            @if ($history->status != 2)
+                <tr style="border-right-style: solid;">
+                    <td id="data" scope="row" style="border-left-style: solid;">Estimasi Pengerjaan</td>
+                    <td id="data">: {{ $history->estimasi_pengerjaan }}</td>
+
+                    <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</td>
+                    <td id="data">: {{ $history->fungsi_keluar }}</td>
+                </tr>
+            @else
+                {{-- Status = 2 → hanya tampil fungsi keluar --}}
+                <tr style="border-right-style: solid;">
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data"></td>
+
+                    <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</td>
+                    <td id="data">: {{ $history->fungsi_keluar }}</td>
+                </tr>
+            @endif
+
+        </tbody>
+
         </tbody>
     </table>
     <table class="w-100">
