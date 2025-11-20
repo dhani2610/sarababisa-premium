@@ -180,7 +180,7 @@
                 // $style = '';
             //  }
          @endphp
-        @if ($history->status != 2)
+        @if ($history->status == 1)
         <tr style="border-right-style: solid;">
             <td id="data" scope="row" style="border-left-style: solid;{{ $style  }}">Keluhan</td>
             <td id="data" style="{{$style }}">: {{ $history->keluhan }}</td>
@@ -282,7 +282,7 @@
         @endif
         </tbody>
     </table>
-    @if ($history->status == 2)
+    @if ($history->status == 2 || $history->status == 3)
     <table class="w-100">
         <tbody>
 
