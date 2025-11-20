@@ -420,7 +420,7 @@
                                 <td class="px-2 py-3">{{ $i++ }}</td>
                                 <td class="px-2 py-3">{{ $item->date }}</td>
                                 <td class="px-2 py-3">{{ $item->tgl_selesai }}</td>
-                                <td class="px-2 py-3">{{ $item->service->nomor_servis ?? $item->service_id }}</td>
+                                <td class="px-2 py-3">{{ $item->service->nomor_servis ?? '' }}</td>
                                 <td class="px-2 py-3">{{ $item->pelanggan->nama ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->penerima->name ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->keluhan ?? '-' }}</td>
