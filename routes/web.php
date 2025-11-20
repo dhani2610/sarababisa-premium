@@ -250,6 +250,8 @@ Route::resource('gaji/karyawan', KepalaTokoKaryawanController::class);
 Route::get('slip-gaji/{id}', [KepalaTokoKaryawanController::class, 'cetak'])->name('cetak-slip-gaji');
 Route::get('/history-garansi/cetak', [HistoryGaransiController::class, 'cetak'])
     ->name('history-garansi.cetak');
+Route::get('/history-garansi/cetak-inject/{id}', [HistoryGaransiController::class, 'cetakinkjet'])
+    ->name('history-garansi.cetak-inject');
 Route::resource('history-garansi', HistoryGaransiController::class);
 Route::patch('/history-garansi/{id}/toggle-status', [HistoryGaransiController::class, 'toggleStatus'])
     ->name('history-garansi.toggleStatus');

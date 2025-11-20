@@ -11,6 +11,7 @@ use App\Models\ServiceTransaction;
 use App\Models\Product;
 use App\Models\ServiceAction;
 use App\Models\Refund;
+use App\Models\Term;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -83,6 +84,34 @@ class HistoryGaransiController extends Controller
         }
     }
 
+    public function cetakinkjet($id)
+    {
+        $history = HistoryGaransi::find($id);
+        $items = ServiceTransaction::with('customer')->findOrFail($history->service_id);
+        $users = User::find(1);
+        $terms = Term::find(2);
+
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+
+        // Ambil nomor invoice dari database
+        $invoiceNumber = $items->nomor_servis;
+        $namaPelanggan = $items->customer->nama;
+
+        $pdf = PDF::loadView('pages.kepalatoko.servis.nota-garansi-cetak-inkjet', [
+        // return View('pages.kepalatoko.servis.nota-garansi-cetak-inkjet', [
+            'users' => $users,
+            'items' => $items,
+            'terms' => $terms,
+            'imagePath' => $imagePath,
+            'history' => $history,
+        ]);
+
+        $filename = 'Nota Pengambilan ' . $invoiceNumber . ' ' . '(' . $namaPelanggan . ')' . '.pdf';
+
+        return $pdf->setOption('isRemoteEnabled', true)->stream($filename);
+    }
+
 
     public function store(Request $request)
     {
@@ -99,6 +128,8 @@ class HistoryGaransiController extends Controller
         $data->service_id  = $request->service_id;
         $data->penerima_id = $request->penerima_id;
         $data->id_customer = $request->id_customer;
+        $data->estimasi_pengerjaan = $request->estimasi_pengerjaan;
+        $data->fungsi_masuk = $request->fungsi_masuk;
         $data->teknisi_id  = 0;
         $data->keluhan  = $request->keluhan;
         $data->tindakan    = [];
@@ -133,6 +164,7 @@ class HistoryGaransiController extends Controller
         $data->catatan     = $request->catatan;
         $data->keluhan     = $request->keluhan;
         $data->status     = $request->status;
+        $data->fungsi_keluar = $request->fungsi_keluar;
         $data->save();
 
         if ($data->status == 3) {

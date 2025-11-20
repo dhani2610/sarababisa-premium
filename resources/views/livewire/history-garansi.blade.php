@@ -201,11 +201,40 @@
                                     </select>
                                 </div>
 
-                                 <div>
+                                <div>
                                     <label class="block text-sm font-medium mb-1">Keluhan <span
                                             class="text-rose-500">*</span></label>
                                     <input type="text" name="keluhan" class="form-input w-full"
                                         required>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="fungsi masuk">Pengecekan
+                                        Fungsi Masuk<span class="text-rose-500">*</span></label>
+                                    <input id="fungsi masuk" name="fungsi masuk" class="form-input w-full px-2 py-1"
+                                        type="text" required
+                                        placeholder="Contoh: Tombol, Kamera, Speaker, dll" />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium mb-1"
+                                        for="estimasi_pengerjaan">Estimasi Pengerjaan</label>
+                                    <select id="estimasi_pengerjaan" name="estimasi_pengerjaan"
+                                        class="form-select text-sm py-2 w-full">
+                                        <option selected value="">Pilih Estimasi Pengerjaan</option>
+                                        <option value="1 Hari">1 Hari</option>
+                                        <option value="2 Hari">2 Hari</option>
+                                        <option value="3 Hari">3 Hari</option>
+                                        <option value="4 Hari">4 Hari</option>
+                                        <option value="5 Hari">5 Hari</option>
+                                        <option value="6 Hari">6 Hari</option>
+                                        <option value="1 Minggu">1 Minggu</option>
+                                        <option value="2 Minggu">2 Minggu</option>
+                                        <option value="3 Minggu">3 Minggu</option>
+                                        <option value="1 Bulan">1 Bulan</option>
+                                        <option value="2 Bulan">2 Bulan</option>
+                                        <option value="3 Bulan">3 Bulan</option>
+                                    </select>
                                 </div>
 
                             </div>
@@ -479,6 +508,16 @@
                                                         <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
                                                         <rect x="9" y="3" width="6" height="4" rx="2" />
                                                         <path d="M9 14l2 2l4 -4" />
+                                                    </svg>
+                                                </button>
+                                            </a>
+                                            <a href="{{ route('history-garansi.cetak-inject', $item->id) }}">
+                                                <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                        <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+                                                        <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+                                                        <rect x="7" y="13" width="10" height="8" rx="2" />
                                                     </svg>
                                                 </button>
                                             </a>

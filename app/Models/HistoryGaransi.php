@@ -22,6 +22,9 @@ class HistoryGaransi extends Model
         'status',
         'cabang_id',
         'id_customer',
+        'estimasi_pengerjaan',
+        'fungsi_masuk',
+        'fungsi_keluar',
     ];
 
     protected $casts = [

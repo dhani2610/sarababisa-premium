@@ -138,8 +138,17 @@
                                             @endforeach
                                         </select>
                                     </div>
+
                                     <div>
-                                        <label class="block text-sm font-medium mb-1">Catatan<span
+                                        <label class="block text-sm font-medium mb-1 mt-1" for="fungsi_keluar">Pengecekan
+                                            Fungsi Keluar<span class="text-rose-500">*</span></label>
+                                        <input id="fungsi_keluar" name="fungsi_keluar" class="form-input w-full px-2 py-1"
+                                            type="text" required
+                                            placeholder="Contoh: Tombol, Kamera, Speaker, dll" />
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1 mt-1">Catatan<span
                                                 class="text-rose-500">*</span></label>
                                         <textarea name="catatan" class="form-input w-full" required>{{  $historyGaransi->catatan  }}</textarea>
                                     </div>
