@@ -248,7 +248,7 @@ $(document).ready(function () {
                     title: { text: "Cabang" }
                 },
                 yAxis: {
-                    title: { text: "Rp" },
+                    title: { text: "Nominal (Rp)" },
                     labels: {
                         formatter: function () {
                             return formatRupiahShort(this.value);
@@ -347,7 +347,7 @@ $(document).ready(function () {
                         title: { text: "Cabang" }
                     },
                     yAxis: {
-                        title: { text: "Rp" },
+                        title: { text: "Nominal (Rp)" },
                         labels: {
                             formatter: function () {
                                 return formatRupiahShort(this.value);
