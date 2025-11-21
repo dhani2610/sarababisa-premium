@@ -77,25 +77,7 @@
                                     @csrf
                                     <div class="px-5 py-4  gap-3">
 
-                                        <div class="mb-3" >
-                                            <label>Dari Cabang</label>
-                                            <select id="dari_cabang_id" name="dari_cabang_id" class="form-select w-full" required>
-                                                <option value="">-- Pilih Cabang --</option>
-                                                @foreach(\App\Models\Cabang::orderBy('nama_cabang')->get() as $c)
-                                                    <option value="{{ $c->id }}">{{ $c->nama_cabang }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3" >
-                                            <label>Ke Cabang</label>
-                                            <select id="ke_cabang_id" name="ke_cabang_id" class="form-select w-full" required>
-                                                <option value="">-- Pilih Cabang --</option>
-                                                @foreach(\App\Models\Cabang::orderBy('nama_cabang')->get() as $c)
-                                                    <option value="{{ $c->id }}">{{ $c->nama_cabang }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                 
 
                                         <div class="mb-3">
                                             <label>Kategori</label>
@@ -108,11 +90,33 @@
                                             </select>
                                         </div>
 
+                                        
+                                        <div class="mb-3" >
+                                            <label>Asal Cabang</label>
+                                            <select id="dari_cabang_id" name="dari_cabang_id" class="form-select w-full" required>
+                                                <option value="">-- Pilih Cabang --</option>
+                                                @foreach(\App\Models\Cabang::orderBy('nama_cabang')->get() as $c)
+                                                    <option value="{{ $c->id }}">{{ $c->nama_cabang }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+
                                         <div class="mb-3" >
                                             <label>Produk Asal</label>
                                             <select id="dari_produk_id" name="dari_produk_id" class="form-select w-full" required>
                                                 <option value="">-- Pilih Produk --</option>
                                                 {{-- options akan terisi via AJAX --}}
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3" >
+                                            <label>Cabang Tujuan</label>
+                                            <select id="ke_cabang_id" name="ke_cabang_id" class="form-select w-full" required>
+                                                <option value="">-- Pilih Cabang --</option>
+                                                @foreach(\App\Models\Cabang::orderBy('nama_cabang')->get() as $c)
+                                                    <option value="{{ $c->id }}">{{ $c->nama_cabang }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
 
