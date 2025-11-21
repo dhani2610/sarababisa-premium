@@ -148,7 +148,7 @@ $(document).ready(function () {
             },
             success: function (res) {
 
-                const range = res.range;
+                const range = res.rangeIndo;
 
                 // ===================================
                 // 1. CHART PENCAPAIAN

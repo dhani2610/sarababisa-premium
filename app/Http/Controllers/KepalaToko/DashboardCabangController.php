@@ -49,11 +49,36 @@ class DashboardCabangController extends Controller
         $endDate   = \Carbon\Carbon::parse($end . '-01');
 
         $listMonths = [];
+        $listMonthsIndo = [];
+
+        $indoMonths = [
+            1 => 'Jan',
+            2 => 'Feb',
+            3 => 'Mar',
+            4 => 'Apr',
+            5 => 'Mei',
+            6 => 'Jun',
+            7 => 'Jul',
+            8 => 'Agu',
+            9 => 'Sep',
+            10 => 'Okt',
+            11 => 'Nov',
+            12 => 'Des'
+        ];
 
         while ($startDate <= $endDate) {
+
+            // Format Y-m (misal 2025-01)
             $listMonths[] = $startDate->format('Y-m');
+
+            // Format Indo: Jan 25
+            $bulan = $indoMonths[(int)$startDate->format('n')];
+            $tahun2 = $startDate->format('y');
+            $listMonthsIndo[] = $bulan . ' ' . $tahun2;
+
             $startDate->addMonth();
         }
+
 
         // HASIL AKHIR
         $dataAnggaran = [];
@@ -555,6 +580,7 @@ class DashboardCabangController extends Controller
 
         return response()->json([
             'range' => $listMonths,
+            'rangeIndo' => $listMonthsIndo,
             'dataPencapaian'  => $dataPencapaian,
             'dataAnggaran'  => $dataAnggaran,
             'dataOmset'  => $dataOmset,
