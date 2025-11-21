@@ -134,11 +134,36 @@ class TransferStokController extends Controller
                     $newName = $baseName . ' #' . $i;
                 }
 
+
+
                 $cloned = $dariProduk->replicate();
                 $cloned->product_name = $newName;
+                // khusus kategori 1 (handphone) → IMEI harus unik
+                if ($dariProduk->categories_id == 1) {
+
+                    $baseImei = $dariProduk->nomor_seri;
+                    $newImei = $baseImei . ' #1';
+
+                    $j = 1;
+                    while (Product::where('nomor_seri', $newImei)->exists()) {
+                        $j++;
+                        $newImei = $baseImei . ' #' . $j;
+                    }
+
+                    $cloned->nomor_seri = $newImei;
+
+                } else {
+                    // kategori NON-IMEI → jangan disalin biar tidak duplicate
+                    $cloned->nomor_seri = null; 
+                    // atau hapus saja: unset($cloned->nomor_seri);
+                }
                 $cloned->cabang_id = $transfer->ke_cabang_id;
                 $cloned->stok = $transfer->stok;
                 $cloned->push();
+                // return response()->json(['needClone'=>$needClone, 'newName'=>$newName, 'cloned' => $cloned]);
+
+                // dd($needClone,$newName,$cloned);
+
 
                 $transfer->ke_produk_id = $cloned->id;
             } else {
@@ -163,6 +188,7 @@ class TransferStokController extends Controller
 
         } catch (\Throwable $e) {
             DB::rollBack();
+            // dd($e->getMessage());
             \Log::error("APPROVE ERROR: " . $e->getMessage());
             return back()->withErrors(['msg' => 'Terjadi error saat approve.']);
         }
