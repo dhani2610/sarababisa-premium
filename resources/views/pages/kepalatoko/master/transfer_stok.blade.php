@@ -386,6 +386,14 @@ $(function() {
         loadProductsByCategory(cabangId, kategoriId, $('#dari_produk_id'), '-- Pilih Produk Asal --');
     });
 
+    // saat pilih ke_cabang, muat produk tujuan
+    $('#ke_cabang_id').on('change', function(){
+        const cabangId = $(this).val();
+        const kategoriId = $('#kategori_id').val();
+        loadProductsByCategory(cabangId, kategoriId, $('#ke_produk_id'), '-- Pilih Produk Tujuan --');
+
+        // loadProducts(id, $('#ke_produk_id'), '-- Pilih Produk Tujuan --');
+    });
 
     // validasi jumlah stok
     $(document).on('change', '#dari_produk_id', function(){
