@@ -17,6 +17,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AutoBiayaServisController;
 use App\Http\Controllers\AutoModalSparepartController;
 use App\Http\Controllers\AutoHargaJualController;
+use App\Http\Controllers\KepalaToko\TransferStokController;
 use App\Http\Controllers\KepalaToko\RefundController;
 use App\Http\Controllers\KepalaToko\DataServisController;
 use App\Http\Controllers\KepalaToko\DataTargetController;
@@ -370,6 +371,15 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::post('refund/delete-selected', [RefundController::class, 'deleteSelected'])->name('refund.deleteSelected');
     Route::get('refund/service/{id}', [RefundController::class, 'serviceDetail'])->name('refund.serviceDetail');
     Route::get('/refund-cetak', [RefundController::class, 'cetak'])->name('refunds.cetak');
+
+
+    Route::resource('transfer-stok', TransferStokController::class)->names('transfer-stok');
+    Route::get('/api/products-by-cabang/{cabang}', [TransferStokController::class, 'productsByCabang'])
+    ->name('api.productsByCabang');
+    Route::post('transfer-stok/delete-selected', [TransferStokController::class, 'deleteSelected'])->name('transfer-stok.deleteSelected');
+    Route::get('transfer-stok-cetak', [TransferStokController::class, 'cetak'])->name('transfer-stok.cetak');
+    Route::post('/transfer-stok/{id}/approve', [TransferStokController::class, 'approve'])
+        ->name('transfer-stok.approve');
 
 
     Route::resource('shift', \App\Http\Controllers\KepalaToko\ShiftController::class)->names('shift');
