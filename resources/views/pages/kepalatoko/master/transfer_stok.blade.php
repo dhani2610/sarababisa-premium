@@ -107,7 +107,7 @@
 
                                         <div class="mb-3" >
                                             <label>Produk Tujuan (opsional)</label>
-                                            <select id="ke_produk_id" name="ke_produk_id" class="form-select w-full">
+                                            <select id="ke_produk_id" name="ke_produk_id" class="form-select w-full" required>
                                                 <option value="">-- Opsional --</option>
                                                 {{-- options via AJAX berdasarkan ke_cabang_id --}}
                                             </select>
@@ -121,7 +121,7 @@
 
                                         <div class="mb-3" >
                                             <label>Tanggal</label>
-                                            <input type="date" name="tanggal" class="form-input w-full" required value="{{ date('Y-m-d') }}">
+                                            <input type="date" name="tanggal" class="form-input w-full" required value="{{ date('Y-m-d') }}" required >
                                         </div>
                                     </div>
 
@@ -366,7 +366,7 @@ $(function() {
     // saat pilih ke_cabang, muat produk tujuan
     $('#ke_cabang_id').on('change', function(){
         const id = $(this).val();
-        loadProducts(id, $('#ke_produk_id'), '-- Pilih Produk Tujuan (opsional) --');
+        loadProducts(id, $('#ke_produk_id'), '-- Pilih Produk Tujuan --');
     });
 
     // validasi jumlah stok

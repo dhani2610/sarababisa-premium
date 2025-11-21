@@ -25,7 +25,7 @@ class BrandRequest extends FormRequest
     {
         return [
             'name' => [
-                'required',
+                'required', 
                 'max:100',
                 function ($attribute, $value, $fail) {
                     $existing = \App\Models\Brand::withTrashed()
