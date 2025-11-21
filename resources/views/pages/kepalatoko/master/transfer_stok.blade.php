@@ -118,7 +118,7 @@
 
                                         <div class="mb-3" >
                                             <label>Produk Tujuan (opsional)</label>
-                                            <select id="ke_produk_id" name="ke_produk_id" class="form-select w-full" required>
+                                            <select id="ke_produk_id" name="ke_produk_id" class="form-select w-full">
                                                 <option value="">-- Opsional --</option>
                                                 {{-- options via AJAX berdasarkan ke_cabang_id --}}
                                             </select>

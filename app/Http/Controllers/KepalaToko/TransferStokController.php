@@ -63,7 +63,7 @@ class TransferStokController extends Controller
             'dari_cabang_id' => $request->dari_cabang_id,
             'ke_cabang_id' => $request->ke_cabang_id,
             'dari_produk_id' => $request->dari_produk_id,
-            'ke_produk_id' => $request->ke_produk_id,
+            'ke_produk_id' => $request->ke_produk_id ?? 0,
             'stok' => $request->stok,
             'tanggal' => $request->tanggal,
             'created_by' => auth()->id(),
