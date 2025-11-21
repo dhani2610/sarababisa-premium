@@ -88,7 +88,8 @@ $(document).ready(function () {
             tooltip: {
                 shared: true,
                 formatter: function () {
-                    let s = `<b>${this.x}</b><br>`;
+                    // let s = `<b>${this.x}</b><br>`;
+                    let s = ``;
                     this.points.forEach(p => {
                         if (isPercent) {
                             s += `${p.series.name}: <b>${p.y}%</b><br>`;
