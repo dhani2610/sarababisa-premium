@@ -259,7 +259,8 @@ $(document).ready(function () {
                 tooltip: {
                     shared: true,
                     formatter: function () {
-                        let s = `<b>${this.x}</b><br>`;
+                        // let s = `<b>${this.x}</b><br>`;
+                        let s = ``;
                         this.points.forEach(p => {
                             s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
                         });
@@ -358,7 +359,8 @@ $(document).ready(function () {
                     tooltip: {
                         shared: true,
                         formatter: function () {
-                            let s = `<b>${this.x}</b><br>`;
+                            // let s = `<b>${this.x}</b><br>`;
+                            let s = ``;
                             this.points.forEach(p => {
                                 s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
                             });
