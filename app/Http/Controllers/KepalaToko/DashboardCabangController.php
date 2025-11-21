@@ -91,45 +91,14 @@ class DashboardCabangController extends Controller
             // Loop per bulan
             foreach ($listMonths as $ym) {
 
-                [$year, $month] = explode('-', $ym);
-
                 $total = Target::where('cabang_id', $cab->id)
                     ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$ym])
-                    ->sum('nilai');
-                // $targets_count = Target::where('cabang_id',getCabangId())->get()->count();
+                    ->sum('target');
+                // $targets_count = Tar get::where('cabang_id',getCabangId())->get()->count();
                 
-                $target = Budget::all()->sum('total');
-
-                $bulanprofitbersihservis = ServiceTransaction::where('cabang_id', $cab->id)->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->where('cabang_id', getCabangId())
-                    ->where('is_approve', 'Setuju')
-                    ->get()
-                    ->sum('profittoko');
-
-                $profitpenjualan = Order::where('cabang_id', $cab->id)->whereHas('detailOrders', function ($query) use ($year, $month) {
-                    $query->whereYear('created_at', $year)
-                        ->whereMonth('created_at', $month)
-                        ->where('cabang_id', getCabangId())
-                        ->where('is_approve', 'Setuju');
-                })
-                    ->with(['detailOrders' => function ($query) {
-                        $query->where('cabang_id', getCabangId())->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
-                            ->groupBy('orders_id');
-                    }])
-                    ->select('id')
-                    ->get();
-
-                $bulanprofitbersihpenjualan = $profitpenjualan->sum(function ($order) {
-                    return $order->detailOrders->sum('total_profit');
-                });
-
-                $bulantotalprofitbersih = ($bulanprofitbersihservis + $bulanprofitbersihpenjualan);
-
 
                 // push ke JSON:
-                $dataAnggaran[$cab->nama_cabang][$ym] = $                $bulantotalprofitbersih = ($bulanprofitbersihservis + $bulanprofitbersihpenjualan);
-;
+                $dataAnggaran[$cab->nama_cabang][$ym] = $total;
             }
         }
 
