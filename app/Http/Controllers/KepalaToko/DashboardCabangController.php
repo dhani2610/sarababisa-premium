@@ -139,7 +139,7 @@ class DashboardCabangController extends Controller
                     ->get();
 
                 $bulanprofitbersihpenjualan = $profitpenjualan->sum(
-                    fn($order) => $order->detailOrders->sum('total_omzet')
+                    fn($order) => $order->detailOrders->sum('total_profit')
                 );
 
                 $bulantotalprofitbersih = $bulanprofitbersihservis + $bulanprofitbersihpenjualan;
