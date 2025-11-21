@@ -144,10 +144,14 @@ class DashboardCabangController extends Controller
 
                 $bulantotalprofitbersih = $bulanprofitbersihservis + $bulanprofitbersihpenjualan;
 
+                $totalbudgets = Budget::where('cabang_id', $cab->id)->sum('total');
+
+                $circumference = 30 * 2 * pi();
+                $percent = $totalbudgets != 0 ? round(($bulantotalprofitbersih / $totalbudgets) * 100) : 0;
                 // ======================
                 // PUSH KE JSON
                 // ======================
-                $dataPencapaian[$cab->nama_cabang][$ym] =$bulantotalprofitbersih;
+                $dataPencapaian[$cab->nama_cabang][$ym] = $percent;
             }
         }
 

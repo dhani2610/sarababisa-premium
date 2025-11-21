@@ -66,56 +66,62 @@ $(document).ready(function () {
     $("#end").val(monthNow);
 
 
-   function renderColumnChart(id, title, categories, categoriesIndo, series) {
-    console.log(categoriesIndo);
+   function renderColumnChart(id, title, categories, categoriesIndo, series, isPercent = false) {
 
-    Highcharts.chart(id, {
-        chart: { type: 'column' },
-        title: { text: title },
+        Highcharts.chart(id, {
+            chart: { type: 'column' },
+            title: { text: title },
 
-        xAxis: { 
-            categories: categoriesIndo 
-        },
+            xAxis: { categories: categoriesIndo },
 
-        yAxis: {
-            title: { text: 'Nominal (Rp)' },
-            labels: {
-                formatter: function () {
-                    return formatRupiahShort(this.value);
-                }
-            }
-        },
-
-        tooltip: {
-            shared: true,
-            formatter: function () {
-                let s = `<b>${this.x}</b><br>`;
-                this.points.forEach(p => {
-                    s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
-                });
-                return s;
-            }
-        },
-
-        plotOptions: {
-            series: {
-                borderWidth: 0,
-                dataLabels: {
-                    enabled: true,
+            yAxis: {
+                title: { text: isPercent ? 'Persentase (%)' : 'Nominal (Rp)' },
+                labels: {
                     formatter: function () {
-                        return formatRupiahShort(this.y);
-                    },
-                    style: { fontSize: "11px", fontWeight: "bold" }
+                        return isPercent
+                            ? this.value + '%'
+                            : formatRupiahShort(this.value);
+                    }
                 }
-            }
-        },
+            },
 
-        exporting: { enabled: false },
-        credits: { enabled: false },
+            tooltip: {
+                shared: true,
+                formatter: function () {
+                    let s = `<b>${this.x}</b><br>`;
+                    this.points.forEach(p => {
+                        if (isPercent) {
+                            s += `${p.series.name}: <b>${p.y}%</b><br>`;
+                        } else {
+                            s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
+                        }
+                    });
+                    return s;
+                }
+            },
 
-        series
-    });
-}
+            plotOptions: {
+                series: {
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function () {
+                            return isPercent
+                                ? this.y + '%'
+                                : formatRupiahShort(this.y);
+                        },
+                        style: { fontSize: "11px", fontWeight: "bold" }
+                    }
+                }
+            },
+
+            exporting: { enabled: false },
+            credits: { enabled: false },
+
+            series
+        });
+
+    }
+
 
     // Set default bulan berjalan
     let current = new Date().toISOString().slice(0, 7);
@@ -166,7 +172,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataAnggaran[cabang][r] || 0)
                     });
                 });
-                renderColumnChart("chart-pencapaian", "Pencapaian ", range,rangeIndo, seriesPencapaian);
+                renderColumnChart("chart-pencapaian", "Pencapaian", range, rangeIndo, seriesPencapaian, true);
 
                 // ===================================
                 // 1. CHART ANGGARAN
