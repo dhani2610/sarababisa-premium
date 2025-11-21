@@ -225,26 +225,52 @@ $(document).ready(function () {
                     };
                 });
 
-                // Render Highcharts
-                Highcharts.chart("chart-omset-produk", {
-                    chart: { type: "column" },
-                    title: { text: "Omset Produk " },
-                    xAxis: {
-                        categories: xCategoriesOmsetProduk,
-                        title: { text: "Cabang" }
-                    },
-                    yAxis: {
-                        title: { text: "Rp" }
-                    },
-                    tooltip: {
-                        shared: true,
-                        valuePrefix: "Rp "
-                    },
-                    plotOptions: {
-                        column: { grouping: true }
-                    },
-                    series: seriesOmsetProduk
-                });
+              Highcharts.chart("chart-omset-produk", {
+                chart: { type: "column" },
+                title: { text: "Omset Produk " },
+                xAxis: {
+                    categories: xCategoriesOmsetProduk,
+                    title: { text: "Cabang" }
+                },
+                yAxis: {
+                    title: { text: "Rp" },
+                    labels: {
+                        formatter: function () {
+                            return formatRupiahShort(this.value);
+                        }
+                    }
+                },
+
+                tooltip: {
+                    shared: true,
+                    formatter: function () {
+                        let s = `<b>${this.x}</b><br>`;
+                        this.points.forEach(p => {
+                            s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
+                        });
+                        return s;
+                    }
+                },
+
+                plotOptions: {
+                    column: { grouping: true },
+                    series: {
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return formatRupiahShort(this.y);
+                            },
+                            style: { fontSize: "11px", fontWeight: "bold" }
+                        }
+                    }
+                },
+
+                exporting: { enabled: false },
+                credits: { enabled: false },
+
+                series: seriesOmsetProduk
+            });
+
 
 
                 // ===================================
@@ -298,7 +324,6 @@ $(document).ready(function () {
                     };
                 });
 
-                // Render Highcharts
                 Highcharts.chart("chart-profit-produk", {
                     chart: { type: "column" },
                     title: { text: "Profit Produk" },
@@ -307,20 +332,44 @@ $(document).ready(function () {
                         title: { text: "Cabang" }
                     },
                     yAxis: {
-                        title: { text: "Rp" }
+                        title: { text: "Rp" },
+                        labels: {
+                            formatter: function () {
+                                return formatRupiahShort(this.value);
+                            }
+                        }
                     },
+
                     tooltip: {
                         shared: true,
-                        valuePrefix: "Rp "
+                        formatter: function () {
+                            let s = `<b>${this.x}</b><br>`;
+                            this.points.forEach(p => {
+                                s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
+                            });
+                            return s;
+                        }
                     },
+
                     plotOptions: {
-                        column: { grouping: true }
+                        column: { grouping: true },
+                        series: {
+                            dataLabels: {
+                                enabled: true,
+                                formatter: function () {
+                                    return formatRupiahShort(this.y);
+                                },
+                                style: { fontSize: "11px", fontWeight: "bold" }
+                            }
+                        }
                     },
+
                     exporting: { enabled: false },
                     credits: { enabled: false },
 
                     series: seriesProfitProduk
                 });
+
 
 
                 // ===================================
