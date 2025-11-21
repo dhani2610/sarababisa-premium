@@ -420,7 +420,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataRefund[cabang][r] || 0)
                     });
                 });
-                renderColumnChart("chart-refund", "Refund ", range,rangeIndo, seriesRefund);
+                renderColumnChart("chart-refund", "Pengembalian Dana ", range,rangeIndo, seriesRefund);
 
             }
         });
