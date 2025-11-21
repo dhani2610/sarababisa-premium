@@ -100,14 +100,14 @@ class DashboardCabangController extends Controller
                 
                 $target = Budget::all()->sum('total');
 
-                $bulanprofitbersihservis = ServiceTransaction::whereYear('tgl_disetujui', $year)
+                $bulanprofitbersihservis = ServiceTransaction::where('cabang_id', $cab->id)->whereYear('tgl_disetujui', $year)
                     ->whereMonth('tgl_disetujui', $month)
                     ->where('cabang_id', getCabangId())
                     ->where('is_approve', 'Setuju')
                     ->get()
                     ->sum('profittoko');
 
-                $profitpenjualan = Order::whereHas('detailOrders', function ($query) use ($year, $month) {
+                $profitpenjualan = Order::where('cabang_id', $cab->id)->whereHas('detailOrders', function ($query) use ($year, $month) {
                     $query->whereYear('created_at', $year)
                         ->whereMonth('created_at', $month)
                         ->where('cabang_id', getCabangId())
