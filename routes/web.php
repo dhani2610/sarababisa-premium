@@ -65,6 +65,7 @@ use App\Http\Controllers\KepalaToko\KategoriController as KepalaTokoKategoriCont
 use App\Http\Controllers\KepalaToko\SupplierController as KepalaTokoSupplierController;
 use App\Http\Controllers\AdminToko\ProdukToolController as AdminTokoProdukToolController;
 use App\Http\Controllers\KepalaToko\DashboardController as KepalaTokoDashboardController;
+use App\Http\Controllers\KepalaToko\DashboardCabangController as KepalaTokoDashboardCabangController;
 use App\Http\Controllers\KepalaToko\LogServisController as KepalaTokoLogServisController;
 use App\Http\Controllers\KepalaToko\PelangganController as KepalaTokoPelangganController;
 use App\Http\Controllers\AdminToko\BisaDiambilController as AdminTokoBisaDiambilController;
@@ -305,6 +306,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
 
     Route::get('/dashboard', [KepalaTokoDashboardController::class, 'index'])->name('kepalatoko-dashboard');
+    Route::get('/dashboard-cabang', [KepalaTokoDashboardCabangController::class, 'index'])->name('kepalatoko-dashboard-cabang');
+    Route::get('/dashboard-cabang-json', [KepalaTokoDashboardCabangController::class, 'getJsonChart'])->name('kepalatoko-dashboard-cabang');
     Route::get('/json-data-servis', [DataServisController::class, 'getDataServis'])->name('json_data_servis');
     Route::get('/json-data-penjualan', [DataPenjualanController::class, 'getDataPenjualan'])->name('json_data_penjualan');
     Route::get('/json-data-target', [DataTargetController::class, 'getDataTarget'])->name('json_data_target');
