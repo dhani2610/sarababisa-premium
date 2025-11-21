@@ -121,7 +121,7 @@ class DashboardCabangController extends Controller
                     ->whereYear('tgl_disetujui', $year)
                     ->whereMonth('tgl_disetujui', $month)
                     ->where('is_approve', 'Setuju')
-                    ->sum('omzet');
+                    ->sum('profittoko');
 
                 // ======================
                 // PROFIT BERSIH PENJUALAN
@@ -133,7 +133,7 @@ class DashboardCabangController extends Controller
                         $q->where('is_approve', 'Setuju');
                     })
                     ->with(['detailOrders' => function ($q) use ($year, $month) {
-                        $q->select('orders_id', DB::raw('SUM(total) as total_omzet'))
+                        $q->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
                         ->groupBy('orders_id');
                     }])
                     ->get();
