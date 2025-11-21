@@ -66,51 +66,56 @@ $(document).ready(function () {
     $("#end").val(monthNow);
 
 
-    function renderColumnChart(id, title, categories, series) {
-        Highcharts.chart(id, {
-            chart: { type: 'column' },
-            title: { text: title },
-            xAxis: { categories },
-            yAxis: {
-                title: { text: 'Nominal (Rp)' },
-                labels: {
-                    formatter: function () {
-                        return formatRupiahShort(this.value);
-                    }
-                }
-            },
+   function renderColumnChart(id, title, categories, categoriesIndo, series) {
+    console.log(categoriesIndo);
 
-            tooltip: {
-                shared: true,
+    Highcharts.chart(id, {
+        chart: { type: 'column' },
+        title: { text: title },
+
+        xAxis: { 
+            categories: categoriesIndo 
+        },
+
+        yAxis: {
+            title: { text: 'Nominal (Rp)' },
+            labels: {
                 formatter: function () {
-                    let s = `<b>${this.x}</b><br>`;
-                    this.points.forEach(p => {
-                        s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
-                    });
-                    return s;
+                    return formatRupiahShort(this.value);
                 }
-            },
+            }
+        },
 
-            plotOptions: {
-                series: {
-                    borderWidth: 0,
-                    dataLabels: {
-                        enabled: true,
-                        formatter: function () {
-                            return formatRupiahShort(this.y);
-                        },
-                        style: { fontSize: "11px", fontWeight: "bold" }
-                    }
+        tooltip: {
+            shared: true,
+            formatter: function () {
+                let s = `<b>${this.x}</b><br>`;
+                this.points.forEach(p => {
+                    s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
+                });
+                return s;
+            }
+        },
+
+        plotOptions: {
+            series: {
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                        return formatRupiahShort(this.y);
+                    },
+                    style: { fontSize: "11px", fontWeight: "bold" }
                 }
-            },
+            }
+        },
 
-            exporting: { enabled: false },
-            credits: { enabled: false },
+        exporting: { enabled: false },
+        credits: { enabled: false },
 
-            series
-        });
-    }
-
+        series
+    });
+}
 
     // Set default bulan berjalan
     let current = new Date().toISOString().slice(0, 7);
@@ -148,7 +153,8 @@ $(document).ready(function () {
             },
             success: function (res) {
 
-                const range = res.rangeIndo;
+                const range = res.range;
+                const rangeIndo = res.rangeIndo;
 
                 // ===================================
                 // 1. CHART PENCAPAIAN
@@ -160,7 +166,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataAnggaran[cabang][r] || 0)
                     });
                 });
-                renderColumnChart("chart-pencapaian", "Pencapaian ", range, seriesPencapaian);
+                renderColumnChart("chart-pencapaian", "Pencapaian ", range,rangeIndo, seriesPencapaian);
 
                 // ===================================
                 // 1. CHART ANGGARAN
@@ -172,7 +178,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataAnggaran[cabang][r] || 0)
                     });
                 });
-                renderColumnChart("chart-anggaran", "Anggaran ", range, seriesAnggaran);
+                renderColumnChart("chart-anggaran", "Anggaran ", range,rangeIndo, seriesAnggaran);
 
 
                 // ===================================
@@ -185,7 +191,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataOmset[cabang][r]?.omset || 0)
                     });
                 });
-                renderColumnChart("chart-omset", "Omset ", range, seriesOmset);
+                renderColumnChart("chart-omset", "Omset ", range,rangeIndo, seriesOmset);
 
 
                 // ===================================
@@ -198,7 +204,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataOmsetService[cabang][r]?.omset || 0)
                     });
                 });
-                renderColumnChart("chart-omset-service", "Omset Service ", range, seriesOmsetService);
+                renderColumnChart("chart-omset-service", "Omset Service ", range,rangeIndo, seriesOmsetService);
 
                 // ===================================
                 // 4. CHART OMSET PRODUK (CABANG + KATEGORI)
@@ -283,7 +289,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataProfit[cabang][r]?.profit || 0)
                     });
                 });
-                renderColumnChart("chart-profit", "Profit ", range, seriesProfit);
+                renderColumnChart("chart-profit", "Profit ", range,rangeIndo, seriesProfit);
 
 
                 // ===================================
@@ -296,7 +302,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataProfitService[cabang][r]?.omset || 0)
                     });
                 });
-                renderColumnChart("chart-profit-service", "Profit Service ", range, seriesProfitService);
+                renderColumnChart("chart-profit-service", "Profit Service ", range,rangeIndo, seriesProfitService);
 
 
                 // ===================================
@@ -382,7 +388,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataPengeluaran[cabang][r] || 0)
                     });
                 });
-                renderColumnChart("chart-pengeluaran", "Pengeluaran ", range, seriesPengeluaran);
+                renderColumnChart("chart-pengeluaran", "Pengeluaran ", range,rangeIndo, seriesPengeluaran);
 
 
                 // ===================================
@@ -395,7 +401,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataInsiden[cabang][r] || 0)
                     });
                 });
-                renderColumnChart("chart-insiden", "Insiden ", range, seriesInsiden);
+                renderColumnChart("chart-insiden", "Insiden ", range,rangeIndo, seriesInsiden);
 
 
                 // ===================================
@@ -408,7 +414,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataRefund[cabang][r] || 0)
                     });
                 });
-                renderColumnChart("chart-refund", "Refund ", range, seriesRefund);
+                renderColumnChart("chart-refund", "Refund ", range,rangeIndo, seriesRefund);
 
             }
         });
