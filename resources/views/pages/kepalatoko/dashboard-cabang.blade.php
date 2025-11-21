@@ -200,7 +200,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataOmset[cabang][r]?.omset || 0)
                     });
                 });
-                renderColumnChart("chart-omset", "Omset ", range,rangeIndo, seriesOmset);
+                renderColumnChart("chart-omset", "Omzet ", range,rangeIndo, seriesOmset);
 
 
                 // ===================================
@@ -213,7 +213,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataOmsetService[cabang][r]?.omset || 0)
                     });
                 });
-                renderColumnChart("chart-omset-service", "Omset Service ", range,rangeIndo, seriesOmsetService);
+                renderColumnChart("chart-omset-service", "Omzet Service ", range,rangeIndo, seriesOmsetService);
 
                 // ===================================
                 // 4. CHART OMSET PRODUK (CABANG + KATEGORI)
@@ -242,7 +242,7 @@ $(document).ready(function () {
 
               Highcharts.chart("chart-omset-produk", {
                 chart: { type: "column" },
-                title: { text: "Omset Produk " },
+                title: { text: "Omzet Produk " },
                 xAxis: {
                     categories: xCategoriesOmsetProduk,
                     title: { text: "Cabang" }
