@@ -91,9 +91,11 @@ class DashboardCabangController extends Controller
             // Loop per bulan
             foreach ($listMonths as $ym) {
 
-                $total = Budget::where('cabang_id', $cab->id)
+                $total = Target::where('cabang_id', $cab->id)
                     ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$ym])
-                    ->sum('total');
+                    ->sum('nilai');
+                // $targets_count = Target::where('cabang_id',getCabangId())->get()->count();
+                
 
                 // push ke JSON:
                 $dataAnggaran[$cab->nama_cabang][$ym] = $total;
