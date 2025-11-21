@@ -10,6 +10,9 @@ class TransferStok extends Model
     use HasFactory;
 
     protected $guarded = [];
+    public function pic() {
+        return $this->belongsTo(User::class, 'created_by');
+    }
     public function dariCabang() {
         return $this->belongsTo(Cabang::class, 'dari_cabang_id');
     }

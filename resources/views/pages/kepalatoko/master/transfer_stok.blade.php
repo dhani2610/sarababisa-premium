@@ -182,6 +182,7 @@
                             <th class="text-center px-2 py-3">Produk Tujuan</th>
                             <th class="text-center px-2 py-3">Stok</th>
                             <th class="text-center px-2 py-3">Status</th>
+                            <th class="text-center px-2 py-3">PIC Transfer</th>
                             <th class="text-center px-2 py-3">Aksi</th>
                         </tr>
                     </thead>
@@ -229,7 +230,7 @@
                             <td class="text-center px-3 py-3 font-semibold">
                                 {{ $t->stok }}
                             </td>
-
+                           
                             {{-- Status --}}
                             <td class="text-center px-3 py-3">
                                 @if ($t->status == 0)
@@ -241,6 +242,10 @@
                                         Disetujui
                                     </span>
                                 @endif
+                            </td>
+
+                             <td class="text-center px-3 py-3 font-semibold">
+                                {{ $t->pic->name ?? '-' }}
                             </td>
 
                             {{-- Aksi --}}
