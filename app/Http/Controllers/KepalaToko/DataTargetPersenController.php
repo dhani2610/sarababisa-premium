@@ -16,6 +16,7 @@ class DataTargetPersenController extends ApiController
     {
         $monthlyData = DB::table('targets')
             ->select(DB::raw('MONTH(created_at) as month'), DB::raw('YEAR(created_at) as year'), DB::raw('SUM(persen) as persen'))
+            ->where('cabang_id',getCabangId())
             ->groupBy(DB::raw('MONTH(created_at)'), DB::raw('YEAR(created_at)'))
             ->orderBy(DB::raw('YEAR(created_at)'), 'asc')
             ->orderBy(DB::raw('MONTH(created_at)'), 'asc')
