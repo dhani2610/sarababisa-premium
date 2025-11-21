@@ -414,7 +414,7 @@ class DashboardCabangController extends Controller
                 // PUSH KE JSON
                 // ======================
                 $dataProfit[$cab->nama_cabang][$ym] = [
-                    'profit'               => $totalOmsetBulanIni,
+                    'profit'               => $bulantotalprofitbersih,
                 ];
             }
         }
