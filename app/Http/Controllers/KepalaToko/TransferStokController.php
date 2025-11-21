@@ -41,10 +41,11 @@ class TransferStokController extends Controller
         ]);
     }
 
-    public function productsByCabang($cabangId)
+    public function productsByCabang($cabangId,$kategori)
     {
         $products = Product::where('cabang_id', $cabangId)
                     ->select(['id','product_name','stok','harga_modal','harga_jual','harga_jual_toko'])
+                    ->where('categories_id', $kategori)
                     ->orderBy('product_name')
                     ->get();
 

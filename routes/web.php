@@ -374,7 +374,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
 
 
     Route::resource('transfer-stok', TransferStokController::class)->names('transfer-stok');
-    Route::get('/api/products-by-cabang/{cabang}', [TransferStokController::class, 'productsByCabang'])
+    Route::get('/api/products-by-cabang/{cabang}/{kategori}', [TransferStokController::class, 'productsByCabang'])
     ->name('api.productsByCabang');
     Route::post('transfer-stok/delete-selected', [TransferStokController::class, 'deleteSelected'])->name('transfer-stok.deleteSelected');
     Route::get('transfer-stok-cetak', [TransferStokController::class, 'cetak'])->name('transfer-stok.cetak');

@@ -97,6 +97,17 @@
                                             </select>
                                         </div>
 
+                                        <div class="mb-3">
+                                            <label>Kategori</label>
+                                            <select id="kategori_id" class="form-select w-full">
+                                                <option value="">-- Pilih Kategori --</option>
+                                                <option value="1">Handphone</option>
+                                                <option value="2">Sparepart</option>
+                                                <option value="3">Aksesoris</option>
+                                                <option value="4">Tools</option>
+                                            </select>
+                                        </div>
+
                                         <div class="mb-3" >
                                             <label>Produk Asal</label>
                                             <select id="dari_produk_id" name="dari_produk_id" class="form-select w-full" required>
@@ -338,17 +349,21 @@ document.addEventListener('alpine:init', () => {
 <script>
 $(function() {
 
-    function loadProducts(cabangId, $targetSelect, placeholder = '-- Pilih Produk --') {
+    function loadProductsByCategory(cabangId, kategoriId, $targetSelect, placeholder = '-- Pilih Produk --') {
         $targetSelect.prop('disabled', true).html(`<option>${placeholder}</option>`);
-        if (!cabangId) {
+
+        if (!cabangId || !kategoriId) {
             $targetSelect.prop('disabled', false);
             return;
         }
-        $.get('/api/products-by-cabang/' + cabangId)
+
+        $.get('/api/products-by-cabang/' + cabangId + '/' + kategoriId)
             .done(function (data) {
                 let opts = `<option value="">${placeholder}</option>`;
                 data.forEach(p => {
-                    opts += `<option value="${p.id}" data-stok="${p.stok}">${p.product_name} (stok: ${p.stok})</option>`;
+                    opts += `<option value="${p.id}" data-stok="${p.stok}">
+                        ${p.product_name} (stok: ${p.stok})
+                    </option>`;
                 });
                 $targetSelect.html(opts).prop('disabled', false).trigger('change');
             })
@@ -357,17 +372,20 @@ $(function() {
             });
     }
 
-    // saat pilih dari_cabang, muat produk asal
-    $('#dari_cabang_id').on('change', function(){
-        const id = $(this).val();
-        loadProducts(id, $('#dari_produk_id'), '-- Pilih Produk Asal --');
+    // Jika kategori dipilih ulang → reset produk
+    $('#kategori_id').on('change', function () {
+        const cabangId = $('#dari_cabang_id').val();
+        const kategoriId = $(this).val();
+        loadProductsByCategory(cabangId, kategoriId, $('#dari_produk_id'), '-- Pilih Produk Asal --');
     });
 
-    // saat pilih ke_cabang, muat produk tujuan
-    $('#ke_cabang_id').on('change', function(){
-        const id = $(this).val();
-        loadProducts(id, $('#ke_produk_id'), '-- Pilih Produk Tujuan --');
+    // Update load ketika cabang berubah
+    $('#dari_cabang_id').on('change', function () {
+        const cabangId = $(this).val();
+        const kategoriId = $('#kategori_id').val();
+        loadProductsByCategory(cabangId, kategoriId, $('#dari_produk_id'), '-- Pilih Produk Asal --');
     });
+
 
     // validasi jumlah stok
     $(document).on('change', '#dari_produk_id', function(){
