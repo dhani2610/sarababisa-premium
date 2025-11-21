@@ -8,12 +8,12 @@
         <div class="mb-6 flex gap-4 items-end">
 
             <div>
-                <label class="block text-sm font-medium mb-1">Start Month</label>
+                <label class="block text-sm font-medium mb-1">Dari</label>
                 <input id="start" type="month" class="border rounded px-3 py-2">
             </div>
 
             <div>
-                <label class="block text-sm font-medium mb-1">End Month</label>
+                <label class="block text-sm font-medium mb-1">Sampai</label>
                 <input id="end" type="month" class="border rounded px-3 py-2">
             </div>
 
