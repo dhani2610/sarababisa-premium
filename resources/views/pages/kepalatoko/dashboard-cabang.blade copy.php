@@ -71,46 +71,12 @@ $(document).ready(function () {
             chart: { type: 'column' },
             title: { text: title },
             xAxis: { categories },
-            yAxis: {
-                title: { text: 'Nominal (Rp)' },
-                labels: {
-                    formatter: function () {
-                        return formatRupiahShort(this.value);
-                    }
-                }
-            },
-
-            tooltip: {
-                shared: true,
-                formatter: function () {
-                    let s = `<b>${this.x}</b><br>`;
-                    this.points.forEach(p => {
-                        s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
-                    });
-                    return s;
-                }
-            },
-
-            plotOptions: {
-                series: {
-                    borderWidth: 0,
-                    dataLabels: {
-                        enabled: true,
-                        formatter: function () {
-                            return formatRupiahShort(this.y);
-                        },
-                        style: { fontSize: "11px", fontWeight: "bold" }
-                    }
-                }
-            },
-
-            exporting: { enabled: false },
-            credits: { enabled: false },
-
+            yAxis: { title: { text: 'Nominal (Rp)' }},
+            tooltip: { shared: true, valuePrefix: "Rp " },
+            plotOptions: { series: { borderWidth: 0 }},
             series
         });
     }
-
 
     // Set default bulan berjalan
     let current = new Date().toISOString().slice(0, 7);
@@ -121,21 +87,6 @@ $(document).ready(function () {
     $("#btnApply").click(function () {
         loadDashboard();
     });
-
-    // Format angka ke Rupiah singkat (Ribuan, Jutaan, Miliar)
-    function formatRupiahShort(value) {
-        if (value >= 1_000_000_000)
-            return "Rp " + (value / 1_000_000_000).toFixed(1).replace('.0','') + " M";
-
-        if (value >= 1_000_000)
-            return "Rp " + (value / 1_000_000).toFixed(1).replace('.0','') + " Jt";
-
-        if (value >= 1_000)
-            return "Rp " + (value / 1_000).toFixed(1).replace('.0','') + " Rb";
-
-        return "Rp " + value;
-    }
-
 
 
     function loadDashboard() {
@@ -316,9 +267,6 @@ $(document).ready(function () {
                     plotOptions: {
                         column: { grouping: true }
                     },
-                    exporting: { enabled: false },
-                    credits: { enabled: false },
-
                     series: seriesProfitProduk
                 });
 

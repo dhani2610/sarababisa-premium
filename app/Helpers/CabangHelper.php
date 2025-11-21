@@ -60,3 +60,16 @@ if (!function_exists('getCabangName')) {
     }
 }
 
+if (!function_exists('getCabangNameUser')) {
+    function getCabangNameUser()
+    {
+        $cbg = Cabang::find(getCabangId());
+        if (!empty($cbg)) {
+            $data = $cbg->nama_cabang ?? '-';
+        }else{
+            $data = '-';
+        }
+        return $data;
+    }
+}
+
