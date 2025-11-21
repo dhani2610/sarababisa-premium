@@ -104,7 +104,7 @@
     </table>
 
     <hr style="border-top: 1px dashed;">
-    
+
     @if ($history->status == 1)
     <h4 class="text-center" style="margin-bottom: 6px; margin-top: 6px;">NOTA TANDA TERIMA KLAIM GARANSI</h4>
     @else
@@ -132,7 +132,7 @@
         <tbody>
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Nama</th>
-                <td id="data" class="capital">: {{ $history->pelanggan->nama }}</td>
+                <td id="data" class="capital">: {{ $history->pelanggan->nama ?? '-' }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">Jenis Barang</th>
                 <td id="data" class="capital">: {{ $items->type->name }}</td>
                 <td id="data" scope="row">IMEI/SN</th>
@@ -140,7 +140,7 @@
             </tr>
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Nomor HP</th>
-                <td id="data">: {{ $history->pelanggan->nomor_hp }}</td>
+                <td id="data">: {{ $history->pelanggan->nomor_hp ?? '-' }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">Merek</th>
                 <td id="data" class="capital">: {{ $items->brand->name }}</td>
                 <td id="data" scope="row">Kelengkapan</th>
@@ -152,7 +152,7 @@
             </tr>
             <tr style="border-bottom-style: solid; border-right-style: solid;">
                 <td scope="row" style="border-left-style: solid;">Alamat</th>
-                <td class="capital">: {{ $history->pelanggan->alamat }}</td>
+                <td class="capital">: {{ $history->pelanggan->alamat ?? '-' }}</td>
                 <td scope="row" style="border-left-style: solid;">Model Seri</th>
                 <td class="capital">: {{ $items->modelserie->name }}</td>
                 <td scope="row">Warna/Kapasitas</th>
@@ -186,7 +186,7 @@
             <td id="data" style="{{$style }}">: {{ $history->keluhan }}</td>
 
             <td id="data" scope="row" style="border-left-style: solid;{{ $style }}">Fungsi (Masuk)</td>
-            <td id="data" style="{{$style }}">: {{ $history->fungsi_masuk }}</td> 
+            <td id="data" style="{{$style }}">: {{ $history->fungsi_masuk }}</td>
 
             <td id="data" class="capital" style="border-left-style: solid;border-right: 2px solid black;border-bottom: 2px solid black" colspan="2">
                 @if ($history->status == 1)
