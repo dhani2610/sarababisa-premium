@@ -80,8 +80,8 @@
                                  
 
                                         <div class="mb-3">
-                                            <label>Kategori</label>
-                                            <select id="kategori_id" class="form-select w-full">
+                                            <label>Kategori<span class="text-rose-500">*</span></label>
+                                            <select id="kategori_id" class="form-select w-full" required>
                                                 <option value="">-- Pilih Kategori --</option>
                                                 <option value="1">Handphone</option>
                                                 <option value="2">Sparepart</option>
@@ -92,7 +92,7 @@
 
                                         
                                         <div class="mb-3" >
-                                            <label>Asal Cabang</label>
+                                            <label>Asal Cabang<span class="text-rose-500">*</span></label>
                                             <select id="dari_cabang_id" name="dari_cabang_id" class="form-select w-full" required>
                                                 <option value="">-- Pilih Cabang --</option>
                                                 @foreach(\App\Models\Cabang::orderBy('nama_cabang')->get() as $c)
@@ -103,7 +103,7 @@
 
 
                                         <div class="mb-3" >
-                                            <label>Produk Asal</label>
+                                            <label>Produk Asal<span class="text-rose-500">*</span></label>
                                             <select id="dari_produk_id" name="dari_produk_id" class="form-select w-full" required>
                                                 <option value="">-- Pilih Produk --</option>
                                                 {{-- options akan terisi via AJAX --}}
@@ -111,7 +111,7 @@
                                         </div>
 
                                         <div class="mb-3" >
-                                            <label>Cabang Tujuan</label>
+                                            <label>Cabang Tujuan<span class="text-rose-500">*</span></label>
                                             <select id="ke_cabang_id" name="ke_cabang_id" class="form-select w-full" required>
                                                 <option value="">-- Pilih Cabang --</option>
                                                 @foreach(\App\Models\Cabang::orderBy('nama_cabang')->get() as $c)
@@ -129,13 +129,13 @@
                                         </div>
 
                                         <div class="mb-3" >
-                                            <label>Jumlah Stok</label>
+                                            <label>Jumlah Stok<span class="text-rose-500">*</span></label>
                                             <input type="number" name="stok" id="stok_input" class="form-input w-full" required>
                                             <small id="stok_warning" class="text-rose-500 hidden">Stok melebihi stok asal!</small>
                                         </div>
 
                                         <div class="mb-3" >
-                                            <label>Tanggal</label>
+                                            <label>Tanggal<span class="text-rose-500">*</span></label>
                                             <input type="date" name="tanggal" class="form-input w-full" required value="{{ date('Y-m-d') }}" required >
                                         </div>
                                     </div>
