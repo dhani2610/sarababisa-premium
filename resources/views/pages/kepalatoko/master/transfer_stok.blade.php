@@ -358,18 +358,18 @@ $(function() {
         }
 
         $.get('/api/products-by-cabang/' + cabangId + '/' + kategoriId)
-            .done(function (data) {
-                let opts = `<option value="">${placeholder}</option>`;
-                data.forEach(p => {
-                    opts += `<option value="${p.id}" data-stok="${p.stok}">
-                        ${p.product_name} (stok: ${p.stok})
-                    </option>`;
-                });
-                $targetSelect.html(opts).prop('disabled', false).trigger('change');
-            })
-            .fail(function(){
-                $targetSelect.html(`<option value="">Gagal mengambil produk</option>`).prop('disabled', false);
+        .done(function (data) {
+            let opts = `<option value="">${placeholder}</option>`;
+            data.forEach(p => {
+                opts += `<option value="${p.id}" data-stok="${p.stok}">
+                    ${p.product_name} (stok: ${p.stok})
+                </option>`;
             });
+            $targetSelect.html(opts).prop('disabled', false).trigger('change');
+        })
+        .fail(function(){
+            $targetSelect.html(`<option value="">Gagal mengambil produk</option>`).prop('disabled', false);
+        });
     }
 
     // Jika kategori dipilih ulang → reset produk
