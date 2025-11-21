@@ -307,7 +307,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
 
     Route::get('/dashboard', [KepalaTokoDashboardController::class, 'index'])->name('kepalatoko-dashboard');
     Route::get('/dashboard-cabang', [KepalaTokoDashboardCabangController::class, 'index'])->name('kepalatoko-dashboard-cabang');
-    Route::get('/dashboard-cabang-json', [KepalaTokoDashboardCabangController::class, 'getJsonChart'])->name('kepalatoko-dashboard-cabang');
+    Route::get('/dashboard-cabang-json', [KepalaTokoDashboardCabangController::class, 'getJsonChart'])->name('kepalatoko-dashboard-cabang-json');
     Route::get('/json-data-servis', [DataServisController::class, 'getDataServis'])->name('json_data_servis');
     Route::get('/json-data-penjualan', [DataPenjualanController::class, 'getDataPenjualan'])->name('json_data_penjualan');
     Route::get('/json-data-target', [DataTargetController::class, 'getDataTarget'])->name('json_data_target');
