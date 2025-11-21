@@ -169,9 +169,11 @@ $(document).ready(function () {
                 Object.keys(res.dataPencapaian).forEach(cabang => {
                     seriesPencapaian.push({
                         name: cabang,
-                        data: range.map(r => res.dataAnggaran[cabang][r] || 0)
+                        data: range.map(r => res.dataPencapaian[cabang][r] || 0)
                     });
                 });
+                console.log(seriesPencapaian);
+                
                 renderColumnChart("chart-pencapaian", "Pencapaian", range, rangeIndo, seriesPencapaian, true);
 
                 // ===================================
