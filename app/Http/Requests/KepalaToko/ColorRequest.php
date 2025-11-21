@@ -3,6 +3,7 @@
 namespace App\Http\Requests\KepalaToko;
 
 use Illuminate\Foundation\Http\FormRequest;
+use function App\Helpers\getCabangId;
 
 class ColorRequest extends FormRequest
 {
@@ -24,14 +25,29 @@ class ColorRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'max:100|required|unique:colors,name',
+            'name' => [
+                'required',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    $cabangId = getCabangId(); // ambil cabang dari helper
+
+                    $exists = \App\Models\Color::where('name', $value)
+                        ->where('cabang_id', $cabangId)
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('Mohon maaf, warna dengan nama ini sudah tersedia di cabang ini.');
+                    }
+                }
+            ],
         ];
     }
 
     public function messages()
     {
         return [
-            'name.unique' => 'Mohon maaf, inputan tidak dapat diproses karena warna dengan nama ini sudah tersedia.',
+            'name.required' => 'Nama warna wajib diisi.',
+            'name.max' => 'Nama warna maksimal 100 karakter.',
         ];
     }
 }

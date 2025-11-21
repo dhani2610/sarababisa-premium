@@ -3,6 +3,8 @@
 namespace App\Http\Requests\KepalaToko;
 
 use Illuminate\Foundation\Http\FormRequest;
+use function App\Helpers\getCabangId;
+use App\Models\Type;
 
 class TypeRequest extends FormRequest
 {
@@ -24,14 +26,29 @@ class TypeRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'max:100|required|unique:types,name',
+            'name' => [
+                'required',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    $cabangId = getCabangId();
+
+                    $exists = Type::where('name', $value)
+                        ->where('cabang_id', $cabangId)
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('Mohon maaf, jenis barang dengan nama ini sudah tersedia di cabang ini.');
+                    }
+                }
+            ],
         ];
     }
 
     public function messages()
     {
         return [
-            'name.unique' => 'Mohon maaf, inputan tidak dapat diproses karena jenis barang dengan nama ini sudah tersedia.',
+            'name.required' => 'Nama jenis barang wajib diisi.',
+            'name.max' => 'Nama jenis barang maksimal 100 karakter.',
         ];
     }
 }
