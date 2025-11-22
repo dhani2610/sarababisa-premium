@@ -34,6 +34,21 @@ class Product extends Model
         'cabang_id',
     ];
 
+    protected $appends = [
+        'display_name'
+    ];
+
+    public function getDisplayNameAttribute()
+    {
+        if ($this->categories_id == 1) {
+            return $this->product_name . ' ' . $this->kondisi . ' ' . $this->warna . ' ' . $this->ram . ' / ' .
+                ($this->capacity ? $this->capacity->name : '-') .
+                ' (IMEI ' . $this->nomor_seri . ')';
+        }
+
+        return $this->product_name . ' ' . $this->nomor_seri;
+    }
+
     public function subCategory()
     {
         return $this->belongsTo(SubCategory::class, 'sub_categories_id', 'id');

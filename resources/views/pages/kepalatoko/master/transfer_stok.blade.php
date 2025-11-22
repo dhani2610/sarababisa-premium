@@ -274,6 +274,7 @@
                                 @endif
 
                                 {{-- DELETE --}}
+                                @if ($t->status != 1 || Auth::user()->role == 'Kepala Toko')
                                 <form action="{{ route('transfer-stok.destroy', $t->id) }}"
                                     method="POST"
                                     class="inline-block"
@@ -290,6 +291,7 @@
                                         Hapus
                                     </button>
                                 </form>
+                                @endif
 
                             </td>
 
@@ -371,7 +373,7 @@ $(function() {
             let opts = `<option value="">${placeholder}</option>`;
             data.forEach(p => {
                 opts += `<option value="${p.id}" data-stok="${p.stok}">
-                    ${p.product_name} (stok: ${p.stok})
+                    ${p.display_name} (stok: ${p.stok})
                 </option>`;
             });
             $targetSelect.html(opts).prop('disabled', false).trigger('change');
