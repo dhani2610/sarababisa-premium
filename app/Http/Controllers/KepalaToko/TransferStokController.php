@@ -61,6 +61,10 @@ class TransferStokController extends Controller
         $dariProduk = Product::findOrFail($request->dari_produk_id);
 
         // cek stok cukup
+        if ($request->dari_cabang_id == $request->ke_cabang_id) {
+            toast('Cabang asal dan tujuan tidak boleh sama.', 'error');
+            return back()->withErrors(['msg' => 'Cabang asal dan tujuan tidak boleh sama.']);
+        }
         if ($request->stok == 0) {
             toast('Stok yang akan di transfer minimal 1.', 'error');
             return back()->withErrors(['msg' => 'Stok yang akan di transfer minimal 1.']);
