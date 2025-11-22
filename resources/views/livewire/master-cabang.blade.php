@@ -342,7 +342,7 @@
                     const selectedIds = [...checkboxes].map((checkbox) => checkbox.value);
 
                     // Kirim permintaan penghapusan ke server
-                    fetch('/tipe-os/delete', {
+                    fetch('/master/master-cabang/delete', {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -366,6 +366,6 @@
 
     <!-- Pagination -->
     <div class="mt-8">
-        {{ $TipeOs->links() }}
+        {{ $cabang->links() }}
     </div>
 </div>
