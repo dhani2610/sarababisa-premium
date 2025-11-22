@@ -31,7 +31,7 @@ class MasterCabang extends Component
         $count = Cabang::all()->count();
         return view('livewire.master-cabang', [
             'count' => $count,
-            'TipeOs' => $this->search === null ?
+            'cabang' => $this->search === null ?
                 Cabang::latest()->paginate($this->paginate) :
                 Cabang::latest()->where('nama_cabang', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
