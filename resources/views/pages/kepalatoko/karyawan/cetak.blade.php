@@ -112,7 +112,7 @@
 		<tbody>
 			<tr>
 			<td>Gaji Pokok</td>
-			<td class="text-right">Rp. {{ number_format($shift->nominal_gaji) }}</td>
+			<td class="text-right">Rp. {{ number_format($shift->nominal_gaji ?? 0) }}</td>
 			</tr>
 			<tr>
 			<td>Tunjangan Kehadiran</td>
@@ -139,7 +139,7 @@
 		<thead>
 			<tr>
 			<th scope="col">Total Penghasilan Bruto</th>
-			<th scope="col" class="text-right text-primary">Rp. {{ number_format($shift->nominal_gaji + $items->absen + $items->bpjs + $bonus + $overtime) }}</th>
+			<th scope="col" class="text-right text-primary">Rp. {{ number_format($shift->nominal_gaji ?? 0 + $items->absen + $items->bpjs + $bonus + $overtime) }}</th>
 			</tr>
 		</thead>
 	</table>
@@ -207,14 +207,14 @@
 		<thead>
 			<tr>
 			<th scope="col">TOTAL DITERIMA KARYAWAN</th>
-			<th scope="col" class="text-right text-success">Rp. {{ number_format($shift->nominal_gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal') - $izin + $overtime - $potongan_telat) }}</th>
+			<th scope="col" class="text-right text-success">Rp. {{ number_format($shift->nominal_gaji ?? 0 + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal') - $izin + $overtime - $potongan_telat) }}</th>
 			</tr>
 		</thead>
 	</table>
 
 	<div class="text-center">
 		@php
-			$angka = $shift->nominal_gaji + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden;
+			$angka = $shift->nominal_gaji ?? 0 + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden;
 		@endphp
 		<span class="badge badge-light px-4 py-3">
 			<p class="text-capitalize mb-0">

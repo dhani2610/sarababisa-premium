@@ -4,7 +4,6 @@ namespace App\Http\Requests\KepalaToko;
 
 use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
-use function App\Helpers\getCabangId;
 
 class HandphoneRequest extends FormRequest
 {
