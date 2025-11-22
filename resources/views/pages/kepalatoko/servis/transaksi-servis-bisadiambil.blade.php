@@ -457,10 +457,10 @@
 
                             $('#biaya').val((parseInt(curBiaya) - parseInt(prevBiaya.val()) + parseInt(data
                                 .biaya)).toString());
-                            $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal
-                                    .val()) + parseInt(data
-                                    .modal_sparepart))
-                                .toString());
+                            // $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal
+                            //         .val()) + parseInt(data
+                            //         .modal_sparepart))
+                            //     .toString());
                             prevModal.val(data.modal_sparepart)
                             prevBiaya.val(data.biaya)
                             myEl.parent().parent().parent().find('[name="modal_sparepart[]"]:first').val(
@@ -476,14 +476,14 @@
                 }
             });
 
-            $(document).on('change', '.modal_sparepart', function(e) {
-                const myEl = $(this);
-                const curModal = $('#total_modal_sparepart').val() || 0;
-                const prevModal = myEl.parent().parent().parent().find('[name="prev_modal"]:first');
-                $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal.val()) + parseInt(myEl.val()))
-                    .toString());
-                prevModal.val(myEl.val())
-            })
+            // $(document).on('change', '.modal_sparepart', function(e) {
+            //     const myEl = $(this);
+            //     const curModal = $('#total_modal_sparepart').val() || 0;
+            //     const prevModal = myEl.parent().parent().parent().find('[name="prev_modal"]:first');
+            //     $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal.val()) + parseInt(myEl.val()))
+            //         .toString());
+            //     prevModal.val(myEl.val())
+            // })
 
             $(document).on('change', '.biaya_servis', function(e) {
                 const myEl = $(this);
