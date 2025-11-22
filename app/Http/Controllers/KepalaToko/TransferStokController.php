@@ -63,6 +63,7 @@ class TransferStokController extends Controller
         // cek stok cukup
         if ($request->stok == 0) {
             toast('Stok yang akan di transfer minimal 1.', 'error');
+            return back()->withErrors(['msg' => 'Stok yang akan di transfer minimal 1.']);
         }
         if ($request->stok > $dariProduk->stok) {
             toast('Stok produk asal tidak mencukupi.', 'error');
