@@ -58,6 +58,17 @@ class TransferStokController extends Controller
     {
         // $data = $request->validated();
 
+        $dariProduk = Product::findOrFail($request->dari_produk_id);
+
+        // cek stok cukup
+        if ($request->stok == 0) {
+            toast('Stok yang akan di transfer minimal 1.', 'error');
+        }
+        if ($request->stok > $dariProduk->stok) {
+            toast('Stok produk asal tidak mencukupi.', 'error');
+            return back()->withErrors(['msg' => 'Stok produk asal tidak mencukupi.']);
+        }
+
         // hanya simpan transfer, status = 0 (menunggu approve)
         $transfer = TransferStok::create([
             'dari_cabang_id' => $request->dari_cabang_id,
