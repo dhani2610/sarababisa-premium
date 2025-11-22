@@ -1,10 +1,10 @@
-@section('title', 'Refund')
+@section('title', 'Pengembalian Dana')
 
 <x-toko-layout>
     <div class=" px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
         <div class="sm:flex sm:justify-between sm:items-center mb-3">
             <div class="mb-4 sm:mb-0">
-                <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Refund ✨</h1>
+                <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Pengembalian Dana ✨</h1>
             </div>
 
 
@@ -132,15 +132,22 @@
                                             </div>
 
                                             <div>
-                                                <label class="block text-sm font-medium mb-1">Nominal <span
+                                                <label class="block text-sm font-medium mb-1">Nominal Potongan Bonus Teknisi<span
                                                         class="text-rose-500">*</span></label>
                                                 <input name="nominal" type="number" id="nominal_input"
-                                                    class="form-input w-full" required />
+                                                    class="form-input w-full disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" readonly style="background: rgb(223, 221, 221)" />
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1">Pengembalian Biaya<span
+                                                        class="text-rose-500">*</span></label>
+                                                <input name="nominal_servis" type="number" id="nominal_input_servis"
+                                                    class="form-input w-full disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" readonly style="background: rgb(223, 221, 221)" />
                                             </div>
 
                                             <div>
                                                 <label class="block text-sm font-medium mb-1">Teknisi (otomatis)</label>
-                                                <input id="teknisi_name" type="text" class="form-input w-full"
+                                                <input id="teknisi_name" type="text" class="form-input w-full" style="background: rgb(223, 221, 221)"
                                                     readonly />
                                             </div>
 
@@ -177,7 +184,7 @@
                         <svg class="w-4 h-4 shrink-0 fill-current opacity-80 mt-[3px] mr-3" viewBox="0 0 16 16">
                             <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm1 12H7V7h2v5zM8 6c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z" />
                         </svg>
-                        <div class="font-medium">menu transaksi refund ini untuk perhitungan transaksi yang masih garansi apabila ada pemotongan ke teknisi yang sudah mendapatkan bonus transaksi tersebut.</div>
+                        <div class="font-medium">menu transaksi Pengembalian Dana ini untuk perhitungan transaksi yang masih garansi apabila ada pemotongan ke teknisi yang sudah mendapatkan bonus transaksi tersebut.</div>
                     </div>
                 </div>
             </div>
@@ -186,7 +193,7 @@
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
             <div x-data="handleSelect()">
                 <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
-                    <h2 class="font-semibold text-slate-800">Semua Refund <span
+                    <h2 class="font-semibold text-slate-800">Semua Pengembalian Dana <span
                             class="text-slate-400 font-medium">{{ $refunds->total() }}</span></h2>
                     <div class="relative inline-flex">
                         <div class="table-items-action hidden">
@@ -205,7 +212,7 @@
                         <thead
                             class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                             <tr>
-                                    @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
+                                @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                                 <th class="text-center px-2 py-3 w-px">
                                     <input id="parent-checkbox" class="form-checkbox" type="checkbox"
                                         @click="toggleAll" />
@@ -213,7 +220,10 @@
                                 @endif
                                 <th class="text-center px-2 py-3">No</th>
                                 <th class="text-center px-2 py-3">Nomor Servis</th>
-                                <th class="text-center px-2 py-3">Nominal</th>
+                                <th class="text-center px-2 py-3">Nominal Potongan Teknisi</th>
+                                {{-- @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko') --}}
+                                <th class="text-center px-2 py-3">Pengembalian BIaya</th>
+                                {{-- @endif --}}
                                 <th class="text-center px-2 py-3">Teknisi</th>
                                 <th class="text-center px-2 py-3">Bulan/Tahun</th>
                                 @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
@@ -234,8 +244,11 @@
                                     </td>
                                     @endif
                                     <td class="text-center px-2 py-3">{{ $i++ }}</td>
-                                    <td class="text-center px-2 py-3">#{{ $r->ServiceTransaction->nomor_servis }}</td>
+                                    <td class="text-center px-2 py-3">#{{ $r->ServiceTransaction->nomor_servis ?? '-' }}</td>
                                     <td class="text-center px-2 py-3">Rp {{ number_format($r->nominal, 2, ',', '.') }}</td>
+                                    {{-- @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko') --}}
+                                    <td class="text-center px-2 py-3">Rp {{ number_format($r->nominal_servis, 2, ',', '.') }}</td>
+                                    {{-- @endif --}}
                                     <td class="text-center px-2 py-3">{{ optional($r->teknisi)->name }}</td>
                                     <td class="text-center px-2 py-3">{{ $r->period ? $r->period->format('F Y') : '-' }}
                                     </td>
@@ -346,6 +359,7 @@
    $(document).ready(function () {
         const teknisiNameInput = document.getElementById('teknisi_name');
         const NominalInput = document.getElementById('nominal_input');
+        const NominalInputServis = document.getElementById('nominal_input_servis');
 
         $('#servis_select').on('select2:select change', function () {
             const id = $(this).val();
@@ -363,6 +377,7 @@
                     console.log(data);
                     teknisiNameInput.value = data.teknisi_name ?? '';
                     NominalInput.value = data.nominal ?? 0;
+                    NominalInputServis.value = data.nominal_servis ?? 0;
                 })
                 .catch(err => {
                     console.error(err);

@@ -12,8 +12,10 @@ class Refund extends Model
     protected $fillable = [
         'servis_transaction_id',
         'nominal',
+        'nominal_servis',
         'teknisi_id',
         'period',
+        'cabang_id',
     ];
 
     protected $dates = ['period'];

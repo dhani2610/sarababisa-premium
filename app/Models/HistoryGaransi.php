@@ -17,7 +17,14 @@ class HistoryGaransi extends Model
         'tindakan',
         'sparepart',
         'total_biaya',
-        'catatan',
+        'keluhan',
+        'tgl_selesai',
+        'status',
+        'cabang_id',
+        'id_customer',
+        'estimasi_pengerjaan',
+        'fungsi_masuk',
+        'fungsi_keluar',
     ];
 
     protected $casts = [
@@ -38,5 +45,9 @@ class HistoryGaransi extends Model
     public function teknisi()
     {
         return $this->belongsTo(User::class, 'teknisi_id');
+    }
+    public function pelanggan()
+    {
+        return $this->belongsTo(Customer::class, 'id_customer');
     }
 }

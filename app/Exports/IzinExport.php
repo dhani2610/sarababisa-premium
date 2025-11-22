@@ -24,7 +24,7 @@ class IzinExport implements FromCollection, WithHeadings, WithStyles, WithColumn
     public function collection()
     {
         $user = Auth::user();
-        $query = Izin::with('user');
+        $query = Izin::where('cabang_id',getCabangId())->with('user');
 
         if ($user->role !== 'Kepala Toko') {
             $query->where('user_id', $user->id);

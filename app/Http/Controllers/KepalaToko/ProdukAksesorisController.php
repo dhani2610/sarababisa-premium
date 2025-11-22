@@ -79,7 +79,8 @@ class ProdukAksesorisController extends Controller
             'harga_jual_toko' => $request->harga_jual_toko,
             'keterangan' => $request->keterangan,
             'garansi' => $request->garansi,
-            'ppn' => $request->ppn
+            'ppn' => $request->ppn,
+            'cabang_id' => getCabangId(),
         ]);
 
         // return redirect()->route('aksesoris.index');
@@ -120,10 +121,10 @@ class ProdukAksesorisController extends Controller
      */
     public function edit($id)
     {
-        $item = Product::findOrFail($id);
-        $accessories = SubCategory::where('categories_id', '=', '3')->get();
-        $model_series = ModelSerie::all();
-        $toko = StoreSetting::find(1);
+        $item = Product::where('cabang_id',getCabangId())->findOrFail($id);
+        $accessories = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '3')->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages.kepalatoko.produk.aksesoris-edit', [
             'item' => $item,

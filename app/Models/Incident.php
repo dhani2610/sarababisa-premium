@@ -18,6 +18,7 @@ class Incident extends Model
         'biaya_teknisi',
         'biaya_toko',
         'created_at',
+        'cabang_id',
     ];
 
     public function worker()

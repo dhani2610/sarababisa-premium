@@ -18,7 +18,7 @@ class ServisBelumDisetujuiData extends Component
 
     public function mount()
     {
-        $this->type = Type::pluck('id')->toArray();
+        $this->type = Type::where('cabang_id',getCabangId())->pluck('id')->toArray();
     }
 
     public $kondisi = [
@@ -42,11 +42,11 @@ class ServisBelumDisetujuiData extends Component
     public function render()
     {
         $toko = User::find(1);
-        $types = Type::all();
-        $processes_count = ServiceTransaction::whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
-        $jumlah_bisa_diambil = ServiceTransaction::where('status_servis', 'Bisa Diambil')->count();
-        $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->count();
-        $jumlah_belum_disetujui = ServiceTransaction::where('status_servis', 'Sudah Diambil')->where('is_approve', '=', null)->count();
+        $types = Type::where('cabang_id',getCabangId())->get();
+        $processes_count = ServiceTransaction::where('cabang_id',getCabangId())->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
+        $jumlah_bisa_diambil = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Bisa Diambil')->count();
+        $jumlah_sudah_diambil = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Sudah Diambil')->count();
+        $jumlah_belum_disetujui = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Sudah Diambil')->where('is_approve', '=', null)->count();
         return view('livewire.servis-belum-disetujui-data', [
             'toko' => $toko,
             'types' => $types,
@@ -54,7 +54,7 @@ class ServisBelumDisetujuiData extends Component
             'jumlah_bisa_diambil' => $jumlah_bisa_diambil,
             'jumlah_sudah_diambil' => $jumlah_sudah_diambil,
             'jumlah_belum_disetujui' => $jumlah_belum_disetujui,
-            'service_transactions' => ServiceTransaction::orderBy('tgl_ambil', 'desc')->when($this->search, function ($q) {
+            'service_transactions' => ServiceTransaction::where('cabang_id',getCabangId())->orderBy('tgl_ambil', 'desc')->when($this->search, function ($q) {
                 $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->where('status_servis', 'Sudah Diambil')->where('is_approve', null)->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Sudah Diambil')->where('is_approve', null)->orWhere('tindakan_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Sudah Diambil')->where('is_approve', null)->orWhere('nama_barang', 'like', '%' . $this->search . '%')->where('status_servis', 'Sudah Diambil')->where('is_approve', null);
             })->when($this->type, function ($q) {
                 $q->whereIn('types_id', $this->type);

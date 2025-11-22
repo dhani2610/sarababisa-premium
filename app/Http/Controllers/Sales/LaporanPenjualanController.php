@@ -58,7 +58,7 @@ class LaporanPenjualanController extends Controller
             ->get()
             ->sum('profit');
 
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages/sales/laporan-penjualan', compact('penjualanhari', 'bonushari', 'penjualanbulan', 'bonusbulan', 'penjualantahun', 'bonustahun', 'toko'));
     }

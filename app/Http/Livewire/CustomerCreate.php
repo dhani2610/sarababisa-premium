@@ -37,7 +37,8 @@ class CustomerCreate extends Component
             'nama' => $this->nama,
             'kategori' => $this->kategori,
             'alamat' => $this->alamat,
-            'nomor_hp' => $this->nomor_hp
+            'nomor_hp' => $this->nomor_hp,
+            'cabang_id' => getCabangId(),
         ]);
 
         $this->resetInput();

@@ -28,11 +28,11 @@ class ReturProductData extends Component
 
     public function render()
     {
-        $purchases = Purchase::all();
-        $returs_count = Retur::all()->count();
-        $purchases_count = Purchase::whereNull('keterangan')
+        $purchases = Purchase::where('cabang_id',getCabangId())->get();
+        $returs_count = Retur::where('cabang_id',getCabangId())->get()->count();
+        $purchases_count = Purchase::where('cabang_id',getCabangId())->whereNull('keterangan')
             ->orWhere('keterangan', '!=', 'Tukar Tambah')->count();
-        $trade_ins_count = Purchase::where('keterangan', '=', 'Tukar Tambah')->count();
+        $trade_ins_count = Purchase::where('cabang_id',getCabangId())->where('keterangan', '=', 'Tukar Tambah')->count();
 
         return view('livewire.retur-product-data', [
             'purchases' => $purchases,
@@ -40,8 +40,8 @@ class ReturProductData extends Component
             'purchases_count' => $purchases_count,
             'trade_ins_count' => $trade_ins_count,
             'returs' => $this->search === null ?
-                Retur::latest()->paginate($this->paginate) :
-                Retur::latest()->where('reference_number', 'like', '%' . $this->search . '%')->orWhere('suppliers_name', 'like', '%' . $this->search . '%')->orWhere('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Retur::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                Retur::where('cabang_id',getCabangId())->latest()->where('reference_number', 'like', '%' . $this->search . '%')->orWhere('suppliers_name', 'like', '%' . $this->search . '%')->orWhere('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

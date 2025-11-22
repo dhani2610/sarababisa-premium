@@ -153,7 +153,7 @@ class PelangganController extends Controller
 
     private function sendWhatsAppMessage($phone, $message)
     {
-        $token = \App\Models\StoreSetting::first()->fonnte ?? null;
+        $token = getStoreSettingByCabang()->fonnte ?? null;
         $url = "https://api.fonnte.com/send";
 
         try {

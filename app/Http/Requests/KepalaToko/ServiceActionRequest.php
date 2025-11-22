@@ -3,6 +3,8 @@
 namespace App\Http\Requests\KepalaToko;
 
 use Illuminate\Foundation\Http\FormRequest;
+use function App\Helpers\getCabangId;
+use App\Models\ServiceAction;
 
 class ServiceActionRequest extends FormRequest
 {
@@ -24,7 +26,20 @@ class ServiceActionRequest extends FormRequest
     public function rules()
     {
         return [
-            'nama_tindakan' => 'required|unique:service_actions,nama_tindakan',
+            'nama_tindakan' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $cabangId = getCabangId();
+
+                    $exists = ServiceAction::where('nama_tindakan', $value)
+                        ->where('cabang_id', $cabangId)
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('Mohon maaf, tindakan servis dengan nama ini sudah tersedia di cabang ini.');
+                    }
+                }
+            ],
             'modal_sparepart' => 'required',
             'harga_toko' => 'required',
             'harga_pelanggan' => 'required',
@@ -35,7 +50,11 @@ class ServiceActionRequest extends FormRequest
     public function messages()
     {
         return [
-            'nama_tindakan.unique' => 'Mohon maaf, inputan tidak dapat diproses karena tindakan servis dengan nama ini sudah tersedia.',
+            'nama_tindakan.required' => 'Nama tindakan wajib diisi.',
+            'modal_sparepart.required' => 'Modal sparepart wajib diisi.',
+            'harga_toko.required' => 'Harga toko wajib diisi.',
+            'harga_pelanggan.required' => 'Harga pelanggan wajib diisi.',
+            'garansi.required' => 'Garansi wajib diisi.',
         ];
     }
 }

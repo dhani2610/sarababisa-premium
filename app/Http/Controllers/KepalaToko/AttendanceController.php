@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Exports\AttendanceMatrixExport;
+use App\Models\Shift;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AttendanceController extends Controller
@@ -58,18 +59,25 @@ class AttendanceController extends Controller
 
         // Validasi logika absensi
         if ($request->type === 'masuk' && $sudahMasuk) {
+            toast('Anda sudah absen masuk hari ini.', 'error');
+
             return redirect()->back()->with('error', 'Anda sudah absen masuk hari ini.');
         }
 
         if ($request->type === 'pulang') {
             if (!$sudahMasuk) {
+                toast('Anda belum absen masuk, tidak bisa absen pulang.', 'error');
+
                 return redirect()->back()->with('error', 'Anda belum absen masuk, tidak bisa absen pulang.');
             }
 
             if ($sudahPulang) {
+                toast('Anda sudah absen pulang hari ini.', 'error');
                 return redirect()->back()->with('error', 'Anda sudah absen pulang hari ini.');
+
             }
         }
+
 
         // handle file upload if photo_file provided
         $photoPath = null;
@@ -87,6 +95,26 @@ class AttendanceController extends Controller
             }
         }
 
+        $potonganTelat = 0;
+        $shift = Shift::where('id',$user->shift_id)->first();
+        if (!empty($shift)) {
+            if ($request->type === 'masuk') {
+                if (date('H:i:s') > $shift->jam_masuk) {
+                    $potonganTelat = $shift->potongan_terlambat ?? 0;
+                    $telat  = 1;
+                }else{
+                    $telat  = 0;
+                    $potonganTelat = 0;
+                }
+            }else{
+                $telat  = 0;
+                $potonganTelat = 0;
+            }
+        }else{
+            toast('Anda belum memiliki shift kerja silahkan hubungi kepala toko.', 'error');
+            return redirect()->back()->with('error', 'Anda belum memiliki shift kerja silahkan hubungi kepala toko.');
+        }
+
         Attendance::create([
             'user_id' => $user->id,
             'type' => $request->type,
@@ -96,8 +124,12 @@ class AttendanceController extends Controller
             'lng' => $request->lng,
             'photo' => $photoPath,
             'note' => $request->note,
+            'nominal_potongan' => $potonganTelat,
+            'telat' => $telat,
+            'cabang_id' => getCabangId(),
         ]);
 
+        toast('Absensi tersimpan.', 'success');
         return redirect()->route('master-absensi.index')->with('success', 'Absensi tersimpan.');
     }
 

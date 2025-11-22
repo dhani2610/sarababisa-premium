@@ -15,9 +15,9 @@ class AnggaranController extends Controller
      */
     public function index()
     {
-        $budgets = Budget::all();
-        $budgets_count = Budget::all()->count();
-        $total_budgets = Budget::all()->sum('total');
+        $budgets = Budget::where('cabang_id',getCabangId())->get();
+        $budgets_count = Budget::where('cabang_id',getCabangId())->get()->count();
+        $total_budgets = Budget::where('cabang_id',getCabangId())->get()->sum('total');
         $targetharian = $total_budgets / 30;
 
         return view('pages/kepalatoko/anggaran', compact('budgets', 'budgets_count', 'total_budgets', 'targetharian'));
@@ -53,7 +53,8 @@ class AnggaranController extends Controller
             'name' => $request->name,
             'quantity' => $request->quantity,
             'price' => $request->price,
-            'total' => $request->quantity * $request->price
+            'total' => $request->quantity * $request->price,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('anggaran.index');

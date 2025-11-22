@@ -3,6 +3,7 @@
 namespace App\Http\Requests\KepalaToko;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ProductRequest extends FormRequest
 {
@@ -24,7 +25,11 @@ class ProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_name' => 'required|unique:products,product_name',
+            'product_name' => [
+                'required',
+                Rule::unique('products', 'product_name')
+                    ->where('cabang_id', $this->cabang_id)
+            ],
             'product_code' => 'max:100',
             'nomor_seri' => 'max:100',
             'categories_id' => [

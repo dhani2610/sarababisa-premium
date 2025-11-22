@@ -18,6 +18,7 @@ class DataPenjualanController extends ApiController
             ->join('orders', 'order_details.orders_id', '=', 'orders.id')
             ->select(DB::raw('MONTH(order_details.created_at) as month'), DB::raw('YEAR(order_details.created_at) as year'), DB::raw('SUM(order_details.total) as total_omzet'), DB::raw('SUM(order_details.profit_toko) as total_profit_bersih'), DB::raw('SUM(order_details.profit) as total_profit_kotor'))
             ->where('orders.is_approve', 'Setuju')
+            ->where('orders.cabang_id',getCabangId())
             ->whereNull('order_details.deleted_at') // Menambahkan kondisi where untuk memfilter data yang deleted_at-nya NULL
             ->groupBy(DB::raw('MONTH(order_details.created_at)'), DB::raw('YEAR(order_details.created_at)'))
             ->orderBy(DB::raw('YEAR(order_details.created_at)'), 'asc')

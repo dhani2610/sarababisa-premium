@@ -32,7 +32,7 @@ class AdminLaporanServisData extends Component
     {
         $users = User::where('role', 'Teknisi')->get();
         $jumlah = ServiceTransaction::where('is_approve', 'Setuju')->where('kondisi_servis', "Sudah jadi")->count();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('livewire.admin-laporan-servis-data', [
             'jumlah' => $jumlah,

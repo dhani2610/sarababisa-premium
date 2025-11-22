@@ -20,7 +20,7 @@ class AdminProdukSparepartData extends Component
     public $paginate = 10;
     public $search;
 
-    
+
     public $fotoProduk, $produkId;
     public $showFotoModal = false;
 
@@ -117,7 +117,7 @@ class AdminProdukSparepartData extends Component
     {
         $spareparts = SubCategory::where('categories_id', '=', '2')->get();
         $model_series = ModelSerie::all();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         $spareparts_count = Product::where('categories_id', '=', '2')->count();
 
         $topProducts = OrderDetail::select(
@@ -132,7 +132,7 @@ class AdminProdukSparepartData extends Component
         ->where('products.categories_id', '=', '2')
         ->orderByDesc('total_terjual')
 ->limit('5')
-        
+
         ->get();
 
 

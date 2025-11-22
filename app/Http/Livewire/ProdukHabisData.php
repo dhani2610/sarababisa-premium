@@ -30,7 +30,7 @@ class ProdukHabisData extends Component
     public function render()
     {
         $categories = SubCategory::all();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         $products_count = Product::where('stok', '=', '0')->count();
         return view('livewire.produk-habis-data', [
             'toko' => $toko,

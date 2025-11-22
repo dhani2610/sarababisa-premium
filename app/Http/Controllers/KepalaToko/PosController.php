@@ -28,14 +28,14 @@ class PosController extends Controller
     public function index()
     {
         Cart::instance('sale')->destroy();
-        $toko = StoreSetting::find(1);
-        $brands = Brand::all();
-        $capacities = Capacity::all();
-        $model_series = ModelSerie::all();
-        $colors = Color::all();
-        $spareparts = SubCategory::where('categories_id', '=', '2')->get();
-        $accessories = SubCategory::where('categories_id', '=', '3')->get();
-        $tools = SubCategory::where('categories_id', '=', '4')->get();
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $colors = Color::where('cabang_id',getCabangId())->get();
+        $spareparts = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '2')->get();
+        $accessories = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '3')->get();
+        $tools = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '4')->get();
 
         return view('pages/kepalatoko/pos/index',compact('brands','capacities','model_series','colors','toko','spareparts','accessories','tools'));
     }

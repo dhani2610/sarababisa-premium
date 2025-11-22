@@ -30,8 +30,24 @@ class Product extends Model
         'model_series_id',
         'ram',
         'capacities_id',
-        'created_at'
+        'created_at',
+        'cabang_id',
     ];
+
+    protected $appends = [
+        'display_name'
+    ];
+
+    public function getDisplayNameAttribute()
+    {
+        if ($this->categories_id == 1) {
+            return $this->product_name . ' ' . $this->kondisi . ' ' . $this->warna . ' ' . $this->ram . ' / ' .
+                ($this->capacity ? $this->capacity->name : '-') .
+                ' (IMEI ' . $this->nomor_seri . ')';
+        }
+
+        return $this->product_name . ' ' . $this->nomor_seri;
+    }
 
     public function subCategory()
     {

@@ -36,6 +36,7 @@ class RincianInvestController extends Controller
             'id_investor' => $request->id_investor,
             'upload_bukti_tf' => $path,
             'keterangan' => $request->keterangan,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('rincian-invest.index')->with('success', 'Data berhasil ditambahkan');

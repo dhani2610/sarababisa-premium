@@ -33,7 +33,7 @@ class AdminPosData extends Component
         $sales = User::where('role', 'Sales')->get();
         $customers = Customer::all();
         $products_count = Product::all()->count();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         return view('livewire.admin-pos-data', [
             'toko' => $toko,
             'customers' => $customers,

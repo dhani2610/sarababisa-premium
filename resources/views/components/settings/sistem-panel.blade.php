@@ -13,8 +13,8 @@
             <livewire:toggle-edit-transaksi></livewire:toggle-edit-transaksi>
             <livewire:toggle-edit-produk></livewire:toggle-edit-produk>
             <livewire:toggle-telegram-bot />
-            <livewire:toggle-absensi-setting />
-            <livewire:toggle-potongan-izin />
+            {{-- <livewire:toggle-absensi-setting /> --}}
+            {{-- <livewire:toggle-potongan-izin /> --}}
             <livewire:toggle-setting-overtime />
         </div>
 

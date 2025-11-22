@@ -26,6 +26,7 @@ class PelangganImport implements ToModel, WithHeadingRow, WithBatchInserts
                 'kategori' => $row['Kategori Pelanggan'],
                 'nomor_hp' => $row['Nomor HP'],
                 'alamat'   => $row['Alamat'],
+                'cabang_id'   => getCabangId(),
             ]
         );
 

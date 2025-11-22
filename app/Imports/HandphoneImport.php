@@ -45,6 +45,7 @@ class HandphoneImport implements ToModel, WithHeadingRow, WithBatchInserts
                 'created_at'        => !empty($row['Tgl Masuk'])
                     ? Carbon::parse($row['Tgl Masuk'])
                     : now(),
+                'cabang_id'   => getCabangId(),
             ]
         );
 

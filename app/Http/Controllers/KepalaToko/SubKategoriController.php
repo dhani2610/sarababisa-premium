@@ -56,7 +56,7 @@ class SubKategoriController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-
+        $data['cabang_id'] = getCabangId();
         SubCategory::create($data);
 
         return redirect()->route('sub-kategori.index');

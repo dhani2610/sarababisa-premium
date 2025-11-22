@@ -31,12 +31,14 @@ class ServiceActionData extends Component
 
     public function render()
     {
-        $service_actions_count = ServiceAction::all()->count();
+        $cabangId = getCabangId(); // cabang aktif
+
+        $service_actions_count = ServiceAction::where('cabang_id',$cabangId)->get()->count();
         return view('livewire.service-action-data', [
             'service_actions_count' => $service_actions_count,
             'service_actions' => $this->search === null ?
-                ServiceAction::latest()->paginate($this->paginate) :
-                ServiceAction::latest()->where('nama_tindakan', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                ServiceAction::where('cabang_id',$cabangId)->latest()->paginate($this->paginate) :
+                ServiceAction::where('cabang_id',$cabangId)->latest()->where('nama_tindakan', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 

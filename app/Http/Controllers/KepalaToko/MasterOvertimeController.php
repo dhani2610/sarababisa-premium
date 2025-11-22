@@ -13,7 +13,7 @@ class MasterOvertimeController extends Controller
 {
     public function index()
     {
-        $overtimes = Overtime::with('user')->latest()->paginate(10);
+        $overtimes = Overtime::where('cabang_id',getCabangId())->with('user')->latest()->paginate(10);
         $stats = $this->getStats();
 
         return view('pages.kepalatoko.master.overtime', compact('overtimes', 'stats'));
@@ -29,7 +29,7 @@ class MasterOvertimeController extends Controller
         ]);
 
         $user = Auth::user();
-        $store = StoreSetting::find(1);
+        $store = StoreSetting::where('cabang_id',getCabangId())->first();
         $ratePerHour = $store->nominal_overtime ?? 0;
 
         $start = Carbon::parse($request->waktu_start);
@@ -45,6 +45,7 @@ class MasterOvertimeController extends Controller
             'nominal_overtime' => $nominal,
             'keterangan' => $request->keterangan,
             'status' => 'pending',
+            'cabang_id' => getCabangId(),
         ]);
 
         toast('Data Lembur berhasil disimpan.', 'success');
@@ -60,7 +61,7 @@ class MasterOvertimeController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        $store = StoreSetting::find(1);
+        $store = StoreSetting::where('cabang_id',getCabangId())->first();
         $ratePerHour = $store->nominal_overtime ?? 0;
 
         $start = Carbon::parse($request->waktu_start);

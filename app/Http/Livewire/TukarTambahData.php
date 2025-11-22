@@ -37,17 +37,17 @@ class TukarTambahData extends Component
 
     public function render()
     {
-        $purchases_count = Purchase::whereNull('keterangan')
+        $purchases_count = Purchase::where('cabang_id',getCabangId())->whereNull('keterangan')
             ->orWhere('keterangan', '!=', 'Tukar Tambah')->count();
-        $returs_count = Retur::all()->count();
-        $trade_ins_count = Purchase::where('keterangan', '=', 'Tukar Tambah')->count();
-        $products = Product::where('categories_id', '1')->get();
-        $customers = Customer::all();
-        $sales = User::where('role', 'Sales')->get();
-        $brands = Brand::all();
-        $model_series = ModelSerie::all();
-        $capacities = Capacity::all();
-        $colors = Color::all();
+        $returs_count = Retur::where('cabang_id',getCabangId())->get()->count();
+        $trade_ins_count = Purchase::where('cabang_id',getCabangId())->where('keterangan', '=', 'Tukar Tambah')->count();
+        $products = Product::where('cabang_id',getCabangId())->where('categories_id', '1')->get();
+        $customers = Customer::where('cabang_id',getCabangId())->get();
+        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $colors = Color::where('cabang_id',getCabangId())->get();
         return view('livewire.tukar-tambah-data', [
             'purchases_count' => $purchases_count,
             'returs_count' => $returs_count,
@@ -60,8 +60,8 @@ class TukarTambahData extends Component
             'capacities' => $capacities,
             'colors' => $colors,
             'tradeins' => $this->search === null ?
-                Purchase::latest()->where('keterangan', 'Tukar Tambah')->paginate($this->paginate) :
-                Purchase::latest()->where('keterangan', 'Tukar Tambah')->where('reference_number', 'like', '%' . $this->search . '%')->orWhere('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Purchase::where('cabang_id',getCabangId())->latest()->where('keterangan', 'Tukar Tambah')->paginate($this->paginate) :
+                Purchase::where('cabang_id',getCabangId())->latest()->where('keterangan', 'Tukar Tambah')->where('reference_number', 'like', '%' . $this->search . '%')->orWhere('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

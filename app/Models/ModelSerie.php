@@ -15,6 +15,7 @@ class ModelSerie extends Model
         'brands_id',
         'id_tipe_os',
         'nominal_bonus',
+        'cabang_id',
     ];
 
     public function brand()

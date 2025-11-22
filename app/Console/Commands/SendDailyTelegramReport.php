@@ -18,7 +18,7 @@ class SendDailyTelegramReport extends Command
 
     public function handle()
     {
-        $setting = StoreSetting::find(1);
+        $setting = StoreSetting::where('cabang_id',getCabangId())->first();
 
         // Skip jika tidak diatur
         if (!$setting || !$setting->token_bot || !$setting->chat_id || !$setting->report_time) {

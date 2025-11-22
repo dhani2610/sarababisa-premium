@@ -121,7 +121,7 @@ class ProdukAksesorisController extends Controller
         $item = Product::findOrFail($id);
         $accessories = SubCategory::where('categories_id', '=', '3')->get();
         $model_series = ModelSerie::all();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages.admintoko.produk.aksesoris-edit', [
             'item' => $item,

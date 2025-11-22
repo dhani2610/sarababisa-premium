@@ -26,18 +26,18 @@ class UbahSudahDiambilController extends Controller
      */
     public function index()
     {
-        $processes_count = ServiceTransaction::whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
-        $bisadiambil = ServiceTransaction::with('customer', 'serviceaction')->where('status_servis', 'Bisa Diambil')->paginate(10);
-        $jumlahbisadiambil = ServiceTransaction::with('customer', 'serviceaction')->where('status_servis', 'Bisa Diambil')->count();
-        $customers = Customer::all();
-        $users = User::all();
-        $types = Type::all();
-        $brands = Brand::all();
-        $capacities = Capacity::all();
-        $model_series = ModelSerie::all();
-        $jumlah_bisa_diambil = ServiceTransaction::where('status_servis', 'Bisa Diambil')->count();
-        $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->count();
-        $jumlah_semua = ServiceTransaction::all()->count();
+        $processes_count = ServiceTransaction::where('cabang_id',getCabangId())->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
+        $bisadiambil = ServiceTransaction::where('cabang_id',getCabangId())->with('customer', 'serviceaction')->where('status_servis', 'Bisa Diambil')->paginate(10);
+        $jumlahbisadiambil = ServiceTransaction::where('cabang_id',getCabangId())->with('customer', 'serviceaction')->where('status_servis', 'Bisa Diambil')->count();
+        $customers = Customer::where('cabang_id',getCabangId())->get();
+        $users = User::where('cabang_id',getCabangId())->get();
+        $types = Type::where('cabang_id',getCabangId())->get();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $jumlah_bisa_diambil = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Bisa Diambil')->count();
+        $jumlah_sudah_diambil = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Sudah Diambil')->count();
+        $jumlah_semua = ServiceTransaction::where('cabang_id',getCabangId())->get()->count();
         return view('pages/kepalatoko/servis/bisa-diambil', compact(
             'processes_count',
             'customers',
@@ -131,7 +131,7 @@ class UbahSudahDiambilController extends Controller
 
 
         $ppn = 0;
-        $cekppn = StoreSetting::find(1);
+        $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
         if (!empty($cekppn) && $cekppn->is_tax == 1) {
             $ppn = $cekppn->ppn;
         }
@@ -213,7 +213,7 @@ class UbahSudahDiambilController extends Controller
             $tempo = null;
         }
         $ppn = 0;
-        $cekppn = StoreSetting::find(1);
+        $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
         if (!empty($cekppn)) {
             if ($cekppn->is_tax == 1) {
                 $ppn = $cekppn->ppn;
@@ -288,7 +288,7 @@ class UbahSudahDiambilController extends Controller
 
     public function sendMessage($message)
     {
-        $storeSetting = \App\Models\StoreSetting::find(1);
+        $storeSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;

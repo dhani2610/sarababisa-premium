@@ -11,7 +11,7 @@ class ShiftController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 25);
-        $shifts = Shift::orderBy('created_at', 'desc')->paginate($perPage);
+        $shifts = Shift::where('cabang_id',getCabangId())->orderBy('created_at', 'desc')->paginate($perPage);
 
         return view('pages.kepalatoko.master.shift', compact('shifts'));
     }
@@ -22,6 +22,9 @@ class ShiftController extends Controller
             'nominal_gaji' => str_replace('.', '', $request->nominal_gaji),
             'potongan_terlambat' => str_replace('.', '', $request->potongan_terlambat),
             'potongan_tidak_masuk' => str_replace('.', '', $request->potongan_tidak_masuk),
+            'potongan_izin' => str_replace('.', '', $request->potongan_izin),
+            'potongan_cuti' => str_replace('.', '', $request->potongan_cuti),
+            'potongan_sakit' => str_replace('.', '', $request->potongan_sakit),
         ]);
         $validated = $request->validate([
             'nama_shift' => 'required|string|max:100',
@@ -30,8 +33,12 @@ class ShiftController extends Controller
             'nominal_gaji' => 'required|integer',
             'potongan_terlambat' => 'required|integer',
             'potongan_tidak_masuk' => 'required|integer',
+            'potongan_izin' => 'required|integer',
+            'potongan_cuti' => 'required|integer',
+            'potongan_sakit' => 'required|integer',
         ]);
 
+        $validated['cabang_id'] = getCabangId();
         Shift::create($validated);
 
         toast('Shift berhasil ditambahkan.', 'success');
@@ -50,6 +57,9 @@ class ShiftController extends Controller
             'nominal_gaji' => str_replace('.', '', $request->nominal_gaji),
             'potongan_terlambat' => str_replace('.', '', $request->potongan_terlambat),
             'potongan_tidak_masuk' => str_replace('.', '', $request->potongan_tidak_masuk),
+            'potongan_izin' => str_replace('.', '', $request->potongan_izin),
+            'potongan_cuti' => str_replace('.', '', $request->potongan_cuti),
+            'potongan_sakit' => str_replace('.', '', $request->potongan_sakit),
         ]);
         $validated = $request->validate([
             'nama_shift' => 'required|string|max:100',
@@ -58,9 +68,13 @@ class ShiftController extends Controller
             'nominal_gaji' => 'required|integer',
             'potongan_terlambat' => 'required|integer',
             'potongan_tidak_masuk' => 'required|integer',
+            'potongan_izin' => 'required|integer',
+            'potongan_cuti' => 'required|integer',
+            'potongan_sakit' => 'required|integer',
         ]);
 
         $item = Shift::findOrFail($id);
+        $validated['cabang_id'] = getCabangId();
         $item->update($validated);
 
         toast('Shift berhasil diupdate.', 'success');

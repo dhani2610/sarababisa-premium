@@ -50,6 +50,7 @@ class TargetTeknisiController extends Controller
             'users_id' => $request->users_id,
             'item' => $request->item,
             'teknisi_name' => $teknisi_name->name,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('target-teknisi.index');
@@ -75,7 +76,7 @@ class TargetTeknisiController extends Controller
     public function edit($id)
     {
         $item = TeknisiTarget::findOrFail($id);
-        $teknisi = User::where('role', 'Teknisi')->get();
+        $teknisi = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
 
         return view('pages.kepalatoko.target-teknisi.edit', [
             'item' => $item,

@@ -18,6 +18,7 @@ class DataTargetController extends ApiController
             ->select(DB::raw('MONTH(created_at) as month'), DB::raw('YEAR(created_at) as year'), DB::raw('SUM(target) as target'), DB::raw('SUM(nilai) as nilai'))
             ->groupBy(DB::raw('MONTH(created_at)'), DB::raw('YEAR(created_at)'))
             ->orderBy(DB::raw('YEAR(created_at)'), 'asc')
+            ->where('cabang_id',getCabangId())
             ->orderBy(DB::raw('MONTH(created_at)'), 'asc')
             ->get();
 

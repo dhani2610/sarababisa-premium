@@ -42,7 +42,7 @@ class TeknisiLaporanServisData extends Component
         $capacities = Capacity::all();
         $model_series = ModelSerie::all();
         $jumlah = ServiceTransaction::where('is_approve', 'Setuju')->where('users_id', Auth::user()->id)->count();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         return view('livewire.teknisi-laporan-servis-data', [
             'jumlah' => $jumlah,
             'users' => $users,

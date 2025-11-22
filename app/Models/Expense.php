@@ -17,7 +17,8 @@ class Expense extends Model
         'users_id',
         'is_approve',
         'tgl_disetujui',
-        'created_at'
+        'created_at',
+        'cabang_id',
     ];
 
     public function user()

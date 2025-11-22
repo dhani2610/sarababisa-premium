@@ -20,7 +20,7 @@ class ProdukAksesorisData extends Component
     public $paginate = 10;
     public $search;
 
-    
+
     public $fotoProduk, $produkId;
     public $showFotoModal = false;
 
@@ -117,31 +117,18 @@ class ProdukAksesorisData extends Component
 
     public function render()
     {
-        $accessories = SubCategory::where('categories_id', '=', '3')->get();
-        $model_series = ModelSerie::all();
-        $toko = StoreSetting::find(1);
-        $accessories_count = Product::where('categories_id', '=', '3')->count();
-        $aksesorisitemready = Product::where('categories_id', 3)->where('stok', '>', 0)->count();
-        $aksesorisstokready = Product::where('categories_id', 3)->where('stok', '>', 0)->sum('stok');
-        $aksesorismodalready = Product::where('categories_id', 3)->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
-        $aksesorisstokhabis = Product::where('categories_id', 3)->where('stok', 0)->count();
-        $aksesorisnominalterjual = Product::where('categories_id', 3)->where('stok', 0)->sum('harga_jual');
-        
-        $topProducts = OrderDetail::select(
-            'order_details.products_id',
-            'products.product_name',
-            'products.harga_jual',
-            DB::raw('SUM(order_details.quantity) as total_terjual'),
-            DB::raw('SUM(order_details.quantity * products.harga_jual) as omzet')
-        )
-        ->join('products', 'products.id', '=', 'order_details.products_id')
-        ->groupBy('order_details.products_id', 'products.product_name', 'products.harga_jual')
-        ->orderByDesc('total_terjual')
-->limit('5')
-        ->where('products.categories_id', 3)
-        
-        ->get();
-        
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $accessories = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '3')->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $accessories_count = Product::where('cabang_id',getCabangId())->where('categories_id', '=', '3')->count();
+        $aksesorisitemready = Product::where('cabang_id',getCabangId())->where('categories_id', 3)->where('stok', '>', 0)->count();
+        $aksesorisstokready = Product::where('cabang_id',getCabangId())->where('categories_id', 3)->where('stok', '>', 0)->sum('stok');
+        $aksesorismodalready = Product::where('cabang_id',getCabangId())->where('categories_id', 3)->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
+        $aksesorisstokhabis = Product::where('cabang_id',getCabangId())->where('categories_id', 3)->where('stok', 0)->count();
+        $aksesorisnominalterjual = Product::where('cabang_id',getCabangId())->where('categories_id', 3)->where('stok', 0)->sum('harga_jual');
+
+        $topProducts = [];
+
         return view('livewire.produk-aksesoris-data', [
             'topProducts' => $topProducts,
             'toko' => $toko,
@@ -154,8 +141,8 @@ class ProdukAksesorisData extends Component
             'aksesorisstokhabis' => $aksesorisstokhabis,
             'aksesorisnominalterjual' => $aksesorisnominalterjual,
             'products' => $this->search === null ?
-                Product::latest()->where('categories_id', '=', '3')->paginate($this->paginate) :
-                Product::latest()->where('categories_id', '=', '3')->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '3')->paginate($this->paginate) :
+                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '3')->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

@@ -17,7 +17,7 @@ class ToolExport implements FromCollection, WithMapping, WithHeadings, ShouldAut
      */
     public function collection()
     {
-        return Product::where('categories_id', '=', '4')->get();
+        return Product::where('cabang_id',getCabangId())->where('categories_id', '=', '4')->get();
     }
 
     public function map($product): array

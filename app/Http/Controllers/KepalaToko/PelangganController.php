@@ -20,8 +20,8 @@ class PelangganController extends Controller
      */
     public function index()
     {
-        $customers = Customer::paginate(10);
-        $customers_count = Customer::all()->count();
+        $customers = Customer::where('cabang_id',getCabangId())->paginate(10);
+        $customers_count = Customer::where('cabang_id',getCabangId())->get()->count();
         return view('pages/kepalatoko/pelanggan', compact('customers', 'customers_count'));
     }
 
@@ -62,11 +62,12 @@ class PelangganController extends Controller
      */
     public function store(CustomerRequest $request)
     {
-        // $data = $request->all();
+        $data = $request->all();
 
-        // Customer::create($data);
+        $data = $data['cabang_id'] = getCabangId();
+        Customer::create($data);
 
-        // return redirect()->route('pelanggan.index');
+        return redirect()->route('pelanggan.index');
     }
 
     public function import(Request $request)
@@ -159,7 +160,7 @@ class PelangganController extends Controller
             $numbers = $request->input('customers', []);
         } else {
             // Kalau select kosong karena "Pilih Semua" dicentang
-            $numbers = Customer::pluck('nomor_hp')->toArray();
+            $numbers = Customer::where('cabang_id',getCabangId())->pluck('nomor_hp')->toArray();
         }
 
         foreach ($numbers as $phone) {
@@ -177,7 +178,7 @@ class PelangganController extends Controller
 
     private function sendWhatsAppMessage($phone, $message)
     {
-        $token = \App\Models\StoreSetting::first()->fonnte ?? null;
+        $token = getStoreSettingByCabang()->fonnte ?? null;
         $url = "https://api.fonnte.com/send";
 
         try {

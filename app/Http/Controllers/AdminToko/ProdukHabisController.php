@@ -90,7 +90,7 @@ class ProdukHabisController extends Controller
     {
         $item = Product::findOrFail($id);
         $categories = SubCategory::all();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages.admintoko.produk.habis-edit', [
             'item' => $item,

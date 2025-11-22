@@ -24,9 +24,9 @@ class TransaksiProdukController extends Controller
      */
     public function index()
     {
-        $jumlah_semua = Order::all()->count();
-        $jumlah_lunas = Order::where('due', '0')->count();
-        $jumlah_tidaklunas = Order::where('due', '>', '0')->count();
+        $jumlah_semua = Order::where('cabang_id',getCabangId())->get()->count();
+        $jumlah_lunas = Order::where('cabang_id',getCabangId())->where('due', '0')->count();
+        $jumlah_tidaklunas = Order::where('cabang_id',getCabangId())->where('due', '>', '0')->count();
 
         return view('pages/kepalatoko/produk/transaksi', compact(
             'jumlah_semua',
@@ -43,6 +43,7 @@ class TransaksiProdukController extends Controller
         $orders = Order::select('orders.*', 'order_details.modal')
             ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
             ->with(['user', 'customer'])
+            ->where('orders.cabang_id',getCabangId())
             ->orderByRaw('is_approve IS NULL DESC')
             ->latest()
             ->skip($offset)
@@ -267,6 +268,7 @@ class TransaksiProdukController extends Controller
 
         $orders = Order::select('orders.*', 'order_details.modal')
             ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
+            ->where('orders.cabang_id',getCabangId())
             ->with(['user', 'customer'])
             ->where('due', '0')
             ->orderByRaw('is_approve IS NULL DESC')
@@ -487,6 +489,7 @@ class TransaksiProdukController extends Controller
         $orders = Order::select('orders.*', 'order_details.modal')
             ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
             ->with(['user', 'customer'])
+            ->where('orders.cabang_id',getCabangId())
             ->where('due','>', '0')
             ->orderByRaw('is_approve IS NULL DESC')
             ->latest();
@@ -852,7 +855,7 @@ class TransaksiProdukController extends Controller
         $subtotal = $orderItem->sum('sub_total');
         $users = User::find(1);
         $terms = Term::find(3);
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);

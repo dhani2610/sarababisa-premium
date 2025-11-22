@@ -25,6 +25,7 @@ class ModelSeriImport implements ToModel, WithHeadingRow, WithBatchInserts
                 'brands_id'      => $row['ID Merek'],
                 'id_tipe_os'     => $row['ID TIPE OS'],
                 'nominal_bonus'  => $row['Nominal Bonus'] ?? $row['ID TIPE OS'], // fallback jika kolom bonus belum ada
+                'cabang_id'   => getCabangId(),
             ]
         );
 

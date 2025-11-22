@@ -30,135 +30,175 @@ class DashboardController extends Controller
     public function index()
     {
         $currentMonth = now()->month;
+        $cabang = getCabangId();
+        $currentDate = Carbon::now();
 
-        $types = Type::with('service')->get();
+        // TYPES & CATEGORIES
+        $types = Type::with('service')
+            ->where('cabang_id', $cabang)
+            ->get();
 
-        $categories = Category::all();
+        $categories = Category::where('cabang_id', $cabang)->get();
 
+        // CATEGORY SALES
         $categorySales = [];
         foreach ($categories as $category) {
-            $totalSales = OrderDetail::totalSales($category->id);
+            $totalSales = OrderDetail::where('cabang_id', $cabang)
+                ->totalSales($category->id);
+
             $categorySales[] = [
                 'category' => $category->category_name,
                 'total_sales' => $totalSales,
             ];
         }
 
-        $totalpengeluaran = Expense::whereYear('created_at', now()->year)
+        // PENGELUARAN
+        $totalpengeluaran = Expense::where('cabang_id', $cabang)
+            ->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
             ->where('is_approve', 'Setuju')
             ->sum('price');
-        $totalinsiden = Incident::whereYear('created_at', now()->year)
+
+        $totalinsiden = Incident::where('cabang_id', $cabang)
+            ->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
             ->sum('biaya_toko');
-        $totalpembelian = Purchase::whereYear('created_at', now()->year)
+
+        $totalpembelian = Purchase::where('cabang_id', $cabang)
+            ->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
             ->sum('total_price');
 
-        // Ambil data transaksi servis yang memiliki status "Belum cek"
-        $transactions = ServiceTransaction::where('status_servis', 'Belum cek')->get();
+        // REMINDER SERVIS
+        $transactions = ServiceTransaction::where('cabang_id', $cabang)
+            ->where('status_servis', 'Belum cek')
+            ->get();
 
-        // Cek apakah ada transaksi yang lebih dari 7 hari dari data dibuat
-        $currentDate = Carbon::now();
-        $reminderThreshold = 7; // Jumlah hari sebelum pengingat ditampilkan
-        $reminders = $transactions->filter(function ($transaction) use ($currentDate, $reminderThreshold) {
-            return $transaction->created_at->addDays($reminderThreshold)->isPast();
+        $reminders = $transactions->filter(function ($transaction) use ($currentDate) {
+            return $transaction->created_at->addDays(7)->isPast();
         })->count();
 
-        $approveservis = ServiceTransaction::where('is_approve', null)
+        // APPROVAL
+        $approveservis = ServiceTransaction::where('cabang_id', $cabang)
+            ->where('is_approve', null)
             ->where('status_servis', 'Sudah Diambil')
             ->count();
-        $approvepenjualan = Order::where('is_approve', null)->count();
-        $approvekasbon = Debt::where('is_approve', null)->count();
-        $approvepengeluaran = Expense::where('is_approve', null)->count();
-        $stokhabis = Product::where('stok', '<=', DB::raw('`stok_minimal`'))->count();
 
-        $totalbudgets = Budget::all()->sum('total');
+        $approvepenjualan = Order::where('cabang_id', $cabang)
+            ->where('is_approve', null)->count();
 
-        $bulanprofitbersihservis = ServiceTransaction::whereYear('tgl_disetujui', now()->year)
+        $approvekasbon = Debt::where('cabang_id', $cabang)
+            ->where('is_approve', null)->count();
+
+        $approvepengeluaran = Expense::where('cabang_id', $cabang)
+            ->where('is_approve', null)->count();
+
+        // STOK HABIS
+        $stokhabis = Product::where('cabang_id', $cabang)
+            ->where('stok', '<=', DB::raw('`stok_minimal`'))->count();
+
+        // TOTAL BUDGET
+        $totalbudgets = Budget::where('cabang_id', $cabang)->sum('total');
+
+        // PROFIT SERVIS BULANAN
+        $bulanprofitbersihservis = ServiceTransaction::where('cabang_id', $cabang)
+            ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', now()->month)
             ->where('is_approve', 'Setuju')
-            ->get()
             ->sum('profittoko');
 
-        $profitpenjualan = Order::whereHas('detailOrders', function ($query) {
-            $query->whereYear('tgl_disetujui', now()->year)
+        // PROFIT PENJUALAN BULANAN
+        $profitpenjualan = Order::where('cabang_id', $cabang)
+            ->whereHas('detailOrders', function ($q) {
+                $q->whereYear('tgl_disetujui', now()->year)
                 ->whereMonth('tgl_disetujui', now()->month)
                 ->where('is_approve', 'Setuju');
-        })
-            ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
-                    ->groupBy('orders_id');
+            })
+            ->with(['detailOrders' => function ($q) {
+                $q->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
+                ->groupBy('orders_id');
             }])
-            ->select('id')
             ->get();
 
-        $bulanprofitbersihpenjualan = $profitpenjualan->sum(function ($order) {
-            return $order->detailOrders->sum('total_profit');
-        });
+        $bulanprofitbersihpenjualan = $profitpenjualan->sum(
+            fn($order) => $order->detailOrders->sum('total_profit')
+        );
 
-        $bulantotalprofitbersih = ($bulanprofitbersihservis + $bulanprofitbersihpenjualan);
+        $bulantotalprofitbersih = $bulanprofitbersihservis + $bulanprofitbersihpenjualan;
 
-        $bulanprofitkotorservis = ServiceTransaction::whereYear('tgl_disetujui', now()->year)
+        // PROFIT KOTOR SERVIS
+        $bulanprofitkotorservis = ServiceTransaction::where('cabang_id', $cabang)
+            ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', now()->month)
             ->where('is_approve', 'Setuju')
-            ->get()
             ->sum('profit');
 
-        $rumusprofitkotorpenjualan = Order::whereHas('detailOrders', function ($query) {
-            $query->whereYear('tgl_disetujui', now()->year)
+        // PROFIT KOTOR PENJUALAN
+        $bulanprofitkotorpenjualan = Order::where('cabang_id', $cabang)
+            ->whereHas('detailOrders', function ($q) {
+                $q->whereYear('tgl_disetujui', now()->year)
                 ->whereMonth('tgl_disetujui', now()->month);
-        })
-            ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(profit) as total_profit'))
-                    ->groupBy('orders_id');
+            })
+            ->with(['detailOrders' => function ($q) {
+                $q->select('orders_id', DB::raw('SUM(profit) as total_profit'))
+                ->groupBy('orders_id');
             }])
-            ->select('id')
-            ->get();
+            ->get()
+            ->sum(fn($order) => $order->detailOrders->sum('total_profit'));
 
-        $bulanprofitkotorpenjualan = $rumusprofitkotorpenjualan->sum(function ($order) {
-            return $order->detailOrders->sum('total_profit');
-        });
+        $bulantotalprofitkotor = $bulanprofitkotorservis + $bulanprofitkotorpenjualan;
 
-        $bulantotalprofitkotor = ($bulanprofitkotorservis + $bulanprofitkotorpenjualan);
-
-        $haripembelian = Purchase::whereYear('created_at', now()->year)
+        // DATA HARIAN
+        $haripembelian = Purchase::where('cabang_id', $cabang)
+            ->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
             ->whereDate('created_at', today())
             ->sum('total_price');
-        $haripengeluaran = Expense::where('is_approve', 'Setuju')
+
+        $haripengeluaran = Expense::where('cabang_id', $cabang)
+            ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', now()->month)
             ->whereDate('tgl_disetujui', today())
             ->sum('price');
-        $hariomzetservis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+
+        $hariomzetservis = ServiceTransaction::where('cabang_id', $cabang)
+            ->where('status_servis', 'Sudah Diambil')
             ->whereYear('tgl_ambil', now()->year)
             ->whereMonth('tgl_ambil', now()->month)
             ->whereDate('tgl_ambil', today())
-            ->get()
             ->sum('omzet');
-        $hariomzetpenjualan = OrderDetail::whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)->whereDate('created_at', today())
-            ->get()
-            ->sum('total');
-        $haritotalomzet = ($hariomzetservis + $hariomzetpenjualan);
 
-        $hariprofitkotorservis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+        $hariomzetpenjualan = OrderDetail::where('cabang_id', $cabang)
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->whereDate('created_at', today())
+            ->sum('total');
+
+        $haritotalomzet = $hariomzetservis + $hariomzetpenjualan;
+
+        $hariprofitkotorservis = ServiceTransaction::where('cabang_id', $cabang)
+            ->where('status_servis', 'Sudah Diambil')
             ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', now()->month)
             ->whereDate('tgl_disetujui', today())
-            ->get()
             ->sum('profit');
-        $hariprofitkotorpenjualan = OrderDetail::whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)->whereDate('created_at', today())
-            ->get()
+
+        $hariprofitkotorpenjualan = OrderDetail::where('cabang_id', $cabang)
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->whereDate('created_at', today())
             ->sum('profit');
+
         $haritotalprofitkotor = $hariprofitkotorservis + $hariprofitkotorpenjualan;
 
-        $targets = Target::all();
+        // TARGET & INVENTORY
+        $targets = Target::where('cabang_id', $cabang)->get();
         $hasData = $targets->isNotEmpty();
 
-        $inventories = Inventory::where('masa_penggantian', '<', $currentDate)->count();
+        $inventories = Inventory::where('cabang_id', $cabang)
+            ->where('masa_penggantian', '<', $currentDate)
+            ->count();
 
         return view('pages/kepalatoko/dashboard', compact(
             'types',
@@ -187,4 +227,165 @@ class DashboardController extends Controller
             'inventories'
         ));
     }
+
+    // public function index()
+    // {
+    //     $currentMonth = now()->month;
+
+    //     $types = Type::with('service')->get();
+
+    //     $categories = Category::all();
+
+    //     $categorySales = [];
+    //     foreach ($categories as $category) {
+    //         $totalSales = OrderDetail::totalSales($category->id);
+    //         $categorySales[] = [
+    //             'category' => $category->category_name,
+    //             'total_sales' => $totalSales,
+    //         ];
+    //     }
+
+    //     $totalpengeluaran = Expense::whereYear('created_at', now()->year)
+    //         ->whereMonth('created_at', now()->month)
+    //         ->where('is_approve', 'Setuju')
+    //         ->sum('price');
+    //     $totalinsiden = Incident::whereYear('created_at', now()->year)
+    //         ->whereMonth('created_at', now()->month)
+    //         ->sum('biaya_toko');
+    //     $totalpembelian = Purchase::whereYear('created_at', now()->year)
+    //         ->whereMonth('created_at', now()->month)
+    //         ->sum('total_price');
+
+    //     // Ambil data transaksi servis yang memiliki status "Belum cek"
+    //     $transactions = ServiceTransaction::where('status_servis', 'Belum cek')->get();
+
+    //     // Cek apakah ada transaksi yang lebih dari 7 hari dari data dibuat
+    //     $currentDate = Carbon::now();
+    //     $reminderThreshold = 7; // Jumlah hari sebelum pengingat ditampilkan
+    //     $reminders = $transactions->filter(function ($transaction) use ($currentDate, $reminderThreshold) {
+    //         return $transaction->created_at->addDays($reminderThreshold)->isPast();
+    //     })->count();
+
+    //     $approveservis = ServiceTransaction::where('is_approve', null)
+    //         ->where('status_servis', 'Sudah Diambil')
+    //         ->count();
+    //     $approvepenjualan = Order::where('is_approve', null)->count();
+    //     $approvekasbon = Debt::where('is_approve', null)->count();
+    //     $approvepengeluaran = Expense::where('is_approve', null)->count();
+    //     $stokhabis = Product::where('stok', '<=', DB::raw('`stok_minimal`'))->count();
+
+    //     $totalbudgets = Budget::all()->sum('total');
+
+    //     $bulanprofitbersihservis = ServiceTransaction::whereYear('tgl_disetujui', now()->year)
+    //         ->whereMonth('tgl_disetujui', now()->month)
+    //         ->where('is_approve', 'Setuju')
+    //         ->get()
+    //         ->sum('profittoko');
+
+    //     $profitpenjualan = Order::whereHas('detailOrders', function ($query) {
+    //         $query->whereYear('tgl_disetujui', now()->year)
+    //             ->whereMonth('tgl_disetujui', now()->month)
+    //             ->where('is_approve', 'Setuju');
+    //     })
+    //         ->with(['detailOrders' => function ($query) {
+    //             $query->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
+    //                 ->groupBy('orders_id');
+    //         }])
+    //         ->select('id')
+    //         ->get();
+
+    //     $bulanprofitbersihpenjualan = $profitpenjualan->sum(function ($order) {
+    //         return $order->detailOrders->sum('total_profit');
+    //     });
+
+    //     $bulantotalprofitbersih = ($bulanprofitbersihservis + $bulanprofitbersihpenjualan);
+
+    //     $bulanprofitkotorservis = ServiceTransaction::whereYear('tgl_disetujui', now()->year)
+    //         ->whereMonth('tgl_disetujui', now()->month)
+    //         ->where('is_approve', 'Setuju')
+    //         ->get()
+    //         ->sum('profit');
+
+    //     $rumusprofitkotorpenjualan = Order::whereHas('detailOrders', function ($query) {
+    //         $query->whereYear('tgl_disetujui', now()->year)
+    //             ->whereMonth('tgl_disetujui', now()->month);
+    //     })
+    //         ->with(['detailOrders' => function ($query) {
+    //             $query->select('orders_id', DB::raw('SUM(profit) as total_profit'))
+    //                 ->groupBy('orders_id');
+    //         }])
+    //         ->select('id')
+    //         ->get();
+
+    //     $bulanprofitkotorpenjualan = $rumusprofitkotorpenjualan->sum(function ($order) {
+    //         return $order->detailOrders->sum('total_profit');
+    //     });
+
+    //     $bulantotalprofitkotor = ($bulanprofitkotorservis + $bulanprofitkotorpenjualan);
+
+    //     $haripembelian = Purchase::whereYear('created_at', now()->year)
+    //         ->whereMonth('created_at', now()->month)
+    //         ->whereDate('created_at', today())
+    //         ->sum('total_price');
+    //     $haripengeluaran = Expense::where('is_approve', 'Setuju')
+    //         ->whereYear('tgl_disetujui', now()->year)
+    //         ->whereMonth('tgl_disetujui', now()->month)
+    //         ->whereDate('tgl_disetujui', today())
+    //         ->sum('price');
+    //     $hariomzetservis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+    //         ->whereYear('tgl_ambil', now()->year)
+    //         ->whereMonth('tgl_ambil', now()->month)
+    //         ->whereDate('tgl_ambil', today())
+    //         ->get()
+    //         ->sum('omzet');
+    //     $hariomzetpenjualan = OrderDetail::whereYear('created_at', now()->year)
+    //         ->whereMonth('created_at', now()->month)->whereDate('created_at', today())
+    //         ->get()
+    //         ->sum('total');
+    //     $haritotalomzet = ($hariomzetservis + $hariomzetpenjualan);
+
+    //     $hariprofitkotorservis = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+    //         ->whereYear('tgl_disetujui', now()->year)
+    //         ->whereMonth('tgl_disetujui', now()->month)
+    //         ->whereDate('tgl_disetujui', today())
+    //         ->get()
+    //         ->sum('profit');
+    //     $hariprofitkotorpenjualan = OrderDetail::whereYear('created_at', now()->year)
+    //         ->whereMonth('created_at', now()->month)->whereDate('created_at', today())
+    //         ->get()
+    //         ->sum('profit');
+    //     $haritotalprofitkotor = $hariprofitkotorservis + $hariprofitkotorpenjualan;
+
+    //     $targets = Target::all();
+    //     $hasData = $targets->isNotEmpty();
+
+    //     $inventories = Inventory::where('masa_penggantian', '<', $currentDate)->count();
+
+    //     return view('pages/kepalatoko/dashboard', compact(
+    //         'types',
+    //         'categories',
+    //         'categorySales',
+    //         'totalpengeluaran',
+    //         'totalinsiden',
+    //         'totalpembelian',
+    //         'approveservis',
+    //         'approvepenjualan',
+    //         'approvekasbon',
+    //         'approvepengeluaran',
+    //         'totalbudgets',
+    //         'haripengeluaran',
+    //         'haripembelian',
+    //         'haritotalomzet',
+    //         'haritotalprofitkotor',
+    //         'bulantotalprofitbersih',
+    //         'bulantotalprofitkotor',
+    //         'bulanprofitbersihservis',
+    //         'bulanprofitbersihpenjualan',
+    //         'reminders',
+    //         'stokhabis',
+    //         'targets',
+    //         'hasData',
+    //         'inventories'
+    //     ));
+    // }
 }

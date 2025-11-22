@@ -16,7 +16,8 @@ class Retur extends Model
         'status',
         'retur_quantity',
         'retur_credit',
-        'date'
+        'date',
+        'cabang_id',
     ];
 
     public function purchase()

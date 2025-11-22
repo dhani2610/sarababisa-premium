@@ -41,7 +41,7 @@
 
                 <!-- Modal -->
                 @php
-                    $fonteeToken = \App\Models\StoreSetting::first()->fonnte ?? null;
+                    $fonteeToken = getStoreSettingByCabang()->fonnte ?? null;
                 @endphp
                 @if (empty($fonteeToken))
 

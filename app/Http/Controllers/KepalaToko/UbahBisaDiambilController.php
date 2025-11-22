@@ -21,10 +21,10 @@ class UbahBisaDiambilController extends Controller
     public function edit($id)
     {
         $item = ServiceTransaction::findOrFail($id);
-        $users = User::where('role', 'Teknisi')->get();
-        $sales = User::where('role', 'Sales')->get();
-        $service_actions = ServiceAction::all();
-        $products = Product::whereHas('subCategory', function ($query) {
+        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
+        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
+        $products = Product::where('cabang_id',getCabangId())->whereHas('subCategory', function ($query) {
             $query->whereHas('category', function ($subQuery) {
                 $subQuery->where('category_name', 'Sparepart');
             });
@@ -235,7 +235,7 @@ class UbahBisaDiambilController extends Controller
 
     public function sendMessage($message)
     {
-        $storeSetting = \App\Models\StoreSetting::find(1);
+        $storeSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;

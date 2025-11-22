@@ -1,8 +1,10 @@
 <div>
+    @if (Auth::user()->role == 'Kapala Toko')
     <div class="grid grid-cols-12 gap-6 mb-4">
         <x-produk.card-stok-ready :itemready="$itemready" :stokready="$stokready" :modalready="$modalready"/>
         <x-produk.card-stok-habis :stokhabis="$stokhabis" :nominalterjual="$nominalterjual"/>
     </div>
+    @endif
     <!-- Page header -->
     <div class="sm:flex sm:justify-between sm:items-center mb-3">
 
@@ -998,7 +1000,7 @@
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
                             @php
-                                $tokoSetting = \App\Models\StoreSetting::find(1);
+                                $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
                             @endphp
                             @if ((int) ($tokoSetting->is_edit_produk ?? 0) == 1 || Auth::user()->role == 'Kepala Toko')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
@@ -1031,9 +1033,11 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Stok Minimal</div>
                             </th>
+                            @if (Auth::user()->role == 'Kapala Toko')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Modal</div>
                             </th>
+                            @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Harga Jual Toko</div>
                             </th>
@@ -1112,9 +1116,11 @@
                                         @endif
                                     </div>
                                 </td>
+                                @if (Auth::user()->role == 'Kapala Toko')
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">Rp. {{ number_format($item->harga_modal) }}</div>
                                 </td>
+                                @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">Rp. {{ number_format($item->harga_jual_toko ?? 0) }}</div>
                                 </td>

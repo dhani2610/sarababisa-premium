@@ -13,7 +13,8 @@ class Customer extends Model
         'nama',
         'kategori',
         'nomor_hp',
-        'alamat'
+        'alamat',
+        'cabang_id',
     ];
 
     // one to many

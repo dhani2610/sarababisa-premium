@@ -58,7 +58,7 @@ class MasterWarnaController extends Controller
     public function store(ColorRequest $request)
     {
         $data = $request->all();
-
+        $data['cabang_id'] = getCabangId();
         Color::create($data);
 
         return redirect()->route('master-warna.index');

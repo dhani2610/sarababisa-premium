@@ -223,7 +223,7 @@
                                         </div>
                                     </div>
                                 @endif
-                               
+
                                 @if ($item->kondisi_servis != 'Sudah jadi')
                                 @else
                                     @if (json_decode($item->tindakan_servis) == null)
@@ -323,16 +323,16 @@
 </x-admin-layout>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-{{-- 
+{{--
 <script>
     $(document).ready(function () {
         // Ambil total dari input yang disabled (karena kamu format pakai number_format)
         let totalBiaya = parseInt($('#total_biaya').val()) || 0;
-        
+
 
         function updateSisa(from, to) {
             let diskon = parseInt($('#diskon').val()) || 0;
-            
+
             let fromVal = parseInt($(from).val()) || 0;
             let finalvalTotal = totalBiaya - diskon;
             if (fromVal > finalvalTotal) {
@@ -355,7 +355,7 @@
 </script> --}}
 @php
     $ppn = 0;
-    $cekPPN = \App\Models\StoreSetting::find(1);
+    $cekPPN = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
     if (!empty($cekPPN)) {
         if ($cekPPN->is_tax == 1 && $cekPPN->ppn != 0) {
             $ppn = $cekPPN->ppn;

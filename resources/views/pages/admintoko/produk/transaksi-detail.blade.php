@@ -4,7 +4,7 @@
 
 <x-admin-layout>
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-     
+
         <!-- Billing Information -->
         <div class="mb-6">
             <div class="text-slate-800 font-semibold mb-4">Data Pelanggan</div>
@@ -53,7 +53,7 @@
                                 </div>
                                 <div class="text-sm font-medium text-slate-800 ml-6">
                                     @if ($item->ppn > 0)
-                                        <span class="text-xs text-blue-500">(+PPN Rp. {{ number_format($item->ppn) }})</span>    
+                                        <span class="text-xs text-blue-500">(+PPN Rp. {{ number_format($item->ppn) }})</span>
                                     @endif
                                      Rp. {{ number_format($item->price * $item->quantity + $item->ppn) }}
                                 </div>
@@ -188,13 +188,13 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>                                            
+                            </div>
                     </div>
                     @php
                     if ($order->customer != null) {
                         $nomor = $order->customer->nomor_hp;
                         $nomorwa = preg_replace('/^08/', 628, $nomor);
-                        $fonteeToken = \App\Models\StoreSetting::first()->fonnte ?? null;
+                        $fonteeToken = getStoreSettingByCabang()->fonnte ?? null;
                     }
                 @endphp
                 {{-- <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Penjualan*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Nota%20:%20{{ $order->invoice_no }}%0ANama%20pelanggan%20:%20*{{ $order->nama_pelanggan }}*%0AProduk%20:%0A{{ $produkDetails }}%0APembayaran%20:%20{{ $order->payment_method }}%0A%0ALink%20garansi%20:%20{{ $toko->link_toko }}/garansi%0A%0ATerimakasih"  target="_blank"> --}}

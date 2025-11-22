@@ -1103,7 +1103,7 @@
                                             </button>
                                         </a>
                                         @php
-                                            $setting = \App\Models\StoreSetting::find(1);
+                                            $setting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
                                         @endphp
                                         @if ((int) ($tokoSetting->is_edit_produk ?? 0) == 1)
                                             @if ($item->categories_id === 1)

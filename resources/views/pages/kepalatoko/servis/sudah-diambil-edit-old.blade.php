@@ -278,7 +278,7 @@
                                                          modalSparepart = selected.dataset.hargaModal || 0;
                                                      ">
                                                     <option selected value="">Pilih Sparepart</option>
-                                                    @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
+                                                    @foreach (App\Models\Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get() as $item)
                                                         <option value="{{ $item->id }}"
                                                             data-harga_modal="{{ $item->harga_modal }}">
                                                             {{ $item->product_name }}
@@ -664,7 +664,7 @@
 
         @php
             $ppn = 0;
-            $cekPPN = \App\Models\StoreSetting::find(1);
+            $cekPPN = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
             if (!empty($cekPPN)) {
                 if ($cekPPN->is_tax == 1 && $cekPPN->ppn != 0) {
                     $ppn = $cekPPN->ppn;
@@ -917,7 +917,7 @@
                         <select class="selectAction2" name="products_id[]"
                             class="form-select text-sm py-1 w-full" style="width: 100%;">
                             <option selected value="">Pilih Sparepart</option>
-                            @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
+                            @foreach (App\Models\Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get() as $item)
                                 <option value="{{ $item->id }}">{{ $item->product_name }}
                                 </option>
                             @endforeach

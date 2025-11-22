@@ -49,8 +49,9 @@ class TargetController extends Controller
     {
         $target = Budget::all()->sum('total');
 
-        $bulanprofitbersihservis = ServiceTransaction::whereYear('tgl_ambil', now()->year)
-            ->whereMonth('tgl_ambil', now()->month)
+        $bulanprofitbersihservis = ServiceTransaction::whereYear('tgl_disetujui', now()->year)
+            ->whereMonth('tgl_disetujui', now()->month)
+            ->where('cabang_id', getCabangId())
             ->where('is_approve', 'Setuju')
             ->get()
             ->sum('profittoko');
@@ -58,10 +59,11 @@ class TargetController extends Controller
         $profitpenjualan = Order::whereHas('detailOrders', function ($query) {
             $query->whereYear('created_at', now()->year)
                 ->whereMonth('created_at', now()->month)
+                ->where('cabang_id', getCabangId())
                 ->where('is_approve', 'Setuju');
         })
             ->with(['detailOrders' => function ($query) {
-                $query->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
+                $query->where('cabang_id', getCabangId())->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
                     ->groupBy('orders_id');
             }])
             ->select('id')
@@ -78,7 +80,8 @@ class TargetController extends Controller
         Target::create([
             'target' => $target,
             'persen' => $persen,
-            'nilai' => $bulantotalprofitbersih
+            'nilai' => $bulantotalprofitbersih,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('target.index');

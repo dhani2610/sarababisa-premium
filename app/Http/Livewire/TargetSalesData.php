@@ -28,14 +28,14 @@ class TargetSalesData extends Component
 
     public function render()
     {
-        $targets_count = SalesTarget::all()->count();
-        $sales = User::where('role', 'Sales')->get();
+        $targets_count = SalesTarget::where('cabang_id',getCabangId())->get()->count();
+        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
         return view('livewire.target-sales-data', [
             'targets_count' => $targets_count,
             'sales' => $sales,
             'targets' => $this->search === null ?
-                SalesTarget::latest()->paginate($this->paginate) :
-                SalesTarget::latest()->where('sales_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                SalesTarget::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                SalesTarget::where('cabang_id',getCabangId())->latest()->where('sales_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

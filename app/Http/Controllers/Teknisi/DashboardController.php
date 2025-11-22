@@ -70,7 +70,7 @@ class DashboardController extends Controller
             $reward = 0; // Atau nilai default lainnya
         }
 
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages/teknisi/dashboard', compact(
             'totalbonus',

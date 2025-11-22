@@ -361,7 +361,7 @@
                                             <!-- End -->
 
                                             @php
-                                                $fonnteToken = \App\Models\StoreSetting::first()->fonnte ?? null;
+                                                $fonnteToken = getStoreSettingByCabang()->fonnte ?? null;
                                                 $hasToken = !empty($fonnteToken);
 
                                                 if ($transaction->customer != null) {

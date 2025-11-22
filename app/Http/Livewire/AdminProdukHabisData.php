@@ -31,7 +31,7 @@ class AdminProdukHabisData extends Component
     {
         $categories = SubCategory::all();
         $products_count = Product::where('stok', '=', '0')->count();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('livewire.admin-produk-habis-data', [
             'toko' => $toko,

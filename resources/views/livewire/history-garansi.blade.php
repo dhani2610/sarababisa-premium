@@ -1,17 +1,44 @@
+<style>
+.btn-status {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Menunggu Konfirmasi (Kuning) */
+.status-menunggu {
+    background-color: #FFF7D1;
+    color: #B58105;
+}
+
+/* Sudah Selesai (Hijau) */
+.status-selesai {
+    background-color: #D1FADF;
+    color: #027A48;
+}
+
+/* Dibatalkan (Merah) */
+.status-batal {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+}
+
+</style>
 <div>
     <!-- Page header -->
     <div class="sm:flex sm:justify-between sm:items-center mb-3">
 
         <!-- Left: Title -->
         <div class="mb-4 sm:mb-0">
-            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">History Garansi Service ✨</h1>
+            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Riwayat Garansi ✨</h1>
         </div>
 
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Cari berdasarkan nama Nomor Service" />
+            <x-search-form placeholder="Cari berdasarkan nama Nomor Servia" />
 
             <!-- Print button -->
             @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
@@ -60,7 +87,7 @@
                         <!-- Modal header -->
                         <div class="px-5 py-3 border-b border-slate-200">
                             <div class="flex justify-between items-center">
-                                <div class="font-semibold text-slate-800">Atur Pencetakan History Garansi</div>
+                                <div class="font-semibold text-slate-800">Atur Pencetakan Riwayat Garansi</div>
                                 <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false">
                                     <div class="sr-only">Close</div>
                                     <svg class="w-4 h-4 fill-current">
@@ -100,7 +127,7 @@
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
-                    + Tambah History Garansi
+                    + Tambah Riwayat Garansi
                 </button>
 
                 <!-- Modal backdrop -->
@@ -130,7 +157,7 @@
 
                                 <!-- Pilih Service -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Nomor Service <span
+                                    <label class="block text-sm font-medium mb-1">Nomor Servis <span
                                             class="text-rose-500">*</span></label>
                                     <select name="service_id" id="service_id" class="form-select select2  w-full"
                                         required>
@@ -138,17 +165,31 @@
                                         @foreach ($serviceTransactions as $st)
                                             <option value="{{ $st->id }}"
                                                 data-teknisi="{{ $st->user->name ?? '' }}"
-                                                data-expired="{{ $st->exp_garansi }}">
+                                                data-expired="{{ $st->exp_garansi }}"
+                                                data-nota="{{ route('kepalatoko-pengambilan-cetak-inkjet', $st->id) }}">
                                                 {{ $st->nomor_servis }}
                                             </option>
                                         @endforeach
                                     </select>
                                     <small class="text-slate-500">Teknisi sebelumnya: <span
                                             id="prev_teknisi"></span></small><br>
-                                    <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small>
+                                    <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small> <br>
+                                    <small class="text-slate-500">Link Nota: <span id="link_nota"></span></small> <br>
+                                    <div id="history_garansi" class="mt-2 text-sm text-slate-700"></div>
+
                                 </div>
 
                                 <!-- Penerima -->
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Pelanggan <span
+                                            class="text-rose-500">*</span></label>
+                                    <select name="id_customer" class="form-select select2 w-full " required>
+                                        <option value="">-- Pilih Pelanggan --</option>
+                                        @foreach ($customer as $cs)
+                                            <option value="{{ $cs->id }}">{{ $cs->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Penerima <span
                                             class="text-rose-500">*</span></label>
@@ -160,73 +201,40 @@
                                     </select>
                                 </div>
 
-                                <!-- Teknisi -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Teknisi<span
+                                    <label class="block text-sm font-medium mb-1">Keluhan <span
                                             class="text-rose-500">*</span></label>
-                                    <select name="teknisi_id" class="form-select w-full " required>
-                                        <option value="">-- Pilih Teknisi --</option>
-                                        @foreach ($users as $u)
-                                            <option value="{{ $u->id }}">{{ $u->name }}</option>
-                                        @endforeach
+                                    <input type="text" name="keluhan" class="form-input w-full"
+                                        required>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="fungsi masuk">Pengecekan
+                                        Fungsi Masuk<span class="text-rose-500">*</span></label>
+                                    <input id="fungsi masuk" name="fungsi masuk" class="form-input w-full px-2 py-1"
+                                        type="text" required
+                                        placeholder="Contoh: Tombol, Kamera, Speaker, dll" />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium mb-1"
+                                        for="estimasi_pengerjaan">Estimasi Pengerjaan</label>
+                                    <select id="estimasi_pengerjaan" name="estimasi_pengerjaan"
+                                        class="form-select text-sm py-2 w-full">
+                                        <option selected value="">Pilih Estimasi Pengerjaan</option>
+                                        <option value="1 Hari">1 Hari</option>
+                                        <option value="2 Hari">2 Hari</option>
+                                        <option value="3 Hari">3 Hari</option>
+                                        <option value="4 Hari">4 Hari</option>
+                                        <option value="5 Hari">5 Hari</option>
+                                        <option value="6 Hari">6 Hari</option>
+                                        <option value="1 Minggu">1 Minggu</option>
+                                        <option value="2 Minggu">2 Minggu</option>
+                                        <option value="3 Minggu">3 Minggu</option>
+                                        <option value="1 Bulan">1 Bulan</option>
+                                        <option value="2 Bulan">2 Bulan</option>
+                                        <option value="3 Bulan">3 Bulan</option>
                                     </select>
-                                </div>
-
-                                <!-- Tindakan -->
-                                <div class="mb-3">
-                                    <label class="block text-sm font-medium mb-1">Tindakan</label>
-                                    <button type="button" id="addTindakanRow"
-                                        class="btn-sm bg-indigo-500 text-white mb-2">
-                                        + Tambah Tindakan
-                                    </button>
-                                    <div id="tindakanContainer"></div>
-                                </div>
-
-                                <!-- Total Biaya Servis -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Total Modal Tindakan</label>
-                                    <input type="number" name="total_biaya_tindakan" id="total_biaya_tindakan"
-                                        value="0" class="form-input w-full" required onkeyup="updateTotalModal()">
-                                </div>
-
-                                <hr>
-
-                                <!-- Checkbox sebelum sparepart -->
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="useSparepartCheckbox">
-                                    <label class="form-check-label" for="useSparepartCheckbox">
-                                        Apakah menggunakan stok sparepart toko?
-                                    </label>
-                                </div>
-                                <!-- Sparepart Dynamic -->
-                                <div id="sparepart_wrapper" style="display:none;">
-                                    <label class="block text-sm font-medium mb-1">Sparepart</label>
-                                    <button type="button" id="addSparepartRow" class="btn-sm bg-indigo-500 text-white">
-                                        + Tambah Sparepart
-                                    </button>
-                                    <div class="mt-2" id="rowContainer"></div>
-                                </div>
-
-                                <!-- Total Biaya -->
-                                <div style="display:none;" id="modal_sparepart_wrapper">
-                                    <label class="block text-sm font-medium mb-1">Modal Sparepart<span
-                                            class="text-rose-500">*</span></label>
-                                    <input type="number" name="modal_sparepart" id="modal_sparepart" value="0"
-                                        class="form-input w-full">
-                                </div>
-                                <!-- Total Biaya -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Total Modal<span
-                                            class="text-rose-500">*</span></label>
-                                    <input type="number" name="total_biaya" id="total_biaya" value="0"
-                                        class="form-input w-full">
-                                </div>
-
-                                <!-- Catatan -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Catatan<span
-                                            class="text-rose-500">*</span></label>
-                                    <textarea name="catatan" class="form-input w-full" required></textarea>
                                 </div>
 
                             </div>
@@ -238,6 +246,7 @@
                         </form>
                     </div>
                 </div>
+
             </div>
 
 
@@ -247,6 +256,65 @@
 
     <!-- More actions -->
     <div class="sm:flex sm:justify-between sm:items-center mb-5">
+           <!-- Left side -->
+        <div class="mb-4 sm:mb-0">
+            <ul class="flex flex-wrap -m-1">
+
+                {{-- SEMUA --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == '' ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Semua
+                            <span class="ml-1 text-slate-400">{{ $count }}</span>
+                        </button>
+                    </a>
+                </li>
+
+                {{-- PROSES (status = 1) --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=1') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == 1 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Proses
+                            <span class="ml-1 text-slate-400">{{ $prosesCount }}</span>
+                        </button>
+                    </a>
+                </li>
+
+                {{-- SELESAI (status = 2) --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=2') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == 2 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Selesai
+                            <span class="ml-1 text-slate-400">{{ $selesaiCount }}</span>
+                        </button>
+                    </a>
+                </li>
+
+                {{-- DIBATALKAN (status = 3) bila ada --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=3') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == 3 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Dibatalkan / Pengembalian Dana
+                            <span class="ml-1 text-slate-400">{{ $dibatalkanCount ?? 0 }}</span>
+                        </button>
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
         <!-- Left side -->
         <div class="mb-0">
             <select wire:model="paginate" id="" class="form-select">
@@ -284,10 +352,11 @@
     @endif
 
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
+
         <div x-data="handleSelect">
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 {{-- Left side --}}
-                <h2 class="font-semibold text-slate-800">Semua History Service <span
+                <h2 class="font-semibold text-slate-800">Semua Riwayat Garansi <span
                         class="text-slate-400 font-medium">{{ $count }}</span></h2>
                 <div class="relative inline-flex">
                     <div class="table-items-action hidden">
@@ -318,10 +387,12 @@
                                 </div>
                             </th>
                             <th class="px-2 py-3">No.</th>
-                            <th class="px-2 py-3">Tanggal</th>
+                            <th class="px-2 py-3">Tgl Masuk</th>
+                            <th class="px-2 py-3">Tgl Selesai</th>
                             <th class="px-2 py-3">Nomor Servis</th>
-                            <th class="px-2 py-3">Customer</th>
+                            <th class="px-2 py-3">Pelanggan</th>
                             <th class="px-2 py-3">Penerima</th>
+                            <th class="px-2 py-3">Keluhan</th>
                             <th class="px-2 py-3">Teknisi</th>
                             <th class="px-2 py-3">Tindakan</th>
                             <th class="px-2 py-3">Sparepart</th>
@@ -348,15 +419,18 @@
 
                                 <td class="px-2 py-3">{{ $i++ }}</td>
                                 <td class="px-2 py-3">{{ $item->date }}</td>
-                                <td class="px-2 py-3">{{ $item->service->nomor_servis ?? $item->service_id }}</td>
-                                <td class="px-2 py-3">{{ $item->service->customer->nama ?? '-' }}</td>
+                                <td class="px-2 py-3">{{ $item->tgl_selesai }}</td>
+                                <td class="px-2 py-3">{{ $item->service->nomor_servis ?? '' }}</td>
+                                <td class="px-2 py-3">{{ $item->pelanggan->nama ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->penerima->name ?? '-' }}</td>
+                                <td class="px-2 py-3">{{ $item->keluhan ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->teknisi->name ?? '-' }}</td>
 
                                 {{-- Tindakan --}}
                                 <td class="px-2 py-3">
+                                    @if (!empty($item->tindakan))
                                     @php
-                                        $tindakans = json_decode($item->tindakan, true) ?? [];
+                                        $tindakans = json_decode( $item->tindakan, true) ?? [];
                                     @endphp
 
                                     <ul class="list-disc ml-4">
@@ -369,22 +443,29 @@
                                             </li>
                                         @endforeach
                                     </ul>
+                                    @else
+                                        -
+                                    @endif
                                 </td>
 
                                 {{-- Sparepart --}}
                                 <td class="px-2 py-3">
-                                    @php $spareparts = json_decode($item->sparepart, true); @endphp
-                                    @if ($spareparts)
-                                        <ul class="list-disc ml-4">
-                                            @foreach ($spareparts as $sp)
-                                                @php $prd = \App\Models\Product::find($sp['id']); @endphp
-                                                <li>
-                                                    {{ $prd->product_name ?? 'Produk ID ' . $sp['id'] }}
-                                                    (x{{ $sp['qty'] }})
-                                                    - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
-                                                </li>
-                                            @endforeach
-                                        </ul>
+                                    @if (!empty($item->sparepart))
+                                        @php $spareparts = json_decode($item->sparepart, true); @endphp
+                                        @if ($spareparts)
+                                            <ul class="list-disc ml-4">
+                                                @foreach ($spareparts as $sp)
+                                                    @php $prd = \App\Models\Product::find($sp['id']); @endphp
+                                                    <li>
+                                                        {{ $prd->product_name ?? 'Produk ID ' . $sp['id'] }}
+                                                        (x{{ $sp['qty'] }})
+                                                        - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            -
+                                        @endif
                                     @else
                                         -
                                     @endif
@@ -393,107 +474,131 @@
                                 <td class="px-2 py-3">Rp{{ number_format($item->total_biaya, 0, ',', '.') }}</td>
                                 <td class="px-2 py-3">{{ $item->catatan }}</td>
                                 <td class="px-2 py-3">
-                                    <button
-                                        class="toggle-status px-2 py-1 rounded
-                                        {{ $item->status == 1 ? 'bg-yellow-100 text-yellow-700' : ($item->status == 2 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') }}"
-                                        data-id="{{ $item->id }}">
-                                        @if ($item->status == 1)
-                                            Diproses
-                                        @elseif ($item->status == 2)
-                                            Selesai
-                                        @elseif ($item->status == 3)
-                                            Dibatalkan
-                                        @endif
-                                    </button>
+                                    <center>
+                                        <button
+                                                class="btn-status
+                                                {{ $item->status == 1 ? 'status-menunggu' : ($item->status == 2 ? 'status-selesai' : 'status-batal') }}"
+                                                data-id="{{ $item->id }}">
+
+                                                @if ($item->status == 1)
+                                                    Diproses
+                                                @elseif ($item->status == 2)
+                                                    Sudah Selesai
+                                                @elseif ($item->status == 3)
+                                                    Dibatalkan / Pengembalian Dana
+                                                @endif
+
+                                            </button>
+                                    </center>
+
+
                                 </td>
 
 
                                 @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                                 {{-- Aksi (popup hapus tetap) --}}
                                 <td class="px-2 py-3">
-                                    <div class="flex space-x-2">
-                                        {{-- <a href="{{ route('history-garansi.edit', $item->id) }}">
-                                            <button class="text-slate-400 hover:text-slate-500 rounded-full">
-                                                <span class="sr-only">Edit</span>
-                                                <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                                    <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
-                                                </svg>
-                                            </button>
-                                        </a> --}}
-                                        <div x-data="{ modalOpen: false }">
-                                            <button class="text-rose-500 hover:text-rose-600 rounded-full"
-                                                @click.prevent="modalOpen = true" aria-controls="danger-modal">
-                                                <span class="sr-only">Delete</span>
-                                                <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                                    <path d="M13 15h2v6h-2zM17 15h2v6h-2z" />
-                                                    <path
-                                                        d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z" />
-                                                </svg>
-                                            </button>
-                                            <!-- Modal backdrop -->
-                                            <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
-                                                x-show="modalOpen"
-                                                x-transition:enter="transition ease-out duration-200"
-                                                x-transition:enter-start="opacity-0"
-                                                x-transition:enter-end="opacity-100"
-                                                x-transition:leave="transition ease-out duration-100"
-                                                x-transition:leave-start="opacity-100"
-                                                x-transition:leave-end="opacity-0" aria-hidden="true" x-cloak></div>
-                                            <!-- Modal dialog -->
-                                            <div id="danger-modal"
-                                                class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                                                role="dialog" aria-modal="true" x-show="modalOpen"
-                                                x-transition:enter="transition ease-in-out duration-200"
-                                                x-transition:enter-start="opacity-0 translate-y-4"
-                                                x-transition:enter-end="opacity-100 translate-y-0"
-                                                x-transition:leave="transition ease-in-out duration-200"
-                                                x-transition:leave-start="opacity-100 translate-y-0"
-                                                x-transition:leave-end="opacity-0 translate-y-4" x-cloak>
-                                                <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full"
-                                                    @keydown.escape.window="modalOpen = false">
-                                                    <div class="p-5 flex space-x-4">
-                                                        <!-- Icon -->
-                                                        <div
-                                                            class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
-                                                            <svg class="w-4 h-4 shrink-0 fill-current text-rose-500"
-                                                                viewBox="0 0 16 16">
-                                                                <path
-                                                                    d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
-                                                            </svg>
-                                                        </div>
-                                                        <!-- Content -->
-                                                        <div>
-                                                            <!-- Modal header -->
-                                                            <div class="mb-2">
-                                                                <div class="text-lg font-semibold text-slate-800">
-                                                                    Apakah anda sudah yakin ?</div>
+                                    <div class="space-x-1 flex">
+                                        <div class="flex space-x-2">
+                                            <a href="{{ route('history-garansi.edit', $item->id) }}">
+                                                <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                        <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+                                                        <rect x="9" y="3" width="6" height="4" rx="2" />
+                                                        <path d="M9 14l2 2l4 -4" />
+                                                    </svg>
+                                                </button>
+                                            </a>
+                                            @if (!empty($item->service))
+                                            <a href="{{ route('history-garansi.cetak-inject', $item->id) }}" target="_blank">
+                                                <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                        <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+                                                        <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+                                                        <rect x="7" y="13" width="10" height="8" rx="2" />
+                                                    </svg>
+                                                </button>
+                                            </a>
+                                            @endif
+                                        </div>
+                                            <div x-data="{ modalOpen: false }">
+                                                <button class="text-rose-500 hover:text-rose-600 rounded-full"
+                                                    @click.prevent="modalOpen = true" aria-controls="danger-modal">
+                                                    <span class="sr-only">Delete</span>
+                                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                                                        <path d="M13 15h2v6h-2zM17 15h2v6h-2z" />
+                                                        <path
+                                                            d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z" />
+                                                    </svg>
+                                                </button>
+                                                <!-- Modal backdrop -->
+                                                <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
+                                                    x-show="modalOpen"
+                                                    x-transition:enter="transition ease-out duration-200"
+                                                    x-transition:enter-start="opacity-0"
+                                                    x-transition:enter-end="opacity-100"
+                                                    x-transition:leave="transition ease-out duration-100"
+                                                    x-transition:leave-start="opacity-100"
+                                                    x-transition:leave-end="opacity-0" aria-hidden="true" x-cloak></div>
+                                                <!-- Modal dialog -->
+                                                <div id="danger-modal"
+                                                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
+                                                    role="dialog" aria-modal="true" x-show="modalOpen"
+                                                    x-transition:enter="transition ease-in-out duration-200"
+                                                    x-transition:enter-start="opacity-0 translate-y-4"
+                                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                                    x-transition:leave="transition ease-in-out duration-200"
+                                                    x-transition:leave-start="opacity-100 translate-y-0"
+                                                    x-transition:leave-end="opacity-0 translate-y-4" x-cloak>
+                                                    <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full"
+                                                        @keydown.escape.window="modalOpen = false">
+                                                        <div class="p-5 flex space-x-4">
+                                                            <!-- Icon -->
+                                                            <div
+                                                                class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
+                                                                <svg class="w-4 h-4 shrink-0 fill-current text-rose-500"
+                                                                    viewBox="0 0 16 16">
+                                                                    <path
+                                                                        d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
+                                                                </svg>
                                                             </div>
-                                                            <!-- Modal content -->
-                                                            <div class="text-sm mb-10">
-                                                                <div class="space-y-2">
-                                                                    <p>Jika sudah terhapus, maka tidak bisa dikembalikan
-                                                                        lagi.</p>
+                                                            <!-- Content -->
+                                                            <div>
+                                                                <!-- Modal header -->
+                                                                <div class="mb-2">
+                                                                    <div class="text-lg font-semibold text-slate-800">
+                                                                        Apakah anda sudah yakin ?</div>
                                                                 </div>
-                                                            </div>
-                                                            <!-- Modal footer -->
-                                                            <div class="flex flex-wrap justify-end space-x-2">
-                                                                <button
-                                                                    class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600"
-                                                                    @click="modalOpen = false">Batal</button>
-                                                                <form
-                                                                    action="{{ route('history-garansi.destroy', $item->id) }}"
-                                                                    method="post">
-                                                                    @method('delete')
-                                                                    @csrf
+                                                                <!-- Modal content -->
+                                                                <div class="text-sm mb-10">
+                                                                    <div class="space-y-2">
+                                                                        <p>Jika sudah terhapus, maka tidak bisa dikembalikan
+                                                                            lagi.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Modal footer -->
+                                                                <div class="flex flex-wrap justify-end space-x-2">
                                                                     <button
-                                                                        class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya,
-                                                                        Hapus</button>
-                                                                </form>
+                                                                        class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600"
+                                                                        @click="modalOpen = false">Batal</button>
+                                                                    <form
+                                                                        action="{{ route('history-garansi.destroy', $item->id) }}"
+                                                                        method="post">
+                                                                        @method('delete')
+                                                                        @csrf
+                                                                        <button
+                                                                            class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya,
+                                                                            Hapus</button>
+                                                                    </form>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
                                         </div>
                                     </div>
                                 </td>
@@ -527,7 +632,72 @@
                 let selected = $(this).find(':selected');
                 $('#prev_teknisi').text(selected.data('teknisi'));
                 $('#exp_garansi').text(selected.data('expired'));
+
+                let notaUrl = selected.data('nota');
+                if (notaUrl) {
+                    $('#link_nota').html(
+                        `<a href="${notaUrl}" target="_blank" class="text-blue-600 underline">Lihat Nota</a>`
+                    );
+                } else {
+                    $('#link_nota').html('');
+                }
+
+                // =======================
+                // AMBIL HISTORY GARANSI
+                // =======================
+                let service_id = $(this).val();
+                let historyBox = $('#history_garansi');
+                historyBox.html('<span class="text-gray-500">Memuat...</span>');
+
+                let url = `/history-garansi/list-data/${service_id}`
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function(response) {
+
+
+                        console.log(url);
+                        console.log(service_id);
+                        console.log(response);
+
+                        if (response.length === 0) {
+                            historyBox.html('<span class="text-gray-500">Tidak ada riwayat garansi.</span>');
+                            return;
+                        }
+
+                        let html = '';
+                        response.forEach((item, index) => {
+
+                            let tindakanHTML = '-';
+                            if (item.tindakan_list && item.tindakan_list.length > 0) {
+                                tindakanHTML = '<ul class="list-disc ml-4">';
+                                item.tindakan_list.forEach(t => {
+                                    tindakanHTML += `<li>${t.nama} - Rp${new Intl.NumberFormat().format(t.harga)}</li>`;
+                                });
+                                tindakanHTML += '</ul>';
+                            }
+
+                            html += `
+                                <div class="mb-2 p-2 border rounded bg-slate-50">
+                                    <div class="font-semibold">Klaim Garansi ${index + 1}</div>
+                                    <div>Tgl Klaim: <b>${item.date || '-'}</b></div>
+                                    <div>Tgl Selesai: <b>${item.tgl_selesai || '-'}</b></div>
+                                    <div>Tindakan: ${tindakanHTML}</div>
+                                    <div>Keluhan: ${item.keluhan || '-'}</div>
+                                    <div>Total Biaya: Rp${item.total_biaya}</div>
+                                </div>
+                            `;
+                        });
+
+
+                        historyBox.html(html);
+                    },
+                    error: function() {
+                        historyBox.html('<span class="text-red-500">Error mengambil data.</span>');
+                    }
+                });
             });
+
         });
     </script>
 

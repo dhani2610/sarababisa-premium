@@ -8,11 +8,11 @@ use Livewire\Component;
 class ToggleTax extends Component
 {
     public $taxApplied = false;
-    public $ppn; 
+    public $ppn;
 
     public function mount()
     {
-        $storeSettings = StoreSetting::find(1); 
+        $storeSettings = StoreSetting::where('cabang_id',getCabangId())->first();
         $this->taxApplied = $storeSettings->is_tax;
         $this->ppn = $storeSettings->ppn; // ambil dari kolom ppn
     }
@@ -24,7 +24,7 @@ class ToggleTax extends Component
 
     public function updatedTaxApplied()
     {
-        $storeSettings = StoreSetting::find(1); 
+        $storeSettings = StoreSetting::where('cabang_id',getCabangId())->first();
         $storeSettings->update([
             'is_tax' => $this->taxApplied,
         ]);
@@ -32,7 +32,7 @@ class ToggleTax extends Component
 
     public function updatedPpn()
     {
-        $storeSettings = StoreSetting::find(1);
+        $storeSettings = StoreSetting::where('cabang_id',getCabangId())->first();
         $storeSettings->update([
             'ppn' => $this->ppn, // simpan ke kolom ppn
         ]);

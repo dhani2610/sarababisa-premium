@@ -11,7 +11,7 @@ class ToggleEditProduk extends Component
 
     public function mount()
     {
-        $storeSettings = StoreSetting::find(1); // Ganti 1 dengan ID yang sesuai
+        $storeSettings = StoreSetting::where('cabang_id',getCabangId())->first(); // Ganti 1 dengan ID yang sesuai
         $this->is_edit_produk = $storeSettings->is_edit_produk;
     }
 
@@ -22,7 +22,7 @@ class ToggleEditProduk extends Component
 
     public function saveSetting()
     {
-        $storeSettings = StoreSetting::find(1); // Ganti sesuai kebutuhan
+        $storeSettings = StoreSetting::where('cabang_id',getCabangId())->first(); // Ganti sesuai kebutuhan
         $storeSettings->update([
             'is_edit_produk' => $this->is_edit_produk,
         ]);

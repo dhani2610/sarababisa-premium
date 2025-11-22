@@ -31,6 +31,9 @@
                             <div class="font-semibold text-left">No.</div>
                         </th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            <div class="font-semibold text-left">Cabang</div>
+                        </th>
+                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Nama</div>
                         </th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -71,7 +74,7 @@
                     @php
                         $i = 1
                     @endphp
-                    @foreach($users as $user)                  
+                    @foreach($users as $user)
                         <tr>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                 <div class="flex items-center">
@@ -83,6 +86,9 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{$i++}}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-medium">{{ getCabangName($user->cabang_id) }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ $user->name }}</div>
@@ -206,7 +212,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>                                            
+                                        </div>
                                     </div>
                                     <!-- End -->
                                 </div>
@@ -272,5 +278,5 @@
                 });
             },
         }))
-    })    
+    })
 </script>

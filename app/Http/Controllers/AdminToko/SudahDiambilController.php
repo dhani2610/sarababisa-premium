@@ -216,7 +216,7 @@ class SudahDiambilController extends Controller
         $nama_pelanggan = Customer::find($request->customers_id);
 
         $ppn = 0;
-        $cekppn = StoreSetting::find(1);
+        $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
         if (!empty($cekppn) && $cekppn->is_tax == 1) {
             $ppn = $cekppn->ppn;
         }
@@ -248,7 +248,7 @@ class SudahDiambilController extends Controller
                 $transfer = $request->transfer;
             }
         }
-        
+
         // Cara pembayaran
         if ($request->cara_pembayaran === 'Tunai') {
             $tunai = $biayaFinal;

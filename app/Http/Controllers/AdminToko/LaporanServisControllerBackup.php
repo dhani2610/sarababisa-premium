@@ -48,7 +48,7 @@ class LaporanServisController extends Controller
             ->get()
             ->sum('profittoko');
 
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages/admintoko/laporan-servis', compact('omzethari', 'profithari', 'omzetbulan', 'profitbulan', 'omzettahun', 'profittahun', 'toko'));
     }
@@ -57,7 +57,7 @@ class LaporanServisController extends Controller
     {
         // Mengambil logo dan nama toko
         $users = User::find(1);
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);

@@ -22,6 +22,7 @@ class SalePayment extends Model
         'amount',
         'created_at',
         'updated_at',
+        'cabang_id',
 
     ];
 

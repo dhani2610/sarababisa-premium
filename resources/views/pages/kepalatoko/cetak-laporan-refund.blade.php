@@ -33,7 +33,7 @@
     <hr style="border-top: 1px dashed;">
 
     <div class="text-center">
-        <h4>LAPORAN REFUND</h4>
+        <h4>LAPORAN PENGEMBALIAN DANA</h4>
         <p>Periode: {{ \Carbon\Carbon::parse($start_date)->format('d-m-Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->format('d-m-Y') }}</p>
     </div>
 
@@ -43,11 +43,14 @@
             <td>Total Data</td><td>: {{ $totalData }}</td>
         </tr>
         <tr>
-            <td>Total Refund</td><td>: Rp {{ number_format($totalRefund, 0, ',', '.') }}</td>
+            <td>Total Potongan Teknisi</td><td>: Rp {{ number_format($totalRefund, 0, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td>Total Pengembalian Biaya</td><td>: Rp {{ number_format($totalRefundServis, 0, ',', '.') }}</td>
         </tr>
     </table>
 
-    <h4 style="text-decoration: underline;">Detail Refund</h4>
+    <h4 style="text-decoration: underline;">Detail Pengembalian Dana</h4>
 
     <table id="detail">
         <thead>
@@ -55,9 +58,10 @@
                 <th>No</th>
                 <th>Tanggal</th>
                 <th>Nomor Servis</th>
-                <th>Customer</th>
+                <th>Pelanggan</th>
                 <th>Teknisi</th>
-                <th>Nominal Refund</th>
+                <th>Nominal Potongan Teknisi</th>
+                <th>Pengembalian Biaya</th>
                 <th>Bulan/Tahun</th>
             </tr>
         </thead>
@@ -68,9 +72,10 @@
                     <td>{{ $i++ }}</td>
                     <td>{{ \Carbon\Carbon::parse($r->created_at)->format('d-m-Y') }}</td>
                     <td>#{{ $r->ServiceTransaction->nomor_servis ?? '-' }}</td>
-                    <td>{{ $r->ServiceTransaction->user->name ?? '-' }}</td>
+                    <td>{{ $r->ServiceTransaction->customer->nama ?? '-' }}</td>
                     <td>{{ $r->teknisi->name ?? '-' }}</td>
                     <td>Rp {{ number_format($r->nominal, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($r->nominal_servis, 0, ',', '.') }}</td>
                     <td>{{ $r->period ? $r->period->format('F Y') : '-' }}</td>
                 </tr>
             @endforeach

@@ -83,6 +83,7 @@ class MasterModelSeriController extends Controller
             return redirect()->back()->with('success', 'Model seri berhasil dipulihkan & diperbarui.');
         }
 
+        $data['cabang_id'] = getCabangId();
         // Kalau belum ada → buat baru
         \App\Models\ModelSerie::create($data);
 

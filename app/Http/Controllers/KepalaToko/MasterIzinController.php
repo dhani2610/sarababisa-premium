@@ -5,6 +5,7 @@ namespace App\Http\Controllers\KepalaToko;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\KepalaToko\IzinRequest;
 use App\Models\Izin;
+use App\Models\Shift;
 use App\Models\User;
 use App\Models\StoreSetting;
 use Illuminate\Http\Request;
@@ -33,19 +34,24 @@ class MasterIzinController extends Controller
             }
 
             // Ambil setting potongan dari store_settings (id = 1)
-            $store = StoreSetting::find(1);
+            $store = StoreSetting::where('cabang_id',getCabangId())->first();
+            $user = User::find($request->user_id);
+            $shift = Shift::where('id',$user->shift_id)->first();
 
             // Jika nominal_potongan tidak diisi manual, ambil dari store_settings sesuai tipe
             if (empty($data['nominal_potongan'])) {
                 switch ($data['tipe']) {
                     case 'izin':
-                        $data['nominal_potongan'] = $store->nominal_potongan_izin ?? 0;
+                        $data['nominal_potongan'] = $shift->potongan_izin ?? 0;
                         break;
                     case 'sakit':
-                        $data['nominal_potongan'] = $store->nominal_potongan_sakit ?? 0;
+                        $data['nominal_potongan'] = $shift->potongan_sakit ?? 0;
                         break;
                     case 'alfa':
-                        $data['nominal_potongan'] = $store->nominal_potongan_alfa ?? 0;
+                        $data['nominal_potongan'] = $shift->potongan_tidak_masuk ?? 0;
+                        break;
+                    case 'cuti':
+                        $data['nominal_potongan'] = $shift->potongan_cuti ?? 0;
                         break;
                     default:
                         $data['nominal_potongan'] = 0;
@@ -56,7 +62,7 @@ class MasterIzinController extends Controller
                 $data['nominal_potongan'] = str_replace('.', '', $data['nominal_potongan']);
             }
             // dd($data);
-
+            $data['cabang_id'] = getCabangId();
             $izin = Izin::create($data);
 
             try {
@@ -167,7 +173,7 @@ class MasterIzinController extends Controller
 
     public function sendMessage($message)
     {
-        $storeSetting = \App\Models\StoreSetting::find(1);
+        $storeSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;
