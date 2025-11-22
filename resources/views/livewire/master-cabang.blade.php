@@ -17,14 +17,14 @@
             <div x-data="{ modalOpen: false }">
 
                 @php
-                    $url = config('app.url');
+                    $url = ENV('APP_URL');
                     $allowedUrls = [
                         'http://hi-bdl.saraba-bisa.com',
                         'http://localhost',
                         'http://127.0.0.1:8000',
                     ];
-
-                    $allowShow = in_array($url, $allowedUrls) && count($cabang) < 1;
+                    $allowShow = in_array($url, $allowedUrls);
+                    // dd($url,$allowShow,count($cabang));
                 @endphp
 
                 @if ($allowShow)
