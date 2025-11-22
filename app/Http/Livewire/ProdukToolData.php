@@ -20,7 +20,7 @@ class ProdukToolData extends Component
     public $paginate = 10;
     public $search;
 
-    
+
     public $fotoProduk, $produkId;
     public $showFotoModal = false;
 
@@ -117,29 +117,16 @@ class ProdukToolData extends Component
     }
     public function render()
     {
-        $tools = SubCategory::where('categories_id', '=', '4')->get();
-        $toko = StoreSetting::find(1);
-        $tools_count = Product::where('categories_id', '=', '4')->count();
-        $toolitemready = Product::where('categories_id', 4)->where('stok', '>', 0)->count();
-        $toolstokready = Product::where('categories_id', 4)->where('stok', '>', 0)->sum('stok');
-        $toolmodalready = Product::where('categories_id', 4)->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
-        $toolstokhabis = Product::where('categories_id', 4)->where('stok', 0)->count();
-        $toolnominalterjual = Product::where('categories_id', 4)->where('stok', 0)->sum('harga_jual');
-        
-        $topProducts = OrderDetail::select(
-            'order_details.products_id',
-            'products.product_name',
-            'products.harga_jual',
-            DB::raw('SUM(order_details.quantity) as total_terjual'),
-            DB::raw('SUM(order_details.quantity * products.harga_jual) as omzet')
-        )
-        ->join('products', 'products.id', '=', 'order_details.products_id')
-        ->groupBy('order_details.products_id', 'products.product_name', 'products.harga_jual')
-        ->orderByDesc('total_terjual')
-->limit('5')
-        ->where('products.categories_id', 4)
-        
-        ->get();
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $tools = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '4')->get();
+        $tools_count = Product::where('cabang_id',getCabangId())->where('categories_id', '=', '4')->count();
+        $toolitemready = Product::where('cabang_id',getCabangId())->where('categories_id', 4)->where('stok', '>', 0)->count();
+        $toolstokready = Product::where('cabang_id',getCabangId())->where('categories_id', 4)->where('stok', '>', 0)->sum('stok');
+        $toolmodalready = Product::where('cabang_id',getCabangId())->where('categories_id', 4)->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
+        $toolstokhabis = Product::where('cabang_id',getCabangId())->where('categories_id', 4)->where('stok', 0)->count();
+        $toolnominalterjual = Product::where('cabang_id',getCabangId())->where('categories_id', 4)->where('stok', 0)->sum('harga_jual');
+
+        $topProducts = [];
 
         return view('livewire.produk-tool-data', [
             'topProducts' => $topProducts,
@@ -152,8 +139,8 @@ class ProdukToolData extends Component
             'toolstokhabis' => $toolstokhabis,
             'toolnominalterjual' => $toolnominalterjual,
             'products' => $this->search === null ?
-                Product::latest()->where('categories_id', '=', '4')->paginate($this->paginate) :
-                Product::latest()->where('categories_id', '=', '4')->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '4')->paginate($this->paginate) :
+                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '4')->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

@@ -67,6 +67,7 @@ class TopProduk extends Component
             ->when($this->categoryId, function ($query) {
                 $query->where('products.categories_id', $this->categoryId);
             })
+            ->where('products.cabang_id',getCabangId())
             ->groupBy('products.model_series_id', 'model_series.name')
             ->orderByDesc('total_terjual')
             ->paginate($this->paginate);

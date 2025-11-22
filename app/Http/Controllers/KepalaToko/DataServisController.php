@@ -17,6 +17,7 @@ class DataServisController extends ApiController
         $monthlyData = DB::table('service_transactions')
             ->select(DB::raw('MONTH(tgl_disetujui) as month'), DB::raw('YEAR(tgl_disetujui) as year'), DB::raw('SUM(omzet) as total_omzet'), DB::raw('SUM(profittoko) as total_profit_bersih'), DB::raw('SUM(profit) as total_profit_kotor'))
             ->where('is_approve', 'Setuju')
+            ->where('cabang_id',getCabangId())
             ->whereNull('deleted_at') // Menambahkan kondisi where untuk memfilter data yang deleted_at-nya NULL
             ->groupBy(DB::raw('MONTH(tgl_disetujui)'), DB::raw('YEAR(tgl_disetujui)'))
             ->orderBy(DB::raw('YEAR(tgl_disetujui)'), 'asc')

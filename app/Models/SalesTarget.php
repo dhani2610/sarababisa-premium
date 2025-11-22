@@ -11,7 +11,8 @@ class SalesTarget extends Model
         'users_id',
         'item',
         'created_at',
-        'sales_name'
+        'sales_name',
+        'cabang_id'
     ];
 
     public function user()

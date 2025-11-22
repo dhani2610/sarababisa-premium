@@ -40,6 +40,7 @@ class BisaDiambilController extends Controller
 
         $query = ServiceTransaction::with(['customer', 'user'])
             ->where('status_servis', 'Bisa Diambil')
+            ->where('cabang_id', getCabangId())
             ->orderBy('created_at', 'desc')
             ->latest()
             ->skip($offset)
@@ -63,7 +64,7 @@ class BisaDiambilController extends Controller
                 if (auth()->user()->role !== 'Investor') {
                     $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
                     $hariIni = \Carbon\Carbon::today();
-                    $tokoSetting = \App\Models\StoreSetting::find(1);
+                    $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
                     if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
                         return '
                             <a href="'.route('transaksi-servis-bisa-diambil.edit', $row->id).'">
@@ -153,7 +154,7 @@ class BisaDiambilController extends Controller
 
                 $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
                 $hariIni = \Carbon\Carbon::today();
-                $tokoSetting = \App\Models\StoreSetting::find(1);
+                $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
                 if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || auth()->user()->role == 'Kepala Toko'){
                     $styleHide = '';
                 }else{

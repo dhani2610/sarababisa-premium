@@ -91,7 +91,7 @@ class TransaksiServisLangsungController extends Controller
 
 
         $ppn = 0;
-        $cekppn = StoreSetting::find(1);
+        $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
         if (!empty($cekppn) && $cekppn->is_tax == 1) {
             $ppn = $cekppn->ppn;
         }
@@ -182,7 +182,7 @@ class TransaksiServisLangsungController extends Controller
         }
         // dd($profittransaksi,$request->all());
         $ppn = 0;
-        $cekppn = StoreSetting::find(1);
+        $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
         if (!empty($cekppn)) {
             if ($cekppn->is_tax == 1) {
                 $ppn = $cekppn->ppn;
@@ -260,7 +260,8 @@ class TransaksiServisLangsungController extends Controller
             'service_actions' => json_encode($request->service_actions_id),
             'products' => json_encode($request->products_id),
             'biaya_j' => json_encode($request->biaya_servis),
-            'modal_j' => json_encode($request->modal_sparepart)
+            'modal_j' => json_encode($request->modal_sparepart),
+            'cabang_id' => getCabangId()
         ]);
 
         if (count($request->products_id) > 0) {
@@ -286,6 +287,7 @@ class TransaksiServisLangsungController extends Controller
                 $order->due = 0;
                 $order->is_approve = 'Setuju';
                 $order->tgl_disetujui = Carbon::today();
+                $order->cabang_id = getCabangId();
                 $order->save();
 
                 if ($request->sales_id[$key] != 1) {
@@ -309,6 +311,7 @@ class TransaksiServisLangsungController extends Controller
                 $orderDetail->profit_toko = ($spareparts->harga_jual - $spareparts->harga_modal) - ($spareparts->harga_jual - $spareparts->harga_modal) / 100 * $persen_sales;
                 $orderDetail->garansi = $expired[$key];
                 $orderDetail->product_discount_amount = 0;
+                $orderDetail->cabang_id = getCabangId();
                 $orderDetail->save();
             }
         }
@@ -354,7 +357,7 @@ class TransaksiServisLangsungController extends Controller
 
     public function sendMessage($message)
     {
-        $storeSetting = \App\Models\StoreSetting::find(1);
+        $storeSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;

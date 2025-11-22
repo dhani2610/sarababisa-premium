@@ -92,7 +92,7 @@ class TransaksiServisLangsungController extends Controller
 
 
         // $ppn = 0;
-        // $cekppn = StoreSetting::find(1);
+        // $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
         // if (!empty($cekppn)) {
         //     if ($cekppn->is_tax == 1) {
         //         $ppn = $cekppn->ppn;
@@ -126,7 +126,7 @@ class TransaksiServisLangsungController extends Controller
         // }
 
         $ppn = 0;
-        $cekppn = StoreSetting::find(1);
+        $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
         if (!empty($cekppn) && $cekppn->is_tax == 1) {
             $ppn = $cekppn->ppn;
         }
@@ -381,7 +381,7 @@ class TransaksiServisLangsungController extends Controller
 
     public function sendMessage($message)
     {
-        $storeSetting = \App\Models\StoreSetting::find(1);
+        $storeSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;

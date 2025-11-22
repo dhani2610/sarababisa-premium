@@ -31,14 +31,14 @@
 
         <!-- Left: Title -->
         <div class="mb-4 sm:mb-0">
-            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">History Garansi Service ✨</h1>
+            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Riwayat Garansi ✨</h1>
         </div>
 
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Cari berdasarkan nama Nomor Service" />
+            <x-search-form placeholder="Cari berdasarkan nama Nomor Servia" />
 
             <!-- Print button -->
             @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
@@ -87,7 +87,7 @@
                         <!-- Modal header -->
                         <div class="px-5 py-3 border-b border-slate-200">
                             <div class="flex justify-between items-center">
-                                <div class="font-semibold text-slate-800">Atur Pencetakan History Garansi</div>
+                                <div class="font-semibold text-slate-800">Atur Pencetakan Riwayat Garansi</div>
                                 <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false">
                                     <div class="sr-only">Close</div>
                                     <svg class="w-4 h-4 fill-current">
@@ -127,7 +127,7 @@
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
-                    + Tambah History Garansi
+                    + Tambah Riwayat Garansi
                 </button>
 
                 <!-- Modal backdrop -->
@@ -157,7 +157,7 @@
 
                                 <!-- Pilih Service -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Nomor Service <span
+                                    <label class="block text-sm font-medium mb-1">Nomor Servis <span
                                             class="text-rose-500">*</span></label>
                                     <select name="service_id" id="service_id" class="form-select select2  w-full"
                                         required>
@@ -165,17 +165,31 @@
                                         @foreach ($serviceTransactions as $st)
                                             <option value="{{ $st->id }}"
                                                 data-teknisi="{{ $st->user->name ?? '' }}"
-                                                data-expired="{{ $st->exp_garansi }}">
+                                                data-expired="{{ $st->exp_garansi }}"
+                                                data-nota="{{ route('kepalatoko-pengambilan-cetak-inkjet', $st->id) }}">
                                                 {{ $st->nomor_servis }}
                                             </option>
                                         @endforeach
                                     </select>
                                     <small class="text-slate-500">Teknisi sebelumnya: <span
                                             id="prev_teknisi"></span></small><br>
-                                    <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small>
+                                    <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small> <br>
+                                    <small class="text-slate-500">Link Nota: <span id="link_nota"></span></small> <br>
+                                    <div id="history_garansi" class="mt-2 text-sm text-slate-700"></div>
+
                                 </div>
 
                                 <!-- Penerima -->
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Pelanggan <span
+                                            class="text-rose-500">*</span></label>
+                                    <select name="id_customer" class="form-select select2 w-full " required>
+                                        <option value="">-- Pilih Pelanggan --</option>
+                                        @foreach ($customer as $cs)
+                                            <option value="{{ $cs->id }}">{{ $cs->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Penerima <span
                                             class="text-rose-500">*</span></label>
@@ -187,11 +201,40 @@
                                     </select>
                                 </div>
 
-                                 <div>
+                                <div>
                                     <label class="block text-sm font-medium mb-1">Keluhan <span
                                             class="text-rose-500">*</span></label>
                                     <input type="text" name="keluhan" class="form-input w-full"
                                         required>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="fungsi masuk">Pengecekan
+                                        Fungsi Masuk<span class="text-rose-500">*</span></label>
+                                    <input id="fungsi masuk" name="fungsi masuk" class="form-input w-full px-2 py-1"
+                                        type="text" required
+                                        placeholder="Contoh: Tombol, Kamera, Speaker, dll" />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium mb-1"
+                                        for="estimasi_pengerjaan">Estimasi Pengerjaan</label>
+                                    <select id="estimasi_pengerjaan" name="estimasi_pengerjaan"
+                                        class="form-select text-sm py-2 w-full">
+                                        <option selected value="">Pilih Estimasi Pengerjaan</option>
+                                        <option value="1 Hari">1 Hari</option>
+                                        <option value="2 Hari">2 Hari</option>
+                                        <option value="3 Hari">3 Hari</option>
+                                        <option value="4 Hari">4 Hari</option>
+                                        <option value="5 Hari">5 Hari</option>
+                                        <option value="6 Hari">6 Hari</option>
+                                        <option value="1 Minggu">1 Minggu</option>
+                                        <option value="2 Minggu">2 Minggu</option>
+                                        <option value="3 Minggu">3 Minggu</option>
+                                        <option value="1 Bulan">1 Bulan</option>
+                                        <option value="2 Bulan">2 Bulan</option>
+                                        <option value="3 Bulan">3 Bulan</option>
+                                    </select>
                                 </div>
 
                             </div>
@@ -203,7 +246,7 @@
                         </form>
                     </div>
                 </div>
-              
+
             </div>
 
 
@@ -213,6 +256,65 @@
 
     <!-- More actions -->
     <div class="sm:flex sm:justify-between sm:items-center mb-5">
+           <!-- Left side -->
+        <div class="mb-4 sm:mb-0">
+            <ul class="flex flex-wrap -m-1">
+
+                {{-- SEMUA --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == '' ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Semua
+                            <span class="ml-1 text-slate-400">{{ $count }}</span>
+                        </button>
+                    </a>
+                </li>
+
+                {{-- PROSES (status = 1) --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=1') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == 1 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Proses
+                            <span class="ml-1 text-slate-400">{{ $prosesCount }}</span>
+                        </button>
+                    </a>
+                </li>
+
+                {{-- SELESAI (status = 2) --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=2') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == 2 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Selesai
+                            <span class="ml-1 text-slate-400">{{ $selesaiCount }}</span>
+                        </button>
+                    </a>
+                </li>
+
+                {{-- DIBATALKAN (status = 3) bila ada --}}
+                <li class="m-1">
+                    <a href="{{ url('history-garansi?status=3') }}">
+                        <button
+                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
+                            border shadow-sm
+                            {{ request('status') == 3 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
+                            Dibatalkan / Pengembalian Dana
+                            <span class="ml-1 text-slate-400">{{ $dibatalkanCount ?? 0 }}</span>
+                        </button>
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
         <!-- Left side -->
         <div class="mb-0">
             <select wire:model="paginate" id="" class="form-select">
@@ -250,10 +352,11 @@
     @endif
 
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
+
         <div x-data="handleSelect">
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 {{-- Left side --}}
-                <h2 class="font-semibold text-slate-800">Semua History Service <span
+                <h2 class="font-semibold text-slate-800">Semua Riwayat Garansi <span
                         class="text-slate-400 font-medium">{{ $count }}</span></h2>
                 <div class="relative inline-flex">
                     <div class="table-items-action hidden">
@@ -284,10 +387,10 @@
                                 </div>
                             </th>
                             <th class="px-2 py-3">No.</th>
-                            <th class="px-2 py-3">Tanggal</th>
+                            <th class="px-2 py-3">Tgl Masuk</th>
                             <th class="px-2 py-3">Tgl Selesai</th>
                             <th class="px-2 py-3">Nomor Servis</th>
-                            <th class="px-2 py-3">Customer</th>
+                            <th class="px-2 py-3">Pelanggan</th>
                             <th class="px-2 py-3">Penerima</th>
                             <th class="px-2 py-3">Keluhan</th>
                             <th class="px-2 py-3">Teknisi</th>
@@ -317,8 +420,8 @@
                                 <td class="px-2 py-3">{{ $i++ }}</td>
                                 <td class="px-2 py-3">{{ $item->date }}</td>
                                 <td class="px-2 py-3">{{ $item->tgl_selesai }}</td>
-                                <td class="px-2 py-3">{{ $item->service->nomor_servis ?? $item->service_id }}</td>
-                                <td class="px-2 py-3">{{ $item->service->customer->nama ?? '-' }}</td>
+                                <td class="px-2 py-3">{{ $item->service->nomor_servis ?? '' }}</td>
+                                <td class="px-2 py-3">{{ $item->pelanggan->nama ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->penerima->name ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->keluhan ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->teknisi->name ?? '-' }}</td>
@@ -347,7 +450,7 @@
 
                                 {{-- Sparepart --}}
                                 <td class="px-2 py-3">
-                                    @if (!empty($item->tindakan))
+                                    @if (!empty($item->sparepart))
                                         @php $spareparts = json_decode($item->sparepart, true); @endphp
                                         @if ($spareparts)
                                             <ul class="list-disc ml-4">
@@ -373,18 +476,18 @@
                                 <td class="px-2 py-3">
                                     <center>
                                         <button
-                                                class="btn-status 
+                                                class="btn-status
                                                 {{ $item->status == 1 ? 'status-menunggu' : ($item->status == 2 ? 'status-selesai' : 'status-batal') }}"
                                                 data-id="{{ $item->id }}">
-    
+
                                                 @if ($item->status == 1)
-                                                    Menunggu Konfirmasi
+                                                    Diproses
                                                 @elseif ($item->status == 2)
                                                     Sudah Selesai
                                                 @elseif ($item->status == 3)
-                                                    Dibatalkan
+                                                    Dibatalkan / Pengembalian Dana
                                                 @endif
-    
+
                                             </button>
                                     </center>
 
@@ -397,7 +500,6 @@
                                 <td class="px-2 py-3">
                                     <div class="space-x-1 flex">
                                         <div class="flex space-x-2">
-                                           
                                             <a href="{{ route('history-garansi.edit', $item->id) }}">
                                                 <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -408,6 +510,18 @@
                                                     </svg>
                                                 </button>
                                             </a>
+                                            @if (!empty($item->service))
+                                            <a href="{{ route('history-garansi.cetak-inject', $item->id) }}" target="_blank">
+                                                <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                        <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+                                                        <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+                                                        <rect x="7" y="13" width="10" height="8" rx="2" />
+                                                    </svg>
+                                                </button>
+                                            </a>
+                                            @endif
                                         </div>
                                             <div x-data="{ modalOpen: false }">
                                                 <button class="text-rose-500 hover:text-rose-600 rounded-full"
@@ -518,7 +632,72 @@
                 let selected = $(this).find(':selected');
                 $('#prev_teknisi').text(selected.data('teknisi'));
                 $('#exp_garansi').text(selected.data('expired'));
+
+                let notaUrl = selected.data('nota');
+                if (notaUrl) {
+                    $('#link_nota').html(
+                        `<a href="${notaUrl}" target="_blank" class="text-blue-600 underline">Lihat Nota</a>`
+                    );
+                } else {
+                    $('#link_nota').html('');
+                }
+
+                // =======================
+                // AMBIL HISTORY GARANSI
+                // =======================
+                let service_id = $(this).val();
+                let historyBox = $('#history_garansi');
+                historyBox.html('<span class="text-gray-500">Memuat...</span>');
+
+                let url = `/history-garansi/list-data/${service_id}`
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function(response) {
+
+
+                        console.log(url);
+                        console.log(service_id);
+                        console.log(response);
+
+                        if (response.length === 0) {
+                            historyBox.html('<span class="text-gray-500">Tidak ada riwayat garansi.</span>');
+                            return;
+                        }
+
+                        let html = '';
+                        response.forEach((item, index) => {
+
+                            let tindakanHTML = '-';
+                            if (item.tindakan_list && item.tindakan_list.length > 0) {
+                                tindakanHTML = '<ul class="list-disc ml-4">';
+                                item.tindakan_list.forEach(t => {
+                                    tindakanHTML += `<li>${t.nama} - Rp${new Intl.NumberFormat().format(t.harga)}</li>`;
+                                });
+                                tindakanHTML += '</ul>';
+                            }
+
+                            html += `
+                                <div class="mb-2 p-2 border rounded bg-slate-50">
+                                    <div class="font-semibold">Klaim Garansi ${index + 1}</div>
+                                    <div>Tgl Klaim: <b>${item.date || '-'}</b></div>
+                                    <div>Tgl Selesai: <b>${item.tgl_selesai || '-'}</b></div>
+                                    <div>Tindakan: ${tindakanHTML}</div>
+                                    <div>Keluhan: ${item.keluhan || '-'}</div>
+                                    <div>Total Biaya: Rp${item.total_biaya}</div>
+                                </div>
+                            `;
+                        });
+
+
+                        historyBox.html(html);
+                    },
+                    error: function() {
+                        historyBox.html('<span class="text-red-500">Error mengambil data.</span>');
+                    }
+                });
             });
+
         });
     </script>
 

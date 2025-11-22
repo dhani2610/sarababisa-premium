@@ -30,6 +30,7 @@ class BrandRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $existing = \App\Models\Brand::withTrashed()
                         ->where('name', $value)
+                        ->where('cabang_id', getCabangId())
                         ->first();
 
                     if ($existing && $existing->deleted_at === null) {

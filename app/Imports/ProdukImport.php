@@ -30,6 +30,7 @@ class ProdukImport implements ToModel, WithHeadingRow, WithBatchInserts
                 'garansi'           => $row['Garansi Produk'],
                 'garansi_imei'      => $row['Garansi IMEI'],
                 'ppn'               => $row['PPN 11%'],
+                'cabang_id'               => getCabangId(),
             ]
         );
 

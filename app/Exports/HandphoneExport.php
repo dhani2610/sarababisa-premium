@@ -17,7 +17,7 @@ class HandphoneExport implements FromCollection, WithMapping, WithHeadings, Shou
      */
     public function collection()
     {
-        return Product::where('categories_id', '=', '1')->get();
+        return Product::where('cabang_id',getCabangId())->where('categories_id', '=', '1')->get();
     }
 
     public function map($product): array

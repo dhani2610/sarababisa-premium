@@ -22,6 +22,7 @@ class ServiceActionImport implements ToModel, WithHeadingRow, WithBatchInserts, 
                 'harga_toko'        => $row['Harga Pelanggan Toko'],
                 'harga_pelanggan'   => $row['Harga Pelanggan Biasa'],
                 'garansi'           => $row['Garansi'],
+                'cabang_id'           => getCabangId(),
             ]
         );
 

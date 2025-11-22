@@ -265,7 +265,7 @@
                         if ($order->customer != null) {
                             $nomor = $order->customer->nomor_hp;
                             $nomorwa = preg_replace('/^08/', 628, $nomor);
-                            $fonteeToken = \App\Models\StoreSetting::first()->fonnte ?? null;
+                            $fonteeToken = getStoreSettingByCabang()->fonnte ?? null;
                         }
                     @endphp
                     {{-- <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Penjualan*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Nota%20:%20{{ $order->invoice_no }}%0ANama%20pelanggan%20:%20*{{ $order->nama_pelanggan }}*%0AProduk%20:%0A{{ $produkDetails }}%0APembayaran%20:%20{{ $order->payment_method }}%0A%0ALink%20garansi%20:%20{{ $toko->link_toko }}/garansi%0A%0ATerimakasih"  target="_blank"> --}}

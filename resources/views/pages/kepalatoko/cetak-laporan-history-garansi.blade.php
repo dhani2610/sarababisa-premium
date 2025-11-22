@@ -121,7 +121,7 @@
 
     <div class="text-center">
         <h4 style="margin-bottom: 6px; margin-top: 5px;">
-            LAPORAN HISTORY GARANSI
+            LAPORAN RIWAYAT GARANSI
         </h4>
         <p style="margin-top: 0">Periode : {{ \Carbon\Carbon::parse($start_date)->format('d-m-Y') }} s/d
             {{ \Carbon\Carbon::parse($end_date)->format('d-m-Y') }}</p>
@@ -134,25 +134,31 @@
     </h4>
 
 
-    <table id="ringkasan">
+    <table id="ringkasan" >
         <tbody>
             <tr>
                 <th>Total Data</th>
                 <th>:{{ $totalData }}</th>
                 <th>Total Selesai</th>
                 <th>:{{ $totalSelesai }}</th>
+               
             </tr>
             <tr>
-                <th>Total Menunggu Konfirmasi</th>
+                <th>Total Diproses</th>
                 <th>:{{ $totalProses }}</th>
-                <th>Total Batal</th>
+                <th>Total Batal / Pengembalian Dana</th>
                 <th>:{{ $totalBatal }}</th>
+               
+            </tr>
+            <tr>
+                <th>Total Modal</th>
+                <th>: Rp{{ number_format($totalModal, 0, ',', '.') }}</th>
             </tr>
         </tbody>
     </table>
 
     <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
-        Detail History
+        Detail Riwayat
     </h4>
     <br>
     <table class="table-auto w-full" id="detail">
@@ -164,7 +170,7 @@
                 <th class="">Tanggal</th>
                 <th class="">Tgl Selesai</th>
                 <th class="">Nomor Servis</th>
-                <th class="">Customer</th>
+                <th class="">Pelanggan</th>
                 <th class="">Penerima</th>
                 <th class="">Teknisi</th>
                 <th class="">Tindakan</th>
@@ -183,7 +189,7 @@
                     <td class="">{{ $item->date }}</td>
                     <td class="">{{ $item->tgl_selesai ?? '-' }}</td>
                     <td class="">{{ $item->service->nomor_servis ?? $item->service_id }}</td>
-                    <td class="">{{ $item->service->customer->nama ?? '-' }}</td>
+                    <td class="">{{ $item->pelanggan->nama ?? '-' }}</td>
                     <td class="">{{ $item->penerima->name ?? '-' }}</td>
                     <td class="">{{ $item->teknisi->name ?? '-' }}</td>
 
@@ -214,7 +220,7 @@
 
                     {{-- Sparepart --}}
                     <td style="text-align:left">
-                        @if (!empty($item->tindakan))
+                        @if (!empty($item->sparepart))
                             @php $spareparts = json_decode($item->sparepart, true); @endphp
                             @if ($spareparts)
                                 {{-- <ul class=""> --}}
@@ -226,7 +232,7 @@
                                             - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
                                         {{-- </li> --}}
                                         <br>
-                                        <br> 
+                                        <br>
                                     @endforeach
                                 {{-- </ul> --}}
                             @else
@@ -242,16 +248,16 @@
                     <td class="">{{ $item->catatan }}</td>
                     <td class="">
                             @if ($item->status == 1)
-                                Menunggu Konfirmasi
+                                Diproses
                             @elseif ($item->status == 2)
                                 Sudah Selesai
                             @elseif ($item->status == 3)
-                                Dibatalkan
+                                Dibatalkan / Pengembalian Dana
                             @endif
                     </td>
                 </tr>
             @endforeach
-        </tbody>
+        </tbody>mak
     </table>
 
 

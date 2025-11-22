@@ -13,7 +13,7 @@ class TogglePotonganIzin extends Component
 
     public function mount()
     {
-        $setting = StoreSetting::find(1);
+        $setting = StoreSetting::where('cabang_id',getCabangId())->first();
         if ($setting) {
             $this->nominal_potongan_izin = number_format($setting->nominal_potongan_izin, 0, '', '.');
             $this->nominal_potongan_alfa = number_format($setting->nominal_potongan_alfa, 0, '', '.');
@@ -38,7 +38,7 @@ class TogglePotonganIzin extends Component
             'nominal_potongan_sakit' => 'nullable',
         ]);
 
-        $setting = StoreSetting::find(1);
+        $setting = StoreSetting::where('cabang_id',getCabangId())->first();
         if ($setting) {
             $setting->update([
                 'nominal_potongan_izin' => $izin,

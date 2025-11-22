@@ -74,6 +74,7 @@ class MasterMerekController extends Controller
             return redirect()->route('master-merek.index')
                 ->with('success', 'Merek berhasil dipulihkan & diperbarui.');
         }
+        $data['cabang_id'] = getCabangId();
 
         // Kalau belum ada → buat baru
         Brand::create($data);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\KepalaToko;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\KepalaToko\RefundRequest;
 use App\Models\Refund;
+use App\Models\Expense;
 use App\Models\ServiceTransaction;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class RefundController extends Controller
         $perPage = $request->get('per_page', 25);
 
         // Query dasar
-        $query = Refund::with(['ServiceTransaction', 'teknisi'])
+        $query = Refund::where('cabang_id',getCabangId())->with(['ServiceTransaction', 'teknisi'])
             ->orderBy('created_at', 'desc');
 
         // Jika role user adalah Teknisi, filter berdasarkan teknisi_id
@@ -30,7 +31,7 @@ class RefundController extends Controller
         $refunds = $query->paginate($perPage);
 
         // Untuk dropdown servis
-        $servis = ServiceTransaction::with('user')->orderBy('id', 'desc')->get();
+        $servis = ServiceTransaction::where('cabang_id',getCabangId())->with('user')->orderBy('id', 'desc')->get();
 
         return view('pages.kepalatoko.master.refund', [
             'refunds' => $refunds,
@@ -49,8 +50,8 @@ class RefundController extends Controller
         $start_date = $request->start_date;
         $end_date = $request->end_date;
 
-        // Query data refund berdasarkan periode
-        $query = Refund::with(['ServiceTransaction.user', 'teknisi'])
+        // Query data pengembalian dana berdasarkan periode
+        $query = Refund::where('cabang_id',getCabangId())->with(['ServiceTransaction.user', 'teknisi'])
             ->whereBetween('created_at', [$start_date, Carbon::parse($end_date)->endOfDay()])
             ->orderBy('created_at', 'desc');
 
@@ -63,6 +64,7 @@ class RefundController extends Controller
 
         // Hitung total
         $totalRefund = $refunds->sum('nominal');
+        $totalRefundServis = $refunds->sum('nominal_servis');
         $totalData = $refunds->count();
 
         // Generate PDF
@@ -75,9 +77,10 @@ class RefundController extends Controller
             'totalData' => $totalData,
             'start_date' => $start_date,
             'end_date' => $end_date,
+            'totalRefundServis' => $totalRefundServis,
         ]);
 
-        $filename = 'Laporan Refund ' . $start_date . ' sd ' . $end_date . '.pdf';
+        $filename = 'Laporan Pengembalian Dana ' . $start_date . ' sd ' . $end_date . '.pdf';
         return $pdf->stream($filename);
     }
 
@@ -98,11 +101,12 @@ class RefundController extends Controller
 
         Refund::whereIn('id', $selectedIds)->delete();
 
-        return response()->json(['message' => 'Data refund berhasil dihapus.']);
+        return response()->json(['message' => 'Data pengembalian dana berhasil dihapus.']);
     }
 
     public function store(RefundRequest $request)
     {
+        // dd($request->all());
         $data = $request->validated();
 
         // convert period from "YYYY-MM" to YYYY-MM-01 (date)
@@ -116,8 +120,17 @@ class RefundController extends Controller
             // jika field di servis bernama users_id
             $data['teknisi_id'] = $servis->users_id ?? $servis->user_id ?? null;
         }
-
+        $data['cabang_id'] = getCabangId();
         Refund::create($data);
+
+
+        if ($servis->biaya > 0) {
+            Expense::create([
+                'name' => 'Refund #'. $servis->nomor_servis,
+                'price' => $servis->biaya,
+                'users_id' => auth()->user()->id
+            ]);
+        }
 
         toast('Refund berhasil ditambahkan.', 'success');
 
@@ -187,6 +200,7 @@ class RefundController extends Controller
             'teknisi_id' => $servis->users_id ?? $servis->user_id ?? null,
             'teknisi_name' => optional($servis->user)->name ?? null,
             'nominal' => $bonus,
+            'nominal_servis' => $servis->biaya ?? $servis->pay ?? null,
         ]);
     }
 }

@@ -34,6 +34,7 @@ class AksesorisImport implements ToModel, WithHeadingRow, WithBatchInserts
                 'keterangan'        => $row['Keterangan'],
                 'garansi'           => $row['Garansi Produk (Hari)'],
                 'ppn'               => $row['PPN 11%'],
+                'cabang_id'   => getCabangId(),
             ]
         );
 

@@ -11,7 +11,7 @@ class ShiftController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 25);
-        $shifts = Shift::orderBy('created_at', 'desc')->paginate($perPage);
+        $shifts = Shift::where('cabang_id',getCabangId())->orderBy('created_at', 'desc')->paginate($perPage);
 
         return view('pages.kepalatoko.master.shift', compact('shifts'));
     }
@@ -38,6 +38,7 @@ class ShiftController extends Controller
             'potongan_sakit' => 'required|integer',
         ]);
 
+        $validated['cabang_id'] = getCabangId();
         Shift::create($validated);
 
         toast('Shift berhasil ditambahkan.', 'success');
@@ -73,6 +74,7 @@ class ShiftController extends Controller
         ]);
 
         $item = Shift::findOrFail($id);
+        $validated['cabang_id'] = getCabangId();
         $item->update($validated);
 
         toast('Shift berhasil diupdate.', 'success');

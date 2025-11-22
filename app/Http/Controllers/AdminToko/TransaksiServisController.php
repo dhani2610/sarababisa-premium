@@ -129,16 +129,16 @@ class TransaksiServisController extends Controller
 
     public function sendMessage($message)
     {
-        $storeSetting = \App\Models\StoreSetting::find(1);
+        $storeSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
         if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
             $botToken = $storeSetting->token_bot;
             $chatId   = $storeSetting->chat_id;
-    
+
             if (!$botToken || !$chatId) {
                 \Log::warning('Telegram bot token atau chat_id belum diset di pengaturan toko.');
                 return;
             }
-    
+
             try {
                 Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                     'chat_id' => $chatId,
@@ -148,7 +148,7 @@ class TransaksiServisController extends Controller
             } catch (\Exception $e) {
                 \Log::error('Gagal kirim pesan Telegram: ' . $e->getMessage());
             }
-        } 
+        }
     }
 
     /**

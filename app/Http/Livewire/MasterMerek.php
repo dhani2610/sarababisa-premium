@@ -27,12 +27,12 @@ class MasterMerek extends Component
 
     public function render()
     {
-        $brands_count = Brand::all()->count();
+        $brands_count = Brand::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.master-merek', [
             'brands_count' => $brands_count,
             'brands' => $this->search === null ?
-                Brand::paginate($this->paginate) :
-                Brand::where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Brand::where('cabang_id',getCabangId())->paginate($this->paginate) :
+                Brand::where('cabang_id',getCabangId())->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

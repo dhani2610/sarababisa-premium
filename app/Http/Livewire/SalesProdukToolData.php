@@ -30,7 +30,7 @@ class SalesProdukToolData extends Component
     public function render()
     {
         $tools = SubCategory::where('categories_id', '=', '4')->get();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         $tools_count = Product::where('categories_id', '=', '4')->count();
         return view('livewire.sales-produk-tool-data', [
             'toko' => $toko,

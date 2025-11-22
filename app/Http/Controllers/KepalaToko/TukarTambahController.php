@@ -39,13 +39,13 @@ class TukarTambahController extends Controller
      */
     public function create()
     {
-        $products = Product::where('categories_id', '1')->where('stok', '>=', '1')->get();
-        $customers = Customer::all();
-        $sales = User::where('role', 'Sales')->get();
-        $brands = Brand::all();
-        $model_series = ModelSerie::all();
-        $capacities = Capacity::all();
-        $colors = Color::all();
+        $products = Product::where('cabang_id',getCabangId())->where('categories_id', '1')->where('stok', '>=', '1')->get();
+        $customers = Customer::where('cabang_id',getCabangId())->get();
+        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $colors = Color::where('cabang_id',getCabangId())->get();
         return view('pages/kepalatoko/pembelian/input-tukar-tambah', compact('customers', 'products', 'sales', 'brands', 'model_series', 'capacities', 'colors'));
     }
 
@@ -75,7 +75,7 @@ class TukarTambahController extends Controller
             'order_date' => $request->order_date,
             'total_products' => 1,
             'sub_total' => $request->price,
-            'invoice_no' => '' . mt_rand(date('Ymd00'), date('Ymd99')),
+            'invoice_no' => '' . mt_rand(date('Ymd00'), date('Ymd99')).time(),
             'nama_pelanggan' => $nama_pelanggan->nama,
             'payment_method' => $request->payment_method,
             'payment_status' => 1,
@@ -86,6 +86,7 @@ class TukarTambahController extends Controller
             'is_approve' => 'Setuju',
             'tgl_disetujui' => date('Y-m-d'),
             'note' => 'Tukar Tambah',
+            'cabang_id' => getCabangId(),
         ]);
 
         $produk_jual = Product::find($request->product_sale_id);
@@ -127,6 +128,7 @@ class TukarTambahController extends Controller
             'profit' => $request->price - $produk_jual->harga_modal,
             'profit_toko' => ($request->price - $produk_jual->harga_modal) - ($request->price - $produk_jual->harga_modal) / 100 * $persen_sales->persen,
             'payment_method' => $request->payment_method,
+            'cabang_id' => getCabangId(),
             'note' => 'Tukar Tambah',
         ]);
 
@@ -153,7 +155,8 @@ class TukarTambahController extends Controller
             'garansi' => $request->garansi,
             'garansi_imei' => $request->garansi_imei,
             'keterangan' => $request->keterangan,
-            'product_code' => $request->product_code
+            'product_code' => $request->product_code,
+            'cabang_id' => getCabangId()
         ]);
 
         // Create product
@@ -165,6 +168,7 @@ class TukarTambahController extends Controller
             'quantity' => 1,
             'product_price' => $request->harga_modal,
             'total_price' => $request->harga_modal,
+            'cabang_id' => getCabangId(),
             'keterangan' => 'Tukar Tambah',
             'date' => date('Y-m-d')
         ]);
@@ -212,18 +216,22 @@ class TukarTambahController extends Controller
                 DB::raw('order_details.price - purchases.product_price as sisa_pembayaran')
             )
             ->whereNotNull('purchases.reference_number')
+            ->where('purchases.cabang_id', getCabangId())
+            ->where('orders.cabang_id', getCabangId())
             ->whereBetween('orders.created_at', [$start_date, $end_date])
             ->get();
 
         // Menghitung total item penjualan
         $total_item = Purchase::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->where('keterangan', 'Tukar Tambah')
             ->sum('quantity');
         // Menghitung total biaya
         $total_pembelian =
             Purchase::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->where('keterangan', 'Tukar Tambah')
             ->sum('product_price');
 
@@ -263,7 +271,7 @@ class TukarTambahController extends Controller
 
         $users = User::find(1);
         $terms = Term::find(3);
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);

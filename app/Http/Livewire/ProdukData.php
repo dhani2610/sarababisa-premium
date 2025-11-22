@@ -120,22 +120,22 @@ class ProdukData extends Component
     public function render()
     {
         $categories = Category::all();
-        $spareparts = SubCategory::where('categories_id', '=', '2')->get();
-        $accessories = SubCategory::where('categories_id', '=', '3')->get();
-        $tools = SubCategory::where('categories_id', '=', '4')->get();
-        $brands = Brand::all();
-        $capacities = Capacity::all();
-        $model_series = ModelSerie::all();
-        $colors = Color::all();
-        $products_count = Product::all()->count();
-        $toko = StoreSetting::find(1);
-        $itemready = Product::where('stok', '>', 0)->count();
-        $stokready = Product::where('stok', '>', 0)->sum('stok');
-        $modalready = Product::where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
-        $stokhabis = Product::where('stok', 0)->count();
-        $nominalterjual = Product::where('stok', 0)->sum('harga_jual');
+        $spareparts = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '2')->get();
+        $accessories = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '3')->get();
+        $tools = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '4')->get();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $colors = Color::where('cabang_id',getCabangId())->get();
+        $products_count = Product::where('cabang_id',getCabangId())->get()->count();
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $itemready = Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->count();
+        $stokready = Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->sum('stok');
+        $modalready = Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
+        $stokhabis = Product::where('cabang_id',getCabangId())->where('stok', 0)->count();
+        $nominalterjual = Product::where('cabang_id',getCabangId())->where('stok', 0)->sum('harga_jual');
 
-        $topProducts = OrderDetail::select(
+        $topProducts = OrderDetail::where('products.cabang_id',getCabangId())->select(
             'order_details.products_id',
             'products.product_name',
             'products.harga_jual',
@@ -170,8 +170,8 @@ class ProdukData extends Component
             'productCategoty' => $productCategoty,
             'nominalterjual' => $nominalterjual,
             'products' => $this->search === null ?
-                Product::latest()->paginate($this->paginate) :
-                Product::latest()->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Product::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                Product::where('cabang_id',getCabangId())->latest()->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

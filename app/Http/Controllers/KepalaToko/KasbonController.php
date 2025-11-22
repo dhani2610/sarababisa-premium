@@ -67,7 +67,7 @@ class KasbonController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-
+        $data['cabang_id'] = getCabangId();
         Debt::create($data);
 
         return redirect()->route('kasbon.index');
@@ -96,8 +96,8 @@ class KasbonController extends Controller
      */
     public function edit($id)
     {
-        $item = Debt::with('worker')->findOrFail($id);
-        $workers = Worker::all();
+        $item = Debt::where('cabang_id',getCabangId())->with('worker')->findOrFail($id);
+        $workers = Worker::where('cabang_id',getCabangId())->get();
 
         return view('pages.kepalatoko.kasbon.edit', [
             'item' => $item,

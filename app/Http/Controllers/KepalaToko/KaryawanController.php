@@ -28,8 +28,8 @@ class KaryawanController extends Controller
      */
     public function index()
     {
-        $workers = Worker::with('worker_users', 'user');
-        $debts = Worker::with('debt')->get();
+        $workers = Worker::where('cabang_id',getCabangId())->with('worker_users', 'user');
+        $debts = Worker::where('cabang_id',getCabangId())->with('debt')->get();
         return view('pages/kepalatoko/karyawan/index', compact('workers', 'debts'));
     }
 
@@ -71,7 +71,7 @@ class KaryawanController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-
+        $data['cabang_id'] = getCabangId();
         Worker::create($data);
 
         return redirect()->route('karyawan.index');

@@ -34,7 +34,7 @@ class PosData extends Component
         $customers = Customer::all();
         $sales = User::where('role', 'Sales')->get();
         $products_count = Product::all()->count();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         return view('livewire.pos-data', [
             'customers' => $customers,
             'toko' => $toko,

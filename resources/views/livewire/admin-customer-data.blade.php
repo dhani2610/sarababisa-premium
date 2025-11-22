@@ -40,7 +40,7 @@
                 <!-- Modal -->
                 {{-- @if (env('TOKEN_FONNTE') === '' || env('TOKEN_FONNTE') === null || empty(env('TOKEN_FONNTE'))) --}}
                 @php
-                    $fonteeToken = \App\Models\StoreSetting::first()->fonnte ?? null;
+                    $fonteeToken = getStoreSettingByCabang()->fonnte ?? null;
                 @endphp
                 @if (empty($fonteeToken))
 

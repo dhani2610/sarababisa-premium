@@ -95,7 +95,8 @@ class ProdukHandphoneController extends Controller
             'nomor_seri' => $request->nomor_seri,
             'garansi' => $request->garansi,
             'garansi_imei' => $request->garansi_imei,
-            'ppn' => $request->ppn
+            'ppn' => $request->ppn,
+            'cabang_id' => getCabangId(),
         ]);
 
         // return redirect()->route('handphone.index');
@@ -135,12 +136,12 @@ class ProdukHandphoneController extends Controller
      */
     public function edit($id)
     {
-        $item = Product::findOrFail($id);
-        $brands = Brand::all();
-        $model_series = ModelSerie::all();
-        $capacities = Capacity::all();
-        $colors = Color::all();
-        $toko = StoreSetting::find(1);
+        $item = Product::where('cabang_id',getCabangId())->findOrFail($id);
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $colors = Color::where('cabang_id',getCabangId())->get();
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages.kepalatoko.produk.handphone-edit', [
             'item' => $item,

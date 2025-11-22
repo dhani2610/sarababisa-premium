@@ -20,25 +20,25 @@ class InsidenController extends Controller
         $currentMonth = now()->month;
         $currentYear = now()->year;
 
-        $jumlahhari = Incident::whereDate('created_at', today())
+        $jumlahhari = Incident::where('cabang_id',getCabangId())->whereDate('created_at', today())
             ->count();
-        $totalbiaya = Incident::whereDate('created_at', today())
+        $totalbiaya = Incident::where('cabang_id',getCabangId())->whereDate('created_at', today())
             ->get()
             ->sum('biaya_toko');
-        $jumlahbulan = Incident::whereMonth('created_at', $currentMonth)
+        $jumlahbulan = Incident::where('cabang_id',getCabangId())->whereMonth('created_at', $currentMonth)
             ->count();
-        $totalbiayabulan = Incident::whereMonth('created_at', $currentMonth)
+        $totalbiayabulan = Incident::where('cabang_id',getCabangId())->whereMonth('created_at', $currentMonth)
             ->get()
             ->sum('biaya_toko');
-        $jumlahtahun = Incident::whereYear('created_at', $currentYear)
+        $jumlahtahun = Incident::where('cabang_id',getCabangId())->whereYear('created_at', $currentYear)
             ->count();
-        $totalbiayatahun = Incident::whereYear('created_at', $currentYear)
+        $totalbiayatahun = Incident::where('cabang_id',getCabangId())->whereYear('created_at', $currentYear)
             ->get()
             ->sum('biaya_toko');
 
-        $users = Worker::where('jabatan', 'like', '%' . 'Teknisi' . '%')->get();
-        $incidents = Incident::with('worker')->get();
-        $incidents_count = Incident::all()->count();
+        $users = Worker::where('cabang_id',getCabangId())->where('jabatan', 'like', '%' . 'Teknisi' . '%')->get();
+        $incidents = Incident::where('cabang_id',getCabangId())->with('worker')->get();
+        $incidents_count = Incident::where('cabang_id',getCabangId())->get()->count();
 
         return view('pages/kepalatoko/insiden', compact(
             'users',
@@ -86,7 +86,8 @@ class InsidenController extends Controller
             'workers_id' => $request->workers_id,
             'persen_teknisi' => $request->persen_teknisi,
             'biaya_teknisi' => $request->price * $request->persen_teknisi / 100,
-            'biaya_toko' => $request->price - ($request->price * $request->persen_teknisi / 100)
+            'biaya_toko' => $request->price - ($request->price * $request->persen_teknisi / 100),
+            'cabang_id' => getCabangId()
         ]);
 
         return redirect()->route('insiden.index');

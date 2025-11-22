@@ -214,7 +214,7 @@
                                                 <label class="block text-sm font-medium mb-1" for="products_id">Sparepart Toko yg Digunakan</label>
                                                 <select id="selectjs6" name="products_id[]" class="form-select text-sm py-1 w-full selectAction2" style="width: 100%;">
                                                     <option selected value="">Pilih Sparepart</option>
-                                                    @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
+                                                    @foreach (App\Models\Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get() as $item)
                                                         <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ $item->product_name }}</option>
                                                     @endforeach
                                                 </select>
@@ -405,7 +405,7 @@
                         <select class="selectAction2" name="products_id[]"
                             class="form-select text-sm py-1 w-full" style="width: 100%;">
                             <option selected value="">Pilih Sparepart</option>
-                            @foreach (App\Models\Product::where('stok', '>', 0)->get() as $item)
+                            @foreach (App\Models\Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get() as $item)
                                 <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ $item->product_name }}
                                 </option>
                             @endforeach
@@ -457,10 +457,10 @@
 
                             $('#biaya').val((parseInt(curBiaya) - parseInt(prevBiaya.val()) + parseInt(data
                                 .biaya)).toString());
-                            $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal
-                                    .val()) + parseInt(data
-                                    .modal_sparepart))
-                                .toString());
+                            // $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal
+                            //         .val()) + parseInt(data
+                            //         .modal_sparepart))
+                            //     .toString());
                             prevModal.val(data.modal_sparepart)
                             prevBiaya.val(data.biaya)
                             myEl.parent().parent().parent().find('[name="modal_sparepart[]"]:first').val(
@@ -476,14 +476,14 @@
                 }
             });
 
-            $(document).on('change', '.modal_sparepart', function(e) {
-                const myEl = $(this);
-                const curModal = $('#total_modal_sparepart').val() || 0;
-                const prevModal = myEl.parent().parent().parent().find('[name="prev_modal"]:first');
-                $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal.val()) + parseInt(myEl.val()))
-                    .toString());
-                prevModal.val(myEl.val())
-            })
+            // $(document).on('change', '.modal_sparepart', function(e) {
+            //     const myEl = $(this);
+            //     const curModal = $('#total_modal_sparepart').val() || 0;
+            //     const prevModal = myEl.parent().parent().parent().find('[name="prev_modal"]:first');
+            //     $('#total_modal_sparepart').val((parseInt(curModal) - parseInt(prevModal.val()) + parseInt(myEl.val()))
+            //         .toString());
+            //     prevModal.val(myEl.val())
+            // })
 
             $(document).on('change', '.biaya_servis', function(e) {
                 const myEl = $(this);

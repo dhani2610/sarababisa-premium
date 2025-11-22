@@ -122,7 +122,7 @@ class ProdukSparepartController extends Controller
         $item = Product::findOrFail($id);
         $spareparts = SubCategory::where('categories_id', '=', '2')->get();
         $model_series = ModelSerie::all();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages.admintoko.produk.sparepart-edit', [
             'item' => $item,

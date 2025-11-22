@@ -17,5 +17,6 @@ class Inventory extends Model
         'price',
         'supplier',
         'masa_penggantian',
+        'cabang_id',
     ];
 }

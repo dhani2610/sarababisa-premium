@@ -45,7 +45,7 @@ class PortalController extends Controller
     }
     public function installAppIOS(Request $request)
     {
-        
+
           $data['productCategory'] = Category::where('show_portal', 1)
             ->orderBy('created_at', 'asc')
             ->get();

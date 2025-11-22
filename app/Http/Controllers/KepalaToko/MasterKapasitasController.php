@@ -16,8 +16,8 @@ class MasterKapasitasController extends Controller
      */
     public function index()
     {
-        $capacities = Capacity::paginate(10);
-        $capacities_count = Capacity::all()->count();
+        $capacities = Capacity::where('cabang_id',getCabangId())->paginate(10);
+        $capacities_count = Capacity::where('cabang_id',getCabangId())->get()->count();
         return view('pages/kepalatoko/master/kapasitas', compact('capacities', 'capacities_count'));
     }
 
@@ -58,7 +58,7 @@ class MasterKapasitasController extends Controller
     public function store(CapacityRequest $request)
     {
         $data = $request->all();
-
+        $data['cabang_id'] = getCabangId();
         Capacity::create($data);
 
         return redirect()->route('master-kapasitas.index');

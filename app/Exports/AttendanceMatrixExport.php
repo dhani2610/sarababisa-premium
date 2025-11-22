@@ -26,12 +26,12 @@ class AttendanceMatrixExport implements FromView, WithStyles, ShouldAutoSize
         $end = Carbon::parse($this->bulan)->endOfMonth();
 
         // ambil semua user yang punya absensi di bulan ini
-        $users = User::whereHas('attendances', function ($q) use ($start, $end) {
+        $users = User::where('cabang_id',getCabangId())->whereHas('attendances', function ($q) use ($start, $end) {
             $q->whereBetween('tanggal', [$start, $end]);
         })->get();
 
         // ambil absensi dalam rentang tanggal
-        $attendances = Attendance::with('user')
+        $attendances = Attendance::where('cabang_id',getCabangId())->with('user')
             ->whereBetween('tanggal', [$start, $end])
             ->get()
             ->groupBy(['user_id', 'tanggal']);

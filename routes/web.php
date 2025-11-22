@@ -17,6 +17,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AutoBiayaServisController;
 use App\Http\Controllers\AutoModalSparepartController;
 use App\Http\Controllers\AutoHargaJualController;
+use App\Http\Controllers\KepalaToko\TransferStokController;
 use App\Http\Controllers\KepalaToko\RefundController;
 use App\Http\Controllers\KepalaToko\DataServisController;
 use App\Http\Controllers\KepalaToko\DataTargetController;
@@ -65,6 +66,7 @@ use App\Http\Controllers\KepalaToko\KategoriController as KepalaTokoKategoriCont
 use App\Http\Controllers\KepalaToko\SupplierController as KepalaTokoSupplierController;
 use App\Http\Controllers\AdminToko\ProdukToolController as AdminTokoProdukToolController;
 use App\Http\Controllers\KepalaToko\DashboardController as KepalaTokoDashboardController;
+use App\Http\Controllers\KepalaToko\DashboardCabangController as KepalaTokoDashboardCabangController;
 use App\Http\Controllers\KepalaToko\LogServisController as KepalaTokoLogServisController;
 use App\Http\Controllers\KepalaToko\PelangganController as KepalaTokoPelangganController;
 use App\Http\Controllers\AdminToko\BisaDiambilController as AdminTokoBisaDiambilController;
@@ -131,7 +133,7 @@ use App\Http\Controllers\KepalaToko\ProdukHandphoneController as KepalaTokoProdu
 use App\Http\Controllers\KepalaToko\ProdukSparepartController as KepalaTokoProdukSparepartController;
 use App\Http\Controllers\KepalaToko\PurchaseProductController as KepalaTokoPurchaseProductController;
 use App\Http\Controllers\KepalaToko\TransaksiProdukController as KepalaTokoTransaksiProdukController;
-use App\Http\Controllers\KepalaToko\TransaksiServisControllers as KepalaTokoTransaksiServisController;
+use App\Http\Controllers\KepalaToko\TransaksiServisController as KepalaTokoTransaksiServisController;
 // Sales
 use App\Http\Controllers\KepalaToko\UbahBisaDiambilController as KepalaTokoUbahBisaDiambilController;
 use App\Http\Controllers\AdminToko\MasterJenisBarangController as AdminTokoMasterJenisBarangController;
@@ -157,6 +159,7 @@ use App\Http\Controllers\KepalaToko\TransaksiServisLangsungController as KepalaT
 use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTransaksiServisLangsungController;
 use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as KepalaTokoServisBelumDisetujuiApproveController;
 use App\Http\Controllers\TipeOsController;
+use App\Http\Controllers\CabangController;
 use App\Http\Controllers\KepalaToko\MasterIzinController;
 use App\Http\Controllers\KepalaToko\MasterOvertimeController;
 
@@ -249,9 +252,12 @@ Route::resource('gaji/karyawan', KepalaTokoKaryawanController::class);
 Route::get('slip-gaji/{id}', [KepalaTokoKaryawanController::class, 'cetak'])->name('cetak-slip-gaji');
 Route::get('/history-garansi/cetak', [HistoryGaransiController::class, 'cetak'])
     ->name('history-garansi.cetak');
+Route::get('/history-garansi/cetak-inject/{id}', [HistoryGaransiController::class, 'cetakinkjet'])
+    ->name('history-garansi.cetak-inject');
 Route::resource('history-garansi', HistoryGaransiController::class);
 Route::patch('/history-garansi/{id}/toggle-status', [HistoryGaransiController::class, 'toggleStatus'])
     ->name('history-garansi.toggleStatus');
+Route::get('/history-garansi/list-data/{id}', [HistoryGaransiController::class, 'getDetailHistory'])->name('history-garansi.list-data');
 Route::post('/history-garansi/bulk-delete', [HistoryGaransiController::class, 'bulkDelete'])->name('history-garansi.bulkDelete');
 
 Route::delete('/master/master-izin/delete-selected', [MasterIzinController::class, 'deleteSelected'])
@@ -272,6 +278,17 @@ Route::post('master/master-overtime/reject-selected', [MasterOvertimeController:
 Route::resource('master/master-overtime', MasterOvertimeController::class);
 
 
+Route::post('/set-cabang', function () {
+    $id = request('cabang_id');
+
+    $user = Auth::user();
+    $user->cabang_id = $id;
+    $user->save();
+
+    return back();
+})->name('set.cabang');
+
+
 // Livewire page (index)
 // Route::get('master/master-absensi', MasterAbsensi::class)->name('master-absensi.index');
 
@@ -290,6 +307,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
 
     Route::get('/dashboard', [KepalaTokoDashboardController::class, 'index'])->name('kepalatoko-dashboard');
+    Route::get('/dashboard-cabang', [KepalaTokoDashboardCabangController::class, 'index'])->name('kepalatoko-dashboard-cabang');
+    Route::get('/dashboard-cabang-json', [KepalaTokoDashboardCabangController::class, 'getJsonChart'])->name('kepalatoko-dashboard-cabang-json');
     Route::get('/json-data-servis', [DataServisController::class, 'getDataServis'])->name('json_data_servis');
     Route::get('/json-data-penjualan', [DataPenjualanController::class, 'getDataPenjualan'])->name('json_data_penjualan');
     Route::get('/json-data-target', [DataTargetController::class, 'getDataTarget'])->name('json_data_target');
@@ -345,12 +364,22 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(fun
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
     Route::resource('master/master-tipe-os', TipeOsController::class);
     Route::resource('master/master-gallery', GalleryController::class);
+    Route::resource('master/master-cabang', CabangController::class);
 
 
     Route::resource('refund', RefundController::class)->names('refund');
     Route::post('refund/delete-selected', [RefundController::class, 'deleteSelected'])->name('refund.deleteSelected');
     Route::get('refund/service/{id}', [RefundController::class, 'serviceDetail'])->name('refund.serviceDetail');
     Route::get('/refund-cetak', [RefundController::class, 'cetak'])->name('refunds.cetak');
+
+
+    Route::resource('transfer-stok', TransferStokController::class)->names('transfer-stok');
+    Route::get('/api/products-by-cabang/{cabang}/{kategori}', [TransferStokController::class, 'productsByCabang'])
+    ->name('api.productsByCabang');
+    Route::post('transfer-stok/delete-selected', [TransferStokController::class, 'deleteSelected'])->name('transfer-stok.deleteSelected');
+    Route::get('transfer-stok-cetak', [TransferStokController::class, 'cetak'])->name('transfer-stok.cetak');
+    Route::post('/transfer-stok/{id}/approve', [TransferStokController::class, 'approve'])
+        ->name('transfer-stok.approve');
 
 
     Route::resource('shift', \App\Http\Controllers\KepalaToko\ShiftController::class)->names('shift');

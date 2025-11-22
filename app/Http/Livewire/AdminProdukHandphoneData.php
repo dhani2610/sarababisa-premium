@@ -23,7 +23,7 @@ class AdminProdukHandphoneData extends Component
     public $paginate = 10;
     public $search;
 
-    
+
     public $fotoProduk, $produkId;
     public $showFotoModal = false;
 
@@ -121,12 +121,12 @@ class AdminProdukHandphoneData extends Component
     public function render()
     {
         $categories = Category::all();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         $brands = Brand::all();
         $capacities = Capacity::all();
         $model_series = ModelSerie::all();
         $colors = Color::all();
-        $tokoSetting = StoreSetting::find(1);
+        $tokoSetting = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $topProducts = OrderDetail::select(
             'order_details.products_id',
@@ -140,7 +140,7 @@ class AdminProdukHandphoneData extends Component
         ->where('products.categories_id', '=', '1')
         ->orderByDesc('total_terjual')
 ->limit('5')
-        
+
         ->get();
 
         $handphones_count = Product::where('categories_id', '=', '1')->count();

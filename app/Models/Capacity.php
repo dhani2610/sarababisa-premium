@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Capacity extends Model
 {
     protected $fillable = [
-        'name'
+        'name',
+        'cabang_id',
     ];
 
     public function relasiService()

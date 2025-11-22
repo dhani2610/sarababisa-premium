@@ -37,11 +37,12 @@ class KaryawanData extends Component
         if ($this->search !== null) {
             $query->where('name', 'like', '%' . $this->search . '%');
         }
+        $query->where('cabang_id',getCabangId());
 
         $workers = $query->latest()->paginate($this->paginate);
 
-        $budgets = Budget::all();
-        $workers_count = Worker::count();
+        $budgets = Budget::where('cabang_id',getCabangId())->get();
+        $workers_count = Worker::where('cabang_id',getCabangId())->count();
 
         return view('livewire.karyawan-data', [
             'budgets' => $budgets,

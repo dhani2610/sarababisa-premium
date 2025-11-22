@@ -153,9 +153,9 @@ class ProdukController extends Controller
      */
     public function edit($id)
     {
-        $item = Product::findOrFail($id);
-        $categories = SubCategory::all();
-        $toko = StoreSetting::find(1);
+        $item = Product::where('cabang_id',getCabangId())->findOrFail($id);
+        $categories = SubCategory::where('cabang_id',getCabangId())->all();
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages.kepalatoko.produk.edit', [
             'item' => $item,
@@ -189,21 +189,21 @@ class ProdukController extends Controller
         $pilihan = $request->stok;
 
         // Mengambil data produk habis
-        $empty_products = Product::where('stok', 0)->get();
+        $empty_products = Product::where('cabang_id',getCabangId())->where('stok', 0)->get();
 
         // Menghitung data produk habis
-        $jumlah_item_habis = Product::where('stok', 0)->count();
+        $jumlah_item_habis = Product::where('cabang_id',getCabangId())->where('stok', 0)->count();
 
         // Mengambil data produk tersedia
-        $available_products = Product::where('stok', '>', 0)->get();
+        $available_products = Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get();
 
         // Menghitung data produk tersedia
-        $jumlah_item_tersedia = Product::where('stok', '>', 0)->count();
+        $jumlah_item_tersedia = Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->count();
 
-        $modal_stok_tersedia = Product::where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
+        $modal_stok_tersedia = Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
 
         // Menghitung stok produk tersedia
-        $jumlah_stok_tersedia = Product::where('stok', '>', 0)->sum('stok');
+        $jumlah_stok_tersedia = Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->sum('stok');
 
         if ($pilihan === "tersedia") {
             $products = $available_products;

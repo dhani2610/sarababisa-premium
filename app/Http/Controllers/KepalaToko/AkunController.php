@@ -15,13 +15,32 @@ class AkunController extends Controller
 {
     public function index()
     {
-        $types = Type::all();
-        $users = User::whereNull('deleted_at')->with('type')->paginate(10);
-        $users_count = User::whereNull('deleted_at')->get()->count();
-        $workers = Worker::all();
-        $shift = Shift::get();
-        return view('pages/kepalatoko/akun', compact('users', 'users_count', 'types', 'workers','shift'));
+        $cabangId = getCabangId(); // Ambil cabang aktif
+
+        $types = Type::where('cabang_id', $cabangId)->get();
+
+        $users = User::whereNull('deleted_at')
+            ->where('cabang_id', $cabangId)
+            ->with('type')
+            ->paginate(10);
+
+        $users_count = User::whereNull('deleted_at')
+            ->where('cabang_id', $cabangId)
+            ->count();
+
+        $workers = Worker::where('cabang_id', $cabangId)->get();
+
+        $shift = Shift::where('cabang_id', $cabangId)->get();
+
+        return view('pages/kepalatoko/akun', compact(
+            'users',
+            'users_count',
+            'types',
+            'workers',
+            'shift'
+        ));
     }
+
 
     public function deleteSelected(Request $request)
     {
@@ -76,12 +95,24 @@ class AkunController extends Controller
 
     public function edit($id)
     {
-        $item = User::with('worker')->findOrFail($id);
-        $types = Type::all();
-        $users = User::paginate(10);
-        $users_count = User::all()->count();
-        $workers = Worker::all();
-        $shift = Shift::get();
+        $cabangId = getCabangId(); // cabang aktif
+
+        // User yang di-edit juga harus terikat cabang
+        $item = User::with('worker')
+            ->where('cabang_id', $cabangId)
+            ->findOrFail($id);
+
+        $types = Type::where('cabang_id', $cabangId)->get();
+
+        $users = User::where('cabang_id', $cabangId)
+            ->paginate(10);
+
+        $users_count = User::where('cabang_id', $cabangId)
+            ->count();
+
+        $workers = Worker::where('cabang_id', $cabangId)->get();
+
+        $shift = Shift::where('cabang_id', $cabangId)->get();
 
         return view('pages.kepalatoko.akun-edit', [
             'types' => $types,
@@ -92,6 +123,7 @@ class AkunController extends Controller
             'shift' => $shift
         ]);
     }
+
     public function setting()
     {
         $types = Type::all();
@@ -182,6 +214,7 @@ class AkunController extends Controller
             'nominal_bonus_admin' => $request->nominal_bonus_admin,
             'shift_id' => $request->shift_id,
             'exp_date' => $langganan,
+            'cabang_id' => getCabangId(),
         ];
 
         if ($request->role === 'Investor' && $request->hasFile('pdf_investor')) {

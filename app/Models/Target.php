@@ -13,5 +13,6 @@ class Target extends Model
         'nilai',
         'created_at',
         'updated_at',
+        'cabang_id',
     ];
 }

@@ -74,7 +74,8 @@ class ExpenseController extends Controller
             'price' => $request->price,
             'users_id' => $request->users_id,
             'is_approve' => 'Setuju',
-            'tgl_disetujui' => $request->tgl_disetujui
+            'tgl_disetujui' => $request->tgl_disetujui,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('pengeluaran.index');
@@ -110,12 +111,14 @@ class ExpenseController extends Controller
         // Mengambil data pengeluaran
         $expenses = Expense::with('user')->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->orderBy('created_at', 'asc')
             ->get();
 
         // Menghitung total pengeluaran
         $total_pengeluaran = Expense::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->sum('price');
 
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-pengeluaran', [

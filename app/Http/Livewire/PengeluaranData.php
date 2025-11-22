@@ -28,14 +28,14 @@ class PengeluaranData extends Component
 
     public function render()
     {
-        $users = User::all();
-        $expenses_count = Expense::all()->count();
+        $users = User::where('cabang_id',getCabangId())->get();
+        $expenses_count = Expense::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.pengeluaran-data', [
             'users' => $users,
             'expenses_count' => $expenses_count,
             'expenses' => $this->search === null ?
-                Expense::orderByRaw('is_approve IS NULL DESC')->latest()->paginate($this->paginate) :
-                Expense::orderByRaw('is_approve IS NULL DESC')->latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Expense::where('cabang_id',getCabangId())->orderByRaw('is_approve IS NULL DESC')->latest()->paginate($this->paginate) :
+                Expense::where('cabang_id',getCabangId())->orderByRaw('is_approve IS NULL DESC')->latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

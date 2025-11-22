@@ -29,16 +29,16 @@ class MasterModelSeri extends Component
 
     public function render()
     {
-        $brands = Brand::all();
-        $tipe = TipeOs::all();
-        $model_series_count = ModelSerie::all()->count();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $tipe = TipeOs::get();
+        $model_series_count = ModelSerie::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.master-model-seri', [
             'brands' => $brands,
             'tipe' => $tipe,
             'model_series_count' => $model_series_count,
             'model_series' => $this->search === null ?
-                ModelSerie::latest()->paginate($this->paginate) :
-                ModelSerie::latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                ModelSerie::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                ModelSerie::where('cabang_id',getCabangId())->latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

@@ -28,12 +28,12 @@ class MasterWarna extends Component
 
     public function render()
     {
-        $count = Color::all()->count();
+        $count = Color::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.master-warna', [
             'count' => $count,
             'colors' => $this->search === null ?
-                Color::latest()->paginate($this->paginate) :
-                Color::latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Color::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                Color::where('cabang_id',getCabangId())->latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

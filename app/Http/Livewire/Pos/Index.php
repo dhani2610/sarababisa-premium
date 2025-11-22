@@ -121,7 +121,7 @@ class Index extends Component
         $this->tax_percentage = 0;
         $this->paid_amount = 0;
 
-        $this->customers = Customer::all();
+        $this->customers = Customer::where('cabang_id',getCabangId())->get();
     }
 
 
@@ -157,8 +157,8 @@ class Index extends Component
     public function render()
     {
         $cart_items = Cart::instance($this->cart_instance)->content();
-        $toko = StoreSetting::find(1);
-        $users = User::where('role', 'Sales')->get();
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $users = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
 
         return view('livewire.pos.index', [
             'cart_items' => $cart_items,
@@ -220,7 +220,7 @@ class Index extends Component
                 $tempo = null;
             }
 
-            $toko = StoreSetting::find(1);
+            $toko = StoreSetting::where('cabang_id',getCabangId())->first();
             $cartTax = Cart::instance($this->cart_instance)->tax(); // Pajak dari Cart
 
             $sale = Order::create([
@@ -242,6 +242,7 @@ class Index extends Component
                 'note'                => $this->note,
                 'is_approve'      => Auth::user()->role == 'Kepala Toko' ? 'Setuju' : null,
                 'tgl_disetujui'      => date('Y-m-d'),
+                'cabang_id'      => getCabangId(),
             ]);
 
             // foreach ($this->cart_instance as cart_items) {}
@@ -289,6 +290,7 @@ class Index extends Component
                     'payment_method'      => $this->payment_method,
                     'is_admin_toko'      => Auth::user()->role == 'Admin Toko' ? 'Admin' : null,
                     'admin_id'      => Auth::user()->role == 'Admin Toko' ? Auth::user()->id : null,
+                    'cabang_id'      => getCabangId(),
                 ]);
 
                 $product = Product::findOrFail($cart_item->id);
@@ -309,6 +311,7 @@ class Index extends Component
                     'orders_id'        => $sale->id,
                     'payment_method' => $this->users_id,
                     'users_id'        => Auth::user()->id,
+                    'cabang_id'      => getCabangId(),
                 ]);
             }
 
@@ -325,7 +328,7 @@ class Index extends Component
                     . "🏦 *Metode Pembayaran:* {$sale->payment_method}\n\n";
 
                 // Kirim ke Telegram
-                $storeSetting = \App\Models\StoreSetting::find(1);
+                $storeSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
                 if ($storeSetting && $storeSetting->token_bot && $storeSetting->chat_id) {
                     Http::post("https://api.telegram.org/bot{$storeSetting->token_bot}/sendMessage", [
                         'chat_id' => $storeSetting->chat_id,

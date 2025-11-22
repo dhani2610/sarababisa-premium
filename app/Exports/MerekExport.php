@@ -17,7 +17,7 @@ class MerekExport implements FromCollection, WithMapping, WithHeadings, ShouldAu
      */
     public function collection()
     {
-        return Brand::all();
+        return Brand::where('cabang_id',getCabangId())->get();
     }
 
     public function map($brand): array

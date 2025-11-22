@@ -19,7 +19,7 @@ class AdminProdukToolData extends Component
     public $paginate = 10;
     public $search;
 
-    
+
     public $fotoProduk, $produkId;
     public $showFotoModal = false;
 
@@ -85,7 +85,7 @@ class AdminProdukToolData extends Component
     }
 
 
-      
+
     use LivewireAlert;
 
     public $barcode;
@@ -118,7 +118,7 @@ class AdminProdukToolData extends Component
     public function render()
     {
         $tools = SubCategory::where('categories_id', '=', '4')->get();
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         $tools_count = Product::where('categories_id', '=', '4')->count();
         $topProducts = OrderDetail::select(
             'order_details.products_id',
@@ -132,7 +132,7 @@ class AdminProdukToolData extends Component
         ->where('products.categories_id', '=', '4')
         ->orderByDesc('total_terjual')
 ->limit('5')
-        
+
         ->get();
 
         return view('livewire.admin-produk-tool-data', [

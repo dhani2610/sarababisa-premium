@@ -15,6 +15,7 @@ class RincianInvest extends Model
         'nominal',
         'upload_bukti_tf',
         'keterangan',
+        'cabang_id',
     ];
 
     protected $casts = [

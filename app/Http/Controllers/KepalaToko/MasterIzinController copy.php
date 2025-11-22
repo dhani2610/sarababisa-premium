@@ -30,7 +30,7 @@ class MasterIzinController extends Controller
             }
 
             // Ambil setting potongan dari store_settings (id = 1)
-            $store = StoreSetting::find(1);
+            $store = StoreSetting::where('cabang_id',getCabangId())->first();
 
             // Jika nominal_potongan tidak diisi manual, ambil dari store_settings sesuai tipe
             if (empty($data['nominal_potongan'])) {
@@ -90,7 +90,7 @@ class MasterIzinController extends Controller
         }
 
         //      // Ambil setting potongan dari store_settings (id = 1)
-        // $store = StoreSetting::find(1);
+        // $store = StoreSetting::where('cabang_id',getCabangId())->first();
 
         // // Jika nominal_potongan tidak diisi manual, ambil dari store_settings sesuai tipe
         // if (empty($data['nominal_potongan'])) {

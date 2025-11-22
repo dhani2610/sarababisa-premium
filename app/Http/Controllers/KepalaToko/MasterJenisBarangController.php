@@ -56,7 +56,7 @@ class MasterJenisBarangController extends Controller
     public function store(TypeRequest $request)
     {
         $data = $request->all();
-
+        $data['cabang_id'] = getCabangId();
         Type::create($data);
 
         return redirect()->route('master-jenis-barang.index');

@@ -27,12 +27,12 @@ class SupplierData extends Component
 
     public function render()
     {
-        $suppliers_count = Supplier::all()->count();
+        $suppliers_count = Supplier::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.supplier-data', [
             'suppliers_count' => $suppliers_count,
             'suppliers' => $this->search === null ?
-                Supplier::latest()->paginate($this->paginate) :
-                Supplier::latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Supplier::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                Supplier::where('cabang_id',getCabangId())->latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

@@ -13,7 +13,7 @@ class ToggleAbsensiSetting extends Component
 
     public function mount()
     {
-        $setting = StoreSetting::find(1);
+        $setting = StoreSetting::where('cabang_id',getCabangId())->first();
         $this->active_setting_absensi = $setting->active_setting_absensi;
         $this->jam_masuk = $setting->jam_masuk;
         $this->jam_pulang = $setting->jam_pulang;
@@ -35,7 +35,7 @@ class ToggleAbsensiSetting extends Component
 
     public function saveSetting()
     {
-        $setting = StoreSetting::find(1);
+        $setting = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $setting->update([
             'active_setting_absensi' => $this->active_setting_absensi,

@@ -28,14 +28,14 @@ class LaporanServisPajakData extends Component
 
     public function render()
     {
-        $users = User::where('role', 'Teknisi')->get();
-        $jumlah = ServiceTransaction::where('ppn','>',0)->where('is_approve', 'Setuju')->where('kondisi_servis', "Sudah jadi")->count();
+        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
+        $jumlah = ServiceTransaction::where('cabang_id',getCabangId())->where('ppn','>',0)->where('is_approve', 'Setuju')->where('kondisi_servis', "Sudah jadi")->count();
         return view('livewire.laporan-servis-pajak-data', [
             'jumlah' => $jumlah,
             'users' => $users,
             'services' => $this->search === null ?
-                ServiceTransaction::where('ppn','>',0)->orderBy('tgl_disetujui', 'desc')->where('is_approve', 'Setuju')->whereIn('kondisi_servis', ['Sudah jadi', 'Tidak bisa', 'Dibatalkan'])->paginate($this->paginate) :
-                ServiceTransaction::where('ppn','>',0)->orderBy('tgl_disetujui', 'desc')->where('is_approve', 'Setuju')->whereIn('kondisi_servis', ['Sudah jadi', 'Tidak bisa', 'Dibatalkan'])->where('created_at', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                ServiceTransaction::where('cabang_id',getCabangId())->where('ppn','>',0)->orderBy('tgl_disetujui', 'desc')->where('is_approve', 'Setuju')->whereIn('kondisi_servis', ['Sudah jadi', 'Tidak bisa', 'Dibatalkan'])->paginate($this->paginate) :
+                ServiceTransaction::where('cabang_id',getCabangId())->where('ppn','>',0)->orderBy('tgl_disetujui', 'desc')->where('is_approve', 'Setuju')->whereIn('kondisi_servis', ['Sudah jadi', 'Tidak bisa', 'Dibatalkan'])->where('created_at', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

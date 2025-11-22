@@ -73,6 +73,7 @@ class ServiceTransaction extends Model
         "ppn",
         "bonus_interface",
         "tipe",
+        "cabang_id",
     ];
 
     public function getActivitylogOptions(): LogOptions

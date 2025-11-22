@@ -76,7 +76,7 @@ class AdminProsesData extends Component
             $q->where('id',auth()->user()->id);
         })->get();
         $sales = User::where('role', 'Sales')->get();
-        $tokoSetting = StoreSetting::find(1);
+        $tokoSetting = StoreSetting::where('cabang_id',getCabangId())->first();
         $penerima = User::when(auth()->user()->role === 'Teknisi', function ($q) {
             $q->where('id',auth()->user()->id);
         })->get();

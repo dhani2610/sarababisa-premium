@@ -32,7 +32,7 @@ class LaporanPajakPenjualanData extends Component
             $query->where('is_approve', 'Setuju');
             $query->where('is_approve', 'Setuju');
         })->sum('quantity');
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $product_transactions = $this->search === null ?
                 OrderDetail::whereHas('order', function ($query) {

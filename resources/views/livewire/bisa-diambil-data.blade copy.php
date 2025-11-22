@@ -552,7 +552,7 @@
                                     @php
                                         $nomor = $transaction->customer->nomor_hp;
                                         $nomorwa = preg_replace('/^08/', '628', $nomor);
-                                        $fonteeToken = \App\Models\StoreSetting::first()->fonnte ?? null;
+                                        $fonteeToken = getStoreSettingByCabang()->fonnte ?? null;
                                     @endphp
 
                                     <div class="flex space-x-1">

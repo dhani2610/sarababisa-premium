@@ -31,12 +31,12 @@ class CustomerData extends Component
 
     public function render()
     {
-        $customers_count = Customer::all()->count();
+        $customers_count = Customer::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.customer-data', [
             'customers_count' => $customers_count,
             'customers' => $this->search === null ?
-                Customer::latest()->paginate($this->paginate) :
-                Customer::latest()->where('nama', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Customer::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                Customer::where('cabang_id',getCabangId())->latest()->where('nama', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 

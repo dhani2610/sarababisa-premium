@@ -119,7 +119,7 @@ class LaporanPenjualanController extends Controller
             return $order->detailOrders->sum('total_profit');
         });
 
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         return view('pages/admintoko/laporan-penjualan', compact('product_transactions', 'count', 'omzethari', 'profithari', 'omzetbulan', 'profitbulan', 'omzettahun', 'profittahun', 'toko'));
     }
@@ -186,7 +186,7 @@ class LaporanPenjualanController extends Controller
             ->whereDate('created_at', '<=', $end_date)
             ->sum('due');
 
-        $toko = StoreSetting::find(1);
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $pdf = Pdf::loadView('pages.admintoko.cetak-laporan-penjualan', [
         // $pdf = Pdf::loadView('pages.admintoko.cetak-laporan-penjualan', [

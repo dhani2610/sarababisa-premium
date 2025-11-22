@@ -25,7 +25,7 @@ class ProdukHandphoneData extends Component
 
     public $barcode;
     public $modalOpen = false;
-    
+
     public $fotoProduk, $produkId;
     public $showFotoModal = false;
 
@@ -119,18 +119,18 @@ class ProdukHandphoneData extends Component
     public function render()
     {
         $categories = Category::all();
-        $toko = StoreSetting::find(1);
-        $brands = Brand::all();
-        $capacities = Capacity::all();
-        $model_series = ModelSerie::all();
-        $colors = Color::all();
-        $handphoneitemready = Product::where('categories_id', 1)->where('stok', '>', 0)->count();
-        $handphonestokready = Product::where('categories_id', 1)->where('stok', '>', 0)->sum('stok');
-        $handphonemodalready = Product::where('categories_id', 1)->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
-        $handphonestokhabis = Product::where('categories_id', 1)->where('stok', 0)->count();
-        $handphonenominalterjual = Product::where('categories_id', 1)->where('stok', 0)->sum('harga_jual');
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $colors = Color::where('cabang_id',getCabangId())->get();
+        $handphoneitemready = Product::where('cabang_id',getCabangId())->where('categories_id', 1)->where('stok', '>', 0)->count();
+        $handphonestokready = Product::where('cabang_id',getCabangId())->where('categories_id', 1)->where('stok', '>', 0)->sum('stok');
+        $handphonemodalready = Product::where('cabang_id',getCabangId())->where('categories_id', 1)->where('stok', '>', 0)->sum(DB::raw('stok * harga_modal'));
+        $handphonestokhabis = Product::where('cabang_id',getCabangId())->where('categories_id', 1)->where('stok', 0)->count();
+        $handphonenominalterjual = Product::where('cabang_id',getCabangId())->where('categories_id', 1)->where('stok', 0)->sum('harga_jual');
 
-        $handphones_count = Product::where('categories_id', '=', '1')->count();
+        $handphones_count = Product::where('cabang_id',getCabangId())->where('categories_id', '=', '1')->count();
 
         $topProducts = OrderDetail::select(
             'order_details.products_id',
@@ -142,9 +142,11 @@ class ProdukHandphoneData extends Component
         ->join('products', 'products.id', '=', 'order_details.products_id')
         ->groupBy('order_details.products_id', 'products.product_name', 'products.harga_jual')
         ->where('products.categories_id', '=', '1')
+        ->where('order_details.cabang_id', getCabangId())
+        ->where('products.cabang_id', getCabangId())
         ->orderByDesc('total_terjual')
-->limit('5')
-        
+        ->limit('5')
+
         ->get();
 
         return view('livewire.produk-handphone-data', [
@@ -162,8 +164,8 @@ class ProdukHandphoneData extends Component
             'handphonestokhabis' => $handphonestokhabis,
             'handphonenominalterjual' => $handphonenominalterjual,
             'products' => $this->search === null ?
-                Product::latest()->where('categories_id', '=', '1')->paginate($this->paginate) :
-                Product::latest()->where('categories_id', '=', '1')->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '1')->paginate($this->paginate) :
+                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '1')->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

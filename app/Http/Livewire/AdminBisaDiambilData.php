@@ -65,7 +65,7 @@ class AdminBisaDiambilData extends Component
     public function render()
     {
         $customers = Customer::all();
-        $tokoSetting = StoreSetting::find(1);
+        $tokoSetting = StoreSetting::where('cabang_id',getCabangId())->first();
         $toko = User::find(1);
         $users = User::where('role', 'Teknisi')->when(auth()->user()->role === 'Teknisi', function ($q) {
             $q->where('id',auth()->user()->id);

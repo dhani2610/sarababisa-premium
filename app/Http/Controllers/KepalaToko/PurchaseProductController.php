@@ -46,8 +46,8 @@ class PurchaseProductController extends Controller
      */
     public function create()
     {
-        $suppliers = Supplier::all();
-        $products = Product::all();
+        $suppliers = Supplier::where('cabang_id',getCabangId())->get();
+        $products = Product::where('cabang_id',getCabangId())->get();
         $categories = Category::all();
         return view('pages/kepalatoko/pembelian/create', compact('suppliers', 'products', 'categories'));
     }
@@ -86,6 +86,7 @@ class PurchaseProductController extends Controller
 
                 $purchase->product_name = $product_name->product_name;
                 $purchase->suppliers_name = $suppliers_name->name;
+                $purchase->cabang_id = getCabangId();
 
                 $purchase->save();
 
