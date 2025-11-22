@@ -3,7 +3,6 @@
 namespace App\Http\Requests\KepalaToko;
 
 use Illuminate\Foundation\Http\FormRequest;
-use function App\Helpers\getCabangId;
 use App\Models\Type;
 
 class TypeRequest extends FormRequest
