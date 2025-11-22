@@ -16,25 +16,30 @@
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
 
-                @php
-                    $url = ENV('APP_URL');
-                    $allowedUrls = [
-                        'http://hi-bdl.saraba-bisa.com',
-                        'http://localhost',
-                        'http://127.0.0.1:8000',
-                    ];
-                    $allowShow = in_array($url, $allowedUrls);
-                    // dd($url,$allowShow,count($cabang));
-                @endphp
+            @php
+                $host = request()->getHost(); // dapat host saja tanpa http:// atau port
+                // host yang boleh tampil tombol
+                $allowedHosts = [
+                    'hi-bdl.saraba-bisa.com',
+                    '127.0.0.1',
+                    'localhost',
+                ];
 
-                @if ($allowShow)
-                    <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true" aria-controls="tambah-modal">
-                        <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
-                            <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-                        </svg>
-                        <span class="hidden xs:block ml-2">Tambah Cabang</span>
-                    </button>
-                @endif
+                // tombol muncul kalau host sesuai DAN jumlah cabang masih 0
+                $allowShow = in_array($host, $allowedHosts);
+            @endphp
+
+            @if ($allowShow)
+            <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white"
+                    @click.prevent="modalOpen = true"
+                    aria-controls="tambah-modal">
+                <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
+                    <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
+                </svg>
+                <span class="hidden xs:block ml-2">Tambah Cabang</span>
+            </button>
+            @endif
+
                 <!-- Modal backdrop -->
                 <div
                     class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
