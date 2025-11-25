@@ -41,27 +41,45 @@ class TransferStokController extends Controller
         ]);
     }
 
-    public function productsByCabang($cabangId)
+    public function productsByCabang($cabangId,$kategori)
     {
-        $products = Product::where('cabang_id', $cabangId)
-                    ->select(['id','product_name','stok','harga_modal','harga_jual','harga_jual_toko'])
+        $products = Product::with('capacity')->where('cabang_id', $cabangId)
+                    ->where('categories_id', $kategori)
                     ->orderBy('product_name')
                     ->get();
 
         return response()->json($products);
     }
 
+    
+
 
     public function store(Request $request)
     {
         // $data = $request->validated();
+
+        $dariProduk = Product::findOrFail($request->dari_produk_id);
+
+        // cek stok cukup
+        if ($request->dari_cabang_id == $request->ke_cabang_id) {
+            toast('Cabang asal dan tujuan tidak boleh sama.', 'error');
+            return back()->withErrors(['msg' => 'Cabang asal dan tujuan tidak boleh sama.']);
+        }
+        if ($request->stok == 0) {
+            toast('Stok yang akan di transfer minimal 1.', 'error');
+            return back()->withErrors(['msg' => 'Stok yang akan di transfer minimal 1.']);
+        }
+        if ($request->stok > $dariProduk->stok) {
+            toast('Stok produk asal tidak mencukupi.', 'error');
+            return back()->withErrors(['msg' => 'Stok produk asal tidak mencukupi.']);
+        }
 
         // hanya simpan transfer, status = 0 (menunggu approve)
         $transfer = TransferStok::create([
             'dari_cabang_id' => $request->dari_cabang_id,
             'ke_cabang_id' => $request->ke_cabang_id,
             'dari_produk_id' => $request->dari_produk_id,
-            'ke_produk_id' => $request->ke_produk_id,
+            'ke_produk_id' => $request->ke_produk_id ?? 0,
             'stok' => $request->stok,
             'tanggal' => $request->tanggal,
             'created_by' => auth()->id(),
@@ -132,11 +150,36 @@ class TransferStokController extends Controller
                     $newName = $baseName . ' #' . $i;
                 }
 
+
+
                 $cloned = $dariProduk->replicate();
                 $cloned->product_name = $newName;
+                // khusus kategori 1 (handphone) → IMEI harus unik
+                if ($dariProduk->categories_id == 1) {
+
+                    $baseImei = $dariProduk->nomor_seri;
+                    $newImei = $baseImei . ' #1';
+
+                    $j = 1;
+                    while (Product::where('nomor_seri', $newImei)->exists()) {
+                        $j++;
+                        $newImei = $baseImei . ' #' . $j;
+                    }
+
+                    $cloned->nomor_seri = $newImei;
+
+                } else {
+                    // kategori NON-IMEI → jangan disalin biar tidak duplicate
+                    $cloned->nomor_seri = null; 
+                    // atau hapus saja: unset($cloned->nomor_seri);
+                }
                 $cloned->cabang_id = $transfer->ke_cabang_id;
                 $cloned->stok = $transfer->stok;
                 $cloned->push();
+                // return response()->json(['needClone'=>$needClone, 'newName'=>$newName, 'cloned' => $cloned]);
+
+                // dd($needClone,$newName,$cloned);
+
 
                 $transfer->ke_produk_id = $cloned->id;
             } else {
@@ -161,6 +204,7 @@ class TransferStokController extends Controller
 
         } catch (\Throwable $e) {
             DB::rollBack();
+            // dd($e->getMessage());
             \Log::error("APPROVE ERROR: " . $e->getMessage());
             return back()->withErrors(['msg' => 'Terjadi error saat approve.']);
         }

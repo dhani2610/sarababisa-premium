@@ -49,11 +49,36 @@ class DashboardCabangController extends Controller
         $endDate   = \Carbon\Carbon::parse($end . '-01');
 
         $listMonths = [];
+        $listMonthsIndo = [];
+
+        $indoMonths = [
+            1 => 'Jan',
+            2 => 'Feb',
+            3 => 'Mar',
+            4 => 'Apr',
+            5 => 'Mei',
+            6 => 'Jun',
+            7 => 'Jul',
+            8 => 'Agu',
+            9 => 'Sep',
+            10 => 'Okt',
+            11 => 'Nov',
+            12 => 'Des'
+        ];
 
         while ($startDate <= $endDate) {
+
+            // Format Y-m (misal 2025-01)
             $listMonths[] = $startDate->format('Y-m');
+
+            // Format Indo: Jan 25
+            $bulan = $indoMonths[(int)$startDate->format('n')];
+            $tahun2 = $startDate->format('y');
+            $listMonthsIndo[] = $bulan . ' ' . $tahun2;
+
             $startDate->addMonth();
         }
+
 
         // HASIL AKHIR
         $dataAnggaran = [];
@@ -66,9 +91,11 @@ class DashboardCabangController extends Controller
             // Loop per bulan
             foreach ($listMonths as $ym) {
 
-                $total = Budget::where('cabang_id', $cab->id)
+                $total = Target::where('cabang_id', $cab->id)
                     ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$ym])
-                    ->sum('total');
+                    ->sum('target');
+                // $targets_count = Tar get::where('cabang_id',getCabangId())->get()->count();
+                
 
                 // push ke JSON:
                 $dataAnggaran[$cab->nama_cabang][$ym] = $total;
@@ -96,7 +123,7 @@ class DashboardCabangController extends Controller
                     ->whereYear('tgl_disetujui', $year)
                     ->whereMonth('tgl_disetujui', $month)
                     ->where('is_approve', 'Setuju')
-                    ->sum('omzet');
+                    ->sum('profittoko');
 
                 // ======================
                 // PROFIT BERSIH PENJUALAN
@@ -108,21 +135,25 @@ class DashboardCabangController extends Controller
                         $q->where('is_approve', 'Setuju');
                     })
                     ->with(['detailOrders' => function ($q) use ($year, $month) {
-                        $q->select('orders_id', DB::raw('SUM(total) as total_omzet'))
+                        $q->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
                         ->groupBy('orders_id');
                     }])
                     ->get();
 
                 $bulanprofitbersihpenjualan = $profitpenjualan->sum(
-                    fn($order) => $order->detailOrders->sum('total_omzet')
+                    fn($order) => $order->detailOrders->sum('total_profit')
                 );
 
                 $bulantotalprofitbersih = $bulanprofitbersihservis + $bulanprofitbersihpenjualan;
 
+                $totalbudgets = Budget::where('cabang_id', $cab->id)->sum('total');
+
+                $circumference = 30 * 2 * pi();
+                $percent = $totalbudgets != 0 ? round(($bulantotalprofitbersih / $totalbudgets) * 100) : 0;
                 // ======================
                 // PUSH KE JSON
                 // ======================
-                $dataPencapaian[$cab->nama_cabang][$ym] =$bulantotalprofitbersih;
+                $dataPencapaian[$cab->nama_cabang][$ym] = $percent;
             }
         }
 
@@ -205,7 +236,7 @@ class DashboardCabangController extends Controller
                 // PUSH KE JSON
                 // ======================
                 $dataOmset[$cab->nama_cabang][$ym] = [
-                    'omset'               => $totalOmsetBulanIni,
+                    'omset'               => $bulantotalprofitbersih,
                 ];
             }
         }
@@ -385,7 +416,7 @@ class DashboardCabangController extends Controller
                 // PUSH KE JSON
                 // ======================
                 $dataProfit[$cab->nama_cabang][$ym] = [
-                    'profit'               => $totalOmsetBulanIni,
+                    'profit'               => $bulantotalprofitbersih,
                 ];
             }
         }
@@ -555,6 +586,7 @@ class DashboardCabangController extends Controller
 
         return response()->json([
             'range' => $listMonths,
+            'rangeIndo' => $listMonthsIndo,
             'dataPencapaian'  => $dataPencapaian,
             'dataAnggaran'  => $dataAnggaran,
             'dataOmset'  => $dataOmset,

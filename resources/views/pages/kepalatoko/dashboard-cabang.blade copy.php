@@ -66,63 +66,17 @@ $(document).ready(function () {
     $("#end").val(monthNow);
 
 
-   function renderColumnChart(id, title, categories, categoriesIndo, series, isPercent = false) {
-
+    function renderColumnChart(id, title, categories, series) {
         Highcharts.chart(id, {
             chart: { type: 'column' },
             title: { text: title },
-
-            xAxis: { categories: categoriesIndo },
-
-            yAxis: {
-                title: { text: isPercent ? 'Persentase (%)' : 'Nominal (Rp)' },
-                labels: {
-                    formatter: function () {
-                        return isPercent
-                            ? this.value + '%'
-                            : formatRupiahShort(this.value);
-                    }
-                }
-            },
-
-            tooltip: {
-                shared: true,
-                formatter: function () {
-                    // let s = `<b>${this.x}</b><br>`;
-                    let s = ``;
-                    this.points.forEach(p => {
-                        if (isPercent) {
-                            s += `${p.series.name}: <b>${p.y}%</b><br>`;
-                        } else {
-                            s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
-                        }
-                    });
-                    return s;
-                }
-            },
-
-            plotOptions: {
-                series: {
-                    dataLabels: {
-                        enabled: true,
-                        formatter: function () {
-                            return isPercent
-                                ? this.y + '%'
-                                : formatRupiahShort(this.y);
-                        },
-                        style: { fontSize: "11px", fontWeight: "bold" }
-                    }
-                }
-            },
-
-            exporting: { enabled: false },
-            credits: { enabled: false },
-
+            xAxis: { categories },
+            yAxis: { title: { text: 'Nominal (Rp)' }},
+            tooltip: { shared: true, valuePrefix: "Rp " },
+            plotOptions: { series: { borderWidth: 0 }},
             series
         });
-
     }
-
 
     // Set default bulan berjalan
     let current = new Date().toISOString().slice(0, 7);
@@ -133,21 +87,6 @@ $(document).ready(function () {
     $("#btnApply").click(function () {
         loadDashboard();
     });
-
-    // Format angka ke Rupiah singkat (Ribuan, Jutaan, Miliar)
-    function formatRupiahShort(value) {
-        if (value >= 1_000_000_000)
-            return "Rp " + (value / 1_000_000_000).toFixed(1).replace('.0','') + " M";
-
-        if (value >= 1_000_000)
-            return "Rp " + (value / 1_000_000).toFixed(1).replace('.0','') + " Jt";
-
-        if (value >= 1_000)
-            return "Rp " + (value / 1_000).toFixed(1).replace('.0','') + " Rb";
-
-        return "Rp " + value;
-    }
-
 
 
     function loadDashboard() {
@@ -161,7 +100,6 @@ $(document).ready(function () {
             success: function (res) {
 
                 const range = res.range;
-                const rangeIndo = res.rangeIndo;
 
                 // ===================================
                 // 1. CHART PENCAPAIAN
@@ -170,12 +108,10 @@ $(document).ready(function () {
                 Object.keys(res.dataPencapaian).forEach(cabang => {
                     seriesPencapaian.push({
                         name: cabang,
-                        data: range.map(r => res.dataPencapaian[cabang][r] || 0)
+                        data: range.map(r => res.dataAnggaran[cabang][r] || 0)
                     });
                 });
-                console.log(seriesPencapaian);
-                
-                renderColumnChart("chart-pencapaian", "Pencapaian", range, rangeIndo, seriesPencapaian, true);
+                renderColumnChart("chart-pencapaian", "Pencapaian ", range, seriesPencapaian);
 
                 // ===================================
                 // 1. CHART ANGGARAN
@@ -187,7 +123,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataAnggaran[cabang][r] || 0)
                     });
                 });
-                renderColumnChart("chart-anggaran", "Anggaran ", range,rangeIndo, seriesAnggaran);
+                renderColumnChart("chart-anggaran", "Anggaran ", range, seriesAnggaran);
 
 
                 // ===================================
@@ -200,7 +136,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataOmset[cabang][r]?.omset || 0)
                     });
                 });
-                renderColumnChart("chart-omset", "Omzet ", range,rangeIndo, seriesOmset);
+                renderColumnChart("chart-omset", "Omset ", range, seriesOmset);
 
 
                 // ===================================
@@ -213,7 +149,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataOmsetService[cabang][r]?.omset || 0)
                     });
                 });
-                renderColumnChart("chart-omset-service", "Omzet Service ", range,rangeIndo, seriesOmsetService);
+                renderColumnChart("chart-omset-service", "Omset Service ", range, seriesOmsetService);
 
                 // ===================================
                 // 4. CHART OMSET PRODUK (CABANG + KATEGORI)
@@ -240,53 +176,26 @@ $(document).ready(function () {
                     };
                 });
 
-              Highcharts.chart("chart-omset-produk", {
-                chart: { type: "column" },
-                title: { text: "Omzet Produk " },
-                xAxis: {
-                    categories: xCategoriesOmsetProduk,
-                    title: { text: "Cabang" }
-                },
-                yAxis: {
-                    title: { text: "Nominal (Rp)" },
-                    labels: {
-                        formatter: function () {
-                            return formatRupiahShort(this.value);
-                        }
-                    }
-                },
-
-                tooltip: {
-                    shared: true,
-                    formatter: function () {
-                        // let s = `<b>${this.x}</b><br>`;
-                        let s = ``;
-                        this.points.forEach(p => {
-                            s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
-                        });
-                        return s;
-                    }
-                },
-
-                plotOptions: {
-                    column: { grouping: true },
-                    series: {
-                        dataLabels: {
-                            enabled: true,
-                            formatter: function () {
-                                return formatRupiahShort(this.y);
-                            },
-                            style: { fontSize: "11px", fontWeight: "bold" }
-                        }
-                    }
-                },
-
-                exporting: { enabled: false },
-                credits: { enabled: false },
-
-                series: seriesOmsetProduk
-            });
-
+                // Render Highcharts
+                Highcharts.chart("chart-omset-produk", {
+                    chart: { type: "column" },
+                    title: { text: "Omset Produk " },
+                    xAxis: {
+                        categories: xCategoriesOmsetProduk,
+                        title: { text: "Cabang" }
+                    },
+                    yAxis: {
+                        title: { text: "Rp" }
+                    },
+                    tooltip: {
+                        shared: true,
+                        valuePrefix: "Rp "
+                    },
+                    plotOptions: {
+                        column: { grouping: true }
+                    },
+                    series: seriesOmsetProduk
+                });
 
 
                 // ===================================
@@ -299,7 +208,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataProfit[cabang][r]?.profit || 0)
                     });
                 });
-                renderColumnChart("chart-profit", "Profit ", range,rangeIndo, seriesProfit);
+                renderColumnChart("chart-profit", "Profit ", range, seriesProfit);
 
 
                 // ===================================
@@ -312,7 +221,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataProfitService[cabang][r]?.omset || 0)
                     });
                 });
-                renderColumnChart("chart-profit-service", "Profit Service ", range,rangeIndo, seriesProfitService);
+                renderColumnChart("chart-profit-service", "Profit Service ", range, seriesProfitService);
 
 
                 // ===================================
@@ -340,6 +249,7 @@ $(document).ready(function () {
                     };
                 });
 
+                // Render Highcharts
                 Highcharts.chart("chart-profit-produk", {
                     chart: { type: "column" },
                     title: { text: "Profit Produk" },
@@ -348,45 +258,17 @@ $(document).ready(function () {
                         title: { text: "Cabang" }
                     },
                     yAxis: {
-                        title: { text: "Nominal (Rp)" },
-                        labels: {
-                            formatter: function () {
-                                return formatRupiahShort(this.value);
-                            }
-                        }
+                        title: { text: "Rp" }
                     },
-
                     tooltip: {
                         shared: true,
-                        formatter: function () {
-                            // let s = `<b>${this.x}</b><br>`;
-                            let s = ``;
-                            this.points.forEach(p => {
-                                s += `${p.series.name}: <b>${formatRupiahShort(p.y)}</b><br>`;
-                            });
-                            return s;
-                        }
+                        valuePrefix: "Rp "
                     },
-
                     plotOptions: {
-                        column: { grouping: true },
-                        series: {
-                            dataLabels: {
-                                enabled: true,
-                                formatter: function () {
-                                    return formatRupiahShort(this.y);
-                                },
-                                style: { fontSize: "11px", fontWeight: "bold" }
-                            }
-                        }
+                        column: { grouping: true }
                     },
-
-                    exporting: { enabled: false },
-                    credits: { enabled: false },
-
                     series: seriesProfitProduk
                 });
-
 
 
                 // ===================================
@@ -399,7 +281,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataPengeluaran[cabang][r] || 0)
                     });
                 });
-                renderColumnChart("chart-pengeluaran", "Pengeluaran ", range,rangeIndo, seriesPengeluaran);
+                renderColumnChart("chart-pengeluaran", "Pengeluaran ", range, seriesPengeluaran);
 
 
                 // ===================================
@@ -412,7 +294,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataInsiden[cabang][r] || 0)
                     });
                 });
-                renderColumnChart("chart-insiden", "Insiden ", range,rangeIndo, seriesInsiden);
+                renderColumnChart("chart-insiden", "Insiden ", range, seriesInsiden);
 
 
                 // ===================================
@@ -425,7 +307,7 @@ $(document).ready(function () {
                         data: range.map(r => res.dataRefund[cabang][r] || 0)
                     });
                 });
-                renderColumnChart("chart-refund", "Pengembalian Dana ", range,rangeIndo, seriesRefund);
+                renderColumnChart("chart-refund", "Refund ", range, seriesRefund);
 
             }
         });

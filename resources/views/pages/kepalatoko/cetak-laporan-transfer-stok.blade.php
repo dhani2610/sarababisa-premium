@@ -82,6 +82,7 @@
                 <th>Ke Cabang</th>
                 <th>Produk Tujuan</th>
                 <th>Stok</th>
+                <th>PIC Transfer</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -119,6 +120,7 @@
 
                     {{-- Stok --}}
                     <td class="text-center">{{ $t->stok }}</td>
+                    <td class="text-center">{{ $t->pic->name ?? '-' }}</td>
 
                     {{-- Status --}}
                     <td class="text-center">

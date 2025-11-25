@@ -49,8 +49,8 @@ class TargetController extends Controller
     {
         $target = Budget::all()->sum('total');
 
-        $bulanprofitbersihservis = ServiceTransaction::whereYear('tgl_ambil', now()->year)
-            ->whereMonth('tgl_ambil', now()->month)
+        $bulanprofitbersihservis = ServiceTransaction::whereYear('tgl_disetujui', now()->year)
+            ->whereMonth('tgl_disetujui', now()->month)
             ->where('cabang_id', getCabangId())
             ->where('is_approve', 'Setuju')
             ->get()

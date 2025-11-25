@@ -77,8 +77,22 @@
                                     @csrf
                                     <div class="px-5 py-4  gap-3">
 
+                                 
+
+                                        <div class="mb-3">
+                                            <label>Kategori<span class="text-rose-500">*</span></label>
+                                            <select id="kategori_id" class="form-select w-full" required>
+                                                <option value="">-- Pilih Kategori --</option>
+                                                <option value="1">Handphone</option>
+                                                <option value="2">Sparepart</option>
+                                                <option value="3">Aksesoris</option>
+                                                <option value="4">Tools</option>
+                                            </select>
+                                        </div>
+
+                                        
                                         <div class="mb-3" >
-                                            <label>Dari Cabang</label>
+                                            <label>Asal Cabang<span class="text-rose-500">*</span></label>
                                             <select id="dari_cabang_id" name="dari_cabang_id" class="form-select w-full" required>
                                                 <option value="">-- Pilih Cabang --</option>
                                                 @foreach(\App\Models\Cabang::orderBy('nama_cabang')->get() as $c)
@@ -87,8 +101,17 @@
                                             </select>
                                         </div>
 
+
                                         <div class="mb-3" >
-                                            <label>Ke Cabang</label>
+                                            <label>Produk Asal<span class="text-rose-500">*</span></label>
+                                            <select id="dari_produk_id" name="dari_produk_id" class="form-select w-full" required>
+                                                <option value="">-- Pilih Produk --</option>
+                                                {{-- options akan terisi via AJAX --}}
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3" >
+                                            <label>Cabang Tujuan<span class="text-rose-500">*</span></label>
                                             <select id="ke_cabang_id" name="ke_cabang_id" class="form-select w-full" required>
                                                 <option value="">-- Pilih Cabang --</option>
                                                 @foreach(\App\Models\Cabang::orderBy('nama_cabang')->get() as $c)
@@ -98,29 +121,21 @@
                                         </div>
 
                                         <div class="mb-3" >
-                                            <label>Produk Asal</label>
-                                            <select id="dari_produk_id" name="dari_produk_id" class="form-select w-full" required>
-                                                <option value="">-- Pilih Produk --</option>
-                                                {{-- options akan terisi via AJAX --}}
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3" >
                                             <label>Produk Tujuan (opsional)</label>
-                                            <select id="ke_produk_id" name="ke_produk_id" class="form-select w-full" required>
+                                            <select id="ke_produk_id" name="ke_produk_id" class="form-select w-full">
                                                 <option value="">-- Opsional --</option>
                                                 {{-- options via AJAX berdasarkan ke_cabang_id --}}
                                             </select>
                                         </div>
 
                                         <div class="mb-3" >
-                                            <label>Jumlah Stok</label>
+                                            <label>Jumlah Stok<span class="text-rose-500">*</span></label>
                                             <input type="number" name="stok" id="stok_input" class="form-input w-full" required>
                                             <small id="stok_warning" class="text-rose-500 hidden">Stok melebihi stok asal!</small>
                                         </div>
 
                                         <div class="mb-3" >
-                                            <label>Tanggal</label>
+                                            <label>Tanggal<span class="text-rose-500">*</span></label>
                                             <input type="date" name="tanggal" class="form-input w-full" required value="{{ date('Y-m-d') }}" required >
                                         </div>
                                     </div>
@@ -171,6 +186,7 @@
                             <th class="text-center px-2 py-3">Produk Tujuan</th>
                             <th class="text-center px-2 py-3">Stok</th>
                             <th class="text-center px-2 py-3">Status</th>
+                            <th class="text-center px-2 py-3">PIC Transfer</th>
                             <th class="text-center px-2 py-3">Aksi</th>
                         </tr>
                     </thead>
@@ -218,7 +234,7 @@
                             <td class="text-center px-3 py-3 font-semibold">
                                 {{ $t->stok }}
                             </td>
-
+                           
                             {{-- Status --}}
                             <td class="text-center px-3 py-3">
                                 @if ($t->status == 0)
@@ -230,6 +246,10 @@
                                         Disetujui
                                     </span>
                                 @endif
+                            </td>
+
+                             <td class="text-center px-3 py-3 font-semibold">
+                                {{ $t->pic->name ?? '-' }}
                             </td>
 
                             {{-- Aksi --}}
@@ -254,6 +274,7 @@
                                 @endif
 
                                 {{-- DELETE --}}
+                                @if ($t->status != 1 || Auth::user()->role == 'Kepala Toko')
                                 <form action="{{ route('transfer-stok.destroy', $t->id) }}"
                                     method="POST"
                                     class="inline-block"
@@ -270,6 +291,7 @@
                                         Hapus
                                     </button>
                                 </form>
+                                @endif
 
                             </td>
 
@@ -338,35 +360,50 @@ document.addEventListener('alpine:init', () => {
 <script>
 $(function() {
 
-    function loadProducts(cabangId, $targetSelect, placeholder = '-- Pilih Produk --') {
+    function loadProductsByCategory(cabangId, kategoriId, $targetSelect, placeholder = '-- Pilih Produk --') {
         $targetSelect.prop('disabled', true).html(`<option>${placeholder}</option>`);
-        if (!cabangId) {
+
+        if (!cabangId || !kategoriId) {
             $targetSelect.prop('disabled', false);
             return;
         }
-        $.get('/api/products-by-cabang/' + cabangId)
-            .done(function (data) {
-                let opts = `<option value="">${placeholder}</option>`;
-                data.forEach(p => {
-                    opts += `<option value="${p.id}" data-stok="${p.stok}">${p.product_name} (stok: ${p.stok})</option>`;
-                });
-                $targetSelect.html(opts).prop('disabled', false).trigger('change');
-            })
-            .fail(function(){
-                $targetSelect.html(`<option value="">Gagal mengambil produk</option>`).prop('disabled', false);
+
+        $.get('/api/products-by-cabang/' + cabangId + '/' + kategoriId)
+        .done(function (data) {
+            let opts = `<option value="">${placeholder}</option>`;
+            data.forEach(p => {
+                opts += `<option value="${p.id}" data-stok="${p.stok}">
+                    ${p.display_name} (stok: ${p.stok})
+                </option>`;
             });
+            $targetSelect.html(opts).prop('disabled', false).trigger('change');
+        })
+        .fail(function(){
+            $targetSelect.html(`<option value="">Gagal mengambil produk</option>`).prop('disabled', false);
+        });
     }
 
-    // saat pilih dari_cabang, muat produk asal
-    $('#dari_cabang_id').on('change', function(){
-        const id = $(this).val();
-        loadProducts(id, $('#dari_produk_id'), '-- Pilih Produk Asal --');
+    // Jika kategori dipilih ulang → reset produk
+    $('#kategori_id').on('change', function () {
+        const cabangId = $('#dari_cabang_id').val();
+        const kategoriId = $(this).val();
+        loadProductsByCategory(cabangId, kategoriId, $('#dari_produk_id'), '-- Pilih Produk Asal --');
+    });
+
+    // Update load ketika cabang berubah
+    $('#dari_cabang_id').on('change', function () {
+        const cabangId = $(this).val();
+        const kategoriId = $('#kategori_id').val();
+        loadProductsByCategory(cabangId, kategoriId, $('#dari_produk_id'), '-- Pilih Produk Asal --');
     });
 
     // saat pilih ke_cabang, muat produk tujuan
     $('#ke_cabang_id').on('change', function(){
-        const id = $(this).val();
-        loadProducts(id, $('#ke_produk_id'), '-- Pilih Produk Tujuan --');
+        const cabangId = $(this).val();
+        const kategoriId = $('#kategori_id').val();
+        loadProductsByCategory(cabangId, kategoriId, $('#ke_produk_id'), '-- Pilih Produk Tujuan --');
+
+        // loadProducts(id, $('#ke_produk_id'), '-- Pilih Produk Tujuan --');
     });
 
     // validasi jumlah stok
