@@ -18,7 +18,7 @@
 
                 <!-- Search form -->
                 <x-search-form placeholder="Cari berdasarkan nama" />
-                
+
             </div>
 
         </div>
@@ -204,7 +204,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div>
+                                {{-- <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Modal Sparepart </label>
                                         <p class="text-xs mt-1" style="color:red">
                                             ⚠️ Jika ingin mengubah nominal, cukup ubah angkanya saja.
@@ -223,6 +223,32 @@
                                         </p>
 
                                     <input id="biaya_j" name="biaya_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->biaya_j }}"/>
+                                </div> --}}
+                                 <div class="mb-4">
+                                    <label class="block text-sm font-medium mb-1">Biaya Modal Sparepart</label>
+
+                                    <div id="modal_container">
+                                        <!-- row dinamis -->
+                                    </div>
+
+                                    <button type="button" id="add_modal" class="px-3 py-1 bg-blue-500 text-white rounded mt-2">
+                                        + Tambah Modal
+                                    </button>
+
+                                </div>
+
+
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium mb-1">Biaya Pengerjaan Sparepart</label>
+
+                                    <div id="biaya_container">
+                                        <!-- row dinamis -->
+                                    </div>
+
+                                    <button type="button" id="add_biaya" class="px-3 py-1 bg-blue-500 text-white rounded mt-2">
+                                        + Tambah Biaya
+                                    </button>
+
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Modal Sparepart </label>
@@ -331,7 +357,7 @@
                                     </div>
 
                                 </div>
-                              
+
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="exp_garansi">Masa Garansi</label>
                                     @if ($item->exp_garansi != null)
@@ -359,7 +385,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 
     @push('styles')
@@ -377,6 +403,70 @@
                 $('#selectjs4').select2();
             });
         </script>
+           <script>
+$(document).ready(function() {
+
+    function addRow(containerId, inputName, value = "") {
+        let html = `
+            <div class="flex items-center mb-2 row-item">
+                <input type="number"
+                       name="${inputName}[]"
+                       class="form-input w-full biaya-input"
+                       value="${value}"
+                       placeholder="Masukkan angka">
+
+                <button type="button" class="ml-2 remove-row bg-red-500 text-white px-3 py-1 rounded">
+                    -
+                </button>
+            </div>
+        `;
+        $(containerId).append(html);
+    }
+
+    /** auto hitung **/
+    function calculate(containerId, target) {
+        let total = 0;
+        $(`${containerId} .biaya-input`).each(function() {
+            total += parseInt($(this).val()) || 0;
+        });
+        $(target).val(total);
+    }
+
+    /** tombol tambah **/
+    $("#add_modal").on("click", function() {
+        addRow("#modal_container", "modal_j");
+    });
+
+    $("#add_biaya").on("click", function() {
+        addRow("#biaya_container", "biaya_j");
+    });
+
+    /** hapus row **/
+    $(document).on("click", ".remove-row", function() {
+        $(this).closest(".row-item").remove();
+        calculate("#modal_container", "#modal_sparepart");
+        calculate("#biaya_container", "#biaya");
+    });
+
+    /** hitung realtime **/
+    $(document).on("input", ".biaya-input", function() {
+        calculate("#modal_container", "#modal_sparepart");
+        calculate("#biaya_container", "#biaya");
+    });
+
+    /** load data dari database **/
+    let modalDB = @json(json_decode($item->modal_j ?? '[]', true) ?? []);
+    let biayaDB = @json(json_decode($item->biaya_j ?? '[]', true) ?? []);
+
+    modalDB.forEach(v => addRow("#modal_container", "modal_j", v));
+    biayaDB.forEach(v => addRow("#biaya_container", "biaya_j", v));
+
+    calculate("#modal_container", "#modal_sparepart");
+    calculate("#biaya_container", "#biaya");
+
+});
+</script>
+
         <script>
        document.addEventListener("DOMContentLoaded", function () {
             const modalJInput = document.getElementById("modal_j");
@@ -442,7 +532,7 @@
             biayaJInput.addEventListener("input", calculatebiaya);
         });
 
-        
+
         let ppn = {{ $item->ppn }};
 
         function getTotal() {
