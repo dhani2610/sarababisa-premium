@@ -190,6 +190,7 @@ class User extends Authenticatable
         $currentMonth = now()->month;
 
         return $this->hasMany(ServiceTransaction::class, 'admin_id', 'id')
+            ->where('status_servis', 'Sudah Diambil')
             ->where('is_approve', 'Setuju')
             ->where('cabang_id', getCabangId())
             ->whereYear('tgl_disetujui', now()->year)
@@ -201,6 +202,7 @@ class User extends Authenticatable
         $lastMonth = now()->subMonth(); // Mendapatkan tanggal bulan sebelumnya
 
         return $this->hasMany(ServiceTransaction::class, 'admin_id', 'id')
+            ->where('status_servis', 'Sudah Diambil')
             ->where('is_approve', 'Setuju')
             ->where('cabang_id', getCabangId())
             ->whereYear('tgl_disetujui', now()->year)
