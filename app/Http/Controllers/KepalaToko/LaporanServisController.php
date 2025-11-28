@@ -207,8 +207,8 @@ class LaporanServisController extends Controller
         // Mengambil data brand terbanyak
         $topbrands =
             ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereDate('tgl_ambil', '>=', $start_date)
-            ->whereDate('tgl_ambil', '<=', $end_date)
+            ->whereDate('tgl_disetujui', '>=', $start_date)
+            ->whereDate('tgl_disetujui', '<=', $end_date)
             ->where('service_transactions.cabang_id',getCabangId())
             ->select('brands.name as brand_name')
             ->join('brands', 'service_transactions.brands_id', '=', 'brands.id')
@@ -220,8 +220,8 @@ class LaporanServisController extends Controller
         // Mengambil data model seri terbanyak
         $topmodelseries =
             ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereDate('tgl_ambil', '>=', $start_date)
-            ->whereDate('tgl_ambil', '<=', $end_date)
+            ->whereDate('tgl_disetujui', '>=', $start_date)
+            ->whereDate('tgl_disetujui', '<=', $end_date)
             ->where('service_transactions.cabang_id',getCabangId())
             ->select('model_series.name as model_name')
             ->join('model_series', 'service_transactions.model_series_id', '=', 'model_series.id')
@@ -233,8 +233,8 @@ class LaporanServisController extends Controller
         // Mengambil data model seri terbanyak
         $topactions =
             ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereDate('tgl_ambil', '>=', $start_date)
-            ->whereDate('tgl_ambil', '<=', $end_date)
+            ->whereDate('tgl_disetujui', '>=', $start_date)
+            ->whereDate('tgl_disetujui', '<=', $end_date)
             ->where('service_transactions.cabang_id',getCabangId())
             ->select('service_actions.nama_tindakan as action_name')
             ->join('service_actions', 'service_transactions.service_actions_id', '=', 'service_actions.id')
@@ -244,33 +244,33 @@ class LaporanServisController extends Controller
             ->get();
 
         // Menghitung total modal
-        $total_modal = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereDate('tgl_ambil', '>=', $start_date)
-            ->whereDate('tgl_ambil', '<=', $end_date)
+        $total_modal = ServiceTransaction::where('is_approve', 'Setuju')
+            ->whereDate('tgl_disetujui', '>=', $start_date)
+            ->whereDate('tgl_disetujui', '<=', $end_date)
             ->where('cabang_id',getCabangId())
             ->sum('modal_sparepart');
 
         // Menghitung total biaya
-        $total_biaya = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereDate('tgl_ambil', '>=', $start_date)
-            ->whereDate('tgl_ambil', '<=', $end_date)
+        $total_biaya = ServiceTransaction::where('is_approve', 'Setuju')
+            ->whereDate('tgl_disetujui', '>=', $start_date)
+            ->whereDate('tgl_disetujui', '<=', $end_date)
             ->where('cabang_id',getCabangId())
             ->sum('biaya');
 
         // Menghitung total diskon
         $total_diskon = ServiceTransaction::where('is_approve', 'Setuju')
-            ->where('kondisi_servis', "Sudah jadi")
-            ->whereDate('tgl_ambil', '>=', $start_date)
-            ->whereDate('tgl_ambil', '<=', $end_date)
+            ->whereDate('tgl_disetujui', '>=', $start_date)
+            ->whereDate('tgl_disetujui', '<=', $end_date)
             ->where('cabang_id',getCabangId())
             ->sum('diskon');
 
         // Menghitung total profit
-        $total_profit = ServiceTransaction::where('status_servis', 'Sudah Diambil')
-            ->whereDate('tgl_ambil', '>=', $start_date)
-            ->whereDate('tgl_ambil', '<=', $end_date)
+        $total_profit = ServiceTransaction::
+            where('is_approve', 'Setuju')
+            ->whereDate('tgl_disetujui', '>=', $start_date)
+            ->whereDate('tgl_disetujui', '<=', $end_date)
             ->where('cabang_id',getCabangId())
-            ->sum('profit');
+            ->sum('profittoko');
 
         // Menghitung total insiden
         $total_insiden = Incident::whereDate('created_at', '>=', $start_date)
