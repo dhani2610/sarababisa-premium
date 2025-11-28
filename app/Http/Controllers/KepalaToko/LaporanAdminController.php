@@ -37,6 +37,7 @@ class LaporanAdminController extends Controller
 
         // Mengambil data servis
         $services = ServiceTransaction::with('brand', 'modelserie')->where('admin_id', $request->admin_id)->where('status_servis', 'Sudah Diambil')
+            ->where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->orderBy('tgl_ambil', 'asc')
@@ -44,18 +45,21 @@ class LaporanAdminController extends Controller
 
         // Menghitung total tindakan
         $total_tindakan = ServiceTransaction::where('admin_id', $request->admin_id)->where('status_servis', 'Sudah Diambil')
+            ->where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->count();
 
         // Menghitung total biaya servis
         $total_biaya_servis = ServiceTransaction::where('status_servis', 'Sudah Diambil')->where('admin_id', $request->admin_id)
+            ->where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('biaya');
 
         // Menghitung total profit servis
         $total_profit_servis = ServiceTransaction::where('admin_id', $request->admin_id)->where('status_servis', 'Sudah Diambil')
+            ->where('is_approve', 'Setuju')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->sum('profit');
