@@ -335,7 +335,7 @@ class LaporanServisController extends Controller
             'total_servis' => $total_servis,
             'total_tunai' => $total_tunai,
             'total_transfer' => $total_transfer,
-            'total_kredit' => $total_kredit,
+            'total_kredit' => $total_kredit,    
             'saldo_akhir' => $saldo_akhir,
             'pengeluaran_data' => $pengeluaran_data,
             'total_dp' => $total_dp,

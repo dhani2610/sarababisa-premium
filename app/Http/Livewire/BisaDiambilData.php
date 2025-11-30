@@ -12,6 +12,7 @@ use App\Models\ModelSerie;
 use Livewire\WithPagination;
 use App\Models\ServiceAction;
 use App\Models\ServiceTransaction;
+use App\Models\StoreSetting;
 
 class BisaDiambilData extends Component
 {
@@ -74,6 +75,7 @@ class BisaDiambilData extends Component
         $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
         $workers = User::where('cabang_id',getCabangId())->get();
         $actions = ServiceAction::where('cabang_id',getCabangId())->get();
+        $storeSetting = StoreSetting::where('cabang_id',getCabangId())->first();;
 
         $processes_count = ServiceTransaction::where('cabang_id',getCabangId())->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
         $jumlah_bisa_diambil = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Bisa Diambil')->count();
@@ -102,6 +104,7 @@ class BisaDiambilData extends Component
             'jumlah_sudah_diambil' => $jumlah_sudah_diambil,
             'jumlah_belum_disetujui' => $jumlah_belum_disetujui,
             'bisadiambil' => $bisadiambil,
+            'storeSetting' => $storeSetting,
         ]);
     }
 }
