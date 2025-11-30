@@ -293,13 +293,25 @@ class LaporanServisController extends Controller
             ->orderBy('tgl_ambil', 'asc')
             ->get();
 
+        $totalInsiden = Incident::where('cabang_id',getCabangId())
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get()
+            ->sum('biaya_toko');
+
         $total_servis = $services->count();
-        $saldo_akhir = $total_profit - $total_pengeluaran;
+        $saldo_akhir = $total_profit - $total_pengeluaran - $totalInsiden;
 
         $pengeluaran_data = Expense::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
             ->where('cabang_id',getCabangId())
             ->get();
+
+        $insiden = Incident::where('cabang_id',getCabangId())
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get();
+       
         // return response()->json($services);
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
         // return view('pages.kepalatoko.cetak-laporan-servis', [
@@ -326,7 +338,9 @@ class LaporanServisController extends Controller
             'total_kredit' => $total_kredit,
             'saldo_akhir' => $saldo_akhir,
             'pengeluaran_data' => $pengeluaran_data,
-            'total_dp' => $total_dp
+            'total_dp' => $total_dp,
+            'totalInsiden' => $totalInsiden,
+            'insiden' => $insiden,
         ]);
 
         $filename = 'Laporan Transaksi Servis' . ' ' . $start_date . ' ' . 'sd' . ' ' . $end_date . '.pdf';
