@@ -244,29 +244,32 @@ class LaporanServisController extends Controller
             ->get();
 
         // Menghitung total modal
-        $total_modal = ServiceTransaction::where('is_approve', 'Setuju')
+        $total_modal = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+        // ->where('is_approve', 'Setuju')
             ->whereDate('tgl_disetujui', '>=', $start_date)
             ->whereDate('tgl_disetujui', '<=', $end_date)
             ->where('cabang_id',getCabangId())
             ->sum('modal_sparepart');
 
         // Menghitung total biaya
-        $total_biaya = ServiceTransaction::where('is_approve', 'Setuju')
+        $total_biaya = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+        // ->where('is_approve', 'Setuju')
             ->whereDate('tgl_disetujui', '>=', $start_date)
             ->whereDate('tgl_disetujui', '<=', $end_date)
             ->where('cabang_id',getCabangId())
             ->sum('biaya');
 
         // Menghitung total diskon
-        $total_diskon = ServiceTransaction::where('is_approve', 'Setuju')
+        $total_diskon = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+        // ->where('is_approve', 'Setuju')
             ->whereDate('tgl_disetujui', '>=', $start_date)
             ->whereDate('tgl_disetujui', '<=', $end_date)
             ->where('cabang_id',getCabangId())
             ->sum('diskon');
 
         // Menghitung total profit
-        $total_profit = ServiceTransaction::
-            where('is_approve', 'Setuju')
+        $total_profit = ServiceTransaction::where('status_servis', 'Sudah Diambil')
+        // ->where('is_approve', 'Setuju')
             ->whereDate('tgl_disetujui', '>=', $start_date)
             ->whereDate('tgl_disetujui', '<=', $end_date)
             ->where('cabang_id',getCabangId())
