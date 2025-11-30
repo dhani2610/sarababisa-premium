@@ -133,6 +133,8 @@
                 <th>: Rp. {{ number_format($total_pengeluaran) }}</th>
             </tr>
             <tr>
+                <th>Total Insiden</th>
+                <th>: Rp. {{ number_format($total_insiden) }}</th>
                 <th>Saldo Akhir</th>
                 <th>: Rp. {{ number_format($saldo_akhir) }}</th>
             </tr>
@@ -489,6 +491,59 @@
              <tr>
 				<th colspan="5">Total Biaya</th>
 				<td style="text-align: right;">Rp. {{ number_format($total_pengeluaran) }}</td>
+			</tr>
+        </tbody>
+    </table>
+    <hr>
+    <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
+        Insiden
+    </h4>
+
+    <table id="detail">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Tanggal</th>
+                <th>Teknisi</th>
+                <th>Nama Insiden</th>
+                <th>Biaya</th>
+            </tr>
+        </thead>
+        <tbody>
+                <!-- Row -->
+            @php
+                $i = 1
+            @endphp
+            @foreach($insiden as $itemsiden)                  
+                <tr>
+                    <td class="">
+                        {{ $i++ }}
+                    </td>
+                    <td class="">
+                        {{ \Carbon\Carbon::parse($itemsiden->created_at)->translatedFormat('d F Y') }}
+                    </td>
+                    <td class="">
+                        @if ($itemsiden->worker)
+                            @if ($itemsiden->worker->exists())
+                                {{ $itemsiden->worker->name }}
+                            @else
+                                Data karyawan telah dihapus
+                            @endif
+                        @else
+                            Data karyawan telah dihapus
+                        @endif
+                    </td>
+                    <td class="">
+                        {{ $itemsiden->name }}
+                    </td>
+                    <td class="">
+                        {{ number_format($itemsiden->price) }}
+                    </td>
+                </tr>
+            @endforeach
+             <tr>
+				<th colspan="4">Total Biaya</th>
+				<td style="text-align: right;">Rp. {{ number_format($total_insiden) }}</td>
 			</tr>
         </tbody>
     </table>

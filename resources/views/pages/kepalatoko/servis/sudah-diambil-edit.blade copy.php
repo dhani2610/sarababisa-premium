@@ -19,6 +19,14 @@
                 <!-- Search form -->
                 <x-search-form placeholder="Cari berdasarkan nama" />
 
+                <!-- Create invoice button -->
+                <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white">
+                        <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
+                            <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
+                        </svg>
+                        <span class="hidden xs:block ml-2">Tambah Transaksi Baru</span>
+                </button>                      
+                
             </div>
 
         </div>
@@ -56,7 +64,7 @@
                     <div class="px-5 py-3 border-b border-slate-200">
                         <div class="flex justify-between items-center">
                             <div class="font-semibold text-slate-800">Edit Transaksi Servis</div>
-                            <a href="{{ route('transaksi-servis-belum-disetujui.index') }}" class="text-slate-400 hover:text-slate-500">
+                            <a href="{{ route('transaksi-servis-sudah-diambil.index') }}" class="text-slate-400 hover:text-slate-500">
                                 <div class="sr-only">Close</div>
                                 <svg class="w-4 h-4 fill-current">
                                     <path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
@@ -65,10 +73,10 @@
                         </div>
                     </div>
                     <!-- Modal content -->
-                    <form action="{{ route('transaksi-servis-belum-disetujui.update', $item->id) }}" method="post">
+                    <form action="{{ route('transaksi-servis-sudah-diambil.update', $item->id) }}" method="post">
                         @method('PUT')
                         @csrf
-                         <div class="px-5 py-4">
+                        <div class="px-5 py-4">
                             <div class="space-y-3">
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="created_at">Tgl. Terima </label>
@@ -204,7 +212,17 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                {{-- <div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="tipe">Tipe Teknisi<span
+                                            class="text-rose-500">*</span></label>
+                                    <select id="tipe" name="tipe"
+                                        class="form-select text-sm py-1 w-full">
+                                        <option selected value="">Pilih Tipe</option>
+                                        <option value="Interface" {{ $item->tipe == 'Interface' ? 'selected' : '' }}>Interface (bonus pertipe)</option>
+                                        <option value="Hardware" {{ $item->tipe == 'Hardware' ? 'selected' : '' }}>Hardware & interface (bonus persen)</option>
+                                    </select>
+                                </div>
+                                <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Modal Sparepart </label>
                                         <p class="text-xs mt-1" style="color:red">
                                             ⚠️ Jika ingin mengubah nominal, cukup ubah angkanya saja.
@@ -223,32 +241,6 @@
                                         </p>
 
                                     <input id="biaya_j" name="biaya_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->biaya_j }}"/>
-                                </div> --}}
-                                 <div class="mb-4">
-                                    <label class="block text-sm font-medium mb-1">Biaya Modal Sparepart</label>
-
-                                    <div id="modal_container">
-                                        <!-- row dinamis -->
-                                    </div>
-
-                                    <button type="button" id="add_modal" class="px-3 py-1 bg-blue-500 text-white rounded mt-2">
-                                        + Tambah Modal
-                                    </button>
-
-                                </div>
-
-
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium mb-1">Biaya Pengerjaan Sparepart</label>
-
-                                    <div id="biaya_container">
-                                        <!-- row dinamis -->
-                                    </div>
-
-                                    <button type="button" id="add_biaya" class="px-3 py-1 bg-blue-500 text-white rounded mt-2">
-                                        + Tambah Biaya
-                                    </button>
-
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Modal Sparepart </label>
@@ -357,15 +349,87 @@
                                     </div>
 
                                 </div>
-
-                                <div>
+                              
+                                {{-- <div>
                                     <label class="block text-sm font-medium mb-1" for="exp_garansi">Masa Garansi</label>
                                     @if ($item->exp_garansi != null)
                                         <input id="exp_garansi" name="exp_garansi" class="form-input w-full px-2 py-1" type="date" value="{{ \Carbon\Carbon::parse($item->exp_garansi)->format('Y-m-d') }}"/>
                                     @else
                                         <input id="exp_garansi" name="exp_garansi" class="form-input w-full px-2 py-1" type="date" value=""/>
                                     @endif
-                                </div>
+                                </div> --}}
+                                 @if ($item->kondisi_servis != 'Sudah jadi')
+                                @else
+                                    @if (json_decode($item->tindakan_servis) == null)
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1"
+                                                for="garansi">Garansi</label>
+                                            <select name="garansi[]" class="form-select text-sm py-1 w-full">
+                                                <option value="">Tidak Ada</option>
+                                                <option value="1">1 Hari</option>
+                                                <option value="2">2 Hari</option>
+                                                <option value="3">3 Hari</option>
+                                                <option value="4">4 Hari</option>
+                                                <option value="5">5 Hari</option>
+                                                <option value="6">6 Hari</option>
+                                                <option value="7">1 Minggu</option>
+                                                <option value="14">2 Minggu</option>
+                                                <option value="21">3 Minggu</option>
+                                                <option value="30">1 Bulan</option>
+                                                <option value="60">2 Bulan</option>
+                                                <option value="90">3 Bulan</option>
+                                                <option value="120">4 Bulan</option>
+                                                <option value="150">5 Bulan</option>
+                                                <option value="180">6 Bulan</option>
+                                                <option value="210">7 Bulan</option>
+                                                <option value="240">8 Bulan</option>
+                                                <option value="270">9 Bulan</option>
+                                                <option value="300">10 Bulan</option>
+                                                <option value="330">11 Bulan</option>
+                                                <option value="365">1 Tahun</option>
+                                                <option value="730">2 Tahun</option>
+                                                <option value="1095">3 Tahun</option>
+                                                <option value="1460">4 Tahun</option>
+                                                <option value="1825">5 Tahun</option>
+                                            </select>
+                                        </div>
+                                    @else
+                                        @foreach (json_decode($item->tindakan_servis) as $items)
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1" for="garansi">Garansi
+                                                    {{ $items }}</label>
+                                                <select name="garansi[]" class="form-select text-sm py-1 w-full">
+                                                    <option value="">Tidak Ada</option>
+                                                    <option value="1">1 Hari</option>
+                                                    <option value="2">2 Hari</option>
+                                                    <option value="3">3 Hari</option>
+                                                    <option value="4">4 Hari</option>
+                                                    <option value="5">5 Hari</option>
+                                                    <option value="6">6 Hari</option>
+                                                    <option value="7">1 Minggu</option>
+                                                    <option value="14">2 Minggu</option>
+                                                    <option value="21">3 Minggu</option>
+                                                    <option value="30">1 Bulan</option>
+                                                    <option value="60">2 Bulan</option>
+                                                    <option value="90">3 Bulan</option>
+                                                    <option value="120">4 Bulan</option>
+                                                    <option value="150">5 Bulan</option>
+                                                    <option value="180">6 Bulan</option>
+                                                    <option value="210">7 Bulan</option>
+                                                    <option value="240">8 Bulan</option>
+                                                    <option value="270">9 Bulan</option>
+                                                    <option value="300">10 Bulan</option>
+                                                    <option value="330">11 Bulan</option>
+                                                    <option value="365">1 Tahun</option>
+                                                    <option value="730">2 Tahun</option>
+                                                    <option value="1095">3 Tahun</option>
+                                                    <option value="1460">4 Tahun</option>
+                                                    <option value="1825">5 Tahun</option>
+                                                </select>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                @endif
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="pengambil">Pengambil</label>
                                     <input id="pengambil" name="pengambil" class="form-input w-full px-2 py-1" type="text" value="{{ $item->pengambil }}"/>
@@ -375,7 +439,7 @@
                         <!-- Modal footer -->
                         <div class="px-5 py-4 border-t border-slate-200">
                             <div class="flex flex-wrap justify-end space-x-2">
-                                <a href="{{ route('transaksi-servis-belum-disetujui.index') }}" class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600">
+                                <a href="{{ route('transaksi-servis-sudah-diambil.index') }}" class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600">
                                     Batal
                                 </a>
                                 <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Simpan</button>
@@ -385,7 +449,7 @@
                 </div>
             </div>
         </div>
-
+        
     </div>
 
     @push('styles')
@@ -403,105 +467,42 @@
                 $('#selectjs4').select2();
             });
         </script>
-           <script>
-$(document).ready(function() {
-
-    function addRow(containerId, inputName, value = "") {
-        let html = `
-            <div class="flex items-center mb-2 row-item">
-                <input type="number"
-                       name="${inputName}[]"
-                       class="form-input w-full biaya-input"
-                       value="${value}"
-                       placeholder="Masukkan angka">
-
-                <button type="button" class="ml-2 remove-row bg-red-500 text-white px-3 py-1 rounded">
-                    -
-                </button>
-            </div>
-        `;
-        $(containerId).append(html);
-    }
-
-    /** auto hitung **/
-    function calculate(containerId, target) {
-        let total = 0;
-        $(`${containerId} .biaya-input`).each(function() {
-            total += parseInt($(this).val()) || 0;
-        });
-        $(target).val(total);
-    }
-
-    /** tombol tambah **/
-    $("#add_modal").on("click", function() {
-        addRow("#modal_container", "modal_j");
-    });
-
-    $("#add_biaya").on("click", function() {
-        addRow("#biaya_container", "biaya_j");
-    });
-
-    /** hapus row **/
-    $(document).on("click", ".remove-row", function() {
-        $(this).closest(".row-item").remove();
-        calculate("#modal_container", "#modal_sparepart");
-        calculate("#biaya_container", "#biaya");
-    });
-
-    /** hitung realtime **/
-    $(document).on("input", ".biaya-input", function() {
-        calculate("#modal_container", "#modal_sparepart");
-        calculate("#biaya_container", "#biaya");
-    });
-
-    /** load data dari database **/
-    let modalDB = @json(json_decode($item->modal_j ?? '[]', true) ?? []);
-    let biayaDB = @json(json_decode($item->biaya_j ?? '[]', true) ?? []);
-
-    modalDB.forEach(v => addRow("#modal_container", "modal_j", v));
-    biayaDB.forEach(v => addRow("#biaya_container", "biaya_j", v));
-
-    calculate("#modal_container", "#modal_sparepart");
-    calculate("#biaya_container", "#biaya");
-
-});
-</script>
-
+                
         <script>
        document.addEventListener("DOMContentLoaded", function () {
-            const modalJInput = document.getElementById("modal_j");
-            const modalSparepartInput = document.getElementById("modal_sparepart");
+    const modalJInput = document.getElementById("modal_j");
+    const modalSparepartInput = document.getElementById("modal_sparepart");
 
-            function calculateModal() {
-                try {
-                    let raw = modalJInput.value.trim();
+    function calculateModal() {
+        try {
+            let raw = modalJInput.value.trim();
 
-                    // perbaiki kutip miring dan koma aneh
-                    raw = raw.replace(/[“”]/g, '"').replace(/‘’/g, "'").replace(/，/g, ",");
+            // perbaiki kutip miring dan koma aneh
+            raw = raw.replace(/[“”]/g, '"').replace(/‘’/g, "'").replace(/，/g, ",");
 
-                    // parse JSON aman
-                    let values = JSON.parse(raw);
+            // parse JSON aman
+            let values = JSON.parse(raw);
 
-                    // pastikan array angka
-                    if (!Array.isArray(values)) values = [values];
-                    let numbers = values.map(v => parseInt(v) || 0);
+            // pastikan array angka
+            if (!Array.isArray(values)) values = [values];
+            let numbers = values.map(v => parseInt(v) || 0);
 
-                    // jumlahkan
-                    let total = numbers.reduce((a, b) => a + b, 0);
+            // jumlahkan
+            let total = numbers.reduce((a, b) => a + b, 0);
 
-                    // taruh ke input modal_sparepart
-                    modalSparepartInput.value = total;
-                } catch (e) {
-                    modalSparepartInput.value = 0;
-                }
-            }
+            // taruh ke input modal_sparepart
+            modalSparepartInput.value = total;
+        } catch (e) {
+            modalSparepartInput.value = 0;
+        }
+    }
 
-            // hitung pertama kali
-            calculateModal();
+    // hitung pertama kali
+    calculateModal();
 
-            // update realtime kalau ada perubahan
-            modalJInput.addEventListener("input", calculateModal);
-        });
+    // update realtime kalau ada perubahan
+    modalJInput.addEventListener("input", calculateModal);
+});
 
         document.addEventListener("DOMContentLoaded", function () {
             const biayaJInput = document.getElementById("biaya_j");
@@ -532,7 +533,7 @@ $(document).ready(function() {
             biayaJInput.addEventListener("input", calculatebiaya);
         });
 
-
+        
         let ppn = {{ $item->ppn }};
 
         function getTotal() {

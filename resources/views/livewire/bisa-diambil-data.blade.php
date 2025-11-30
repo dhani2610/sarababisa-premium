@@ -461,7 +461,7 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Teknisi</div>
                             </th>
-                            @if (Auth::user()->role != 'Investor')
+                            @if (Auth::user()->role != 'Investor' && $storeSetting->is_modal == 1)
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Modal Sparepart</div>
                             </th>

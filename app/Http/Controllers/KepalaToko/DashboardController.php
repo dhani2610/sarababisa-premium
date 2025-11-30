@@ -164,9 +164,9 @@ class DashboardController extends Controller
 
         $hariomzetservis = ServiceTransaction::where('cabang_id', $cabang)
             ->where('status_servis', 'Sudah Diambil')
-            ->whereYear('tgl_ambil', now()->year)
-            ->whereMonth('tgl_ambil', now()->month)
-            ->whereDate('tgl_ambil', today())
+            ->whereYear('tgl_disetujui', now()->year)
+            ->whereMonth('tgl_disetujui', now()->month)
+            ->whereDate('tgl_disetujui', today())
             ->sum('omzet');
 
         $hariomzetpenjualan = OrderDetail::where('cabang_id', $cabang)

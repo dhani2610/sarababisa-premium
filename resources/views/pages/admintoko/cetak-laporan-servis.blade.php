@@ -121,8 +121,10 @@
                 <th>: Rp. {{ number_format($total_kredit) }}</th>
             </tr>
             <tr>
+                @if ($toko->is_modal === 1)
                 <th>Total Modal Sparepart</th>
                 <th>: Rp. {{ number_format($total_modal) }}</th>
+                @endif
                 @if (Auth::user()->role != 'Teknisi')
                 <th>Total Profit</th>
                 <th>: Rp. {{ number_format($total_profit) }}</th>
@@ -166,7 +168,7 @@
                 <th>Teknisi</th>
                 <th>Model Seri</th>
                 <th>Tindakan</th>
-                @if ($toko->is_bonus === 1)
+                @if ($toko->is_modal === 1)
                     <th>Modal Sparepart</th>
                 @endif
                 <th>Biaya Servis</th>
@@ -228,7 +230,7 @@
                             $modal_convert = is_array($modal_j) ? ($modal_j[0] ?? 0) : $modal_j;
                         @endphp
 
-                        @if ($toko->is_bonus === 1)
+                        @if ($toko->is_modal === 1)
                             <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($modal_convert) }}
                             </td>

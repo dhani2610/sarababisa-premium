@@ -189,6 +189,7 @@ class LaporanPenjualanController extends Controller
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $pdf = Pdf::loadView('pages.admintoko.cetak-laporan-penjualan', [
+        // return view('pages.admintoko.cetak-laporan-penjualan', [
         // $pdf = Pdf::loadView('pages.admintoko.cetak-laporan-penjualan', [
             'users' => $users,
             'toko' => $toko,
