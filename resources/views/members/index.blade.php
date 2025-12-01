@@ -117,6 +117,29 @@
                                             class="btn btn-success btn-action">Update</button>
                                     </div>
                                 </div>
+
+                                <div class="card shadow-sm mb-4 border-0">
+                                    <div class="card-body">
+
+                                        <h6 class="text-primary fw-bold mb-2">Paket Cabang Member</h6>
+
+                                        <div class="mb-2">
+                                            <small class="text-muted">Total Max Cabang Saat Ini:</small><br>
+                                            <span id="cab-now-{{ $member->id }}"
+                                                class="fw-bold text-dark">Loading...</span>
+                                        </div>
+
+                                        <div class="input-group mt-2">
+                                            <input type="number" id="cab-input-{{ $member->id }}"
+                                                class="form-control" placeholder="Masukan jumlah max cabang">
+                                            <button onclick="updateCabang({{ $member->id }}, '{{ $member->link }}')"
+                                                class="btn btn-primary">Update</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
                             </div>
 
                             <!-- Action Buttons -->
@@ -196,6 +219,38 @@
                 })
                 .then(res => Swal.fire('Sukses', res.data.msg, 'success'))
                 .catch(() => Swal.fire('Error', 'Gagal update expired', 'error'));
+        }
+
+
+        // LOAD TOTAL CABANG untuk tiap member dari API remote
+        @foreach ($members as $member)
+            axios.get("{{ $member->link }}/api/get-total-cabang")
+                .then(res => {
+                    document.getElementById("cab-now-{{ $member->id }}").textContent = res.data.data;
+                    document.getElementById("cab-input-{{ $member->id }}").value = res.data.data;
+                })
+                .catch(err => {
+                    document.getElementById("cab-now-{{ $member->id }}").textContent = "Gagal Ambil Data";
+                });
+        @endforeach
+
+
+        // UPDATE CABANG
+        function updateCabang(memberId, link) {
+            const val = document.getElementById("cab-input-" + memberId).value;
+
+            if (!val) {
+                return Swal.fire("Peringatan", "Total cabang wajib diisi!", "warning");
+            }
+
+            axios.post(link + "/api/update-total-cabang", {
+                total_cabang: val
+            }).then(res => {
+                Swal.fire("Sukses", res.data.msg, "success");
+                document.getElementById("cab-now-" + memberId).textContent = val;
+            }).catch(() => {
+                Swal.fire("Error", "Gagal update cabang!", "error");
+            });
         }
     </script>
 </body>
