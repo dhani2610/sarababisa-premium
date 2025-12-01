@@ -225,6 +225,7 @@ class AkunController extends Controller
     {
         // dd($request->all());
         $langganan = Auth::user()->exp_date;
+        $total_cabang = Auth::user()->total_cabang;
 
         $data = [
             'name' => $request->name,
@@ -242,6 +243,7 @@ class AkunController extends Controller
             'nominal_bonus_admin' => $request->nominal_bonus_admin,
             'shift_id' => $request->shift_id,
             'exp_date' => $langganan,
+            'total_cabang' => $total_cabang,
             'cabang_id' => getCabangId(),
         ];
 
@@ -260,6 +262,7 @@ class AkunController extends Controller
         // dd($request->all());
         $item = User::findOrFail($id);
         $langganan = Auth::user()->exp_date;
+        $total_cabang = Auth::user()->total_cabang;
 
         $password = $item->password;
         if ($request->filled('password')) {
@@ -282,6 +285,7 @@ class AkunController extends Controller
             'nominal_bonus_admin' => $request->nominal_bonus_admin,
             'shift_id' => $request->shift_id,
             'exp_date' => $langganan,
+            'total_cabang' => $total_cabang,
         ];
 
         if ($request->role === 'Investor' && $request->hasFile('pdf_investor')) {
