@@ -91,7 +91,7 @@
 	<table id="ringkasan">
 		<tbody>
 			<tr>
-				@if ($toko->is_bonus === 1)
+				@if ($toko->is_modal === 1)
 				<th>Total Modal</th>
 				<th>: Rp. {{ number_format($total_modal) }}</th>
 				@endif
@@ -140,7 +140,7 @@
 				<th>Pelanggan</th>
 				<th>Nama Produk</th>
 				<th>Jumlah</th>
-				@if ($toko->is_bonus === 1)
+				@if ($toko->is_modal === 1)
 				<th>Modal</th>
 				@endif
 				<th>Harga Jual</th>
@@ -184,7 +184,7 @@
 						@endif
 					</td>
 					<td style="text-align: center; width: 40px;">{{ $item->quantity }}</td>
-					@if ($toko->is_bonus === 1)
+					@if ($toko->is_modal === 1)
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->modal) }}</td>
 					@endif
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->total) }}</td>

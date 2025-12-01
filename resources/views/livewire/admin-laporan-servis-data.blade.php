@@ -160,7 +160,7 @@
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Tindakan</div>
                         </th>
-                        @if ($toko->is_bonus === 1)
+                        @if ($toko->is_modal === 1)
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Modal Sparepart</div>
                         </th>
@@ -206,7 +206,7 @@
                                     {{ implode(', ', json_decode($item->tindakan_servis) ?? []) }}
                                 </div>
                             </td>
-                            @if ($toko->is_bonus === 1)
+                            @if ($toko->is_modal === 1)
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ number_format($item->modal_sparepart) }}</div>
                             </td>

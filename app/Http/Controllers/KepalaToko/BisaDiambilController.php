@@ -29,8 +29,9 @@ class BisaDiambilController extends Controller
      */
     public function index()
     {
+        $storeSetting = StoreSetting::where('cabang_id',getCabangId())->first();;
 
-        return view('pages/kepalatoko/servis/bisa-diambil');
+        return view('pages/kepalatoko/servis/bisa-diambil',compact('storeSetting'));
     }
 
     public function getData(Request $request)
