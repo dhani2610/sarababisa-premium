@@ -17,16 +17,12 @@
             <div x-data="{ modalOpen: false }">
 
             @php
-                $host = request()->getHost(); // dapat host saja tanpa http:// atau port
-                // host yang boleh tampil tombol
-                $allowedHosts = [
-                    'hi-bdl.saraba-bisa.com',
-                    '127.0.0.1',
-                    'localhost',
-                ];
+                if (count($cabang) < Auth::user()->total_cabang) {
+                    $allowShow = true;
+                }else {
+                    $allowShow = false;
+                }
 
-                // tombol muncul kalau host sesuai DAN jumlah cabang masih 0
-                $allowShow = in_array($host, $allowedHosts);
             @endphp
 
             @if ($allowShow)

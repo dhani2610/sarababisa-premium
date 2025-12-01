@@ -145,9 +145,37 @@ class AkunController extends Controller
 
         return redirect()->back()->with('success', 'Tanggal expired berhasil diperbarui untuk semua user!');
     }
+    public function getDataTotalCabang(Request $request)
+    {
+        try {
+            $data = User::select('total_cabang')->first();
+
+            return response()->json(['msg'=>'berhasil','data'=>$data->total_cabang ?? 0]);
+        } catch (\Throwable $th) {
+            return response()->json(['msg'=>'gagal','error'=> $th->getMessage()]);
+        }
+    }
+    public function updateTotalCabang(Request $request)
+    {
+        try {
+            $request->validate([
+                'total_cabang' => 'required|date',
+            ]);
+
+            User::query()->update([
+                'total_cabang' => $request->total_cabang,
+            ]);
+
+            return response()->json(['msg'=>'berhasil','data'=>$data->total_cabang ?? 0]);
+        } catch (\Throwable $th) {
+            return response()->json(['msg'=>'gagal','error'=> $th->getMessage()]);
+        }
+    }
+
     public function updateExpDateJson(Request $request)
     {
         try {
+            $request->validate([
             $request->validate([
                 'exp_date' => 'required|date',
             ]);

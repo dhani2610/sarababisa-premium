@@ -63,6 +63,7 @@ class User extends Authenticatable
         'nominal_bonus_admin',
         'shift_id',
         'cabang_id',
+        'total_cabang',
     ];
 
     /**
