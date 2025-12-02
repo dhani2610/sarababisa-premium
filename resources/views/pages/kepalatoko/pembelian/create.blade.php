@@ -186,16 +186,16 @@
                                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                         <div class="font-semibold text-left">Nama Produk</div>
                                     </th>
-                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="kapasitas">
                                         <div class="font-semibold text-left">Kapasitas</div>
                                     </th>
-                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="ram">
                                         <div class="font-semibold text-left">Ram</div>
                                     </th>
-                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="warna">
                                         <div class="font-semibold text-left">Warna</div>
                                     </th>
-                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="imei">
                                         <div class="font-semibold text-left">Imei</div>
                                     </th>
                                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -224,9 +224,11 @@
                             <tbody class="text-sm divide-y divide-slate-200">
                                 <!-- Row -->
                                 <tr>
-                                    <td colspan="8"></td>
-                                    <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                        <input type="text" name="estimated_amount" id="estimated_amount" value="0" class="form-input estimated_amount" readonly style="background-color: #ddd;">
+                                    <td>
+                                        <div class="font-semibold ml-3">Subtotal</div>
+                                    </td>
+                                    <td  class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <input type="text" name="estimated_amount" id="estimated_amount" size="float:right" value="0" class="form-input estimated_amount" readonly style="background-color: #ddd;">
                                     </td>
                                     <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     </td>
@@ -268,7 +270,7 @@
                     <input type="hidden" name="products_id[]" value="@{{products_id}}">
                 </td>
 
-                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="kapasitas">
                     <select id="capacities_id" name="capacities_id[]" class="form-input text-sm " >
                         <option selected value="">Pilih Memori</option>
                         @foreach ($capacities as $capacity)
@@ -276,7 +278,7 @@
                         @endforeach
                     </select>
                 </td>
-                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="ram">
                     <select id="ram" name="ram[]" class="form-input text-sm " >
                         <option selected value="">Pilih RAM</option>
                         <option value="2 GB">2 GB</option>
@@ -288,7 +290,7 @@
                     </select>
                 </td>
 
-                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="warna">
                     <select id="warna" name="warna[]" class="form-input text-sm " >
                         <option selected value="">Pilih Warna</option>
                         @foreach ($colors as $item)
@@ -296,7 +298,7 @@
                         @endforeach
                     </select>
                 </td>
-                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="imei">
                     <input id="nomor_seri" name="nomor_seri[]" class="form-input " type="text" />
                 </td>
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -334,6 +336,31 @@
         </script>
 
         <script>
+        // Ketika kategori berubah
+        $("#categories_id").on("change", function () {
+            const categoryId = $(this).val();
+
+            // Jika kategori BUKAN 1, hide kapasitias, ram, warna, imei
+            if (categoryId != 1) {
+                $('[data-hp-field]').hide();
+                $('[data-hp-field] select, [data-hp-field] input').val('');
+            } else {
+                $('[data-hp-field]').show();
+            }
+        });
+
+        // Ketika user klik "Masukkan Produk", cek lagi kategori
+        $(document).on("click", ".addeventmore", function () {
+            setTimeout(() => {
+                const categoryId = $("#categories_id").val();
+                if (categoryId != 1) {
+                    $('[data-hp-field]').hide();
+                } else {
+                    $('[data-hp-field]').show();
+                }
+            }, 200);
+        });
+
         document.getElementById("tipe_select").addEventListener("change", function () {
             const tipe = this.value;
 
