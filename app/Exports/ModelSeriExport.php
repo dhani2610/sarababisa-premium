@@ -24,7 +24,7 @@ class ModelSeriExport implements FromCollection, WithMapping, WithHeadings, Shou
     {
         return [
             $modelserie->id,
-            $modelserie->name,
+            $modelserie->name ?? '-',
             $modelserie->brands_id,
             $modelserie->id_tipe_os,
             $modelserie->nominal_bonus,

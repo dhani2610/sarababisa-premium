@@ -25,12 +25,12 @@
                         <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                     </svg>
                     <span class="hidden xs:block ml-2">Tambah Transaksi Baru</span>
-                </button>                        
-                
+                </button>
+
             </div>
 
         </div>
-     
+
         <div x-data="{ modalOpen: true }">
             <!-- Modal backdrop -->
             <div
@@ -86,7 +86,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Nama Barang</label>
-                                    <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->type->name }} {{ $item->brand->name }} {{ $item->modelserie->name }}" disabled />
+                                    <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->type->name }} {{ $item->brand->name }} {{ $item->modelserie->name ?? '-' }}" disabled />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Warna & Kapasitas Barang</label>

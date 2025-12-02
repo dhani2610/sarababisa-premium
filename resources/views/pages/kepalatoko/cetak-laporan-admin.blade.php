@@ -150,7 +150,7 @@
 						</td>
 					@endif
 					<td style="text-align: left; width: 90px;" class="capital">{{ $item->nama_pelanggan }}</td>
-					<td style="text-align: left; width: 80px;">{{ $item->modelserie->name }}</td>
+					<td style="text-align: left; width: 80px;">{{ $item->modelserie->name ?? '-' }}</td>
 					<td class="capital" style="text-align: left;">
 						@if ($item->kondisi_servis != 'Sudah jadi')
 							{{ $item->kondisi_servis }}

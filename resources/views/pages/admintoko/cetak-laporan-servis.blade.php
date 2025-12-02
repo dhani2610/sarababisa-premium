@@ -212,7 +212,7 @@
                         @endif
                         <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
                             @if ($item->modelserie)
-                                {{ $item->modelserie->name }}
+                                {{ $item->modelserie->name ?? '-' }}
                             @else
                                 -
                             @endif
@@ -350,7 +350,7 @@
                         @endif
                         <td style="text-align: left; width: 70px;">
                             @if ($item->modelserie)
-                                {{ $item->modelserie->name }}
+                                {{ $item->modelserie->name ?? '-' }}
                             @else
                                 -
                             @endif
@@ -462,7 +462,7 @@
                     <td>{{ $item->nomor_servis }}</td>
                     <td>{{ $item->nama_pelanggan }}</td>
                     <td>{{ $item->penerima }}</td>
-                    <td>{{ $item->modelserie->name ?? '-' }}</td>
+                    <td>{{ $item->modelserie->name ?? '-' ?? '-' }}</td>
                     <td>{{ $item->kerusakan }}</td>
                     <td>Rp. {{ number_format($item->estimasi_biaya) }}</td>
                     <td>Rp. {{ number_format($item->uang_muka) }}</td>

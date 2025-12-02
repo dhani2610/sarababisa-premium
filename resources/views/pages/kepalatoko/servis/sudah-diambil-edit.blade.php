@@ -141,7 +141,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="model_series_id">Model Seri </label>
                                     <select id="selectjs2" name="model_series_id" class="form-select text-sm py-1 w-full" >
-                                        <option selected value="{{ $item->modelserie->id }}">{{ $item->modelserie->name }}</option>
+                                        <option selected value="{{ $item->modelserie->id }}">{{ $item->modelserie->name ?? '-' }}</option>
                                         @foreach ($model_series as $model_serie)
                                             <option value="{{ $model_serie->id }}">{{ $model_serie->name }}</option>
                                         @endforeach
@@ -169,7 +169,7 @@
                                         <option value="Dibatalkan">Dibatalkan</option>
                                     </select>
                                 </div>
-                              
+
                                     <label class="block text-sm font-medium mb-1" for="products_id">Sparepart yang digunakan  </label>
                                     <select id="selectjs4" name="products_id" class="form-select text-sm py-1 w-full">
                                         @if ($item->product != null)
@@ -204,7 +204,7 @@
                                         <option value="Interface" {{ $item->tipe == 'Interface' ? 'selected' : '' }}>Interface (bonus pertipe)</option>
                                         <option value="Hardware" {{ $item->tipe == 'Hardware' ? 'selected' : '' }}>Hardware & interface (bonus persen)</option>
                                     </select>
-                                </div> 
+                                </div>
                                 {{-- @dd($item) --}}
 
                                 <div>
@@ -462,14 +462,14 @@ $(document).ready(function() {
 
                 <div class="mb-2">
                     <label class="text-sm">Biaya Modal Sparepart</label>
-                    <input type="number" name="modal_j[]" 
+                    <input type="number" name="modal_j[]"
                            class="form-input w-full px-2 py-1 biaya-modal"
                            value="${modal}" placeholder="Masukkan modal">
                 </div>
 
                 <div class="mb-2">
                     <label class="text-sm">Biaya Pengerjaan Sparepart</label>
-                    <input type="number" name="biaya_j[]" 
+                    <input type="number" name="biaya_j[]"
                            class="form-input w-full px-2 py-1 biaya-biaya"
                            value="${biaya}" placeholder="Masukkan biaya">
                 </div>
