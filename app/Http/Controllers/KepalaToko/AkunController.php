@@ -176,7 +176,6 @@ class AkunController extends Controller
     {
         try {
             $request->validate([
-            $request->validate([
                 'exp_date' => 'required|date',
             ]);
 
