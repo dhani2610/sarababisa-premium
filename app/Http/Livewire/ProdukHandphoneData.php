@@ -164,8 +164,8 @@ class ProdukHandphoneData extends Component
             'handphonestokhabis' => $handphonestokhabis,
             'handphonenominalterjual' => $handphonenominalterjual,
             'products' => $this->search === null ?
-                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '1')->paginate($this->paginate) :
-                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '1')->where('product_name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '1')->orderBy('created_at','desc')->paginate($this->paginate) :
+                Product::where('cabang_id',getCabangId())->latest()->where('categories_id', '=', '1')->where('product_name', 'like', '%' . $this->search . '%')->orderBy('created_at','desc')->paginate($this->paginate)
         ]);
     }
 }

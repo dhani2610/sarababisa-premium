@@ -162,7 +162,7 @@
                         @endif
                         <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
                             @if ($item->modelserie)
-                                {{ $item->modelserie->name }}
+                                {{ $item->modelserie->name ?? '-' }}
                             @else
                                 -
                             @endif
@@ -178,7 +178,7 @@
                         <td style="width: 60px; text-align: right;">Rp. {{ number_format($modal_j[0]) }}
                         </td>
                         <td style="width: 60px; text-align: right;">Rp. {{ number_format($biaya_j[0]) }}</td>
-                        {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td> --}} 
+                        {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td> --}}
                         <td style="width: 50px; text-align: right;" rowspan="{{ count($tindakan_servis) }}">Rp. {{ number_format($item->diskon) }}</td>
                         <td style="width: 60px; text-align: right;">
                             @php
@@ -304,7 +304,7 @@
                         @endif
                         <td style="text-align: left; width: 70px;">
                             @if ($item->modelserie)
-                                {{ $item->modelserie->name }}
+                                {{ $item->modelserie->name ?? '-' }}
                             @else
                                 -
                             @endif
@@ -422,7 +422,7 @@
                     <td>{{ $item->nomor_servis }}</td>
                     <td>{{ $item->nama_pelanggan }}</td>
                     <td>{{ $item->penerima }}</td>
-                    <td>{{ $item->modelserie->name ?? '-' }}</td>
+                    <td>{{ $item->modelserie->name ?? '-' ?? '-' }}</td>
                     <td>{{ $item->kerusakan }}</td>
                     <td>Rp. {{ number_format($item->estimasi_biaya) }}</td>
                     <td>Rp. {{ number_format($item->uang_muka) }}</td>

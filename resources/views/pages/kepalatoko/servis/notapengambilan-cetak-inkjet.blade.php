@@ -150,7 +150,7 @@
                 <td scope="row" style="border-left-style: solid;">Alamat</th>
                 <td class="capital">: {{ $items->customer->alamat }}</td>
                 <td scope="row" style="border-left-style: solid;">Model Seri</th>
-                <td class="capital">: {{ $items->modelserie->name }}</td>
+                <td class="capital">: {{ $items->modelserie->name ?? '-' }}</td>
                 <td scope="row">Warna/Kapasitas</th>
                 <td class="capital">: {{ $items->warna }} / {{ $items->capacity->name }}</td>
             </tr>
@@ -186,10 +186,10 @@
                     <br>
                     <br>
                     PPN ({{ $items->ppn }}%)
-                    
+
                     <br>
                     <br>
-                    Total 
+                    Total
                     @endif
                 </td>
                 <td id="data">: Rp. {{ number_format($items->biaya - $items->diskon) }}
@@ -202,9 +202,9 @@
                     : Rp. {{ number_format($totalWithPpn) }}
                     @endif
                 </td>
-               
+
             </tr>
-          
+
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Kondisi Servis</th>
                 <td id="data" class="capital">: {{ $items->kondisi_servis }}</td>
@@ -242,8 +242,8 @@
                                     <li style="margin-bottom: 6px">{{ $tindakan }}
                                         {{-- (<strong>{{ Carbon\Carbon::make(json_decode($items->exp_garansi_j)[$key])->format('Y-m-d') ? 'Garansi ' . Carbon\Carbon::make(json_decode($items->exp_garansi_j)[$key])->format('Y-m-d') : 'Garansi tidak ada' }}</strong>) --}}
                                          (<strong>
-                                            {{ ($garansi = json_decode($items->exp_garansi_j, true)[$key] ?? null) 
-                                                ? 'Garansi ' . \Carbon\Carbon::make($garansi)->format('Y-m-d') 
+                                            {{ ($garansi = json_decode($items->exp_garansi_j, true)[$key] ?? null)
+                                                ? 'Garansi ' . \Carbon\Carbon::make($garansi)->format('Y-m-d')
                                                 : 'Garansi tidak ada' }}
                                         </strong>)
 
@@ -266,8 +266,8 @@
                             @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
-                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key]) 
-                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya) 
+                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key])
+                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya)
                                         : '-' }}
                                     </li>
                                 </ul>
@@ -286,18 +286,18 @@
                     <td id="data" scope="row" style="border-left-style: solid;"></td>
                     <td id="data"></td>
                     <td id="data" scope="row" style="border-left-style: solid;">Sisa Pembayaran</td>
-                    {{-- <td id="data">: Rp. 
+                    {{-- <td id="data">: Rp.
                         {{ number_format(
-                            $items->biaya 
-                            - ($items->kondisi_servis == 'Dibatalkan' ? 0 : $items->uang_muka) 
+                            $items->biaya
+                            - ($items->kondisi_servis == 'Dibatalkan' ? 0 : $items->uang_muka)
                             - $items->diskon
                         ) }}
                     </td> --}}
-                    {{-- <td id="data">: Rp. 
+                    {{-- <td id="data">: Rp.
                         {{ number_format(
                             max(0,
-                                $items->biaya 
-                                - $items->diskon 
+                                $items->biaya
+                                - $items->diskon
                                 - ($items->kondisi_servis == 'Dibatalkan' ? 0 : $items->uang_muka)
                             )
                         ) }}
@@ -331,8 +331,8 @@
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">{{ $tindakan }}
                                         (<strong>
-                                            {{ ($garansi = json_decode($items->exp_garansi_j, true)[$key] ?? null) 
-                                                ? 'Garansi ' . \Carbon\Carbon::make($garansi)->format('Y-m-d') 
+                                            {{ ($garansi = json_decode($items->exp_garansi_j, true)[$key] ?? null)
+                                                ? 'Garansi ' . \Carbon\Carbon::make($garansi)->format('Y-m-d')
                                                 : 'Garansi tidak ada' }}
                                         </strong>)
 
@@ -349,8 +349,8 @@
                             @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
-                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key]) 
-                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya) 
+                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key])
+                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya)
                                         : '-' }}
                                     </li>
                                 </ul>
@@ -376,7 +376,7 @@
                     @endphp
 
                     <td id="data">: Rp. {{ number_format($subtotal) }}</td>
-                        
+
                 </tr>
             @elseif ($items->diskon != null && $items->uang_muka === null)
                 <tr style="border-right-style: solid;">
@@ -405,8 +405,8 @@
                             @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
-                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key]) 
-                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya) 
+                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key])
+                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya)
                                         : '-' }}
                                     </li>
                                 </ul>
@@ -463,8 +463,8 @@
                            @foreach (json_decode($items->biaya_j) as $key => $biaya)
                                 <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
                                     <li style="margin-bottom: 6px">
-                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key]) 
-                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya) 
+                                        {{ is_array(json_decode($items->tindakan_servis, true)) && isset(json_decode($items->tindakan_servis, true)[$key])
+                                        ? json_decode($items->tindakan_servis, true)[$key] . ' = Rp. ' . number_format($biaya)
                                         : '-' }}
                                     </li>
                                 </ul>
@@ -503,17 +503,17 @@
                     }
                     return $temp;
                 }
-            
+
                 function terbilang($nilai) {
                     if($nilai<0) {
                         $hasil = "Minus ". trim(penyebut($nilai));
                     } else {
                         $hasil = trim(penyebut($nilai));
-                    }     		
+                    }
                     return $hasil;
                 }
                 @endphp
-              
+
                 <th class="text-right w-75">
                     {{-- <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">Terbilang : {{ terbilang($totalWithPpn) }}</span> --}}
                 </th>
@@ -534,7 +534,7 @@
                     </td>
                 @endif
             </tr>
-            
+
             <tr>
             <tr>
                 <th class="text-left w-75">Syarat & Ketentuan</th>

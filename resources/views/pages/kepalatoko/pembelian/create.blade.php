@@ -93,18 +93,36 @@
         <div class="space-y-8 mt-8 mb-6">
             <div class="grid gap-5 md:grid-cols-3">
                 <div>
-                    <!-- Start -->
-                    <div>
-                        <label class="block text-sm font-medium mb-1" for="default">Supplier</label>
-                        <select id="suppliers_id" name="suppliers_id" class="form-select text-sm w-full" required>
-                            <option value="">Pilih Supplier</option>
-                            @foreach ($suppliers as $item)
-                                <option value="{{ $item->id }}">{{ $item->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <!-- End -->
+                    <label class="block text-sm font-medium mb-1">Tipe</label>
+                    <select id="tipe_select" class="form-select text-sm w-full" required>
+                        <option value="">Pilih Tipe</option>
+                        <option value="Supplier">Supplier</option>
+                        <option value="Pelanggan">Pelanggan</option>
+                    </select>
                 </div>
+
+                <!-- Supplier Dropdown -->
+                <div id="supplier_box" class="hidden">
+                    <label class="block text-sm font-medium mb-1">Supplier</label>
+                    <select id="supplier_select" name="supplier_id" class="supplier_id form-select text-sm w-full">
+                        <option value="">Pilih Supplier</option>
+                        @foreach ($suppliers as $item)
+                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Pelanggan Dropdown -->
+                <div id="pelanggan_box" class="hidden">
+                    <label class="block text-sm font-medium mb-1">Pelanggan</label>
+                    <select id="pelanggan_select" name="suppliers_id" class="supplier_id form-select text-sm w-full">
+                        <option value="">Pilih Pelanggan</option>
+                        @foreach ($customers as $c)
+                            <option value="{{ $c->id }}">{{ $c->nama }} - {{ $c->nomor_hp }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
 
                 <div>
                     <!-- Start -->
@@ -159,50 +177,66 @@
                     <h2 class="font-semibold text-slate-800">Data Produk</h2>
                 </header>
                 <!-- Table -->
-                <div class="overflow-x-auto">
-                    <table class="table-auto w-full">
-                        <!-- Table header -->
-                        <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
-                            <tr>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-semibold text-left">Nama Produk</div>
-                                </th>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-semibold text-left">Kuantitas</div>
-                                </th>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-semibold text-left">Harga Beli</div>
-                                </th>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-semibold text-left">Keterangan</div>
-                                </th>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-semibold text-left">Total</div>
-                                </th>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-semibold text-left">Aksi</div>
-                                </th>
-                            </tr>
-                        </thead>
+                {{-- <div class=""> --}}
+                    <div class="overflow-x-auto w-full">
+                        <table class="min-w-max w-full">
+                            <!-- Table header -->
+                            <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
+                                <tr>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <div class="font-semibold text-left">Nama Produk</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="kapasitas">
+                                        <div class="font-semibold text-left">Kapasitas</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="ram">
+                                        <div class="font-semibold text-left">Ram</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="warna">
+                                        <div class="font-semibold text-left">Warna</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="imei">
+                                        <div class="font-semibold text-left">Imei</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <div class="font-semibold text-left">Kuantitas</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <div class="font-semibold text-left">Harga Beli</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <div class="font-semibold text-left">Keterangan</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <div class="font-semibold text-left">Total</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <div class="font-semibold text-left">Aksi</div>
+                                    </th>
+                                </tr>
+                            </thead>
 
-                        <tbody id="addRow" class="text-sm divide-y divide-slate-200">
+                            <tbody id="addRow" class="text-sm divide-y divide-slate-200">
 
-                        </tbody>
+                            </tbody>
 
-                        <!-- Table body -->
-                        <tbody class="text-sm divide-y divide-slate-200">
-                            <!-- Row -->
-                            <tr>
-                                <td colspan="4"></td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <input type="text" name="estimated_amount" id="estimated_amount" value="0" class="form-input estimated_amount" readonly style="background-color: #ddd;">
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            <!-- Table body -->
+                            <tbody class="text-sm divide-y divide-slate-200">
+                                <!-- Row -->
+                                <tr>
+                                    <td>
+                                        <div class="font-semibold ml-3">Subtotal</div>
+                                    </td>
+                                    <td  class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <input type="text" name="estimated_amount" id="estimated_amount" size="float:right" value="0" class="form-input estimated_amount" readonly style="background-color: #ddd;">
+                                    </td>
+                                    <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {{-- </div> --}}
             </div>
 
             <div class="mt-3">
@@ -230,14 +264,45 @@
                 <input type="hidden" name="date[]" value="@{{date}}">
                 <input type="hidden" name="reference_number[]" value="@{{reference_number}}">
                 <input type="hidden" name="suppliers_id[]" value="@{{suppliers_id}}">
->
+                <input type="hidden" name="tipe_select[]" value="@{{tipe_select}}">
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                     <div class="font-medium">@{{ product_name }}</div>
                     <input type="hidden" name="products_id[]" value="@{{products_id}}">
                 </td>
 
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="kapasitas">
+                    <select id="capacities_id" name="capacities_id[]" class="form-input text-sm " >
+                        <option selected value="">Pilih Memori</option>
+                        @foreach ($capacities as $capacity)
+                            <option value="{{ $capacity->id }}">{{ $capacity->name }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="ram">
+                    <select id="ram" name="ram[]" class="form-input text-sm " >
+                        <option selected value="">Pilih RAM</option>
+                        <option value="2 GB">2 GB</option>
+                        <option value="3 GB">3 GB</option>
+                        <option value="4 GB">4 GB</option>
+                        <option value="6 GB">6 GB</option>
+                        <option value="8 GB">8 GB</option>
+                        <option value="12 GB">12 GB</option>
+                    </select>
+                </td>
+
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="warna">
+                    <select id="warna" name="warna[]" class="form-input text-sm " >
+                        <option selected value="">Pilih Warna</option>
+                        @foreach ($colors as $item)
+                            <option value="{{ $item->name }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="imei">
+                    <input id="nomor_seri" name="nomor_seri[]" class="form-input " type="text" />
+                </td>
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                    <input type="number" min="1" class="form-input quantity text-right" name="quantity[]" value="">
+                    <input type="number" min="1" class="form-input quantity text-right w-full px-2 py-1" name="quantity[]" value="">
                 </td>
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -270,12 +335,66 @@
 
         </script>
 
+        <script>
+        // Ketika kategori berubah
+        $("#categories_id").on("change", function () {
+            const categoryId = $(this).val();
+
+            // Jika kategori BUKAN 1, hide kapasitias, ram, warna, imei
+            if (categoryId != 1) {
+                $('[data-hp-field]').hide();
+                $('[data-hp-field] select, [data-hp-field] input').val('');
+            } else {
+                $('[data-hp-field]').show();
+            }
+        });
+
+        // Ketika user klik "Masukkan Produk", cek lagi kategori
+        $(document).on("click", ".addeventmore", function () {
+            setTimeout(() => {
+                const categoryId = $("#categories_id").val();
+                if (categoryId != 1) {
+                    $('[data-hp-field]').hide();
+                } else {
+                    $('[data-hp-field]').show();
+                }
+            }, 200);
+        });
+
+        document.getElementById("tipe_select").addEventListener("change", function () {
+            const tipe = this.value;
+
+            const supplierBox = document.getElementById("supplier_box");
+            const pelangganBox = document.getElementById("pelanggan_box");
+
+            if (tipe === "Supplier") {
+                supplierBox.classList.remove("hidden");
+                pelangganBox.classList.add("hidden");
+            } else if (tipe === "Pelanggan") {
+                pelangganBox.classList.remove("hidden");
+                supplierBox.classList.add("hidden");
+            } else {
+                supplierBox.classList.add("hidden");
+                pelangganBox.classList.add("hidden");
+            }
+        });
+        </script>
+
+
         <script type="text/javascript">
             $(document).ready(function(){
                 $(document).on("click",".addeventmore", function(){
                     var date = $('#date').val();
                     var reference_number = $('#reference_number').val();
-                    var suppliers_id = $('#suppliers_id').val();
+                    var tipe_select = $('#tipe_select').val();
+                    if (tipe_select == 'Pelanggan') {
+                        var suppliers_id =$('#pelanggan_select').val()
+                    }else{
+                        var suppliers_id =$('#supplier_select').val()
+                    }
+                    console.log('====================================');
+                    console.log(suppliers_id);
+                    console.log('====================================');
                     var products_id = $('#products_id').val();
                     var product_name = $('#products_id').find('option:selected').text();
                     if(date == ''){
@@ -284,6 +403,10 @@
                         }
                         if(reference_number == ''){
                         $.notify("Nomor Referensi wajib diisi" ,  {globalPosition: 'top right', className:'error' });
+                        return false;
+                        }
+                        if(tipe_select == ''){
+                        $.notify("Tipe wajib diisi" ,  {globalPosition: 'top right', className:'error' });
                         return false;
                         }
                         if(suppliers_id == ''){
@@ -301,7 +424,8 @@
                             reference_number:reference_number,
                             suppliers_id:suppliers_id,
                             products_id:products_id,
-                            product_name:product_name
+                            product_name:product_name,
+                            tipe_select:tipe_select
                         };
                         var html = template(data);
                         $("#addRow").append(html);

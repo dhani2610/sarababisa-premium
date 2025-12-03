@@ -20,7 +20,7 @@
                 </svg>
                 <span class="hidden xs:block ml-2">Tambah Pembelian</span>
             </a>
-            
+
         </div>
 
     </div>
@@ -122,7 +122,7 @@
                         @php
                             $i = 1
                         @endphp
-                        @foreach($purchases as $item)                  
+                        @foreach($purchases as $item)
                             <tr>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
@@ -140,11 +140,13 @@
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">
-                                        @if ($item->supplier != null)
+                                        {{ $item->suppliers_name }}
+
+                                        {{-- @if ($item->supplier != null)
                                             {{ $item->supplier->name }}
                                         @else
                                             -
-                                        @endif
+                                        @endif --}}
                                     </div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -234,7 +236,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>                                            
+                                            </div>
                                         </div>
                                         <!-- End -->
                                     </div>
@@ -299,7 +301,7 @@
                     });
                 },
             }))
-        })    
+        })
     </script>
 
     <!-- Pagination -->

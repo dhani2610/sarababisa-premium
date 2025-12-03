@@ -8,6 +8,10 @@ use App\Models\Supplier;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Capacity;
+use App\Models\ModelSerie;
+use App\Models\Color;
+use App\Models\Customer;
 
 class PurchaseProductController extends Controller
 {
@@ -49,7 +53,12 @@ class PurchaseProductController extends Controller
         $suppliers = Supplier::where('cabang_id',getCabangId())->get();
         $products = Product::where('cabang_id',getCabangId())->get();
         $categories = Category::all();
-        return view('pages/kepalatoko/pembelian/create', compact('suppliers', 'products', 'categories'));
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $colors = Color::where('cabang_id',getCabangId())->get();
+        $customers = Customer::where('cabang_id',getCabangId())->get();
+
+        return view('pages/kepalatoko/pembelian/create', compact('customers','suppliers', 'products', 'categories','capacities','model_series','colors'));
     }
 
     /**
@@ -60,6 +69,7 @@ class PurchaseProductController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         if ($request->products_id == null) {
 
             $notification = array(
@@ -70,6 +80,8 @@ class PurchaseProductController extends Controller
         } else {
             $count_product = count($request->products_id);
             for ($i = 0; $i < $count_product; $i++) {
+
+                $tipe = $request->tipe_select[$i];
                 $purchase = new Purchase();
                 $purchase->date = date('Y-m-d', strtotime($request->date[$i]));
                 $purchase->reference_number = $request->reference_number[$i];
@@ -82,18 +94,53 @@ class PurchaseProductController extends Controller
                 $purchase->keterangan = $request->keterangan[$i];
 
                 $product_name = Product::find($purchase->products_id);
-                $suppliers_name = Supplier::find($purchase->suppliers_id);
+                if ($tipe == 'Pelanggan') {
+                    $suppliers_name = Customer::find($request->suppliers_id[$i]);
+                    // dd($suppliers_name,$request->suppliers_id[$i]);
+                    $purchase->suppliers_name = $suppliers_name->nama;
+                }else{
+                    $suppliers_name = Supplier::find($purchase->suppliers_id);
+                    $purchase->suppliers_name = $suppliers_name->name;
+                }
 
                 $purchase->product_name = $product_name->product_name;
-                $purchase->suppliers_name = $suppliers_name->name;
                 $purchase->cabang_id = getCabangId();
 
                 $purchase->save();
 
-                // add new stock to the product
                 $products = Product::find($purchase->products_id);
-                $products->stok += $request->quantity[$i];
-                $products->save();
+                if (!empty($request->nomor_seri[$i])) {
+
+                    if ($products->nomor_seri == $request->nomor_seri[$i]) {
+                        // add new stock to the product
+                        $products->stok += $request->quantity[$i];
+                        $products->save();
+                    }else{
+                        $namakategori = Category::find(1);
+
+                        $productsNew = new Product();
+                        $productsNew->product_name = $product_name->product_name;
+                        $productsNew->categories_id = 1;
+                        $productsNew->category_name = $namakategori->category_name;
+                        $productsNew->capacities_id = $request->capacities_id[$i];
+                        $productsNew->harga_modal = $request->product_price[$i];
+                        $productsNew->harga_jual = $request->product_price[$i];
+                        $productsNew->harga_jual_toko = $request->product_price[$i];
+                        $productsNew->ram = $request->ram[$i];
+                        $productsNew->warna = $request->warna[$i];
+                        $productsNew->nomor_seri = $request->nomor_seri[$i];
+                        $productsNew->stok_minimal = 1;
+                        $productsNew->stok = $request->quantity[$i];
+                        $productsNew->keterangan = $request->keterangan[$i];
+                        $productsNew->cabang_id = getCabangId();
+                        $productsNew->save();
+                    }
+                }else{
+                    // add new stock to the product
+                    $products->stok += $request->quantity[$i];
+                    $products->save();
+                }
+
             }
         }
 

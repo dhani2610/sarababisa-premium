@@ -141,7 +141,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="model_series_id">Model Seri </label>
                                     <select id="selectjs2" name="model_series_id" class="form-select text-sm py-1 w-full" >
-                                        <option selected value="{{ $item->modelserie->id }}">{{ $item->modelserie->name }}</option>
+                                        <option selected value="{{ $item->modelserie->id }}">{{ $item->modelserie->name ?? '-' }}</option>
                                         @foreach ($model_series as $model_serie)
                                             <option value="{{ $model_serie->id }}">{{ $model_serie->name }}</option>
                                         @endforeach
@@ -169,24 +169,7 @@
                                         <option value="Dibatalkan">Dibatalkan</option>
                                     </select>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1" for="service_actions_id">Tindakan Servis  </label>
-                                    @if ($item->service_actions_id != null)
-                                        <select id="selectjs3" name="service_actions_id" class="form-select text-sm py-1 w-full">
-                                            @if ($item->serviceaction != null)
-                                                <option selected value="{{ $item->serviceaction->id }}">{{ $item->serviceaction->nama_tindakan }}</option>
-                                            @else
-                                                <option selected value=""></option>
-                                            @endif
-                                            @foreach ($service_actions as $action)
-                                                <option value="{{ $action->id }}">{{ $action->nama_tindakan }}</option>
-                                            @endforeach
-                                        </select>
-                                    @else
-                                        <input id="tindakan_servis" name="tindakan_servis" class="form-input w-full px-2 py-1" type="text" value="{{ $item->tindakan_servis }}"/>
-                                    @endif
-                                </div>
-                                <div>
+
                                     <label class="block text-sm font-medium mb-1" for="products_id">Sparepart yang digunakan  </label>
                                     <select id="selectjs4" name="products_id" class="form-select text-sm py-1 w-full">
                                         @if ($item->product != null)
@@ -222,32 +205,21 @@
                                         <option value="Hardware" {{ $item->tipe == 'Hardware' ? 'selected' : '' }}>Hardware & interface (bonus persen)</option>
                                     </select>
                                 </div>
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium mb-1">Biaya Modal Sparepart</label>
+                                {{-- @dd($item) --}}
 
-                                    <div id="modal_container">
-                                        <!-- row dinamis -->
+                                <div>
+                                <div class="mb-4 mt-4">
+                                    <label class="block text-sm font-medium mb-1">Tindakan & Biaya Sparepart</label>
+
+                                    <div id="group_container">
+                                        <!-- row group dinamis -->
                                     </div>
 
-                                    <button type="button" id="add_modal" class="px-3 py-1 bg-blue-500 text-white rounded mt-2">
-                                        + Tambah Modal
+                                    <button type="button" id="add_group" class="px-3 py-1 bg-blue-500 text-white rounded mt-2">
+                                        + Tambah Tindakan
                                     </button>
-
                                 </div>
 
-
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium mb-1">Biaya Pengerjaan Sparepart</label>
-
-                                    <div id="biaya_container">
-                                        <!-- row dinamis -->
-                                    </div>
-
-                                    <button type="button" id="add_biaya" class="px-3 py-1 bg-blue-500 text-white rounded mt-2">
-                                        + Tambah Biaya
-                                    </button>
-
-                                </div>
 
 
                                 <div>
@@ -475,67 +447,101 @@
                 $('#selectjs4').select2();
             });
         </script>
-
-   <script>
+<script>
 $(document).ready(function() {
 
-    function addRow(containerId, inputName, value = "") {
+    function addGroup(tindakan = "", modal = "", biaya = "") {
         let html = `
-            <div class="flex items-center mb-2 row-item">
-                <input type="number"
-                       name="${inputName}[]"
-                       class="form-input w-full biaya-input"
-                       value="${value}"
-                       placeholder="Masukkan angka">
+            <div class="border p-3 rounded mb-3 group-item">
 
-                <button type="button" class="ml-2 remove-row bg-red-500 text-white px-3 py-1 rounded">
-                    -
+                <div class="mb-2">
+                    <label class="text-sm">Tindakan Servis</label>
+                    <input type="text" name="tindakan_servis[]" class="form-input w-full px-2 py-1"
+                           value="${tindakan}" placeholder="Nama tindakan">
+                </div>
+
+                <div class="mb-2">
+                    <label class="text-sm">Biaya Modal Sparepart</label>
+                    <input type="number" name="modal_j[]"
+                           class="form-input w-full px-2 py-1 biaya-modal"
+                           value="${modal}" placeholder="Masukkan modal">
+                </div>
+
+                <div class="mb-2">
+                    <label class="text-sm">Biaya Pengerjaan Sparepart</label>
+                    <input type="number" name="biaya_j[]"
+                           class="form-input w-full px-2 py-1 biaya-biaya"
+                           value="${biaya}" placeholder="Masukkan biaya">
+                </div>
+
+                <button type="button"
+                        class="remove-group bg-red-500 text-white px-3 py-1 rounded mt-2">
+                    Hapus
                 </button>
             </div>
         `;
-        $(containerId).append(html);
+        $("#group_container").append(html);
     }
 
-    /** auto hitung **/
-    function calculate(containerId, target) {
-        let total = 0;
-        $(`${containerId} .biaya-input`).each(function() {
-            total += parseInt($(this).val()) || 0;
+    function calculateTotals() {
+        let totalModal = 0;
+        let totalBiaya = 0;
+
+        $(".biaya-modal").each(function() {
+            totalModal += parseInt($(this).val()) || 0;
         });
-        $(target).val(total);
+
+        $(".biaya-biaya").each(function() {
+            totalBiaya += parseInt($(this).val()) || 0;
+        });
+
+        $("#modal_sparepart").val(totalModal);
+        $("#biaya").val(totalBiaya);
     }
 
-    /** tombol tambah **/
-    $("#add_modal").on("click", function() {
-        addRow("#modal_container", "modal_j");
+    $("#add_group").on("click", function() {
+        addGroup();
     });
 
-    $("#add_biaya").on("click", function() {
-        addRow("#biaya_container", "biaya_j");
+    $(document).on("click", ".remove-group", function() {
+        $(this).closest(".group-item").remove();
+        calculateTotals();
     });
 
-    /** hapus row **/
-    $(document).on("click", ".remove-row", function() {
-        $(this).closest(".row-item").remove();
-        calculate("#modal_container", "#modal_sparepart");
-        calculate("#biaya_container", "#biaya");
+    $(document).on("input", ".biaya-modal, .biaya-biaya", function() {
+        calculateTotals();
     });
 
-    /** hitung realtime **/
-    $(document).on("input", ".biaya-input", function() {
-        calculate("#modal_container", "#modal_sparepart");
-        calculate("#biaya_container", "#biaya");
-    });
 
-    /** load data dari database **/
+    /** ----------------------------
+     * LOAD DATA DARI DATABASE
+     * --------------------------- */
+
+    let tindakanDB = @json(json_decode($item->tindakan_servis ?? '[]', true));
+    let tindakanSingle = @json($item->tindakan_servis);
     let modalDB = @json(json_decode($item->modal_j ?? '[]', true) ?? []);
     let biayaDB = @json(json_decode($item->biaya_j ?? '[]', true) ?? []);
 
-    modalDB.forEach(v => addRow("#modal_container", "modal_j", v));
-    biayaDB.forEach(v => addRow("#biaya_container", "biaya_j", v));
+    // Jika tindakanDB kosong → berarti tidak ada array
+    if (!Array.isArray(tindakanDB) || tindakanDB.length === 0) {
+        tindakanDB = [];
 
-    calculate("#modal_container", "#modal_sparepart");
-    calculate("#biaya_container", "#biaya");
+        // duplikasi tindakan_servis sesuai jumlah modal
+        modalDB.forEach(() => {
+            tindakanDB.push(tindakanSingle ?? "");
+        });
+    }
+
+    // generate group
+    modalDB.forEach((m, i) => {
+        addGroup(
+            tindakanDB[i] ?? "",
+            m ?? "",
+            biayaDB[i] ?? ""
+        );
+    });
+
+    calculateTotals();
 
 });
 </script>

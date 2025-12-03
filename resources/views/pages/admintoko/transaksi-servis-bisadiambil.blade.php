@@ -87,7 +87,7 @@
                                     <input
                                         class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                                         type="text"
-                                        value="{{ $item->type->name }} {{ $item->brand->name }} {{ $item->modelserie->name }}"
+                                        value="{{ $item->type->name }} {{ $item->brand->name }} {{ $item->modelserie->name ?? '-' }}"
                                         disabled />
                                 </div>
                                 <div>

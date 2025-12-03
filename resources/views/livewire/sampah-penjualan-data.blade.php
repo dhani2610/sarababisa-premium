@@ -142,7 +142,7 @@
                             </div>
                         </div>
                     </div>
-                </div>                                            
+                </div>
             </div>
             <!-- End Delete-->
         </div>
@@ -194,7 +194,7 @@
                     @php
                         $i = 1
                     @endphp
-                    @foreach($items as $item)                  
+                    @foreach($items as $item)
                         <tr>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ $i++ }}</div>
@@ -207,13 +207,13 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 @if ($item->user)
-                                    <div class="font-medium">{{ $item->user->name }}</div>
+                                    <div class="font-medium">{{ $item->user->name ?? '-' }}</div>
                                 @else
                                     <div class="font-medium text-red-600">Akun sudah dihapus</div>
                                 @endif
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-medium">{{ $item->customer->nama }}</div>
+                                <div class="font-medium">{{ $item->customer->nama ?? '-' }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ $item->product_name }}</div>
@@ -301,7 +301,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>                                            
+                                        </div>
                                     </div>
                                     <!-- End -->
                                 </div>

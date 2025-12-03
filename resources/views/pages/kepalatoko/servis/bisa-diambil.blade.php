@@ -109,7 +109,7 @@
                             data: 'teknisi',
                             name: 'teknisi'
                         },
-                        @if (Auth::user()->role != 'Investor')
+                        @if (Auth::user()->role != 'Investor' && $storeSetting->is_modal == 1)
                             {
                                 data: 'modal_sparepart',
                                 name: 'modal_sparepart'
