@@ -155,7 +155,7 @@ class PurchaseProductController extends Controller
                 if ($request->product_price[$i] > 0) {
                     # code...
                     Expense::create([
-                        'name' => 'Pembelian produk '. $purchase->product_name.'QTY',
+                        'name' => 'Pembelian produk '. $product_name->product_name,
                         'price' => cleanNumber($purchase->total_price),
                         'users_id' => auth()->user()->id
                     ]);
