@@ -12,6 +12,7 @@ use App\Models\Capacity;
 use App\Models\ModelSerie;
 use App\Models\Color;
 use App\Models\Customer;
+use App\Models\Expense;
 
 class PurchaseProductController extends Controller
 {
@@ -67,9 +68,17 @@ class PurchaseProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+    function cleanNumber($value)
+    {
+        return (int) str_replace(['.', ','], '', $value);
+    }
     public function store(Request $request)
     {
-        // dd($request->all());
+        function cleanNumber($value)
+        {
+            return (int) str_replace(['.', ','], '', $value);
+        }
         if ($request->products_id == null) {
 
             $notification = array(
@@ -90,10 +99,11 @@ class PurchaseProductController extends Controller
                 $purchase->products_id = $request->products_id[$i];
                 $purchase->quantity = $request->quantity[$i];
                 $purchase->product_price = $request->product_price[$i];
-                $purchase->total_price = $request->total_price[$i];
+                $purchase->total_price = cleanNumber($request->total_price[$i]);
                 $purchase->keterangan = $request->keterangan[$i];
 
-                $product_name = Product::find($purchase->products_id);
+                $product_name = Product::find($purchase->products_id[$i]);
+
                 if ($tipe == 'Pelanggan') {
                     $suppliers_name = Customer::find($request->suppliers_id[$i]);
                     // dd($suppliers_name,$request->suppliers_id[$i]);
@@ -108,9 +118,9 @@ class PurchaseProductController extends Controller
 
                 $purchase->save();
 
-                $products = Product::find($purchase->products_id);
+                $products = Product::find($purchase->products_id[$i]);
                 if (!empty($request->nomor_seri[$i])) {
-
+                    // dd($products->nomor_seri == $request->nomor_seri[$i],$products->nomor_seri,$request->nomor_seri[$i]);
                     if ($products->nomor_seri == $request->nomor_seri[$i]) {
                         // add new stock to the product
                         $products->stok += $request->quantity[$i];
@@ -124,8 +134,8 @@ class PurchaseProductController extends Controller
                         $productsNew->category_name = $namakategori->category_name;
                         $productsNew->capacities_id = $request->capacities_id[$i];
                         $productsNew->harga_modal = $request->product_price[$i];
-                        $productsNew->harga_jual = $request->product_price[$i];
-                        $productsNew->harga_jual_toko = $request->product_price[$i];
+                        $productsNew->harga_jual = $request->harga_jual_pelanggan[$i];
+                        $productsNew->harga_jual_toko = $request->harga_jual_toko[$i];
                         $productsNew->ram = $request->ram[$i];
                         $productsNew->warna = $request->warna[$i];
                         $productsNew->nomor_seri = $request->nomor_seri[$i];
@@ -141,7 +151,18 @@ class PurchaseProductController extends Controller
                     $products->save();
                 }
 
+
+                if ($request->product_price[$i] > 0) {
+                    # code...
+                    Expense::create([
+                        'name' => 'Pembelian produk '. $purchase->product_name.'QTY',
+                        'price' => cleanNumber($purchase->total_price),
+                        'users_id' => auth()->user()->id
+                    ]);
+                }
+
             }
+
         }
 
         return redirect()->route('purchase.index');
