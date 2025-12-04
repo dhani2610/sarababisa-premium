@@ -133,7 +133,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="model_series_id">Model Seri </label>
                                     <select id="selectjs2" name="model_series_id" class="form-select text-sm py-1 w-full" >
-                                        <option selected value="{{ $item->modelserie->id }}">{{ $item->modelserie->name ?? '-' }}</option>
+                                        <option selected value="{{ $item->modelserie->id ?? '' }}">{{ $item->modelserie->name ?? '-' }}</option>
                                         @foreach ($model_series as $model_serie)
                                             <option value="{{ $model_serie->id }}">{{ $model_serie->name }}</option>
                                         @endforeach
