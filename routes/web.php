@@ -305,7 +305,7 @@ Route::get('master/master-absensi/export', [AttendanceController::class, 'export
     Route::get('/get-total-cabang', [KepalaTokoAkunController::class, 'getDataTotalCabang'])->name('get-total-cabang');
     Route::get('/update-total-cabang', [KepalaTokoAkunController::class, 'updateTotalCabang'])->name('update-total-cabang');
 
-Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription'])->group(function () {
+Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja'])->group(function () {
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
 
     Route::get('/dashboard', [KepalaTokoDashboardController::class, 'index'])->name('kepalatoko-dashboard');
@@ -536,7 +536,7 @@ Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::cl
 Route::get('transaksi-produk-inkjet/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakinkjet'])->name('lunas-cetak-inkjet');
 Route::post('/servis/admin-transaksi-servis-langsung', [AdminTokoTransaksiServisLangsungController::class, 'store'])->name('admin-servis-langsung');
 
-Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(function () {
+Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription','jam_kerja'])->group(function () {
     Route::get('/admin-dashboard', [AdminTokoDashboardController::class, 'index'])->name('admintoko-dashboard');
     Route::resource('servis/admin-tindakan-servis', AdminTokoTindakanServisController::class);
     Route::resource('admin-pelanggan', AdminTokoPelangganController::class);
@@ -635,7 +635,7 @@ Route::middleware(['ensureAdminRole:AdminToko', 'checkSubscription'])->group(fun
 });
 Route::get('admin-cetak-laporan-servis', [AdminTokoLaporanServisController::class, 'cetak'])->name('admin-cetak-laporan-servis');
 
-Route::middleware(['ensureTeknisiRole:Teknisi', 'checkSubscription'])->group(function () {
+Route::middleware(['ensureTeknisiRole:Teknisi', 'checkSubscription','jam_kerja'])->group(function () {
     Route::get('/teknisi-dashboard', [TeknisiDashboardController::class, 'index'])->name('teknisi-dashboard');
     Route::resource('teknisi-pengeluaran', TeknisiExpenseController::class);
     Route::resource('teknisi-pelanggan', TeknisiPelangganController::class);
@@ -656,7 +656,7 @@ Route::middleware(['ensureTeknisiRole:Teknisi', 'checkSubscription'])->group(fun
     Route::resource('teknisi-kasbon', TeknisiKasbonController::class);
 });
 
-Route::middleware(['ensureSalesRole:Sales', 'checkSubscription'])->group(
+Route::middleware(['ensureSalesRole:Sales', 'checkSubscription','jam_kerja'])->group(
     function () {
         Route::get('/sales-dashboard', [SalesDashboardController::class, 'index'])->name('sales-dashboard');
         Route::resource('sales-pelanggan', SalesPelangganController::class);

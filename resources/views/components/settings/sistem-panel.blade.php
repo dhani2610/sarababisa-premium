@@ -15,7 +15,8 @@
             <livewire:toggle-edit-transaksi></livewire:toggle-edit-transaksi>
             <livewire:toggle-edit-produk></livewire:toggle-edit-produk>
             <livewire:toggle-telegram-bot />
-            <livewire:toggle-setting-overtime />
+            <livewire:toggle-store-hours />
+            {{-- <livewire:toggle-setting-overtime /> --}}
         </div>
 
         <!-- Panel footer -->
