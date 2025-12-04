@@ -118,7 +118,7 @@
                                         class="form-select text-sm py-1 w-full selectjs4" required style="width: 100%">
                                         <option selected="">Pilih Model Seri</option>
                                         @foreach ($model_series as $model_serie)
-                                            <option value="{{ $model_serie->id }}" {{ $item->modelserie->id == $model_serie->id ? 'selected' : ''  }}>{{ $model_serie->name }}</option>
+                                            <option value="{{ $model_serie->id }}" {{ $item->modelserie->id ?? '' == $model_serie->id ? 'selected' : ''  }}>{{ $model_serie->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>

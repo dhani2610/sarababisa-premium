@@ -314,7 +314,7 @@
                                 @endif
                             </td>
 
-                            @if ($toko->is_bonus === 1)
+                            @if ($toko->is_modal === 1)
                                 <td style="width: 60px; text-align: right;">Rp.
                                     {{ number_format($modal_j[$i]) }}
                                 </td>
