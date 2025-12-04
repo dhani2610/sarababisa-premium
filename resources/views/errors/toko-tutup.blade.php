@@ -37,7 +37,7 @@
 
         <div class="mt-8">
             <a href="/" class="inline-block bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-6 rounded-lg transition duration-200">
-                &larr; Kembali ke Halaman Sebelumnya
+                &larr; Kembali ke Halaman Utama
             </a>
         </div>
 
