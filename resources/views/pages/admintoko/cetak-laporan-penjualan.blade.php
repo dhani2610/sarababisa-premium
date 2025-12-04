@@ -83,7 +83,7 @@
 		</h4>
 		<p style="margin-top: 0">Periode : {{ \Carbon\Carbon::parse($start_date)->format('d-m-Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->format('d-m-Y') }}</p>
 	</div>
-	
+
 	<h4 style="margin-bottom: 6px; text-decoration: underline;">
 		Ringkasan
 	</h4>
@@ -91,10 +91,8 @@
 	<table id="ringkasan">
 		<tbody>
 			<tr>
-				@if ($toko->is_modal === 1)
-				<th>Total Modal</th>
-				<th>: Rp. {{ number_format($total_modal) }}</th>
-				@endif
+                <th>Total Item Penjualan</th>
+				<th>: {{ $total_penjualan }} item</th>
 				<th>Total Pembayaran Tunai</th>
 				<th>: Rp. {{ number_format($total_tunai) }}</th>
 			</tr>
@@ -111,19 +109,22 @@
 				<th>: Rp. {{ number_format($total_kredit) }}</th>
 			</tr>
 			<tr>
-				@if ($toko->is_bonus === 1)
+                @if ($toko->is_modal_produk === 1)
+				<th>Total Modal</th>
+				<th>: Rp. {{ number_format($total_modal) }}</th>
+				@endif
+				@if ($toko->is_profit_produk === 1)
 				<th>Total Profit</th>
 				<th>: Rp. {{ number_format($total_profit) }}</th>
 				@endif
-				<th></th>
-				<th></th>
+
 			</tr>
-			<tr>
+			{{-- <tr>
 				<th>Total Item Penjualan</th>
 				<th>: {{ $total_penjualan }} item</th>
 				<th></th>
 				<th></th>
-			</tr>
+			</tr> --}}
 		</tbody>
 	</table>
 
@@ -140,12 +141,12 @@
 				<th>Pelanggan</th>
 				<th>Nama Produk</th>
 				<th>Jumlah</th>
-				@if ($toko->is_modal === 1)
+				@if ($toko->is_modal_produk === 1)
 				<th>Modal</th>
 				@endif
 				<th>Harga Jual</th>
 				<th>Diskon</th>
-				@if ($toko->is_bonus === 1)
+				@if ($toko->is_bonus_produk === 1)
 				<th>Profit</th>
 				@endif
 			</tr>
@@ -184,12 +185,12 @@
 						@endif
 					</td>
 					<td style="text-align: center; width: 40px;">{{ $item->quantity }}</td>
-					@if ($toko->is_modal === 1)
+					@if ($toko->is_modal_produk === 1)
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->modal) }}</td>
 					@endif
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->total) }}</td>
 					<td style="width: 60px; text-align: right;">Rp. {{ number_format($item->sub_total - $item->total) }}</td>
-					@if ($toko->is_bonus === 1)
+					@if ($toko->is_ === 1)
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
 					@endif
 				</tr>

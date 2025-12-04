@@ -27,11 +27,12 @@ class TransaksiProdukController extends Controller
         $jumlah_semua = Order::where('cabang_id',getCabangId())->get()->count();
         $jumlah_lunas = Order::where('cabang_id',getCabangId())->where('due', '0')->count();
         $jumlah_tidaklunas = Order::where('cabang_id',getCabangId())->where('due', '>', '0')->count();
-
+        $storeSettings = StoreSetting::where('cabang_id', getCabangId())->first();
         return view('pages/kepalatoko/produk/transaksi', compact(
             'jumlah_semua',
             'jumlah_lunas',
-            'jumlah_tidaklunas'
+            'jumlah_tidaklunas',
+            'storeSettings',
         ));
     }
 

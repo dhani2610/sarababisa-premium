@@ -20,7 +20,7 @@
             <x-penjualan.card-laporan-bulan :omzetbulan="$omzetbulan" :profitbulan="$profitbulan" :toko="$toko"/>
             <x-penjualan.card-laporan-tahun :omzettahun="$omzettahun" :profittahun="$profittahun" :toko="$toko"/>
         </div>
-     
+
         <!-- Table -->
         <livewire:admin-laporan-penjualan-data></livewire:admin-laporan-penjualan-data>
 

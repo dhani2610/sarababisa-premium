@@ -22,7 +22,7 @@
                     </svg>
                 </button>
                 <div
-                    class="origin-top-left z-10 absolute top-full min-w-56 bg-white border border-slate-200 pt-1.5 rounded shadow-lg overflow-hidden mt-1 left-4"                
+                    class="origin-top-left z-10 absolute top-full min-w-56 bg-white border border-slate-200 pt-1.5 rounded shadow-lg overflow-hidden mt-1 left-4"
                     @click.outside="open = false"
                     @keydown.escape.window="open = false"
                     x-show="open"
@@ -32,7 +32,7 @@
                     x-transition:leave="transition ease-out duration-200"
                     x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0"
-                    x-cloak                
+                    x-cloak
                 >
                     <div class="text-xs font-semibold text-slate-400 uppercase pt-1.5 pb-2 px-4">Filter</div>
                     <ul class="mb-4">
@@ -174,7 +174,7 @@
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Pembayaran</div>
                         </th>
-                        @if ($toko->is_bonus === 1)
+                        @if ($toko->is_profit === 1)
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Profit Toko</div>
                         </th>
@@ -184,7 +184,7 @@
                 <!-- Table body -->
                 <tbody class="text-sm divide-y divide-slate-200">
                     <!-- Row -->
-                    @foreach($services as $item)                  
+                    @foreach($services as $item)
                         <tr>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ \Carbon\Carbon::parse($item->tgl_disetujui)->translatedFormat('d F Y') }}</div>
@@ -220,7 +220,7 @@
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ $item->cara_pembayaran }}</div>
                             </td>
-                            @if ($toko->is_bonus === 1)
+                            @if ($toko->is_profit === 1)
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">
                                     {{ number_format($item->profittoko) }}
@@ -238,5 +238,5 @@
     <div class="mt-8">
         {{ $services->links() }}
     </div>
-    
+
 </div>
