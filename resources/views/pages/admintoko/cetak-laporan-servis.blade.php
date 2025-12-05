@@ -126,8 +126,10 @@
                 <th>: Rp. {{ number_format($total_modal) }}</th>
                 @endif
                 @if (Auth::user()->role != 'Teknisi')
+                @if ($toko->is_profit === 1)
                 <th>Total Profit</th>
                 <th>: Rp. {{ number_format($total_profit) }}</th>
+                @endif
                 @endif
                  @if (Auth::user()->role == 'Teknisi')
                 <th>Total Pengeluaran</th>
@@ -173,7 +175,7 @@
                 @endif
                 <th>Biaya Servis</th>
                 <th>Diskon</th>
-                @if ($toko->is_bonus === 1)
+                @if ($toko->is_profit === 1)
                     <th>Profit</th>
                 @endif
                 <th>Pembayaran</th>
@@ -212,7 +214,7 @@
                         @endif
                         <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
                             @if ($item->modelserie)
-                                {{ $item->modelserie->name }}
+                                {{ $item->modelserie->name ?? '-' }}
                             @else
                                 -
                             @endif
@@ -241,7 +243,7 @@
                         <td style="width: 60px; text-align: right;">Rp.
                             {{ number_format($biayaj_convert) }}</td>
                         <td style="width: 50px; text-align: right;" rowspan="{{ count($tindakan_servis) }}">Rp. {{ number_format($item->diskon) }}</td>
-                        @if ($toko->is_bonus === 1)
+                        @if ($toko->is_profit === 1)
                             <td style="width: 60px; text-align: right;">Rp.
                                 {{ number_format($biayaj_convert - $modal_convert - $item->diskon) }}
                             </td>
@@ -314,7 +316,7 @@
                                 @endif
                             </td>
 
-                            @if ($toko->is_bonus === 1)
+                            @if ($toko->is_modal === 1)
                                 <td style="width: 60px; text-align: right;">Rp.
                                     {{ number_format($modal_j[$i]) }}
                                 </td>
@@ -323,7 +325,7 @@
                                 {{ number_format($biaya_j[$i]) }}</td>
                             {{-- <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td> --}}
 
-                            @if ($toko->is_bonus === 1)
+                            @if ($toko->is_profit === 1)
                                 <td style="width: 60px; text-align: right;">Rp.
                                     {{ number_format($biaya_j[$i] - $modal_j[$i]) }}
                                 </td>
@@ -350,7 +352,7 @@
                         @endif
                         <td style="text-align: left; width: 70px;">
                             @if ($item->modelserie)
-                                {{ $item->modelserie->name }}
+                                {{ $item->modelserie->name ?? '-' }}
                             @else
                                 -
                             @endif
@@ -366,13 +368,13 @@
 
 
 
-                        @if ($toko->is_bonus === 1)
+                        @if ($toko->is_modal === 1)
                             <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}
                             </td>
                         @endif
                         <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td>
                         <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
-                        @if ($toko->is_bonus === 1)
+                        @if ($toko->is_profit === 1)
                             <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
                         @endif
                         <td class="" style="text-align: left; width: 80px;">
@@ -462,7 +464,7 @@
                     <td>{{ $item->nomor_servis }}</td>
                     <td>{{ $item->nama_pelanggan }}</td>
                     <td>{{ $item->penerima }}</td>
-                    <td>{{ $item->modelserie->name ?? '-' }}</td>
+                    <td>{{ $item->modelserie->name ?? '-' ?? '-' }}</td>
                     <td>{{ $item->kerusakan }}</td>
                     <td>Rp. {{ number_format($item->estimasi_biaya) }}</td>
                     <td>Rp. {{ number_format($item->uang_muka) }}</td>

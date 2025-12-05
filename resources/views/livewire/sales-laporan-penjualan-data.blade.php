@@ -36,7 +36,7 @@
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Jumlah</div>
                         </th>
-                        @if ($toko->is_bonus === 1)
+                        @if ($toko->is_bonus_produk === 1)
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Bonus</div>
                         </th>
@@ -46,7 +46,7 @@
                 <!-- Table body -->
                 <tbody class="text-sm divide-y divide-slate-200">
                     <!-- Row -->
-                    @foreach($product_transactions as $item)                  
+                    @foreach($product_transactions as $item)
                         <tr>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}</div>
@@ -85,7 +85,7 @@
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ $item->quantity }}</div>
                             </td>
-                            @if ($toko->is_bonus === 1)
+                            @if ($toko->is_bonus_produk === 1)
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">
                                     @php
@@ -107,5 +107,5 @@
     <div class="mt-8">
         {{ $product_transactions->links() }}
     </div>
-    
+
 </div>

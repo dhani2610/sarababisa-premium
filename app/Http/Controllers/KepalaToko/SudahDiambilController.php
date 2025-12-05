@@ -783,6 +783,7 @@ class SudahDiambilController extends Controller
 
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         $item = ServiceTransaction::findOrFail($id);
 
         $nama_tipe = Type::find($request->types_id);

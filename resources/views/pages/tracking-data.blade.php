@@ -20,7 +20,7 @@
 
         <div class="space-y-2">
             @foreach ($services as $item)
-                @php                    
+                @php
                     if ($item->status_servis === 'Sudah Diambil') :
                         $status_color = 'bg-emerald-100 text-emerald-600';
                     elseif ($item->status_servis === 'Bisa Diambil') :
@@ -32,10 +32,10 @@
                 <div class="shadow-lg rounded-sm border px-5 py-4 bg-white border-slate-200">
                     <div class="md:flex justify-between items-center space-y-4 md:space-y-0">
                         <!-- Left side -->
-                        <div class="flex items-start space-x-3 md:space-x-4">                             
+                        <div class="flex items-start space-x-3 md:space-x-4">
                             <div>
                                 <div class="text-xs font-semibold text-blue-600">#{{ $item->nomor_servis }}</div>
-                                <div class="inline-flex font-semibold text-slate-800">{{ $item->type->name }} {{ $item->brand->name }} {{ $item->modelserie->name }}</div>
+                                <div class="inline-flex font-semibold text-slate-800">{{ $item->type->name }} {{ $item->brand->name }} {{ $item->modelserie->name ?? '-' }}</div>
                                 <div class="text-sm">{{ $item->kerusakan }}</div>
                             </div>
                         </div>
@@ -64,7 +64,7 @@
                                     <div class="text-sm text-blue-600">Garansi Aktif s/d {{ \Carbon\Carbon::parse($item->exp_garansi)->translatedFormat('d M Y') }}</div>
                                 @endif
                             @else
-                                
+
                             @endif
                         </div>
                     </div>

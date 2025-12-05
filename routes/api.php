@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AkunController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,3 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('customers', 'Api\Customers@index')->name('api-customers');
+
+Route::get('/get-total-cabang', [AkunController::class, 'getDataTotalCabang'])->name('get-total-cabang');
+Route::post('/update-total-cabang', [AkunController::class, 'updateTotalCabang'])->name('update-total-cabang');
+

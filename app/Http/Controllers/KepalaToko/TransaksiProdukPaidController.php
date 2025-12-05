@@ -5,6 +5,7 @@ namespace App\Http\Controllers\KepalaToko;
 use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -20,11 +21,13 @@ class TransaksiProdukPaidController extends Controller
         $jumlah_semua = Order::where('cabang_id',getCabangId())->get()->count();
         $jumlah_lunas = Order::where('cabang_id',getCabangId())->where('due', '0')->count();
         $jumlah_tidaklunas = Order::where('cabang_id',getCabangId())->where('due', '>', '0')->count();
+        $storeSettings = StoreSetting::where('cabang_id', getCabangId())->first();
 
         return view('pages/kepalatoko/produk/transaksi-lunas', compact(
             'jumlah_semua',
             'jumlah_lunas',
-            'jumlah_tidaklunas'
+            'jumlah_tidaklunas',
+            'storeSettings',
         ));
     }
 

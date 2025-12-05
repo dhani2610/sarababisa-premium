@@ -111,7 +111,7 @@
                             @if ($item->subject)
                                 @if ($item->subject->exists())
                                     <div class="font-medium">{{ $item->subject->type->name }}
-                                        {{ $item->subject->brand->name }} {{ $item->subject->modelserie->name }}</div>
+                                        {{ $item->subject->brand->name }} {{ $item->subject->modelserie->name ?? '-' }}</div>
                                 @else
                                     <div class="font-medium text-rose-600">Data servis telah dihapus</div>
                                 @endif

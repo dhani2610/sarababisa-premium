@@ -53,7 +53,7 @@
                     $i = 1
                 @endphp
                 @foreach($processes as $process)
-                    @php                    
+                    @php
                         if ($process->status_servis === 'Sedang Dikerjakan') :
                             $status_color = 'bg-emerald-100 text-emerald-600';
                             $total_color = 'text-emerald-500';
@@ -67,7 +67,7 @@
                             $status_color = 'bg-slate-100 text-slate-500';
                             $total_color = 'text-slate-500';
                         endif;
-                    @endphp                  
+                    @endphp
                     <tr>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-medium">{{ $i++ }}</div>
@@ -107,7 +107,7 @@
                             </div>
                         </td>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                            <div class="font-medium">{{ $process->type->name }} {{ $process->brand->name }} {{ $process->modelserie->name }}</div>
+                            <div class="font-medium">{{ $process->type->name }} {{ $process->brand->name }} {{ $process->modelserie->name ?? '-' }}</div>
                         </td>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-medium">
@@ -240,10 +240,10 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>                                            
+                                        </div>
                                 </div>
                                 <!-- End -->
-                                
+
                                 <!-- Start -->
                                 <div x-data="{ modalOpen: false }">
                                     <button class="text-rose-500 hover:text-rose-600 rounded-full" @click.prevent="modalOpen = true" aria-controls="danger-modal">
@@ -317,7 +317,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>                                            
+                                    </div>
                                 </div>
                                 <!-- End -->
                             </div>

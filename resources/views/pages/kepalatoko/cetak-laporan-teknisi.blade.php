@@ -134,7 +134,7 @@
 					<td style="width: 10px;">{{ $i++ }}</td>
 					<td class="text-center" style="width: 60px;">{{ $item->nomor_servis }}</td>
 					<td style="text-align: left; width: 90px;" class="capital">{{ $item->nama_pelanggan }}</td>
-					<td style="text-align: left; width: 80px;">{{ $item->modelserie->name }}</td>
+					<td style="text-align: left; width: 80px;">{{ $item->modelserie->name ?? '-' ?? '-' }}</td>
 					<td class="capital" style="text-align: left;">
 						@if ($item->kondisi_servis != 'Sudah jadi')
 							{{ $item->kondisi_servis }}

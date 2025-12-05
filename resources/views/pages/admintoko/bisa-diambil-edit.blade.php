@@ -25,8 +25,8 @@
                             <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                         </svg>
                         <span class="hidden xs:block ml-2">Tambah Transaksi Baru</span>
-                </button>                      
-                
+                </button>
+
             </div>
 
         </div>
@@ -122,7 +122,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="model_series_id">Model Seri </label>
                                     <select id="selectjs2" name="model_series_id" class="form-select text-sm py-1 w-full" >
-                                        <option selected value="{{ $item->modelserie->id }}">{{ $item->modelserie->name }}</option>
+                                        <option selected value="{{ $item->modelserie->id ?? '' }}">{{ $item->modelserie->name ?? '-' }}</option>
                                         @foreach ($model_series as $model_serie)
                                             <option value="{{ $model_serie->id }}">{{ $model_serie->name }}</option>
                                         @endforeach
@@ -197,7 +197,7 @@
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Pengerjaan Sparepart </label>
                                     <input id="biaya_j" name="biaya_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->biaya_j }}"/>
                                 </div>
-                               
+
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="biaya">Biaya Servis </label>
                                     <input id="biaya" name="biaya" class="form-input w-full px-2 py-1" type="number" value="{{ $item->biaya }}"/>
@@ -221,7 +221,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 
     @push('styles')

@@ -85,7 +85,7 @@
 		</h4>
 		<p style="margin-top: 0">Periode : {{ \Carbon\Carbon::parse($start_date)->format('d-m-Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->format('d-m-Y') }}</p>
 	</div>
-	
+
 	<h4 style="margin-bottom: 6px; text-decoration: underline;">
 		Ringkasan
 	</h4>
@@ -155,7 +155,7 @@
 					<td style="text-align: left; width: 70px;" class="capital">{{ $item->nama_pelanggan }}</td>
 					<td style="text-align: left; width: 70px;">
 						@if ($item->modelserie)
-							{{ $item->modelserie->name }}
+							{{ $item->modelserie->name ?? '-' }}
 						@else
 							-
 						@endif

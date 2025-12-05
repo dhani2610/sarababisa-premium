@@ -52,7 +52,7 @@
                 @php
                     $i = 1
                 @endphp
-                @foreach($sudahdiambil as $transaction)                 
+                @foreach($sudahdiambil as $transaction)
                     <tr>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-medium">{{ $i++ }}</div>
@@ -92,7 +92,7 @@
                             </div>
                         </td>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                            <div class="font-medium">{{ $transaction->type->name }} {{ $transaction->brand->name }} {{ $transaction->modelserie->name }}</div>
+                            <div class="font-medium">{{ $transaction->type->name }} {{ $transaction->brand->name }} {{ $transaction->modelserie->name ?? '-' }}</div>
                         </td>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-medium capitalize">{{ $transaction->kerusakan }}</div>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	
+
 	<style type="text/css">
 		html {
 			margin: 0;
@@ -14,7 +14,7 @@
 			font-size: 10px;
 			color: #000000;
 		}
-		
+
 		footer {
 			margin-top: 5px;
 		}
@@ -86,7 +86,7 @@
 				</tr>
 				<tr>
 				<td class="title">Nama Barang</td>
-				<td class="value">: {{ $items->type->name }} {{ $items->brand->name }} {{ $items->modelserie->name }}</td>
+				<td class="value">: {{ $items->type->name }} {{ $items->brand->name }} {{ $items->modelserie->name ?? '-' }}</td>
 				</tr>
 				<tr>
 				<td class="title">IMEI/SN</td>

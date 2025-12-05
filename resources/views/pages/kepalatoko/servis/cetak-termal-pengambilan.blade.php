@@ -101,7 +101,7 @@
                 <tr>
                     <td class="title">Nama Barang</td>
                     <td class="value">: {{ $items->type->name }} {{ $items->brand->name }}
-                        {{ $items->modelserie->name }}</td>
+                        {{ $items->modelserie->name ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td class="title">IMEI/SN</td>
@@ -223,7 +223,7 @@
                     </tr>
                     @endif
                 @endif
-               
+
                 @if ($ppn > 0)
                     <tr>
                         <td class="title">PPN ({{ $items->ppn }}%)</td>

@@ -154,7 +154,7 @@
                 <td scope="row" style="border-left-style: solid;">Alamat</th>
                 <td class="capital">: {{ $history->pelanggan->alamat ?? '-' }}</td>
                 <td scope="row" style="border-left-style: solid;">Model Seri</th>
-                <td class="capital">: {{ $items->modelserie->name }}</td>
+                <td class="capital">: {{ $items->modelserie->name ?? '-' }}</td>
                 <td scope="row">Warna/Kapasitas</th>
                 <td class="capital">: {{ $items->warna }} / {{ $items->capacity->name }}</td>
             </tr>
