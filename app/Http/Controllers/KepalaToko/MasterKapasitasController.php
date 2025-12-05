@@ -55,10 +55,35 @@ class MasterKapasitasController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    // public function store(CapacityRequest $request)
+    // {
+    //     $data = $request->all();
+    //     $data['cabang_id'] = getCabangId();
+    //     Capacity::create($data);
+
+    //     return redirect()->route('master-kapasitas.index');
+    // }
+
     public function store(CapacityRequest $request)
     {
         $data = $request->all();
-        $data['cabang_id'] = getCabangId();
+        $cabangId = getCabangId();
+
+        $namaAsli = $data['name'];
+        $finalName = $namaAsli;
+        $counter = 2;
+
+        // Loop Cek Duplikat
+        // HANYA cek data aktif (tidak pakai withTrashed), sesuai request "gausah ngecek ke sampah"
+        while (Capacity::where('name', $finalName)->exists()) {
+            $finalName = $namaAsli . ' (' . $counter . ')';
+            $counter++;
+        }
+
+        // Simpan dengan nama yang sudah unik
+        $data['name'] = $finalName;
+        $data['cabang_id'] = $cabangId;
+
         Capacity::create($data);
 
         return redirect()->route('master-kapasitas.index');

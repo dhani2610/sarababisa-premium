@@ -67,24 +67,50 @@ class MasterModelSeriController extends Controller
     //     return redirect()->route('master-model-seri.index');
     // }
 
+    // public function store(ModelSerieRequest $request)
+    // {
+    //     $data = $request->validated();
+
+    //     $existing = \App\Models\ModelSerie::withTrashed()
+    //         ->where('name', $data['name'])
+    //         ->first();
+
+    //     if ($existing && $existing->trashed()) {
+    //         // Kalau ada yang soft delete → restore
+    //         $existing->restore();
+    //         $existing->update($data);
+
+    //         return redirect()->back()->with('success', 'Model seri berhasil dipulihkan & diperbarui.');
+    //     }
+
+    //     $data['cabang_id'] = getCabangId();
+    //     // Kalau belum ada → buat baru
+    //     \App\Models\ModelSerie::create($data);
+
+    //     return redirect()->back()->with('success', 'Model seri berhasil ditambahkan.');
+    // }
+
     public function store(ModelSerieRequest $request)
     {
         $data = $request->validated();
+        $data['cabang_id'] = getCabangId();
 
-        $existing = \App\Models\ModelSerie::withTrashed()
-            ->where('name', $data['name'])
-            ->first();
+        $namaAsli = $data['name'];
+        $finalName = $namaAsli;
+        $counter = 2;
 
-        if ($existing && $existing->trashed()) {
-            // Kalau ada yang soft delete → restore
-            $existing->restore();
-            $existing->update($data);
-
-            return redirect()->back()->with('success', 'Model seri berhasil dipulihkan & diperbarui.');
+        // Loop Cek Duplikat
+        // Menggunakan withTrashed() agar mengecek seluruh data termasuk yang sudah dihapus.
+        // Jika "iPhone 11" ada di sampah, maka input baru akan menjadi "iPhone 11 (2)"
+        while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
+            $finalName = $namaAsli . ' (' . $counter . ')';
+            $counter++;
         }
 
-        $data['cabang_id'] = getCabangId();
-        // Kalau belum ada → buat baru
+        // Update nama di array data dengan nama yang sudah unik
+        $data['name'] = $finalName;
+
+        // Selalu Create Baru (Logic restore dihapus total)
         \App\Models\ModelSerie::create($data);
 
         return redirect()->back()->with('success', 'Model seri berhasil ditambahkan.');

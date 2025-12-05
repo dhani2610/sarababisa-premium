@@ -58,25 +58,52 @@ class MasterMerekController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    // public function store(BrandRequest $request)
+    // {
+    //     $data = $request->validated();
+
+    //     $existing = Brand::withTrashed()
+    //         ->where('name', $data['name'])
+    //         ->first();
+
+    //     if ($existing && $existing->trashed()) {
+    //         // Kalau ada merek dengan nama sama tapi soft delete → restore
+    //         $existing->restore();
+    //         $existing->update($data);
+
+    //         return redirect()->route('master-merek.index')
+    //             ->with('success', 'Merek berhasil dipulihkan & diperbarui.');
+    //     }
+    //     $data['cabang_id'] = getCabangId();
+
+    //     // Kalau belum ada → buat baru
+    //     Brand::create($data);
+
+    //     return redirect()->route('master-merek.index')
+    //         ->with('success', 'Merek berhasil ditambahkan.');
+    // }
+
     public function store(BrandRequest $request)
     {
         $data = $request->validated();
-
-        $existing = Brand::withTrashed()
-            ->where('name', $data['name'])
-            ->first();
-
-        if ($existing && $existing->trashed()) {
-            // Kalau ada merek dengan nama sama tapi soft delete → restore
-            $existing->restore();
-            $existing->update($data);
-
-            return redirect()->route('master-merek.index')
-                ->with('success', 'Merek berhasil dipulihkan & diperbarui.');
-        }
         $data['cabang_id'] = getCabangId();
 
-        // Kalau belum ada → buat baru
+        $namaAsli = $data['name'];
+        $finalName = $namaAsli;
+        $counter = 2;
+
+        // Loop Cek Duplikat
+        // Kita gunakan withTrashed() agar pengecekan mencakup data yang sudah dihapus juga.
+        // Jadi kalau ada "Samsung" (Soft Deleted), input baru akan jadi "Samsung (2)"
+        while (Brand::withTrashed()->where('name', $finalName)->exists()) {
+            $finalName = $namaAsli . ' (' . $counter . ')';
+            $counter++;
+        }
+
+        // Set nama final yang sudah unik
+        $data['name'] = $finalName;
+
+        // Langsung Create Baru (Logic restore dihapus)
         Brand::create($data);
 
         return redirect()->route('master-merek.index')
