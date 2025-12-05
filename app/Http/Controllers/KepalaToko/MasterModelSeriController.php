@@ -34,9 +34,9 @@ class MasterModelSeriController extends Controller
             })
             ->exists();
 
-        if ($hasRelation) {
-            return response()->json(['message' => 'Data Model Seri yang memiliki riwayat transaksi tidak bisa dihapus.']);
-        }
+        // if ($hasRelation) {
+        //     return response()->json(['message' => 'Data Model Seri yang memiliki riwayat transaksi tidak bisa dihapus.']);
+        // }
 
         ModelSerie::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data model seri berhasil dihapus.']);
@@ -189,12 +189,12 @@ class MasterModelSeriController extends Controller
     {
         $item = ModelSerie::findOrFail($id);
 
-        if (
-            $item->relasiService()->exists()
-        ) {
-            toast('Data Model Seri yang memiliki riwayat transaksi tidak bisa dihapus.', 'error');
-            return redirect()->back();
-        }
+        // if (
+        //     $item->relasiService()->exists()
+        // ) {
+        //     toast('Data Model Seri yang memiliki riwayat transaksi tidak bisa dihapus.', 'error');
+        //     return redirect()->back();
+        // }
 
         $item->delete();
 

@@ -34,9 +34,9 @@ class MasterMerekController extends Controller
             })
             ->exists();
 
-        if ($hasRelation) {
-            return response()->json(['message' => 'Data Merek yang memiliki riwayat transaksi/model seri tidak bisa dihapus.']);
-        }
+        // if ($hasRelation) {
+        //     return response()->json(['message' => 'Data Merek yang memiliki riwayat transaksi/model seri tidak bisa dihapus.']);
+        // }
 
         Brand::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data merek berhasil dihapus.']);
@@ -178,12 +178,12 @@ class MasterMerekController extends Controller
     {
         $item = Brand::findOrFail($id);
 
-        if (
-            $item->relasiService()->exists() || $item->relasiModelSerie()->exists()
-        ) {
-            toast('Data Merek yang memiliki riwayat transaksi/model seri tidak bisa dihapus.', 'error');
-            return redirect()->back();
-        }
+        // if (
+        //     $item->relasiService()->exists() || $item->relasiModelSerie()->exists()
+        // ) {
+        //     toast('Data Merek yang memiliki riwayat transaksi/model seri tidak bisa dihapus.', 'error');
+        //     return redirect()->back();
+        // }
 
         $item->delete();
 

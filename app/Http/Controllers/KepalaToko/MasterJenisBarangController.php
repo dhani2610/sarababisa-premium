@@ -29,9 +29,9 @@ class MasterJenisBarangController extends Controller
             })
             ->exists();
 
-        if ($hasRelation) {
-            return response()->json(['message' => 'Data jenis barang yang memiliki riwayat transaksi tidak bisa dihapus.']);
-        }
+        // if ($hasRelation) {
+        //     return response()->json(['message' => 'Data jenis barang yang memiliki riwayat transaksi tidak bisa dihapus.']);
+        // }
 
         Type::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data jenis barang berhasil dihapus.']);
@@ -144,12 +144,12 @@ class MasterJenisBarangController extends Controller
     {
         $item = Type::findOrFail($id);
 
-        if (
-            $item->relasiService()->exists()
-        ) {
-            toast('Data Jenis Barang yang memiliki riwayat transaksi tidak bisa dihapus.', 'error');
-            return redirect()->back();
-        }
+        // if (
+        //     $item->relasiService()->exists()
+        // ) {
+        //     toast('Data Jenis Barang yang memiliki riwayat transaksi tidak bisa dihapus.', 'error');
+        //     return redirect()->back();
+        // }
 
         $item->delete();
 
