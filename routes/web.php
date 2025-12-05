@@ -423,6 +423,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::resource('produk/sparepart', KepalaTokoProdukSparepartController::class);
     Route::resource('produk/aksesoris', KepalaTokoProdukAksesorisController::class);
     Route::resource('produk/tool', KepalaTokoProdukToolController::class);
+    Route::get('produk/purchase/cetak', [KepalaTokoPurchaseProductController::class, 'cetak'])->name('purchase.cetak');
     Route::resource('produk/purchase', KepalaTokoPurchaseProductController::class);
     Route::delete('/purchases/delete', [KepalaTokoPurchaseProductController::class, 'deleteSelected']);
     Route::resource('produk/retur', KepalaTokoReturProductController::class);

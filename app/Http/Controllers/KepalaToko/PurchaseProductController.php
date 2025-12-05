@@ -11,9 +11,10 @@ use App\Models\Category;
 use App\Models\Capacity;
 use App\Models\ModelSerie;
 use App\Models\Color;
+use App\Models\User;
 use App\Models\Customer;
 use App\Models\Expense;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 class PurchaseProductController extends Controller
 {
     /**
@@ -24,6 +25,52 @@ class PurchaseProductController extends Controller
     public function index()
     {
         return view('pages/kepalatoko/pembelian/index');
+    }
+
+    public function cetak(Request $request)
+    {
+        // 1. Ambil data Toko/User (Sesuaikan ID user pemilik toko)
+        $users = User::find(1);
+
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+
+        // 2. Filter Tanggal
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+
+        // 3. Query Data Pembelian
+        // Logic disamakan dengan index: exclude 'Tukar Tambah'
+        $query = Purchase::with(['product', 'supplier']) // Eager load biar cepat
+            ->where('cabang_id', getCabangId())
+            ->whereDate('date', '>=', $start_date) // Menggunakan kolom 'date' sesuai tampilan tabel
+            ->whereDate('date', '<=', $end_date)
+            ->where(function ($q) {
+                $q->whereNull('keterangan')
+                  ->orWhere('keterangan', '!=', 'Tukar Tambah');
+            })
+            ->orderBy('date', 'asc');
+
+        $purchases = $query->get();
+
+        // 4. Hitung Ringkasan (Summary)
+        $total_item = $query->sum('quantity');
+        $total_pembelian = $query->sum('total_price');
+
+        // 5. Generate PDF
+        $pdf = Pdf::loadView('pages.kepalatoko.pembelian.cetak-pdf', [
+            'users' => $users,
+            'imagePath' => $imagePath,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'purchases' => $purchases,
+            'total_item' => $total_item,
+            'total_pembelian' => $total_pembelian
+        ]);
+
+        $filename = 'Laporan Pembelian ' . $start_date . ' sd ' . $end_date . '.pdf';
+
+        return $pdf->stream($filename);
     }
 
     public function deleteSelected(Request $request)
@@ -113,7 +160,7 @@ class PurchaseProductController extends Controller
                     $purchase->suppliers_name = $suppliers_name->name;
                 }
 
-                $purchase->product_name = $product_name->product_name;
+                $purchase->product_name = $product_name->product_name ?? '-';
                 $purchase->cabang_id = getCabangId();
 
                 $purchase->save();
@@ -129,7 +176,7 @@ class PurchaseProductController extends Controller
                         $namakategori = Category::find(1);
 
                         $productsNew = new Product();
-                        $productsNew->product_name = $product_name->product_name;
+                        $productsNew->product_name = $product_name->product_name ?? '-';
                         $productsNew->categories_id = 1;
                         $productsNew->category_name = $namakategori->category_name;
                         $productsNew->capacities_id = $request->capacities_id[$i];
@@ -155,7 +202,7 @@ class PurchaseProductController extends Controller
                 if ($request->product_price[$i] > 0) {
                     # code...
                     Expense::create([
-                        'name' => 'Pembelian produk '. $product_name->product_name,
+                        'name' => 'Pembelian produk '. $purchase->product_name,
                         'price' => cleanNumber($purchase->total_price),
                         'users_id' => auth()->user()->id
                     ]);
