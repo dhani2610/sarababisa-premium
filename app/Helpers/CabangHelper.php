@@ -19,7 +19,13 @@ if (!function_exists('getCabangId')) {
 if (!function_exists('getCabang')) {
     function getCabang()
     {
-        $data = Cabang::orderBy('nama_cabang','asc')->get();
+        if (Auth::check()) {
+            if (Auth::user()->id == 1) {
+                $data = Cabang::orderBy('nama_cabang','asc')->get();
+            }else{
+                $data = Cabang::orderBy('nama_cabang','asc')->where('id',Auth::user()->cabang_id)->get();
+            }
+        }
 
         // Default fallback ke 1
         return $data;
