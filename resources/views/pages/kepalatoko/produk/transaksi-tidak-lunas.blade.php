@@ -128,7 +128,7 @@
                                     <th>Pelanggan</th>
                                     <th>Pembayaran</th>
                                     @if (Auth::user()->role != 'Investor')
-                                        @if ($storeSettings->is_modal_produk == 1)
+                                        @if ($storeSettingsAuth::user()->role == 'Kepala Toko' || $storeSettings->is_modal_produk == 1)
                                         <th>Modal</th>
                                         @endif
                                     @endif
@@ -303,7 +303,7 @@
                                 data: 'pembayaran'
                             },
                             @if (Auth::user()->role != 'Investor')
-                                @if ($storeSettings->is_modal_produk == 1)
+                                @if ($storeSettingsAuth::user()->role == 'Kepala Toko' || $storeSettings->is_modal_produk == 1)
                                 {
                                     data: 'modal'
                                 },
