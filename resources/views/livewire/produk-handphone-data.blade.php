@@ -688,7 +688,7 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Stok</div>
                             </th>
-                            @if (Auth::user()->role == 'Kapala Toko' || $toko->is_modal_produk === 1)
+                            @if (Auth::user()->role == 'Kepala Toko' || $toko->is_modal_produk === 1)
                                 <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-semibold text-left">Modal</div>
                                 </th>
@@ -779,7 +779,7 @@
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $item->stok }}</div>
                                 </td>
-                                @if (Auth::user()->role == 'Kapala Toko' || $toko->is_modal_produk === 1)
+                                @if (Auth::user()->role == 'Kepala Toko' || $toko->is_modal_produk === 1)
                                     <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                         <div class="font-medium">Rp. {{ number_format($item->harga_modal) }}</div>
                                     </td>
