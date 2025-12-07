@@ -592,9 +592,10 @@ class TransaksiServisController extends Controller
         // Ambil nomor invoice dari database
         $invoiceNumber = $items->nomor_servis;
         $namaPelanggan = $items->customer->nama;
-
+        $toko = StoreSetting::where('cabang_id', getCabangId())->first();
         $pdf = PDF::loadView('pages.kepalatoko.servis.notaterima-cetak-termal', [
         // return view('pages.kepalatoko.servis.notaterima-cetak-termal', [
+            'toko' => $toko,
             'users' => $users,
             'items' => $items,
             'imagePath' => $imagePath,
@@ -617,9 +618,11 @@ class TransaksiServisController extends Controller
         // Ambil nomor invoice dari database
         $invoiceNumber = $items->nomor_servis;
         $namaPelanggan = $items->customer->nama;
+        $toko = StoreSetting::where('cabang_id', getCabangId())->first();
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
         // return view('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
+            'toko' => $toko,
             'users' => $users,
             'items' => $items,
             'terms' => $terms,

@@ -509,9 +509,11 @@ class SudahDiambilController extends Controller
         // Ambil nomor invoice dari database
         $invoiceNumber = $items->nomor_servis;
         $namaPelanggan = $items->customer->nama;
+        $toko = StoreSetting::where('cabang_id', getCabangId())->first();
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.cetak-termal-pengambilan', [
         // return View('pages.kepalatoko.servis.cetak-termal-pengambilan', [
+            'toko' => $toko,
             'users' => $users,
             'items' => $items,
             'imagePath' => $imagePath,
@@ -960,12 +962,14 @@ class SudahDiambilController extends Controller
         // Ambil nomor invoice dari database
         $invoiceNumber = $items->nomor_servis;
         $namaPelanggan = $items->customer->nama;
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
         // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
             'users' => $users,
             'items' => $items,
             'terms' => $terms,
+            'toko' => $toko,
             'imagePath' => $imagePath,
         ]);
 
