@@ -96,7 +96,7 @@ class MasterMerekController extends Controller
         // Kita gunakan withTrashed() agar pengecekan mencakup data yang sudah dihapus juga.
         // Jadi kalau ada "Samsung" (Soft Deleted), input baru akan jadi "Samsung (2)"
         while (Brand::withTrashed()->where('name', $finalName)->exists()) {
-            $finalName = $namaAsli . ' (' . $counter . ')';
+            $finalName = $namaAsli . '.';
             $counter++;
         }
 

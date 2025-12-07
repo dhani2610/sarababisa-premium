@@ -46,7 +46,7 @@ class ServiceActionImport implements ToModel, WithHeadingRow, WithBatchInserts
 
         // Loop: Selama nama tersebut sudah ada di tabel (milik siapapun/cabang manapun), tambah angka
         while (ServiceAction::where('nama_tindakan', $finalName)->exists()) {
-            $finalName = $namaTindakanAsli . ' (' . $counter . ')';
+            $finalName = $namaTindakanAsli . '.';
             $counter++;
         }
 

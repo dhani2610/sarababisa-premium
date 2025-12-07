@@ -102,7 +102,7 @@ class MasterModelSeriController extends Controller
         // Menggunakan withTrashed() agar mengecek seluruh data termasuk yang sudah dihapus.
         // Jika "iPhone 11" ada di sampah, maka input baru akan menjadi "iPhone 11 (2)"
         // while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
-        //     $finalName = $namaAsli . ' (' . $counter . ')';
+        //     $finalName = $namaAsli . '.';
         //     $counter++;
         // }
 

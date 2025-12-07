@@ -60,7 +60,7 @@ class SparepartImport implements ToModel, WithHeadingRow, WithBatchInserts
         // Cek apakah nama sparepart ini sudah dipakai secara GLOBAL (di cabang lain)?
         // Jika ya, rename jadi "LCD iPhone X (2)", dst.
         while (Product::where('product_name', $finalName)->exists()) {
-            $finalName = $namaAsli . ' (' . $counter . ')';
+            $finalName = $namaAsli . '.';
             $counter++;
         }
 

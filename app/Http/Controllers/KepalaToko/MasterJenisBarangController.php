@@ -75,7 +75,7 @@ class MasterJenisBarangController extends Controller
         // Mengecek apakah nama 'finalName' sudah ada di database.
         // Loop akan terus berjalan sampai menemukan nama yang belum dipakai.
         while (Type::where('name', $finalName)->exists()) {
-            $finalName = $namaAsli . ' (' . $counter . ')';
+            $finalName = $namaAsli . '.';
             $counter++;
         }
 

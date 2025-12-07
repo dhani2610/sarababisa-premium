@@ -51,7 +51,7 @@ class PelangganImport implements ToModel, WithHeadingRow, WithBatchInserts
         // Jika ya, kita rename HP-nya agar tetap bisa masuk (unik).
         // PENTING: Ini akan membuat nomor HP jadi string seperti "0812345 (2)"
         while (Customer::where('nomor_hp', $finalHp)->exists()) {
-            $finalHp = $hpAsli . ' (' . $counter . ')';
+            $finalHp = $hpAsli . '.';
             $counter++;
         }
 

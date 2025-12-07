@@ -67,14 +67,14 @@ class ProdukImport implements ToModel, WithHeadingRow, WithBatchInserts
             // KASUS BARANG BERSERI (HP):
             // Cek apakah SN ini sudah dipakai di cabang lain? Rename SN-nya.
             while (Product::where('nomor_seri', $finalSn)->exists()) {
-                $finalSn = $snAsli . ' (' . $counter . ')';
+                $finalSn = $snAsli . '.';
                 $counter++;
             }
         } else {
             // KASUS BARANG NON-SERI (Aksesoris):
             // Cek apakah Nama Produk sudah dipakai di cabang lain? Rename Namanya.
             while (Product::where('product_name', $finalName)->exists()) {
-                $finalName = $namaAsli . ' (' . $counter . ')';
+                $finalName = $namaAsli . '.';
                 $counter++;
             }
         }
