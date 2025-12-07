@@ -120,14 +120,113 @@ class PurchaseProductController extends Controller
     {
         return (int) str_replace(['.', ','], '', $value);
     }
+    // public function store(Request $request)
+    // {
+    //     function cleanNumber($value)
+    //     {
+    //         return (int) str_replace(['.', ','], '', $value);
+    //     }
+    //     if ($request->products_id == null) {
+
+    //         $notification = array(
+    //             'message' => 'Sorry you do not select any item',
+    //             'alert-type' => 'error'
+    //         );
+    //         return redirect()->back()->with($notification);
+    //     } else {
+    //         $count_product = count($request->products_id);
+    //         for ($i = 0; $i < $count_product; $i++) {
+
+    //             $tipe = $request->tipe_select[$i];
+    //             $purchase = new Purchase();
+    //             $purchase->date = date('Y-m-d', strtotime($request->date[$i]));
+    //             $purchase->reference_number = $request->reference_number[$i];
+    //             $purchase->suppliers_id = $request->suppliers_id[$i];
+
+    //             $purchase->products_id = $request->products_id[$i];
+    //             $purchase->quantity = $request->quantity[$i];
+    //             $purchase->product_price = $request->product_price[$i];
+    //             $purchase->total_price = cleanNumber($request->total_price[$i]);
+    //             $purchase->keterangan = $request->keterangan[$i];
+
+    //             $product_name = Product::find($purchase->products_id[$i]);
+
+    //             if ($tipe == 'Pelanggan') {
+    //                 $suppliers_name = Customer::find($request->suppliers_id[$i]);
+    //                 // dd($suppliers_name,$request->suppliers_id[$i]);
+    //                 $purchase->suppliers_name = $suppliers_name->nama;
+    //             }else{
+    //                 $suppliers_name = Supplier::find($purchase->suppliers_id);
+    //                 $purchase->suppliers_name = $suppliers_name->name;
+    //             }
+
+    //             $purchase->product_name = $product_name->product_name ?? '-';
+    //             $purchase->cabang_id = getCabangId();
+
+    //             $purchase->save();
+
+    //             $products = Product::find($purchase->products_id[$i]);
+    //             if (!empty($request->nomor_seri[$i])) {
+    //                 // dd($products->nomor_seri == $request->nomor_seri[$i],$products->nomor_seri,$request->nomor_seri[$i]);
+    //                 if ($products->nomor_seri == $request->nomor_seri[$i]) {
+    //                     // add new stock to the product
+    //                     $products->stok += $request->quantity[$i];
+    //                     $products->save();
+    //                 }else{
+    //                     $namakategori = Category::find(1);
+
+    //                     $productsNew = new Product();
+    //                     $productsNew->product_name = $product_name->product_name ?? '-';
+    //                     $productsNew->categories_id = 1;
+    //                     $productsNew->category_name = $namakategori->category_name;
+    //                     $productsNew->capacities_id = $request->capacities_id[$i];
+    //                     $productsNew->harga_modal = $request->product_price[$i];
+    //                     $productsNew->harga_jual = $request->harga_jual_pelanggan[$i];
+    //                     $productsNew->harga_jual_toko = $request->harga_jual_toko[$i];
+    //                     $productsNew->ram = $request->ram[$i];
+    //                     $productsNew->warna = $request->warna[$i];
+    //                     $productsNew->nomor_seri = $request->nomor_seri[$i];
+    //                     $productsNew->stok_minimal = 1;
+    //                     $productsNew->stok = $request->quantity[$i];
+    //                     $productsNew->keterangan = $request->keterangan[$i];
+    //                     $productsNew->cabang_id = getCabangId();
+    //                     $productsNew->save();
+    //                 }
+    //             }else{
+    //                 // add new stock to the product
+    //                 $products->stok += $request->quantity[$i];
+    //                 $products->save();
+    //             }
+
+
+    //             if ($request->product_price[$i] > 0) {
+    //                 # code...
+    //                 Expense::create([
+    //                     'name' => 'Pembelian produk '. $purchase->product_name,
+    //                     'price' => cleanNumber($purchase->total_price),
+    //                     'users_id' => auth()->user()->id
+    //                 ]);
+    //             }
+
+    //         }
+
+    //     }
+
+    //     return redirect()->route('purchase.index');
+    // }
+
+
     public function store(Request $request)
     {
-        function cleanNumber($value)
-        {
-            return (int) str_replace(['.', ','], '', $value);
+        // Fungsi helper untuk membersihkan format angka
+        if (!function_exists('cleanNumber')) {
+            function cleanNumber($value)
+            {
+                return (int) str_replace(['.', ','], '', $value);
+            }
         }
-        if ($request->products_id == null) {
 
+        if ($request->products_id == null) {
             $notification = array(
                 'message' => 'Sorry you do not select any item',
                 'alert-type' => 'error'
@@ -135,48 +234,64 @@ class PurchaseProductController extends Controller
             return redirect()->back()->with($notification);
         } else {
             $count_product = count($request->products_id);
+            
             for ($i = 0; $i < $count_product; $i++) {
 
                 $tipe = $request->tipe_select[$i];
+                
+                // Ambil data produk di awal loop agar efisien
+                $productModel = Product::find($request->products_id[$i]);
+
                 $purchase = new Purchase();
                 $purchase->date = date('Y-m-d', strtotime($request->date[$i]));
                 $purchase->reference_number = $request->reference_number[$i];
                 $purchase->suppliers_id = $request->suppliers_id[$i];
-
                 $purchase->products_id = $request->products_id[$i];
                 $purchase->quantity = $request->quantity[$i];
                 $purchase->product_price = $request->product_price[$i];
                 $purchase->total_price = cleanNumber($request->total_price[$i]);
                 $purchase->keterangan = $request->keterangan[$i];
 
-                $product_name = Product::find($purchase->products_id[$i]);
-
+                // Set Nama Supplier/Pelanggan
                 if ($tipe == 'Pelanggan') {
-                    $suppliers_name = Customer::find($request->suppliers_id[$i]);
-                    // dd($suppliers_name,$request->suppliers_id[$i]);
-                    $purchase->suppliers_name = $suppliers_name->nama;
-                }else{
-                    $suppliers_name = Supplier::find($purchase->suppliers_id);
-                    $purchase->suppliers_name = $suppliers_name->name;
+                    $customer = Customer::find($request->suppliers_id[$i]);
+                    $purchase->suppliers_name = $customer->nama;
+                } else {
+                    // Asumsi suppliers_id sudah single value dari input array
+                    $supplier = Supplier::find($request->suppliers_id[$i]);
+                    $purchase->suppliers_name = $supplier->name;
                 }
 
-                $purchase->product_name = $product_name->product_name ?? '-';
+                $purchase->product_name = $productModel->product_name ?? '-';
                 $purchase->cabang_id = getCabangId();
 
                 $purchase->save();
 
-                $products = Product::find($purchase->products_id[$i]);
+                // LOGIKA UPDATE STOK ATAU BUAT PRODUK BARU
                 if (!empty($request->nomor_seri[$i])) {
-                    // dd($products->nomor_seri == $request->nomor_seri[$i],$products->nomor_seri,$request->nomor_seri[$i]);
-                    if ($products->nomor_seri == $request->nomor_seri[$i]) {
-                        // add new stock to the product
-                        $products->stok += $request->quantity[$i];
-                        $products->save();
-                    }else{
+                    
+                    // Cek apakah nomor seri sama dengan produk yang dipilih
+                    if ($productModel->nomor_seri == $request->nomor_seri[$i]) {
+                        // Jika sama, tambahkan stok ke produk tersebut
+                        $productModel->stok += $request->quantity[$i];
+                        $productModel->save();
+                    } else {
+                        // Jika beda, BUAT PRODUK BARU (Duplikat Data)
                         $namakategori = Category::find(1);
 
+                        // --- [MULAI] LOGIKA PENGECEKAN NAMA DUPLIKAT ---
+                        $baseName = $productModel->product_name ?? '-';
+                        $finalName = $baseName;
+
+                        // Selama nama tersebut masih ada di database, tambahkan titik (.)
+                        // Gunakan withTrashed() jika ingin mengecek data yang sudah dihapus juga
+                        while (Product::where('product_name', $finalName)->exists()) {
+                            $finalName = $finalName . '.';
+                        }
+                        // --- [SELESAI] LOGIKA PENGECEKAN NAMA DUPLIKAT ---
+
                         $productsNew = new Product();
-                        $productsNew->product_name = $product_name->product_name ?? '-';
+                        $productsNew->product_name = $finalName; // Pakai nama yang sudah ada titiknya
                         $productsNew->categories_id = 1;
                         $productsNew->category_name = $namakategori->category_name;
                         $productsNew->capacities_id = $request->capacities_id[$i];
@@ -190,26 +305,24 @@ class PurchaseProductController extends Controller
                         $productsNew->stok = $request->quantity[$i];
                         $productsNew->keterangan = $request->keterangan[$i];
                         $productsNew->cabang_id = getCabangId();
+                        
                         $productsNew->save();
                     }
-                }else{
-                    // add new stock to the product
-                    $products->stok += $request->quantity[$i];
-                    $products->save();
+                } else {
+                    // Jika tidak ada input nomor seri, update stok produk yang ada
+                    $productModel->stok += $request->quantity[$i];
+                    $productModel->save();
                 }
 
-
+                // Simpan Pengeluaran (Expense)
                 if ($request->product_price[$i] > 0) {
-                    # code...
                     Expense::create([
-                        'name' => 'Pembelian produk '. $purchase->product_name,
+                        'name' => 'Pembelian produk ' . $purchase->product_name,
                         'price' => cleanNumber($purchase->total_price),
                         'users_id' => auth()->user()->id
                     ]);
                 }
-
             }
-
         }
 
         return redirect()->route('purchase.index');

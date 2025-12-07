@@ -97,16 +97,24 @@ class MasterModelSeriController extends Controller
 
         $namaAsli = $data['name'];
         $finalName = $namaAsli;
-        $counter = 2;
 
         // Loop Cek Duplikat
         // Menggunakan withTrashed() agar mengecek seluruh data termasuk yang sudah dihapus.
         // Jika "iPhone 11" ada di sampah, maka input baru akan menjadi "iPhone 11 (2)"
-        while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
-            $finalName = $namaAsli . ' (' . $counter . ')';
-            $counter++;
-        }
+        // while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
+        //     $finalName = $namaAsli . ' (' . $counter . ')';
+        //     $counter++;
+        // }
 
+        $finalName = $request->name; 
+
+        // Cek keberadaan nama (termasuk yang sudah dihapus/withTrashed)
+        while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
+            
+            // Jika ada, tambahkan satu titik di belakang nama yang sedang dicek
+            $finalName = $finalName . '.';
+            
+        }
         // Update nama di array data dengan nama yang sudah unik
         $data['name'] = $finalName;
 
