@@ -206,36 +206,8 @@
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('pos')){{ '!text-indigo-500' }}@endif" href="{{ route('pos') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Point of Sales (POS)</span>
                                     </a>
-                                </li> <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-jenis-barang.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-jenis-barang.index') }}">
-                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Jenis Barang</span>
-                                    </a>
                                 </li>
-                                <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-merek.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-merek.index') }}">
-                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Merek</span>
-                                    </a>
-                                </li>
-                                <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-model-seri.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-model-seri.index') }}">
-                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Model Seri</span>
-                                    </a>
-                                </li>
-                                <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-kapasitas.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-kapasitas.index') }}">
-                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Kapasitas</span>
-                                    </a>
-                                </li>
-                                <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-warna.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-warna.index') }}">
-                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Warna</span>
-                                    </a>
-                                </li>
-                                <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-tipe-os.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-tipe-os.index') }}">
-                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Tipe OS</span>
-                                    </a>
-                                </li>
+                                
                                 @endif
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('transaksi-produk.index', 'transaksi-produk-paid.index', 'transaksi-produk-due.index', 'transaksi-produk.show', 'transaksi-produk.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('transaksi-produk.index') }}">
