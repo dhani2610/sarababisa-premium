@@ -1,5 +1,5 @@
 <div>
-    @if (Auth::user()->role == 'Kapala Toko')
+    @if (Auth::user()->role == 'Kepala Toko')
     <div class="grid grid-cols-12 gap-6 mb-4">
         <x-produk.card-stok-ready :itemready="$itemready" :stokready="$stokready" :modalready="$modalready"/>
         <x-produk.card-stok-habis :stokhabis="$stokhabis" :nominalterjual="$nominalterjual"/>

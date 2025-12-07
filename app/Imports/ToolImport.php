@@ -59,7 +59,7 @@ class ToolImport implements ToModel, WithHeadingRow, WithBatchInserts
         // Cek apakah nama alat ini sudah dipakai secara GLOBAL (di cabang lain)?
         // Jika ya, rename jadi "Obeng (2)", dst.
         while (Product::where('product_name', $finalName)->exists()) {
-            $finalName = $namaAsli . ' (' . $counter . ')';
+            $finalName = $namaAsli . '.';
             $counter++;
         }
 

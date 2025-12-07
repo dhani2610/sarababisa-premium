@@ -63,6 +63,7 @@ class CabangController extends Controller
         $storeSetting->bank = $request->bank;
         $storeSetting->rekening = $request->rekening;
         $storeSetting->pemilik_rekening = $request->pemilik_rekening;
+        $storeSetting->alamat_toko = $request->alamat_toko;
         $storeSetting->cabang_id = $data->id;
         $storeSetting->is_tax = 0;
         $storeSetting->is_bonus = 1;
@@ -127,6 +128,7 @@ class CabangController extends Controller
         $storeSetting->nama_toko = $request->nama_toko;
         $storeSetting->alamat_toko = $request->alamat_toko;
         $storeSetting->deskripsi_toko = $request->deskripsi_toko;
+        $storeSetting->alamat_toko = $request->alamat_toko;
         $storeSetting->nomor_hp_toko = $request->nomor_hp_toko;
         $storeSetting->bank = $request->bank;
         $storeSetting->rekening = $request->rekening;

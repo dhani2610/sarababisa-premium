@@ -6,7 +6,8 @@
             <div class="flex items-center mb-4 md:mb-0">
                 <!-- User info -->
                 <div>
-                    <div class="mb-2">Halo, <strong class="font-semibold text-slate-800">{{ Auth::user()->name }}</strong> 👋,</div>
+                    {{-- <div class="mb-2">Halo, <strong class="font-semibold text-slate-800">{{ Auth::user()->name }}</strong> 👋,</div> --}}
+                    <div class="mb-2">Halo, <strong class="font-semibold text-slate-800">{{ getCabangNameUser() }}</strong> 👋,</div>
                     <p>Berikut adalah keuangan toko Anda hari ini:</p>
                 </div>
             </div>

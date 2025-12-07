@@ -27,20 +27,20 @@ class CustomerRequest extends FormRequest
             'nama' => 'required|max:100',
             'kategori' => 'required|max:100',
             'alamat' => 'required|max:100',
-            'nomor_hp' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    $cabangId = getCabangId();
+            // 'nomor_hp' => [
+            //     'required',
+            //     function ($attribute, $value, $fail) {
+            //         $cabangId = getCabangId();
 
-                    $exists = \App\Models\Customer::where('nomor_hp', $value)
-                        ->where('cabang_id', $cabangId)
-                        ->exists();
+            //         $exists = \App\Models\Customer::where('nomor_hp', $value)
+            //             ->where('cabang_id', $cabangId)
+            //             ->exists();
 
-                    if ($exists) {
-                        $fail('Mohon maaf, pelanggan dengan nomor HP ini sudah tersedia di cabang ini.');
-                    }
-                }
-            ],
+            //         if ($exists) {
+            //             $fail('Mohon maaf, pelanggan dengan nomor HP ini sudah tersedia di cabang ini.');
+            //         }
+            //     }
+            // ],
         ];
     }
 

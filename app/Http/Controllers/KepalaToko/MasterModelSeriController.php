@@ -34,9 +34,9 @@ class MasterModelSeriController extends Controller
             })
             ->exists();
 
-        if ($hasRelation) {
-            return response()->json(['message' => 'Data Model Seri yang memiliki riwayat transaksi tidak bisa dihapus.']);
-        }
+        // if ($hasRelation) {
+        //     return response()->json(['message' => 'Data Model Seri yang memiliki riwayat transaksi tidak bisa dihapus.']);
+        // }
 
         ModelSerie::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data model seri berhasil dihapus.']);
@@ -67,24 +67,58 @@ class MasterModelSeriController extends Controller
     //     return redirect()->route('master-model-seri.index');
     // }
 
+    // public function store(ModelSerieRequest $request)
+    // {
+    //     $data = $request->validated();
+
+    //     $existing = \App\Models\ModelSerie::withTrashed()
+    //         ->where('name', $data['name'])
+    //         ->first();
+
+    //     if ($existing && $existing->trashed()) {
+    //         // Kalau ada yang soft delete → restore
+    //         $existing->restore();
+    //         $existing->update($data);
+
+    //         return redirect()->back()->with('success', 'Model seri berhasil dipulihkan & diperbarui.');
+    //     }
+
+    //     $data['cabang_id'] = getCabangId();
+    //     // Kalau belum ada → buat baru
+    //     \App\Models\ModelSerie::create($data);
+
+    //     return redirect()->back()->with('success', 'Model seri berhasil ditambahkan.');
+    // }
+
     public function store(ModelSerieRequest $request)
     {
         $data = $request->validated();
-
-        $existing = \App\Models\ModelSerie::withTrashed()
-            ->where('name', $data['name'])
-            ->first();
-
-        if ($existing && $existing->trashed()) {
-            // Kalau ada yang soft delete → restore
-            $existing->restore();
-            $existing->update($data);
-
-            return redirect()->back()->with('success', 'Model seri berhasil dipulihkan & diperbarui.');
-        }
-
         $data['cabang_id'] = getCabangId();
-        // Kalau belum ada → buat baru
+
+        $namaAsli = $data['name'];
+        $finalName = $namaAsli;
+
+        // Loop Cek Duplikat
+        // Menggunakan withTrashed() agar mengecek seluruh data termasuk yang sudah dihapus.
+        // Jika "iPhone 11" ada di sampah, maka input baru akan menjadi "iPhone 11 (2)"
+        // while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
+        //     $finalName = $namaAsli . '.';
+        //     $counter++;
+        // }
+
+        $finalName = $request->name; 
+
+        // Cek keberadaan nama (termasuk yang sudah dihapus/withTrashed)
+        while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
+            
+            // Jika ada, tambahkan satu titik di belakang nama yang sedang dicek
+            $finalName = $finalName . '.';
+            
+        }
+        // Update nama di array data dengan nama yang sudah unik
+        $data['name'] = $finalName;
+
+        // Selalu Create Baru (Logic restore dihapus total)
         \App\Models\ModelSerie::create($data);
 
         return redirect()->back()->with('success', 'Model seri berhasil ditambahkan.');
@@ -163,12 +197,12 @@ class MasterModelSeriController extends Controller
     {
         $item = ModelSerie::findOrFail($id);
 
-        if (
-            $item->relasiService()->exists()
-        ) {
-            toast('Data Model Seri yang memiliki riwayat transaksi tidak bisa dihapus.', 'error');
-            return redirect()->back();
-        }
+        // if (
+        //     $item->relasiService()->exists()
+        // ) {
+        //     toast('Data Model Seri yang memiliki riwayat transaksi tidak bisa dihapus.', 'error');
+        //     return redirect()->back();
+        // }
 
         $item->delete();
 

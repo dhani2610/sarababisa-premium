@@ -28,17 +28,17 @@ class TypeRequest extends FormRequest
             'name' => [
                 'required',
                 'max:100',
-                function ($attribute, $value, $fail) {
-                    $cabangId = getCabangId();
+                // function ($attribute, $value, $fail) {
+                //     $cabangId = getCabangId();
 
-                    $exists = Type::where('name', $value)
-                        ->where('cabang_id', $cabangId)
-                        ->exists();
+                //     $exists = Type::where('name', $value)
+                //         ->where('cabang_id', $cabangId)
+                //         ->exists();
 
-                    if ($exists) {
-                        $fail('Mohon maaf, jenis barang dengan nama ini sudah tersedia di cabang ini.');
-                    }
-                }
+                //     if ($exists) {
+                //         $fail('Mohon maaf, jenis barang dengan nama ini sudah tersedia di cabang ini.');
+                //     }
+                // }
             ],
         ];
     }

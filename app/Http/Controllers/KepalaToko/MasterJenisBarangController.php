@@ -29,9 +29,9 @@ class MasterJenisBarangController extends Controller
             })
             ->exists();
 
-        if ($hasRelation) {
-            return response()->json(['message' => 'Data jenis barang yang memiliki riwayat transaksi tidak bisa dihapus.']);
-        }
+        // if ($hasRelation) {
+        //     return response()->json(['message' => 'Data jenis barang yang memiliki riwayat transaksi tidak bisa dihapus.']);
+        // }
 
         Type::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data jenis barang berhasil dihapus.']);
@@ -53,10 +53,38 @@ class MasterJenisBarangController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    // public function store(TypeRequest $request)
+    // {
+    //     $data = $request->all();
+    //     $data['cabang_id'] = getCabangId();
+    //     Type::create($data);
+
+    //     return redirect()->route('master-jenis-barang.index');
+    // }
+
     public function store(TypeRequest $request)
     {
+        // 1. Ambil Nama Asli dan ID Cabang
+        $cabangId = getCabangId();
+        $namaAsli = $request->name;
+
+        $finalName = $namaAsli;
+        $counter = 2;
+
+        // 2. Loop Cek Duplikat (Logic Create Baru)
+        // Mengecek apakah nama 'finalName' sudah ada di database.
+        // Loop akan terus berjalan sampai menemukan nama yang belum dipakai.
+        while (Type::where('name', $finalName)->exists()) {
+            $finalName = $namaAsli . '.';
+            $counter++;
+        }
+
+        // 3. Siapkan Data untuk disimpan
         $data = $request->all();
-        $data['cabang_id'] = getCabangId();
+        $data['name'] = $finalName; // Timpa nama dengan yang sudah unik/aman
+        $data['cabang_id'] = $cabangId;
+
+        // 4. Create Data
         Type::create($data);
 
         return redirect()->route('master-jenis-barang.index');
@@ -116,12 +144,12 @@ class MasterJenisBarangController extends Controller
     {
         $item = Type::findOrFail($id);
 
-        if (
-            $item->relasiService()->exists()
-        ) {
-            toast('Data Jenis Barang yang memiliki riwayat transaksi tidak bisa dihapus.', 'error');
-            return redirect()->back();
-        }
+        // if (
+        //     $item->relasiService()->exists()
+        // ) {
+        //     toast('Data Jenis Barang yang memiliki riwayat transaksi tidak bisa dihapus.', 'error');
+        //     return redirect()->back();
+        // }
 
         $item->delete();
 

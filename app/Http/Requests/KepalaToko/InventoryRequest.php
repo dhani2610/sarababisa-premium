@@ -28,17 +28,17 @@ class InventoryRequest extends FormRequest
             'code' => [
                 'required',
                 'max:100',
-                function ($attribute, $value, $fail) {
-                    $cabangId = getCabangId();
+                // function ($attribute, $value, $fail) {
+                //     $cabangId = getCabangId();
 
-                    $exists = Inventory::where('code', $value)
-                        ->where('cabang_id', $cabangId)
-                        ->exists();
+                //     $exists = Inventory::where('code', $value)
+                //         ->where('cabang_id', $cabangId)
+                //         ->exists();
 
-                    if ($exists) {
-                        $fail('Mohon maaf, inventaris dengan kode ini sudah tersedia di cabang ini.');
-                    }
-                }
+                //     if ($exists) {
+                //         $fail('Mohon maaf, inventaris dengan kode ini sudah tersedia di cabang ini.');
+                //     }
+                // }
             ],
         ];
     }

@@ -46,7 +46,7 @@ class BrandImport implements ToModel, WithHeadingRow, WithBatchInserts
 
         // Loop: Jika nama sudah ada di database (milik cabang manapun), tambah angka (2), (3)...
         while (Brand::where('name', $finalName)->exists()) {
-            $finalName = $namaAsli . ' (' . $counter . ')';
+            $finalName = $namaAsli . '.';
             $counter++;
         }
 
