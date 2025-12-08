@@ -77,7 +77,7 @@ class ProsesData extends Component
         $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
         $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
         $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
-        $penerima = User::where('cabang_id',getCabangId())->whereNotIn('role',['Investor'])->get();
+        $penerima = User::where('cabang_id',getCabangId())->whereNotIn('role',['Investor','Kepala Toko'])->get();
         $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
         $products = Product::where('cabang_id',getCabangId())->whereHas('subCategory', function ($query) {
             $query->whereHas('category', function ($subQuery) {
