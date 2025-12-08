@@ -323,8 +323,10 @@ class ServisBelumDisetujuiController extends Controller
                 $subQuery->where('category_name', 'Sparepart');
             });
         })->where('stok', '>=', 1)->get();
+        $sales = User::where('role', 'Sales')->get();
 
         return view('pages.kepalatoko.servis.belum-disetujui-edit', [
+            'sales' => $sales,
             'item' => $item,
             'types' => $types,
             'customers' => $customers,

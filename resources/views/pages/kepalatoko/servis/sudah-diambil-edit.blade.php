@@ -452,7 +452,7 @@ $(document).ready(function() {
 
     const serviceActions = @json($service_actions);
     const products = @json($products);
-    const salesUsers = @json($users->where('role', 'Sales')->values());
+    const salesUsers = @json($sales);
 
 
     let existingData = [];
