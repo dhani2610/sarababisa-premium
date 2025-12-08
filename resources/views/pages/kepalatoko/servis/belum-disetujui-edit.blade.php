@@ -512,13 +512,13 @@ $(document).ready(function() {
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Modal Sparepart (Rp)</label>
                     <div class="relative">
-                        <input type="text" name="modal_j[]" class="form-input w-full pl-3 pr-2 py-2 format-rupiah input-modal" value="${modalVal}" placeholder="0">
+                        <input type="number" name="modal_j[]" class="form-input w-full pl-3 pr-2 py-2 format-rupiah input-modal" value="${modalVal}" placeholder="0">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Biaya Jasa (Rp)</label>
                     <div class="relative">
-                        <input type="text" name="biaya_j[]" class="form-input w-full pl-3 pr-2 py-2 format-rupiah input-biaya" value="${biayaVal}" placeholder="0">
+                        <input type="number" name="biaya_j[]" class="form-input w-full pl-3 pr-2 py-2 format-rupiah input-biaya" value="${biayaVal}" placeholder="0">
                     </div>
                 </div>
             </div>
