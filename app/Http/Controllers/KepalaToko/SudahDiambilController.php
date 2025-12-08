@@ -31,7 +31,7 @@ class SudahDiambilController extends Controller
     public function index()
     {
         $storeSetting = StoreSetting::where('cabang_id',getCabangId())->first();;
-        
+
         return view('pages/kepalatoko/servis/sudah-diambil',compact('storeSetting'));
     }
 
@@ -799,12 +799,31 @@ class SudahDiambilController extends Controller
             $persen_teknisi = null;
         }
 
-        if ($request->service_actions_id != null) {
-            $tindakan_servis = ServiceAction::find($request->service_actions_id)->nama_tindakan;
-        } elseif ($request->tindakan_servis != null) {
-            $tindakan_servis = $request->tindakan_servis;
-        } else {
-            $tindakan_servis = null;
+        $tindakan_servis = []; // 1. Inisialisasi sebagai array kosong
+
+        // Pastikan request memiliki inputnya untuk menghindari error
+        if ($request->has('service_actions_id')) {
+            // 2. Lakukan loop pada semua tindakan yang dikirim
+            foreach ($request->service_actions_id as $key => $servis_id) {
+                $tindakan = null; // Reset untuk setiap iterasi
+
+                // 3. Cek apakah tindakan dipilih dari dropdown
+                if (!empty($servis_id)) {
+                    $action = ServiceAction::find($servis_id);
+                    if ($action) {
+                        $tindakan = $action->nama_tindakan;
+                    }
+                }
+                // 4. Jika tidak, cek apakah diisi manual
+                elseif (!empty($request->tindakan_servis_manual[$key])) {
+                    $tindakan = $request->tindakan_servis_manual[$key];
+                }
+
+                // 5. Tambahkan ke array jika ada tindakan yang valid
+                if ($tindakan !== null) {
+                    array_push($tindakan_servis, $tindakan);
+                }
+            }
         }
 
         $profittransaksi = $request->biaya - $request->modal_sparepart - $request->diskon;
@@ -924,6 +943,8 @@ class SudahDiambilController extends Controller
             'products_id' => $request->products_id,
             'tindakan_servis' => $tindakan_servis,
             'modal_sparepart' => $request->modal_sparepart,
+            'service_actions' => json_encode($request->service_actions_id),
+            'products' => json_encode($request->products_id),
             'biaya_j' => $request->biaya_j,
             'modal_j' => $request->modal_j,
             'biaya' => $request->biaya,
@@ -938,13 +959,13 @@ class SudahDiambilController extends Controller
             'persen_teknisi' => $persen_teknisi,
             'omzet' => $request->biaya - $request->diskon,
             'profit' => $profittransaksi,
-             'pay' => $pay,
+            'pay' => $pay,
             'due' => $due,
             'tempo' => $tempo,
             'tunai' => $tunai,
             'transfer' => $transfer,
             'ppn' => $ppn ?? 0,
-            'profittoko' => $profittransaksi - ($bagihasil *= $persen_teknisi)
+            'profittoko' => $profittransaksi - ($bagihasil *= $persen_teknisi),
         ]);
 
         return redirect()->route('transaksi-servis-sudah-diambil.index');

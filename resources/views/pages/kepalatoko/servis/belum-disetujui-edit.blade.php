@@ -162,7 +162,7 @@
                                     </select>
                                 </div>
 
-                                <div>
+                                {{-- <div>
                                     <label class="block text-sm font-medium mb-1" for="products_id">Sparepart yang digunakan  </label>
                                     <select id="selectjs4" name="products_id" class="form-select text-sm py-1 w-full">
                                         @if ($item->product != null)
@@ -174,7 +174,7 @@
                                             <option value="{{ $product->id }}">{{ $product->product_name }}</option>
                                         @endforeach
                                     </select>
-                                </div>
+                                </div> --}}
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="users_id">Penerima/Teknisi </label>
                                     <select id="users_id" name="users_id" class="form-select text-sm py-1 w-full" >
@@ -188,44 +188,27 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                {{-- <div>
-                                    <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Modal Sparepart </label>
-                                        <p class="text-xs mt-1" style="color:red">
-                                            ⚠️ Jika ingin mengubah nominal, cukup ubah angkanya saja.
-                                            Jika ingin menambahkan nominal baru, pisahkan dengan koma di dalam tanda kurung siku.
-                                            Contoh: ["10000","3000"]
-                                        </p>
+                                <div class="mb-4 mt-4 border-t border-slate-200 pt-4">
+                                    <label class="block text-sm font-medium mb-2">Tindakan & Biaya Sparepart</label>
 
-                                    <input id="modal_j" name="modal_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->modal_j }}"/>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1" for="modal_sparepart">Biaya Pengerjaan Sparepart </label>
-                                        <p class="text-xs mt-1" style="color:red">
-                                            ⚠️ Jika ingin mengubah nominal, cukup ubah angkanya saja.
-                                            Jika ingin menambahkan nominal baru, pisahkan dengan koma di dalam tanda kurung siku.
-                                            Contoh: ["10000","3000"]
-                                        </p>
+                                    <div id="service-container"></div>
 
-                                    <input id="biaya_j" name="biaya_j" class="form-input w-full px-2 py-1" type="text" value="{{ $item->biaya_j }}"/>
-                                </div> --}}
-                                 <div class="mb-4 mt-4">
-                                    <label class="block text-sm font-medium mb-1">Tindakan & Biaya Sparepart</label>
-
-                                    <div id="group_container">
-                                        <!-- row group dinamis -->
-                                    </div>
-
-                                    <button type="button" id="add_group" class="px-3 py-1 bg-blue-500 text-white rounded mt-2">
+                                    <button type="button" id="add-service-row" class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white mt-2">
                                         + Tambah Tindakan
                                     </button>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1" for="modal_sparepart">Modal Sparepart </label>
-                                    <input id="modal_sparepart" name="modal_sparepart" class="form-input w-full px-2 py-1 " style="    background: rgb(203 213 225 / var(--tw-border-opacity));" type="number" readonly value="{{ $item->modal_sparepart }}"/>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1" for="biaya">Biaya Servis </label>
-                                    <input id="biaya" name="biaya" class="form-input w-full px-2 py-1 " style="    background: rgb(203 213 225 / var(--tw-border-opacity));" type="number" readonly value="{{ $item->biaya }}"/>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-slate-50 p-3 rounded">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1" for="modal_sparepart">Total Modal Sparepart</label>
+                                        <input id="modal_sparepart" name="modal_sparepart" class="form-input w-full px-2 py-1 bg-slate-200 text-slate-500"
+                                            type="text" readonly value="{{ $item->modal_sparepart ?? 0 }}"/>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya Servis</label>
+                                        <input id="biaya" name="biaya" class="form-input w-full px-2 py-1 bg-slate-200 text-slate-500"
+                                            type="text" readonly value="{{ $item->biaya ?? 0 }}"/>
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="uang_muka">Uang Muka </label>
@@ -375,98 +358,285 @@
     <script>
 $(document).ready(function() {
 
-    function addGroup(tindakan = "", modal = "", biaya = "") {
+    const serviceActions = @json($service_actions);
+    const products = @json($products);
+    const salesUsers = @json($users->where('role', 'Sales')->values());
+
+
+    let existingData = [];
+
+    @if($item->tindakan_servis)
+        let rawTindakan = @json(json_decode($item->tindakan_servis));
+        let rawModal = @json(json_decode($item->modal_j));
+        let rawBiaya = @json(json_decode($item->biaya_j));
+
+        if(Array.isArray(rawTindakan)) {
+            rawTindakan.forEach((val, index) => {
+                existingData.push({
+                    action_val: val, // Bisa ID action atau Text manual
+                    modal: rawModal[index] ?? 0,
+                    biaya: rawBiaya[index] ?? 0,
+                    product_id: '',
+                    sales_id: ''
+                });
+            });
+        }
+    @endif
+
+    function addRow(data = null) {
+        let uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+
+        let actionVal = data ? data.action_val : '';
+        let modalVal = data ? formatRupiah(data.modal.toString()) : '';
+        let biayaVal = data ? formatRupiah(data.biaya.toString()) : '';
+        let productId = data ? data.product_id : '';
+        let salesId = data ? data.sales_id : '';
+
+        // Generate Options Action
+        let actionOptions = '<option value="">Pilih Tindakan</option>';
+        serviceActions.forEach(act => {
+            let selected = (act.id == actionVal || act.nama_tindakan == actionVal) ? 'selected' : '';
+            actionOptions += `<option value="${act.id}" ${selected}>${act.nama_tindakan}</option>`;
+        });
+
+        // Generate Options Product
+        let productOptions = '<option value="">Pilih Sparepart</option>';
+        products.forEach(prod => {
+            let selected = (prod.id == productId) ? 'selected' : '';
+            // Simpan harga modal di data-attribute
+            productOptions += `<option value="${prod.id}" data-harga_modal="${prod.harga_modal}" ${selected}>${prod.product_name}</option>`;
+        });
+
+        // Generate Options Sales
+        let salesOptions = '<option value="">Pilih Sales</option>';
+        salesUsers.forEach(user => {
+            let selected = (user.id == salesId) ? 'selected' : '';
+            salesOptions += `<option value="${user.id}" ${selected}>${user.name}</option>`;
+        });
+
         let html = `
-            <div class="border p-3 rounded mb-3 group-item">
+        <div class="service-row border border-slate-200 rounded-lg p-4 mb-4 bg-slate-50 shadow-sm" id="row-${uniqueId}">
 
-                <div class="mb-2">
-                    <label class="text-sm">Tindakan Servis</label>
-                    <input type="text" name="tindakan_servis[]" class="form-input w-full px-2 py-1"
-                           value="${tindakan}" placeholder="Nama tindakan">
-                </div>
-
-                <div class="mb-2">
-                    <label class="text-sm">Biaya Modal Sparepart</label>
-                    <input type="number" name="modal_j[]"
-                           class="form-input w-full px-2 py-1 biaya-modal"
-                           value="${modal}" placeholder="Masukkan modal">
-                </div>
-
-                <div class="mb-2">
-                    <label class="text-sm">Biaya Pengerjaan Sparepart</label>
-                    <input type="number" name="biaya_j[]"
-                           class="form-input w-full px-2 py-1 biaya-biaya"
-                           value="${biaya}" placeholder="Masukkan biaya">
-                </div>
+            <div class="flex justify-between items-start mb-2">
+                <label class="block text-sm font-bold text-slate-800">
+                    Tindakan Servis <span class="text-rose-500">*</span>
+                </label>
 
                 <button type="button"
-                        class="remove-group bg-red-500 text-white px-3 py-1 rounded mt-2">
+                        class="text-xs text-red-500 hover:text-white border border-red-500 hover:bg-red-500 font-medium rounded-md px-2 py-1 transition duration-150 ease-in-out flex items-center gap-1"
+                        onclick="removeRow('${uniqueId}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash w-3 h-3" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                       <path d="M4 7l16 0"></path>
+                       <path d="M10 11l0 6"></path>
+                       <path d="M14 11l0 6"></path>
+                       <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                       <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                    </svg>
                     Hapus
                 </button>
             </div>
+
+            <div class="mb-3" x-data="{ showManual: ${actionVal && !Number.isInteger(parseInt(actionVal)) ? 'true' : 'false'} }">
+
+                <div x-show="!showManual">
+                    <select name="service_actions_id[]" class="form-select w-full select2-class action-select">
+                        ${actionOptions}
+                    </select>
+                </div>
+                <div x-show="showManual" class="mt-1">
+                    <input type="text" name="tindakan_servis_manual[]" class="form-input w-full" placeholder="Isi tindakan manual" value="${actionVal}">
+                </div>
+                <label class="inline-flex items-center mt-2 text-xs text-slate-500 cursor-pointer hover:text-slate-700">
+                    <input type="checkbox" class="form-checkbox h-3 w-3 text-indigo-500 rounded border-gray-300" x-model="showManual">
+                    <span class="ml-2">Input Manual / Tidak ada di list</span>
+                </label>
+            </div>
+
+            <div x-data="{ useSparepart: ${productId ? 'true' : 'false'} }" class="border-t border-slate-200 pt-3 mt-3">
+                <label class="flex items-center text-sm font-medium mb-3 cursor-pointer">
+                    <input type="checkbox" class="form-checkbox h-4 w-4 text-indigo-500 rounded border-gray-300" x-model="useSparepart">
+                    <span class="ml-2 text-slate-700">Gunakan Sparepart Toko?</span>
+                </label>
+
+                <div x-show="useSparepart" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 transition-all duration-300 ease-in-out">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Sparepart</label>
+                        <select name="products_id[]" class="form-select w-full select2-class product-select">
+                            ${productOptions}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Sales</label>
+                        <select name="sales_id[]" class="form-select w-full select2-class">
+                            ${salesOptions}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Garansi</label>
+                    <select name="garansi[]" class="form-select w-full text-sm py-2">
+                        <option value="">Tidak Ada</option>
+                           <option value="">Tidak Ada</option>
+                            <option value="1">1 Hari</option>
+                            <option value="2">2 Hari</option>
+                            <option value="3">3 Hari</option>
+                            <option value="4">4 Hari</option>
+                            <option value="5">5 Hari</option>
+                            <option value="6">6 Hari</option>
+                            <option value="7">1 Minggu</option>
+                            <option value="14">2 Minggu</option>
+                            <option value="21">3 Minggu</option>
+                            <option value="30">1 Bulan</option>
+                            <option value="60">2 Bulan</option>
+                            <option value="90">3 Bulan</option>
+                            <option value="120">4 Bulan</option>
+                            <option value="150">5 Bulan</option>
+                            <option value="180">6 Bulan</option>
+                            <option value="210">7 Bulan</option>
+                            <option value="240">8 Bulan</option>
+                            <option value="270">9 Bulan</option>
+                            <option value="300">10 Bulan</option>
+                            <option value="330">11 Bulan</option>
+                            <option value="365">1 Tahun</option>
+                            <option value="730">2 Tahun</option>
+                            <option value="1095">3 Tahun</option>
+                            <option value="1460">4 Tahun</option>
+                            <option value="1825">5 Tahun</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Modal Sparepart (Rp)</label>
+                    <div class="relative">
+                        <input type="text" name="modal_j[]" class="form-input w-full pl-3 pr-2 py-2 format-rupiah input-modal" value="${modalVal}" placeholder="0">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Biaya Jasa (Rp)</label>
+                    <div class="relative">
+                        <input type="text" name="biaya_j[]" class="form-input w-full pl-3 pr-2 py-2 format-rupiah input-biaya" value="${biayaVal}" placeholder="0">
+                    </div>
+                </div>
+            </div>
+        </div>
         `;
-        $("#group_container").append(html);
+
+        $('#service-container').append(html);
+
+        // Inisialisasi Select2 pada elemen baru
+        $(`#row-${uniqueId} .select2-class`).select2({
+            width: '100%'
+        });
     }
 
-    function calculateTotals() {
+    // --- 3. EVENT LISTENERS ---
+
+    // Tombol Tambah Row
+    $('#add-service-row').click(function() {
+        addRow();
+    });
+
+    // Hapus Row (Global function agar bisa dipanggil dari HTML string)
+    window.removeRow = function(id) {
+        if(confirm('Hapus baris tindakan ini?')) {
+            $(`#row-${id}`).remove();
+            calculateGrandTotal();
+        }
+    }
+
+    // Auto-fill Modal saat Sparepart dipilih
+    $(document).on('change', '.product-select', function() {
+        let hargaModal = $(this).find(':selected').data('harga_modal') || 0;
+        let row = $(this).closest('.service-row');
+        row.find('.input-modal').val(formatRupiah(hargaModal.toString()));
+        calculateGrandTotal();
+    });
+
+    // Format Rupiah saat mengetik (Event Delegation)
+    $(document).on('keyup', '.format-rupiah', function() {
+        $(this).val(formatRupiah($(this).val()));
+        calculateGrandTotal();
+    });
+
+    // --- 4. KALKULASI TOTAL ---
+    function calculateGrandTotal() {
         let totalModal = 0;
         let totalBiaya = 0;
 
-        $(".biaya-modal").each(function() {
-            totalModal += parseInt($(this).val()) || 0;
+        $('.input-modal').each(function() {
+            // Hapus titik sebelum menjumlahkan
+            let val = $(this).val().replace(/\./g, '') || 0;
+            totalModal += parseInt(val);
         });
 
-        $(".biaya-biaya").each(function() {
-            totalBiaya += parseInt($(this).val()) || 0;
+        $('.input-biaya').each(function() {
+            let val = $(this).val().replace(/\./g, '') || 0;
+            totalBiaya += parseInt(val);
         });
 
-        $("#modal_sparepart").val(totalModal);
-        $("#biaya").val(totalBiaya);
+        // Set value ke input readonly (dengan format rupiah)
+        $('#modal_sparepart').val(formatRupiah(totalModal.toString()));
+        $('#biaya').val(formatRupiah(totalBiaya.toString()));
+
+        // Trigger perubahan untuk logic pembayaran (Tunai/Transfer) yang sudah ada
+        $('#biaya').trigger('input');
     }
 
-    $("#add_group").on("click", function() {
-        addGroup();
-    });
+    // Helper: Format Rupiah (10000 -> 10.000)
+    function formatRupiah(angka, prefix) {
+        // if(!angka) return '';
+        // var number_string = angka.replace(/[^,\d]/g, '').toString(),
+        //     split = number_string.split(','),
+        //     sisa = split[0].length % 3,
+        //     rupiah = split[0].substr(0, sisa),
+        //     ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-    $(document).on("click", ".remove-group", function() {
-        $(this).closest(".group-item").remove();
-        calculateTotals();
-    });
+        // if (ribuan) {
+        //     separator = sisa ? '.' : '';
+        //     rupiah += separator + ribuan.join('.');
+        // }
 
-    $(document).on("input", ".biaya-modal, .biaya-biaya", function() {
-        calculateTotals();
-    });
-
-
-    /** ----------------------------
-     * LOAD DATA DARI DATABASE
-     * --------------------------- */
-
-    let tindakanDB = @json(json_decode($item->tindakan_servis ?? '[]', true));
-    let tindakanSingle = @json($item->tindakan_servis);
-    let modalDB = @json(json_decode($item->modal_j ?? '[]', true) ?? []);
-    let biayaDB = @json(json_decode($item->biaya_j ?? '[]', true) ?? []);
-
-    // Jika tindakanDB kosong → berarti tidak ada array
-    if (!Array.isArray(tindakanDB) || tindakanDB.length === 0) {
-        tindakanDB = [];
-
-        // duplikasi tindakan_servis sesuai jumlah modal
-        modalDB.forEach(() => {
-            tindakanDB.push(tindakanSingle ?? "");
-        });
+        // rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        // return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+        return angka;
     }
 
-    // generate group
-    modalDB.forEach((m, i) => {
-        addGroup(
-            tindakanDB[i] ?? "",
-            m ?? "",
-            biayaDB[i] ?? ""
-        );
+    // --- 5. SUBMIT FORM HANDLER (PENTING: Hapus titik) ---
+    $('form').on('submit', function() {
+        // Loop semua input yang punya class 'format-rupiah'
+        $('.format-rupiah').each(function() {
+            let rawValue = $(this).val().replace(/\./g, ''); // Hapus titik
+            $(this).val(rawValue); // Set nilai bersih kembali ke input
+        });
+
+        // Bersihkan juga input total readonly agar tersimpan bersih
+        let cleanModal = $('#modal_sparepart').val().replace(/\./g, '');
+        let cleanBiaya = $('#biaya').val().replace(/\./g, '');
+        $('#modal_sparepart').val(cleanModal);
+        $('#biaya').val(cleanBiaya);
+
+        return true; // Lanjutkan submit
     });
 
-    calculateTotals();
+    // --- 6. INISIALISASI SAAT LOAD ---
+    // Load existing data jika ada
+    if(existingData.length > 0) {
+        existingData.forEach(item => addRow(item));
+    } else {
+        // Jika data kosong (atau error parse), tambah 1 baris kosong
+        addRow();
+    }
+
+    // Hitung total awal
+    calculateGrandTotal();
+
+    // Format input static (uang muka & diskon) saat load
+    $('.format-rupiah').each(function(){
+       $(this).val(formatRupiah($(this).val()));
+    });
 
 });
 </script>
