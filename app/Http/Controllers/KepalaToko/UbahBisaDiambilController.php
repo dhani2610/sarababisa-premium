@@ -144,53 +144,56 @@ class UbahBisaDiambilController extends Controller
                 $spareparts->stok -= 1;
                 $spareparts->save();
 
-                // // Menambahkan data transaksi produk sparepart
-                // $nama_pelanggan = Customer::find($item->customers_id)->nama;
-                // $order = new Order();
-                // $order->customers_id = $item->customers_id;
-                // $order->users_id = $request->sales_id[$key];
-                // $order->order_date = Carbon::today()->locale('id')->translatedFormat('d F Y');
-                // $order->total_products = 1;
-                // $order->sub_total = $spareparts->harga_jual;
-                // $order->invoice_no = '' . mt_rand(date('Ymd00'), date('Ymd99'));
-                // $order->nama_pelanggan = $nama_pelanggan;
-                // $order->payment_method = "Tunai";
-                // $order->pay = $spareparts->harga_jual;
-                // $order->due = 0;
-                // $order->save();
+                // Menambahkan data transaksi produk sparepart
+                $nama_pelanggan = Customer::find($item->customers_id)->nama;
+                $order = new Order();
+                $order->customers_id = $item->customers_id;
+                $order->users_id = $request->sales_id[$key];
+                $order->order_date = Carbon::today()->locale('id')->translatedFormat('d F Y');
+                $order->total_products = 1;
+                $order->sub_total = $spareparts->harga_jual;
+                $order->invoice_no = '' . mt_rand(date('Ymd00'), date('Ymd99'));
+                $order->nama_pelanggan = $nama_pelanggan;
+                $order->payment_method = "Tunai";
+                $order->pay = $spareparts->harga_jual;
+                $order->due = 0;
+                $order->save();
 
-                // // Menambahkan data detail transaksi produk sparepart
-                // $garansi = Carbon::now();
-                // if (
-                //     $spareparts->garansi != null
-                // ) {
-                //     $expired = $garansi->addDays(
-                //         $spareparts->garansi
-                //     );
-                // } else {
-                //     $expired = null;
-                // }
-                // if ($request->sales_id[$key] != 1) {
-                //     $persen_sales = User::find($request->sales_id[$key])->persen;
-                // } else {
-                //     $persen_sales = null;
-                // }
-                // $orderDetail = new OrderDetail();
-                // $orderDetail->orders_id = $order->id;
-                // $orderDetail->users_id = $request->sales_id[$key];
-                // $orderDetail->products_id = $request->products_id[$key];
-                // $orderDetail->product_name = $spareparts->product_name;
-                // $orderDetail->quantity = 1;
-                // $orderDetail->price = $spareparts->harga_jual;
-                // $orderDetail->total = $spareparts->harga_jual;
-                // $orderDetail->sub_total = $spareparts->harga_jual;
-                // $orderDetail->modal = $spareparts->harga_modal;
+                // Menambahkan data detail transaksi produk sparepart
+                $garansi = Carbon::now();
+                if (
+                    $spareparts->garansi != null
+                ) {
+                    $expired = $garansi->addDays(
+                        $spareparts->garansi
+                    );
+                } else {
+                    $expired = null;
+                }
+                if ($request->sales_id[$key] != 1) {
+                    $persen_sales = User::find($request->sales_id[$key])->persen;
+                } else {
+                    $persen_sales = null;
+                }
+                $orderDetail = new OrderDetail();
+                $orderDetail->orders_id = $order->id;
+                $orderDetail->users_id = $request->sales_id[$key];
+                $orderDetail->products_id = $request->products_id[$key];
+                $orderDetail->product_name = $spareparts->product_name;
+                $orderDetail->quantity = 1;
+                $orderDetail->price = $spareparts->harga_jual;
+                $orderDetail->total = $spareparts->harga_jual;
+                $orderDetail->sub_total = $spareparts->harga_jual;
+                $orderDetail->modal = $spareparts->harga_modal;
                 // $orderDetail->profit = $spareparts->harga_jual - $spareparts->harga_modal;
                 // $orderDetail->persen_sales = $persen_sales;
                 // $orderDetail->profit_toko = ($spareparts->harga_jual - $spareparts->harga_modal) - ($spareparts->harga_jual - $spareparts->harga_modal) / 100 * $persen_sales;
-                // $orderDetail->garansi = $expired;
-                // $orderDetail->product_discount_amount = 0;
-                // $orderDetail->save();
+                $orderDetail->profit = 0;
+                $orderDetail->persen_sales = 0;
+                $orderDetail->profit_toko = 0;
+                $orderDetail->garansi = $expired;
+                $orderDetail->product_discount_amount = 0;
+                $orderDetail->save();
             }
         }
 
