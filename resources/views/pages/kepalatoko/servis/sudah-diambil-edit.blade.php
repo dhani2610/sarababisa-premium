@@ -501,6 +501,7 @@ $(document).ready(function() {
 
         // Generate Options Sales
         let salesOptions = '<option value="">Pilih Sales</option>';
+        let salesOptions = '<option value="">Tidak ada sales</option>';
         salesUsers.forEach(user => {
             let selected = (user.id == salesId) ? 'selected' : '';
             salesOptions += `<option value="${user.id}" ${selected}>${user.name}</option>`;
