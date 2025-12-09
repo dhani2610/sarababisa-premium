@@ -272,7 +272,7 @@ class TransaksiServisLangsungController extends Controller
                 $spareparts->stok -= 1;
                 $spareparts->save();
 
-                Menambahkan data transaksi produk sparepart
+                // Menambahkan data transaksi produk sparepart
                 $nama_pelanggan = Customer::find($request->customers_id)->nama;
                 $order = new Order();
                 $order->customers_id = $request->customers_id;
