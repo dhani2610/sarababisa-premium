@@ -151,11 +151,13 @@ class UbahBisaDiambilController extends Controller
                 $order->users_id = $request->sales_id[$key];
                 $order->order_date = Carbon::today()->locale('id')->translatedFormat('d F Y');
                 $order->total_products = 1;
-                $order->sub_total = $spareparts->harga_jual;
+                // $order->sub_total = $spareparts->harga_jual;
+                $order->sub_total = $spareparts->harga_modal;
                 $order->invoice_no = '' . mt_rand(date('Ymd00'), date('Ymd99'));
                 $order->nama_pelanggan = $nama_pelanggan;
                 $order->payment_method = "Tunai";
-                $order->pay = $spareparts->harga_jual;
+                // $order->pay = $spareparts->harga_jual;
+                $order->pay = $spareparts->harga_modal;
                 $order->due = 0;
                 $order->save();
 
@@ -181,9 +183,12 @@ class UbahBisaDiambilController extends Controller
                 $orderDetail->products_id = $request->products_id[$key];
                 $orderDetail->product_name = $spareparts->product_name;
                 $orderDetail->quantity = 1;
-                $orderDetail->price = $spareparts->harga_jual;
-                $orderDetail->total = $spareparts->harga_jual;
-                $orderDetail->sub_total = $spareparts->harga_jual;
+                // $orderDetail->price = $spareparts->harga_jual;
+                // $orderDetail->total = $spareparts->harga_jual;
+                // $orderDetail->sub_total = $spareparts->harga_jual;
+                $orderDetail->price = $spareparts->harga_modal;
+                $orderDetail->total = $spareparts->harga_modal;
+                $orderDetail->sub_total = $spareparts->harga_modal;
                 $orderDetail->modal = $spareparts->harga_modal;
                 // $orderDetail->profit = $spareparts->harga_jual - $spareparts->harga_modal;
                 // $orderDetail->persen_sales = $persen_sales;
