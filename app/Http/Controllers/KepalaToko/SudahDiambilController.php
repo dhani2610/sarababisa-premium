@@ -985,8 +985,8 @@ class SudahDiambilController extends Controller
         $namaPelanggan = $items->customer->nama;
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
-        $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
-        // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
+        // $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
+        return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
             'users' => $users,
             'items' => $items,
             'terms' => $terms,
