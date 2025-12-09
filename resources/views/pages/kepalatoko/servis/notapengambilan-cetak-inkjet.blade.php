@@ -232,7 +232,7 @@
                     @endif
                 @endif
             </tr>
-            @if ($items->uang_muka != null && $items->diskon != null)
+            @if (($items->uang_muka != null && $items->uang_muka != 0) && ($items->diskon != null && $items->diskon != 0))
                 <tr style="border-right-style: solid;">
                     <td id="data" scope="row" style="border-left-style: solid;">Tindakan Servis</td>
                     <td id="data" class="capital">
@@ -322,7 +322,7 @@
                     {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka - $items->diskon) }}
                     </td> --}}
                 </tr>
-            @elseif ($items->uang_muka != null && $items->diskon === null)
+            @elseif (($items->uang_muka != null && $items->uang_muka != 0) && ($items->diskon == null || $items->diskon == 0))
                 <tr style="border-right-style: solid;">
                     <td id="data" scope="row" style="border-left-style: solid;">Tindakan Servis</td>
                     <td id="data" class="capital">
@@ -378,7 +378,7 @@
                     <td id="data">: Rp. {{ number_format($subtotal) }}</td>
 
                 </tr>
-            @elseif ($items->diskon != null && $items->uang_muka === null)
+            @elseif (($items->diskon != null && $items->diskon != 0) && ($items->uang_muka == null || $items->uang_muka == 0))
                 <tr style="border-right-style: solid;">
                     <td id="data" scope="row" style="border-left-style: solid;">Tindakan Servis</td>
                     <td id="data" class="capital">
@@ -435,7 +435,7 @@
                     <td id="data">: Rp. {{ number_format($subtotal) }}</td>
 
                 </tr>
-            @elseif ($items->diskon === null && $items->uang_muka === null)
+            @elseif (($items->diskon == null || $items->diskon == 0) && ($items->uang_muka == null || $items->uang_muka == 0))
                 <tr style="border-right-style: solid; border-bottom-style: solid;">
                     <td id="data" scope="row" style="border-left-style: solid;">Tindakan Servis</td>
                     <td id="data" class="capital">
