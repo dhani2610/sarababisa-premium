@@ -543,21 +543,21 @@ class SudahDiambilController extends Controller
     public function edit($id)
     {
         $item = ServiceTransaction::findOrFail($id);
-        $customers = Customer::all();
-        $types = Type::all();
-        $brands = Brand::all();
-        $model_series = ModelSerie::all();
-        $service_actions = ServiceAction::all();
-        $capacities = Capacity::all();
-        $penerima = User::whereNotIn('role',['Investor'])->get();
-        $users = User::where('role', 'Teknisi')->get();
-        $workers = Worker::where('jabatan', 'like', '%' . 'teknisi')->get();
+        $customers = Customer::where('cabang_id',getCabangId())->get();
+        $types = Type::where('cabang_id',getCabangId())->get();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $penerima = User::whereNotIn('role',['Investor'])->where('cabang_id',getCabangId())->get();
+        $users = User::where('role', 'Teknisi')->where('cabang_id',getCabangId())->get();
+        $workers = Worker::where('jabatan', 'like', '%' . 'teknisi')->where('cabang_id',getCabangId())->get();
         $products = Product::whereHas('subCategory', function ($query) {
             $query->whereHas('category', function ($subQuery) {
                 $subQuery->where('category_name', 'Sparepart');
             });
-        })->where('stok', '>=', 1)->get();
-        $sales = User::where('role', 'Sales')->get();
+        })->where('stok', '>=', 1)->where('cabang_id',getCabangId())->get();
+        $sales = User::where('role', 'Sales')->where('cabang_id',getCabangId())->get();
         return view('pages.kepalatoko.servis.sudah-diambil-edit', [
             'item' => $item,
             'types' => $types,
