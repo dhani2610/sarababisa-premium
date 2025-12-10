@@ -111,14 +111,14 @@
 				<td style="height: 50px; vertical-align: middle; text-align: left; line-height: 1.5em;"><strong>{{ $users->nama_toko }} ({{ $users->deskripsi_toko }})</strong> <br>
 					{{ $users->alamat_toko }} - {{ $users->nomor_hp_toko }}
                     @foreach ($phones as $index => $phone)
-                           | {{ $phone['title'] }} : {{ $phone['nomor'] }} 
+                           | {{ $phone['title'] }} : {{ $phone['nomor'] }}
                    @endforeach
 				</td>
 			@else
 				<td style="text-align: left; line-height: 1.5em;"><strong>{{ $users->nama_toko }} ({{ $users->deskripsi_toko }})</strong> <br>
 					{{ $users->alamat_toko }} - {{ $users->nomor_hp_toko }}
                     @foreach ($phones as $index => $phone)
-                           | {{ $phone['title'] }} : {{ $phone['nomor'] }} 
+                           | {{ $phone['title'] }} : {{ $phone['nomor'] }}
                    @endforeach
 				</td>
 			@endif
@@ -288,8 +288,15 @@
   </table>
   <table width="100%">
     <tr>
+        @php
+            $banks = old('banks', json_decode($users->banks ?? '[]', true));
+        @endphp
       <td class="text-justify" style="font-style: italic; padding-right: 30px;">
         {!! $terms->description !!}
+        @foreach ($banks as $index => $bank)
+            <br><strong>No. Rekening : {{ $bank['rekening'] }}, {{ $bank['bank'] }} An.
+                {{ $bank['pemilik'] }} </strong>
+        @endforeach
       </td>
     </tr>
   </table>
