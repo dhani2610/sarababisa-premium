@@ -35,6 +35,7 @@ class GalleryController extends Controller
             Gallery::create([
                 'title' => $request->title,
                 'foto'  => $path,
+                'cabang_id'  => getCabangId(),
             ]);
 
             return redirect()->route('master-gallery.index')->with('success', 'Foto berhasil ditambahkan');

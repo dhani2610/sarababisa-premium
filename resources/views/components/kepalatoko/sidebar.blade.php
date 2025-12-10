@@ -207,6 +207,7 @@
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Point of Sales (POS)</span>
                                     </a>
                                 </li>
+                                
                                 @endif
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('transaksi-produk.index', 'transaksi-produk-paid.index', 'transaksi-produk-due.index', 'transaksi-produk.show', 'transaksi-produk.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('transaksi-produk.index') }}">
@@ -270,11 +271,13 @@
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Tipe OS</span>
                                     </a>
                                 </li>
+                                @if (Auth::user()->id == 1)
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-cabang.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-cabang.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Cabang</span>
                                     </a>
                                 </li>
+                                @endif
                                 {{-- <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-gallery.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-gallery.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Gallery</span>

@@ -27,17 +27,17 @@ class ColorRequest extends FormRequest
             'name' => [
                 'required',
                 'max:100',
-                function ($attribute, $value, $fail) {
-                    $cabangId = getCabangId(); // ambil cabang dari helper
+                // function ($attribute, $value, $fail) {
+                //     $cabangId = getCabangId(); // ambil cabang dari helper
 
-                    $exists = \App\Models\Color::where('name', $value)
-                        ->where('cabang_id', $cabangId)
-                        ->exists();
+                //     $exists = \App\Models\Color::where('name', $value)
+                //         ->where('cabang_id', $cabangId)
+                //         ->exists();
 
-                    if ($exists) {
-                        $fail('Mohon maaf, warna dengan nama ini sudah tersedia di cabang ini.');
-                    }
-                }
+                //     if ($exists) {
+                //         $fail('Mohon maaf, warna dengan nama ini sudah tersedia di cabang ini.');
+                //     }
+                // }
             ],
         ];
     }

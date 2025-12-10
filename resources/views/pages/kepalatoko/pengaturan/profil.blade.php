@@ -20,7 +20,7 @@
                 <x-settings.settings-sidebar />
 
                 <!-- Panel -->
-                <x-settings.profil-panel />
+                <x-settings.profil-panel :users="$users"/>
 
             </div>
         </div>

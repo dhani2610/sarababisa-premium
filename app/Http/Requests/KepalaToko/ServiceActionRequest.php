@@ -27,17 +27,17 @@ class ServiceActionRequest extends FormRequest
         return [
             'nama_tindakan' => [
                 'required',
-                function ($attribute, $value, $fail) {
-                    $cabangId = getCabangId();
+                // function ($attribute, $value, $fail) {
+                //     $cabangId = getCabangId();
 
-                    $exists = ServiceAction::where('nama_tindakan', $value)
-                        ->where('cabang_id', $cabangId)
-                        ->exists();
+                //     $exists = ServiceAction::where('nama_tindakan', $value)
+                //         ->where('cabang_id', $cabangId)
+                //         ->exists();
 
-                    if ($exists) {
-                        $fail('Mohon maaf, tindakan servis dengan nama ini sudah tersedia di cabang ini.');
-                    }
-                }
+                //     if ($exists) {
+                //         $fail('Mohon maaf, tindakan servis dengan nama ini sudah tersedia di cabang ini.');
+                //     }
+                // }
             ],
             'modal_sparepart' => 'required',
             'harga_toko' => 'required',

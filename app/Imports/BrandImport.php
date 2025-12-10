@@ -16,19 +16,46 @@ class BrandImport implements ToModel, WithHeadingRow, WithBatchInserts
             return null;
         }
 
-        // Update jika sudah ada, buat baru jika belum ada
-        Brand::updateOrCreate(
-            [
-                'name' => $row['Nama Merek'], // pencarian berdasarkan nama merek
-            ],
-            [
-                'id'   => $row['ID Merek'],
-                'name' => $row['Nama Merek'],
-                'cabang_id'   => getCabangId(),
-            ]
-        );
+        $cabangId = getCabangId();
+        $namaAsli = $row['Nama Merek'];
 
-        return null;
+        // 1. CEK DATA EKSISTING DI CABANG INI
+        // Cari apakah Brand ini sudah ada di cabang yang sedang login?
+        $existingBrand = Brand::where('cabang_id', $cabangId)
+                            ->where('name', $namaAsli)
+                            ->first();
+
+        if ($existingBrand) {
+            // == KONDISI UPDATE ==
+            // Data sudah ada di cabang ini, update datanya.
+            // (Catatan: Hati-hati mengupdate 'id' jika itu Primary Key)
+            $existingBrand->update([
+                'id' => $row['ID Merek'],
+                // Nama tidak perlu diupdate karena sudah pasti sama
+            ]);
+
+            return null;
+        }
+
+        // == KONDISI CREATE (BARU) ==
+        // Data belum ada di cabang ini.
+        // Cek apakah nama ini sudah dipakai cabang lain?
+
+        $finalName = $namaAsli;
+        $counter = 2;
+
+        // Loop: Jika nama sudah ada di database (milik cabang manapun), tambah angka (2), (3)...
+        while (Brand::where('name', $finalName)->exists()) {
+            $finalName = $namaAsli . '.';
+            $counter++;
+        }
+
+        // Simpan Data Baru dengan nama yang sudah aman
+        return new Brand([
+            'id'          => $row['ID Merek'],
+            'name'        => $finalName, // Nama unik (misal: "Samsung (2)")
+            'cabang_id'   => $cabangId,
+        ]);
     }
 
     public function batchSize(): int

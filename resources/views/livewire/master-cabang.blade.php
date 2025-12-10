@@ -99,6 +99,10 @@
                                         <input id="deskripsi_toko" name="deskripsi_toko" class="form-input w-full px-2 py-1" type="text" required />
                                     </div>
                                     <div>
+                                        <label class="block text-sm font-medium mb-1" for="owner">Alamat Toko <span class="text-rose-500">*</span></label>
+                                        <input id="alamat_toko" name="alamat_toko" class="form-input w-full px-2 py-1" type="text" required />
+                                    </div>
+                                    <div>
                                         <label class="block text-sm font-medium mb-1" for="owner">Nomor Toko <span class="text-rose-500">*</span></label>
                                         <input id="nomor_hp_toko" name="nomor_hp_toko" class="form-input w-full px-2 py-1" type="text" required />
                                     </div>

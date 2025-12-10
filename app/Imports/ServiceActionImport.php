@@ -4,29 +4,61 @@ namespace App\Imports;
 
 use App\Models\ServiceAction;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithUpserts;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 
-class ServiceActionImport implements ToModel, WithHeadingRow, WithBatchInserts, WithUpserts
+// Hapus 'WithUpserts' karena kita akan handle logika uniknya sendiri
+class ServiceActionImport implements ToModel, WithHeadingRow, WithBatchInserts
 {
     public function model(array $row)
     {
-        // Update jika nama_tindakan sudah ada, buat baru jika belum
-        ServiceAction::updateOrCreate(
-            [
-                'nama_tindakan' => $row['Nama Tindakan'], // kunci unik
-            ],
-            [
+        $cabangId = getCabangId();
+        $namaTindakanAsli = $row['Nama Tindakan'];
+
+        // 1. CEK DATA EKSISTING DI CABANG INI
+        // Kita cari apakah "Ganti LCD" (nama asli) sudah ada di cabang ini?
+        // Atau mungkin "Ganti LCD (2)" yang milik cabang ini?
+
+        // Logika: Kita coba update dulu berdasarkan nama persis yg ada di Excel + Cabang ID
+        $existingService = ServiceAction::where('cabang_id', $cabangId)
+                            ->where('nama_tindakan', $namaTindakanAsli)
+                            ->first();
+
+        if ($existingService) {
+            // == KONDISI UPDATE ==
+            // Datanya sudah ada di cabang ini, langsung update saja.
+            $existingService->update([
                 'modal_sparepart'   => $row['Modal Sparepart'],
                 'harga_toko'        => $row['Harga Pelanggan Toko'],
                 'harga_pelanggan'   => $row['Harga Pelanggan Biasa'],
                 'garansi'           => $row['Garansi'],
-                'cabang_id'           => getCabangId(),
-            ]
-        );
+            ]);
 
-        return null;
+            return $existingService;
+        }
+
+        // == KONDISI CREATE (BARU) ==
+        // Data belum ada di cabang ini. Kita harus buat baru.
+        // TAPI, kita harus cek apakah nama ini sudah dipake secara GLOBAL (di cabang lain)?
+
+        $finalName = $namaTindakanAsli;
+        $counter = 2;
+
+        // Loop: Selama nama tersebut sudah ada di tabel (milik siapapun/cabang manapun), tambah angka
+        while (ServiceAction::where('nama_tindakan', $finalName)->exists()) {
+            $finalName = $namaTindakanAsli . '.';
+            $counter++;
+        }
+
+        // Setelah loop selesai, $finalName pasti unik (misal: "Ganti LCD (2)")
+        return new ServiceAction([
+            'nama_tindakan'     => $finalName, // Nama yang sudah aman
+            'cabang_id'         => $cabangId,
+            'modal_sparepart'   => $row['Modal Sparepart'],
+            'harga_toko'        => $row['Harga Pelanggan Toko'],
+            'harga_pelanggan'   => $row['Harga Pelanggan Biasa'],
+            'garansi'           => $row['Garansi'],
+        ]);
     }
 
     public function batchSize(): int
@@ -34,8 +66,5 @@ class ServiceActionImport implements ToModel, WithHeadingRow, WithBatchInserts, 
         return 1000;
     }
 
-    public function uniqueBy()
-    {
-        return ['nama_tindakan'];
-    }
+    // Hapus function uniqueBy() karena kita tidak pakai WithUpserts lagi
 }

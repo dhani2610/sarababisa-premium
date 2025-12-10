@@ -34,9 +34,9 @@ class MasterMerekController extends Controller
             })
             ->exists();
 
-        if ($hasRelation) {
-            return response()->json(['message' => 'Data Merek yang memiliki riwayat transaksi/model seri tidak bisa dihapus.']);
-        }
+        // if ($hasRelation) {
+        //     return response()->json(['message' => 'Data Merek yang memiliki riwayat transaksi/model seri tidak bisa dihapus.']);
+        // }
 
         Brand::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data merek berhasil dihapus.']);
@@ -58,30 +58,58 @@ class MasterMerekController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(BrandRequest $request)
-    {
-        $data = $request->validated();
+    // public function store(BrandRequest $request)
+    // {
+    //     $data = $request->validated();
 
-        $existing = Brand::withTrashed()
-            ->where('name', $data['name'])
-            ->first();
+    //     $existing = Brand::withTrashed()
+    //         ->where('name', $data['name'])
+    //         ->first();
 
-        if ($existing && $existing->trashed()) {
-            // Kalau ada merek dengan nama sama tapi soft delete → restore
-            $existing->restore();
-            $existing->update($data);
+    //     if ($existing && $existing->trashed()) {
+    //         // Kalau ada merek dengan nama sama tapi soft delete → restore
+    //         $existing->restore();
+    //         $existing->update($data);
 
-            return redirect()->route('master-merek.index')
-                ->with('success', 'Merek berhasil dipulihkan & diperbarui.');
-        }
-        $data['cabang_id'] = getCabangId();
+    //         return redirect()->route('master-merek.index')
+    //             ->with('success', 'Merek berhasil dipulihkan & diperbarui.');
+    //     }
+    //     $data['cabang_id'] = getCabangId();
 
-        // Kalau belum ada → buat baru
-        Brand::create($data);
+    //     // Kalau belum ada → buat baru
+    //     Brand::create($data);
 
-        return redirect()->route('master-merek.index')
-            ->with('success', 'Merek berhasil ditambahkan.');
+    //     return redirect()->route('master-merek.index')
+    //         ->with('success', 'Merek berhasil ditambahkan.');
+    // }
+
+public function store(BrandRequest $request)
+{
+    $data = $request->validated();
+    $data['cabang_id'] = getCabangId();
+
+    $finalName = $data['name'];
+
+    // Loop Cek Duplikat
+    // Jika "Samsung" ada, dia akan ngecek "Samsung."
+    // Jika "Samsung." ada, dia akan ngecek "Samsung.."
+    // Dan seterusnya...
+    while (Brand::withTrashed()->where('name', $finalName)->exists()) {
+        
+        // PERBAIKAN DISINI:
+        // Tambahkan titik ke $finalName, JANGAN ke $namaAsli
+        $finalName = $finalName . '.'; 
+        
     }
+
+    // Set nama final yang sudah unik
+    $data['name'] = $finalName;
+
+    Brand::create($data);
+
+    return redirect()->route('master-merek.index')
+        ->with('success', 'Merek berhasil ditambahkan.');
+}
 
     public function import(Request $request)
     {
@@ -151,12 +179,12 @@ class MasterMerekController extends Controller
     {
         $item = Brand::findOrFail($id);
 
-        if (
-            $item->relasiService()->exists() || $item->relasiModelSerie()->exists()
-        ) {
-            toast('Data Merek yang memiliki riwayat transaksi/model seri tidak bisa dihapus.', 'error');
-            return redirect()->back();
-        }
+        // if (
+        //     $item->relasiService()->exists() || $item->relasiModelSerie()->exists()
+        // ) {
+        //     toast('Data Merek yang memiliki riwayat transaksi/model seri tidak bisa dihapus.', 'error');
+        //     return redirect()->back();
+        // }
 
         $item->delete();
 

@@ -688,10 +688,10 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Stok</div>
                             </th>
-                            @if (Auth::user()->role == 'Kapala Toko')
-                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-semibold text-left">Modal</div>
-                            </th>
+                            @if (Auth::user()->role == 'Kepala Toko' || $toko->is_modal_produk === 1)
+                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    <div class="font-semibold text-left">Modal</div>
+                                </th>
                             @endif
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Harga Jual Toko</div>
@@ -779,10 +779,10 @@
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $item->stok }}</div>
                                 </td>
-                                @if (Auth::user()->role == 'Kapala Toko')
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">Rp. {{ number_format($item->harga_modal) }}</div>
-                                </td>
+                                @if (Auth::user()->role == 'Kepala Toko' || $toko->is_modal_produk === 1)
+                                    <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <div class="font-medium">Rp. {{ number_format($item->harga_modal) }}</div>
+                                    </td>
                                 @endif
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">Rp. {{ number_format($item->harga_jual_toko) }}</div>

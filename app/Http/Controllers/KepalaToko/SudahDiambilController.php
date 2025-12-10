@@ -31,7 +31,7 @@ class SudahDiambilController extends Controller
     public function index()
     {
         $storeSetting = StoreSetting::where('cabang_id',getCabangId())->first();;
-        
+
         return view('pages/kepalatoko/servis/sudah-diambil',compact('storeSetting'));
     }
 
@@ -501,7 +501,17 @@ class SudahDiambilController extends Controller
     public function pengambilantermal($id)
     {
         $items = ServiceTransaction::with('customer')->findOrFail($id);
-        $users = User::find(1);
+        // $users = User::find(1);
+
+        if ($items->cabang_id == 1) {
+            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }else{
+            $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
@@ -509,9 +519,11 @@ class SudahDiambilController extends Controller
         // Ambil nomor invoice dari database
         $invoiceNumber = $items->nomor_servis;
         $namaPelanggan = $items->customer->nama;
+        $toko = StoreSetting::where('cabang_id', getCabangId())->first();
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.cetak-termal-pengambilan', [
         // return View('pages.kepalatoko.servis.cetak-termal-pengambilan', [
+            'toko' => $toko,
             'users' => $users,
             'items' => $items,
             'imagePath' => $imagePath,
@@ -531,21 +543,21 @@ class SudahDiambilController extends Controller
     public function edit($id)
     {
         $item = ServiceTransaction::findOrFail($id);
-        $customers = Customer::all();
-        $types = Type::all();
-        $brands = Brand::all();
-        $model_series = ModelSerie::all();
-        $service_actions = ServiceAction::all();
-        $capacities = Capacity::all();
-        $penerima = User::whereNotIn('role',['Investor'])->get();
-        $users = User::where('role', 'Teknisi')->get();
-        $workers = Worker::where('jabatan', 'like', '%' . 'teknisi')->get();
+        $customers = Customer::where('cabang_id',getCabangId())->get();
+        $types = Type::where('cabang_id',getCabangId())->get();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $penerima = User::whereNotIn('role',['Investor'])->where('cabang_id',getCabangId())->get();
+        $users = User::where('role', 'Teknisi')->where('cabang_id',getCabangId())->get();
+        $workers = Worker::where('jabatan', 'like', '%' . 'teknisi')->where('cabang_id',getCabangId())->get();
         $products = Product::whereHas('subCategory', function ($query) {
             $query->whereHas('category', function ($subQuery) {
                 $subQuery->where('category_name', 'Sparepart');
             });
-        })->where('stok', '>=', 1)->get();
-        $sales = User::where('role', 'Sales')->get();
+        })->where('stok', '>=', 1)->where('cabang_id',getCabangId())->get();
+        $sales = User::where('role', 'Sales')->where('cabang_id',getCabangId())->get();
         return view('pages.kepalatoko.servis.sudah-diambil-edit', [
             'item' => $item,
             'types' => $types,
@@ -797,12 +809,31 @@ class SudahDiambilController extends Controller
             $persen_teknisi = null;
         }
 
-        if ($request->service_actions_id != null) {
-            $tindakan_servis = ServiceAction::find($request->service_actions_id)->nama_tindakan;
-        } elseif ($request->tindakan_servis != null) {
-            $tindakan_servis = $request->tindakan_servis;
-        } else {
-            $tindakan_servis = null;
+        $tindakan_servis = []; // 1. Inisialisasi sebagai array kosong
+
+        // Pastikan request memiliki inputnya untuk menghindari error
+        if ($request->has('service_actions_id')) {
+            // 2. Lakukan loop pada semua tindakan yang dikirim
+            foreach ($request->service_actions_id as $key => $servis_id) {
+                $tindakan = null; // Reset untuk setiap iterasi
+
+                // 3. Cek apakah tindakan dipilih dari dropdown
+                if (!empty($servis_id)) {
+                    $action = ServiceAction::find($servis_id);
+                    if ($action) {
+                        $tindakan = $action->nama_tindakan;
+                    }
+                }
+                // 4. Jika tidak, cek apakah diisi manual
+                elseif (!empty($request->tindakan_servis_manual[$key])) {
+                    $tindakan = $request->tindakan_servis_manual[$key];
+                }
+
+                // 5. Tambahkan ke array jika ada tindakan yang valid
+                if ($tindakan !== null) {
+                    array_push($tindakan_servis, $tindakan);
+                }
+            }
         }
 
         $profittransaksi = $request->biaya - $request->modal_sparepart - $request->diskon;
@@ -922,6 +953,8 @@ class SudahDiambilController extends Controller
             'products_id' => $request->products_id,
             'tindakan_servis' => $tindakan_servis,
             'modal_sparepart' => $request->modal_sparepart,
+            'service_actions' => json_encode($request->service_actions_id),
+            'products' => json_encode($request->products_id),
             'biaya_j' => $request->biaya_j,
             'modal_j' => $request->modal_j,
             'biaya' => $request->biaya,
@@ -936,13 +969,13 @@ class SudahDiambilController extends Controller
             'persen_teknisi' => $persen_teknisi,
             'omzet' => $request->biaya - $request->diskon,
             'profit' => $profittransaksi,
-             'pay' => $pay,
+            'pay' => $pay,
             'due' => $due,
             'tempo' => $tempo,
             'tunai' => $tunai,
             'transfer' => $transfer,
             'ppn' => $ppn ?? 0,
-            'profittoko' => $profittransaksi - ($bagihasil *= $persen_teknisi)
+            'profittoko' => $profittransaksi - ($bagihasil *= $persen_teknisi),
         ]);
 
         return redirect()->route('transaksi-servis-sudah-diambil.index');
@@ -951,8 +984,18 @@ class SudahDiambilController extends Controller
     public function cetakinkjet($id)
     {
         $items = ServiceTransaction::with('customer')->findOrFail($id);
-        $users = User::find(1);
+        // $users = User::find(1);
         $terms = Term::find(2);
+
+        if ($items->cabang_id == 1) {
+            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }else{
+            $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
@@ -960,12 +1003,14 @@ class SudahDiambilController extends Controller
         // Ambil nomor invoice dari database
         $invoiceNumber = $items->nomor_servis;
         $namaPelanggan = $items->customer->nama;
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
         // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
             'users' => $users,
             'items' => $items,
             'terms' => $terms,
+            'toko' => $toko,
             'imagePath' => $imagePath,
         ]);
 

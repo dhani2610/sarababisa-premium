@@ -16,12 +16,22 @@ class AksesorisImport implements ToModel, WithHeadingRow, WithBatchInserts
             return null;
         }
 
-        Product::updateOrCreate(
-            [
-                'product_name' => $row['Nama Produk'], // kunci unik untuk pencarian
-            ],
-            [
-                'categories_id'     => 3, // default kategori Aksesoris
+        $cabangId = getCabangId();
+        $namaAsli = $row['Nama Produk'];
+
+        // ---------------------------------------------------------
+        // 1. LOGIKA UPDATE (Prioritas Utama - Cek Cabang Sendiri)
+        // ---------------------------------------------------------
+        // Cari apakah Produk ini sudah ada di cabang ini?
+        $existingProduct = Product::where('cabang_id', $cabangId)
+                            ->where('product_name', $namaAsli)
+                            ->first();
+
+        if ($existingProduct) {
+            // == KONDISI UPDATE ==
+            // Data sudah ada di cabang ini, update detailnya (stok, harga, dll)
+            $existingProduct->update([
+                'categories_id'     => 3, // Tetap set default Aksesoris
                 'category_name'     => "Aksesoris",
                 'sub_categories_id' => $row['ID Sub Kategori'],
                 'model_series_id'   => $row['ID Model Seri'],
@@ -29,16 +39,48 @@ class AksesorisImport implements ToModel, WithHeadingRow, WithBatchInserts
                 'stok'              => $row['Stok'],
                 'stok_minimal'      => $row['Stok Minimal'],
                 'harga_modal'       => $row['Harga Modal'],
-                'harga_jual_toko'        => $row['Harga Jual Toko'],
+                'harga_jual_toko'   => $row['Harga Jual Toko'],
                 'harga_jual'        => $row['Harga Jual Pelanggan'],
                 'keterangan'        => $row['Keterangan'],
                 'garansi'           => $row['Garansi Produk (Hari)'],
                 'ppn'               => $row['PPN 11%'],
-                'cabang_id'   => getCabangId(),
-            ]
-        );
+            ]);
 
-        return null;
+            return null; // Selesai update, stop.
+        }
+
+        // ---------------------------------------------------------
+        // 2. LOGIKA CREATE (Jika belum ada di cabang ini)
+        // ---------------------------------------------------------
+
+        $finalName = $namaAsli;
+        $counter = 2;
+
+        // Cek apakah nama produk ini sudah dipakai secara GLOBAL (di cabang lain)?
+        // Jika ya, rename jadi "Casing HP (2)", dst.
+        while (Product::where('product_name', $finalName)->exists()) {
+            $finalName = $namaAsli . '.';
+            $counter++;
+        }
+
+        // Simpan Data Baru
+        return new Product([
+            'product_name'      => $finalName, // Nama yang sudah aman (unik)
+            'categories_id'     => 3,
+            'category_name'     => "Aksesoris",
+            'sub_categories_id' => $row['ID Sub Kategori'],
+            'model_series_id'   => $row['ID Model Seri'],
+            'product_code'      => $row['Kode Produk'],
+            'stok'              => $row['Stok'],
+            'stok_minimal'      => $row['Stok Minimal'],
+            'harga_modal'       => $row['Harga Modal'],
+            'harga_jual_toko'   => $row['Harga Jual Toko'],
+            'harga_jual'        => $row['Harga Jual Pelanggan'],
+            'keterangan'        => $row['Keterangan'],
+            'garansi'           => $row['Garansi Produk (Hari)'],
+            'ppn'               => $row['PPN 11%'],
+            'cabang_id'         => $cabangId,
+        ]);
     }
 
     public function batchSize(): int

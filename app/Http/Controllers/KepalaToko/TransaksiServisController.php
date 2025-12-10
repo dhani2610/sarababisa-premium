@@ -585,16 +585,27 @@ class TransaksiServisController extends Controller
     public function cetaktermal($id)
     {
         $items = ServiceTransaction::with('customer')->findOrFail($id);
-        $users = User::find(1);
+        // $users = User::find(1);
+        if ($items->cabang_id == 1) {
+            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }else{
+            $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
+
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
 
         // Ambil nomor invoice dari database
         $invoiceNumber = $items->nomor_servis;
         $namaPelanggan = $items->customer->nama;
-
+        $toko = StoreSetting::where('cabang_id', getCabangId())->first();
         $pdf = PDF::loadView('pages.kepalatoko.servis.notaterima-cetak-termal', [
         // return view('pages.kepalatoko.servis.notaterima-cetak-termal', [
+            'toko' => $toko,
             'users' => $users,
             'items' => $items,
             'imagePath' => $imagePath,
@@ -608,7 +619,16 @@ class TransaksiServisController extends Controller
     public function cetakinkjet($id)
     {
         $items = ServiceTransaction::with('customer')->findOrFail($id);
-        $users = User::find(1);
+        // $users = User::find(1);
+        if ($items->cabang_id == 1) {
+            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }else{
+            $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
         $terms = Term::find(1);
 
         $logo = $users->profile_photo_path;
@@ -617,9 +637,11 @@ class TransaksiServisController extends Controller
         // Ambil nomor invoice dari database
         $invoiceNumber = $items->nomor_servis;
         $namaPelanggan = $items->customer->nama;
+        $toko = StoreSetting::where('cabang_id', getCabangId())->first();
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
         // return view('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
+            'toko' => $toko,
             'users' => $users,
             'items' => $items,
             'terms' => $terms,

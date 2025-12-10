@@ -67,12 +67,12 @@
                         </a>
                     </li> --}}
                     <!-- Pelanggan -->
-                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['admin-pelanggan'])){{ 'bg-slate-900' }}@endif">
-                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['admin-pelanggan'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('admin-pelanggan.index') }}">
+                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['pelanggan'])){{ 'bg-slate-900' }}@endif">
+                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['pelanggan'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('pelanggan.index') }}">
                             <div class="flex items-center">
                                 <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
-                                        <path class="fill-current @if(in_array(Request::segment(1), ['admin-pelanggan'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M18.974 8H22a2 2 0 012 2v6h-2v5a1 1 0 01-1 1h-2a1 1 0 01-1-1v-5h-2v-6a2 2 0 012-2h.974zM20 7a2 2 0 11-.001-3.999A2 2 0 0120 7zM2.974 8H6a2 2 0 012 2v6H6v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5H0v-6a2 2 0 012-2h.974zM4 7a2 2 0 11-.001-3.999A2 2 0 014 7z" />
-                                        <path class="fill-current @if(in_array(Request::segment(1), ['admin-pelanggan'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M12 6a3 3 0 110-6 3 3 0 010 6zm2 18h-4a1 1 0 01-1-1v-6H6v-6a3 3 0 013-3h6a3 3 0 013 3v6h-3v6a1 1 0 01-1 1z" />
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['pelanggan'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M18.974 8H22a2 2 0 012 2v6h-2v5a1 1 0 01-1 1h-2a1 1 0 01-1-1v-5h-2v-6a2 2 0 012-2h.974zM20 7a2 2 0 11-.001-3.999A2 2 0 0120 7zM2.974 8H6a2 2 0 012 2v6H6v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5H0v-6a2 2 0 012-2h.974zM4 7a2 2 0 11-.001-3.999A2 2 0 014 7z" />
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['pelanggan'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M12 6a3 3 0 110-6 3 3 0 010 6zm2 18h-4a1 1 0 01-1-1v-6H6v-6a3 3 0 013-3h6a3 3 0 013 3v6h-3v6a1 1 0 01-1 1z" />
                                     </svg>
                                 <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Pelanggan</span>
                             </div>
@@ -101,7 +101,7 @@
                         <div class="lg:hidden lg:sidebar-expanded:block 2xl:block">
                             <ul class="pl-9 mt-1 @if(!in_array(Request::segment(1), ['servis'])){{ 'hidden' }}@endif" :class="open ? '!block' : 'hidden'">
                                 <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-tindakan-servis.index', 'admin-tindakan-servis.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-tindakan-servis.index') }}">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('tindakan-servis.index', 'tindakan-servis.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('tindakan-servis.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Tindakan</span>
                                     </a>
                                 </li>
@@ -175,8 +175,13 @@
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Top Produk</span>
                                     </a>
                                 </li>
-                                <li class="mb-1 last:mb-0">
+                                {{-- <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-purchase.index', 'admin-purchase.create', 'admin-retur.index', 'admin-tukar-tambah.index', 'admin-tukar-tambah.create')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-purchase.index') }}">
+                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Pembelian Produk</span>
+                                    </a>
+                                </li> --}}
+                                <li class="mb-1 last:mb-0">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('purchase.index', 'purchase.create', 'retur.index', 'tukar-tambah.index', 'tukar-tambah.create')){{ '!text-indigo-500' }}@endif" href="{{ route('purchase.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Pembelian Produk</span>
                                     </a>
                                 </li>
@@ -216,28 +221,28 @@
                         </a>
                         <div class="lg:hidden lg:sidebar-expanded:block 2xl:block">
                             <ul class="pl-9 mt-1 @if(!in_array(Request::segment(1), ['master'])){{ 'hidden' }}@endif" :class="open ? '!block' : 'hidden'">
-                                <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-master-jenis-barang.index', 'admin-master-jenis-barang.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-master-jenis-barang.index') }}">
+                                 <li class="mb-1 last:mb-0">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-jenis-barang.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-jenis-barang.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Jenis Barang</span>
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-master-merek.index', 'admin-master-merek.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-master-merek.index') }}">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-merek.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-merek.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Merek</span>
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-master-model-seri.index', 'admin-master-model-seri.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-master-model-seri.index') }}">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-model-seri.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-model-seri.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Model Seri</span>
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-master-kapasitas.index', 'admin-master-kapasitas.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-master-kapasitas.index') }}">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-kapasitas.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-kapasitas.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Kapasitas</span>
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
-                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-master-warna.index', 'admin-master-warna.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-master-warna.index') }}">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-warna.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-warna.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Warna</span>
                                     </a>
                                 </li>
@@ -327,8 +332,8 @@
                             </div>
                         </a>
                     </li>
-                 
-                 
+
+
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['karyawan.index'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['karyawan.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('karyawan.index') }}">
                             <div class="flex items-center">
@@ -354,7 +359,7 @@
                                 </div>
                             </a>
                         </li>
-                    
+
 
                      <div>
                         <h3 class="text-xs uppercase text-slate-500 font-semibold pl-3">

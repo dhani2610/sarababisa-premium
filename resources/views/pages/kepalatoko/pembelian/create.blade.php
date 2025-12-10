@@ -201,7 +201,14 @@
                                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                         <div class="font-semibold text-left">Kuantitas</div>
                                     </th>
-                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="harga_jual_toko">
+                                        <div class="font-semibold text-left">Harga Jual Toko</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="harga_jual_pelanggan">
+                                        <div class="font-semibold text-left">Harga Jual Pelanggan</div>
+                                    </th>
+                                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                         <div class="font-semibold text-left">Harga Beli</div>
                                     </th>
                                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -306,7 +313,14 @@
                 </td>
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                    <input type="number" class="form-input product_price text-right" name="product_price[]" value="">
+                    <input type="text" class="form-input harga_jual_toko text-right harga-format" name="harga_jual_toko[]" value="" data-hp-field="harga_jual_toko">
+                </td>
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                    <input type="text" class="form-input harga_jual_pelanggan text-right harga-format" name="harga_jual_pelanggan[]" value="" data-hp-field="harga_jual_pelanggan">
+                </td>
+
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                    <input type="text" class="form-input product_price text-right harga-format" name="product_price[]" value="">
                 </td>
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -314,7 +328,7 @@
                 </td>
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                    <input type="number" class="form-input total_price" name="total_price[]" value="0" readonly>
+                    <input type="text" class="form-input total_price" name="total_price[]" value="0" readonly>
                 </td>
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -336,6 +350,23 @@
         </script>
 
         <script>
+        function formatRibuan(angka) {
+            return angka.replace(/\D/g, "")      // Hapus semua non-digit
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        $(document).on("input", ".harga-format", function () {
+            let val = $(this).val();
+            $(this).val(formatRibuan(val));
+        });
+
+        // Sebelum submit: hapus semua koma untuk jadi integer
+        $("#storeButton").on("click", function () {
+            $(".harga-format").each(function () {
+                let clean = $(this).val().replace(/,/g, "");
+                $(this).val(clean);
+            });
+        });
         // Ketika kategori berubah
         $("#categories_id").on("change", function () {
             const categoryId = $(this).val();
@@ -437,10 +468,14 @@
                 });
 
                 $(document).on('keyup click','.product_price,.quantity', function(){
-                    var product_price = $(this).closest("tr").find("input.product_price").val();
+                    var product_price = $(this).closest("tr").find("input.product_price").val().replace(/,/g, "");
                     var quantity = $(this).closest("tr").find("input.quantity").val();
                     var total = product_price * quantity;
-                    $(this).closest("tr").find("input.total_price").val(total);
+                    $(this).closest("tr").find("input.total_price").val(total.toLocaleString('id'));
+                     console.log('====================================');
+                    console.log(product_price);
+                    console.log(total);
+                    console.log('====================================');
                     totalAmountPrice();
                 });
 
@@ -448,6 +483,10 @@
                     var sum = 0;
                     $(".total_price").each(function(){
                         var value = $(this).val();
+                        console.log('====================================');
+                        value = value.replace(/[^0-9]/g, "");
+                        console.log(value);
+                        console.log('====================================');
                         if(!isNaN(value) && value.length != 0){
                             sum += parseFloat(value);
                         }
@@ -473,11 +512,41 @@
                         url:"{{ route('get-product') }}",
                         type: "GET",
                         data:{categories_id:categories_id},
-                        success:function(data){
+                        // success:function(data){
+                        //     var html = '<option value="">Pilih Produk</option>';
+                        //     $.each(data,function(key,v){
+                        //         html += '<option value=" '+v.id+' "> '+v.product_name+'</option>';
+                        //     });
+                        //     $('#products_id').html(html);
+                        // }
+                        success: function(data) {
                             var html = '<option value="">Pilih Produk</option>';
-                            $.each(data,function(key,v){
-                                html += '<option value=" '+v.id+' "> '+v.product_name+'</option>';
+                            
+                            $.each(data, function(key, v) {
+                                var text = '';
+
+                                if (v.categories_id == 1) {
+                                    
+                                    var capacityName = '-';
+                                    if (v.capacity != null && v.capacity.name != null) {
+                                        capacityName = v.capacity.name;
+                                    }
+
+                                    var kondisi = v.kondisi ? v.kondisi : '';
+                                    var warna = v.warna ? v.warna : '';
+                                    var ram = v.ram ? v.ram : '';
+                                    var nomor_seri = v.nomor_seri ? v.nomor_seri : '';
+
+                                    text = v.product_name + ' ' + kondisi + ' ' + warna + ' ' + ram + ' / ' + capacityName + ' (IMEI ' + nomor_seri + ')';
+                                    
+                                } else {
+                                    var nomor_seri = v.nomor_seri ? v.nomor_seri : '';
+                                    text = v.product_name + ' ' + nomor_seri;
+                                }
+
+                                html += '<option value="' + v.id + '">' + text + '</option>';
                             });
+
                             $('#products_id').html(html);
                         }
                     })

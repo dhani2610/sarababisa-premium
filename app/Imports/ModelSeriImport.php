@@ -16,20 +16,48 @@ class ModelSeriImport implements ToModel, WithHeadingRow, WithBatchInserts
             return null;
         }
 
-        // Update jika sudah ada, buat baru jika belum ada
-        ModelSerie::updateOrCreate(
-            [
-                'name' => $row['Nama Model Seri'], // pencarian berdasarkan nama model seri
-            ],
-            [
+        $cabangId = getCabangId();
+        $namaAsli = $row['Nama Model Seri'];
+
+        // 1. CEK DATA EKSISTING DI CABANG INI
+        // Cari apakah model ini sudah ada di cabang yang sedang login?
+        $existingModel = ModelSerie::where('cabang_id', $cabangId)
+                            ->where('name', $namaAsli)
+                            ->first();
+
+        if ($existingModel) {
+            // == KONDISI UPDATE ==
+            // Data sudah ada di cabang ini, update detailnya saja
+            $existingModel->update([
                 'brands_id'      => $row['ID Merek'],
                 'id_tipe_os'     => $row['ID TIPE OS'],
-                'nominal_bonus'  => $row['Nominal Bonus'] ?? 0, // fallback jika kolom bonus belum ada
-                'cabang_id'   => getCabangId(),
-            ]
-        );
+                'nominal_bonus'  => $row['Nominal Bonus'] ?? 0,
+            ]);
 
-        return null;
+            return null; // Return null karena sudah di-handle update
+        }
+
+        // == KONDISI CREATE (BARU) ==
+        // Data belum ada di cabang ini, kita buat baru.
+        // TAPI cek dulu, apakah nama ini sudah dipakai cabang lain?
+
+        $finalName = $namaAsli;
+        $counter = 2;
+
+        // Loop: Jika nama sudah ada di database (milik cabang manapun), tambah angka (2), (3)...
+        while (ModelSerie::where('name', $finalName)->exists()) {
+            $finalName = $namaAsli . '.';
+            $counter++;
+        }
+
+        // Simpan Data Baru dengan nama yang sudah aman
+        return new ModelSerie([
+            'name'           => $finalName, // Nama unik
+            'brands_id'      => $row['ID Merek'],
+            'id_tipe_os'     => $row['ID TIPE OS'],
+            'nominal_bonus'  => $row['Nominal Bonus'] ?? 0,
+            'cabang_id'      => $cabangId,
+        ]);
     }
 
     public function batchSize(): int

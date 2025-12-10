@@ -35,6 +35,10 @@ class StoreSetting extends Model
         'nominal_potongan_sakit',
         'nominal_overtime',
         'cabang_id',
+        'is_profit',
+        'is_profit_produk',
+        'is_modal_produk',
+        'is_bonus_produk',
     ];
 
 }

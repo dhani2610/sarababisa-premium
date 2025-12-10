@@ -55,14 +55,40 @@ class MasterWarnaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    // public function store(ColorRequest $request)
+    // {
+    //     $data = $request->all();
+    //     $data['cabang_id'] = getCabangId();
+    //     Color::create($data);
+
+    //     return redirect()->route('master-warna.index');
+    // }
     public function store(ColorRequest $request)
     {
         $data = $request->all();
-        $data['cabang_id'] = getCabangId();
+        $cabangId = getCabangId();
+
+        $namaAsli = $data['name'];
+        $finalName = $namaAsli;
+        $counter = 2;
+
+        // Loop Cek Duplikat
+        // HANYA cek data aktif (tanpa withTrashed)
+        // Jika "Merah" ada, maka akan mencari "Merah (2)", "Merah (3)", dst.
+        while (Color::where('name', $finalName)->exists()) {
+            $finalName = $namaAsli . '.';
+            $counter++;
+        }
+
+        // Simpan dengan nama unik
+        $data['name'] = $finalName;
+        $data['cabang_id'] = $cabangId;
+
         Color::create($data);
 
         return redirect()->route('master-warna.index');
     }
+
 
     /**
      * Display the specified resource.

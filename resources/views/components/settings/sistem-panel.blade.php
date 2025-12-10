@@ -9,12 +9,14 @@
                 <div class="text-sm">Informasi ini akan mengatur bagaimana sistem ingin diterapkan pada beberapa bagian.</div>
             </section>
             <livewire:toggle-tax></livewire:toggle-tax>
-            <livewire:toggle-bonus></livewire:toggle-bonus>
-            <livewire:toggle-modal></livewire:toggle-modal>
+            {{-- <livewire:toggle-bonus></livewire:toggle-bonus>
+            <livewire:toggle-modal></livewire:toggle-modal> --}}
+            <livewire:toggle-financial-settings />
             <livewire:toggle-edit-transaksi></livewire:toggle-edit-transaksi>
             <livewire:toggle-edit-produk></livewire:toggle-edit-produk>
             <livewire:toggle-telegram-bot />
-            <livewire:toggle-setting-overtime />
+            <livewire:toggle-store-hours />
+            {{-- <livewire:toggle-setting-overtime /> --}}
         </div>
 
         <!-- Panel footer -->
