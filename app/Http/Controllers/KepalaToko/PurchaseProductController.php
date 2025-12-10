@@ -306,6 +306,11 @@ class PurchaseProductController extends Controller
                         $productsNew = new Product();
                         $productsNew->product_name = $finalName; // Pakai nama yang sudah ada titiknya
                         $productsNew->categories_id = 1;
+                        $productsNew->warna = $productModel->warna;
+                        $productsNew->kondisi = $productModel->kondisi;
+                        $productsNew->brands_id = $productModel->brands_id;
+                        $productsNew->model_series_id = $productModel->model_series_id;
+                        $productsNew->capacities_id = $productModel->capacities_id;
                         $productsNew->category_name = $namakategori->category_name;
                         $productsNew->capacities_id = $request->capacities_id[$i];
                         $productsNew->harga_modal = $request->product_price[$i];
