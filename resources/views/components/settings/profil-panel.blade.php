@@ -4,7 +4,7 @@
     <form action="{{ route('informasi-toko-update') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="p-6 space-y-6" x-data="formData()">
-
+            <input type="hidden" value="{{ $users->id }}" name="id_kepala_toko">
             @if ($errors->any())
                 <div x-show="open" x-data="{ open: true }">
                     <div class="px-4 py-2 rounded-sm text-sm bg-rose-500 text-white">
@@ -29,48 +29,88 @@
                     </div>
                 </div>
             @endif
+
             <!-- Picture -->
             <section>
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Logo Toko</h3>
                 <div class="flex items-center">
                     <div class="mr-4">
-                        <img class="w-20 h-20 rounded-full" src="{{ Storage::url(Auth::user()->profile_photo_path) }}"
+                        <img class="w-20 h-20 rounded-full" src="{{ Storage::url($users->profile_photo_path) }}"
                             width="80" height="80" alt="Logo Toko" />
                     </div>
                     <input type="file" name="profile_photo_path" id="profile_photo_path"
                         class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
                 </div>
             </section>
-            <section>
-                <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Foto Login</h3>
-                <div class="flex items-center">
-                    <div class="mr-4">
-                        <img class="w-20 h-20 object-cover rounded" 
-                            src="{{ Auth::user()->foto_login ? Storage::url(Auth::user()->foto_login) : asset('img/default-login.jpg') }}" 
-                            width="80" height="80" alt="Foto Login" />
+            @if ($users->id == 1)
+                <section>
+                    <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Foto Login</h3>
+                    <div class="flex items-center">
+                        <div class="mr-4">
+                            <img class="w-20 h-20 object-cover rounded"
+                                src="{{ $users->foto_login ? Storage::url($users->foto_login) : asset('img/default-login.jpg') }}"
+                                width="80" height="80" alt="Foto Login" />
+                        </div>
+                        <div>
+                            <input
+                                type="file"
+                                name="foto_login"
+                                id="foto_login"
+                                accept="image/*"
+                                class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white"
+                                onchange="checkFileSizeLogin(this)"
+                            >
+                            <p id="foto_login_alert" class="text-red-500 text-xs mt-1 hidden">
+                                Ukuran foto maksimal 1 MB!
+                            </p>
+                            <p class="text-gray-500 text-xs mt-1">
+                                Maksimal ukuran file: 1 MB
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <input 
-                            type="file" 
-                            name="foto_login" 
-                            id="foto_login" 
+
+                    <script>
+                        function checkFileSizeLogin(input) {
+                            const file = input.files[0];
+                            const alertEl = document.getElementById('foto_login_alert');
+                            if (file && file.size > 1024 * 1024) {
+                                alertEl.classList.remove('hidden');
+                                input.value = ''; // reset input
+                            } else {
+                                alertEl.classList.add('hidden');
+                            }
+                        }
+                    </script>
+                </section>
+
+                <section>
+                    <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Foto Portal</h3>
+                    <div class="flex items-center">
+                        <div class="mr-4">
+                            <img class="w-20 h-20 " src="{{ Storage::url($users->foto_portal) }}"
+                                width="80" height="80" alt="Logo Toko" />
+                        </div>
+                        <div>
+                        <input
+                            type="file"
+                            name="foto_portal"
+                            id="foto_portal"
                             accept="image/*"
                             class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white"
-                            onchange="checkFileSizeLogin(this)"
+                            onchange="checkFileSize(this)"
                         >
-                        <p id="foto_login_alert" class="text-red-500 text-xs mt-1 hidden">
+                        <p id="foto_portal_alert" class="text-red-500 text-xs mt-1 hidden">
                             Ukuran foto maksimal 1 MB!
                         </p>
                         <p class="text-gray-500 text-xs mt-1">
                             Maksimal ukuran file: 1 MB
                         </p>
                     </div>
-                </div>
 
-                <script>
-                    function checkFileSizeLogin(input) {
+                    <script>
+                    function checkFileSize(input) {
                         const file = input.files[0];
-                        const alertEl = document.getElementById('foto_login_alert');
+                        const alertEl = document.getElementById('foto_portal_alert');
                         if (file && file.size > 1024 * 1024) {
                             alertEl.classList.remove('hidden');
                             input.value = ''; // reset input
@@ -78,75 +118,38 @@
                             alertEl.classList.add('hidden');
                         }
                     }
-                </script>
-            </section>
+                    </script>
 
-            <section>
-                <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Foto Portal</h3>
-                <div class="flex items-center">
-                    <div class="mr-4">
-                        <img class="w-20 h-20 " src="{{ Storage::url(Auth::user()->foto_portal) }}"
-                            width="80" height="80" alt="Logo Toko" />
                     </div>
-                    <div>
-                    <input 
-                        type="file" 
-                        name="foto_portal" 
-                        id="foto_portal" 
-                        accept="image/*"
-                        class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white"
-                        onchange="checkFileSize(this)"
-                    >
-                    <p id="foto_portal_alert" class="text-red-500 text-xs mt-1 hidden">
-                        Ukuran foto maksimal 1 MB!
-                    </p>
-                    <p class="text-gray-500 text-xs mt-1">
-                        Maksimal ukuran file: 1 MB
-                    </p>
-                </div>
 
-                <script>
-                function checkFileSize(input) {
-                    const file = input.files[0];
-                    const alertEl = document.getElementById('foto_portal_alert');
-                    if (file && file.size > 1024 * 1024) {
-                        alertEl.classList.remove('hidden');
-                        input.value = ''; // reset input
-                    } else {
-                        alertEl.classList.add('hidden');
-                    }
-                }
-                </script>
+                    <div class="sm:w-1/2">
+                        <label class="block text-sm font-medium mb-1" for="owner">Warna Portal</label>
+                        <input name="color_portal" id="color_portal" class="form-input w-full" type="color"
+                            value="{{ $users->color_portal }}" />
+                    </div>
+                </section>
+                <!-- Business Profile -->
+                <section>
+                    <h3 class="text-xl leading-snug text-slate-800 font-bold mb-1">Social Media Portal</h3>
+                    <div class="sm:w-1/2">
+                        <label class="block text-sm font-medium mt-3" for="owner">Instagram (Link Url)</label>
+                        <input name="ig" id="ig" class="form-input w-full" type="text" placeholder="https://www.instagram.com/yourusername"
+                            value="{{ $users->ig }}" />
+                    </div>
+                    <div class="sm:w-1/2">
+                        <label class="block text-sm font-medium mt-3" for="owner">Tiktok (Link Url)</label>
+                        <input name="tiktok" id="tiktok" class="form-input w-full" type="text" placeholder="http://tiktok.com/@yourusername"
+                            value="{{ $users->tiktok }}" />
+                    </div>
+                    <div class="sm:w-1/2">
+                        <label class="block text-sm font-medium mt-3" for="owner">Facebook (Link Url)</label>
+                        <input name="fb" id="fb" class="form-input w-full" type="text" placeholder="http://facebook.com/yourusername"
+                            value="{{ $users->fb }}" />
+                    </div>
 
-                </div>
+                </section>
+            @endif
 
-                <div class="sm:w-1/2">
-                    <label class="block text-sm font-medium mb-1" for="owner">Warna Portal</label>
-                    <input name="color_portal" id="color_portal" class="form-input w-full" type="color"
-                        value="{{ Auth::user()->color_portal }}" />
-                </div>
-            </section>
-
-            <!-- Business Profile -->
-            <section>
-                <h3 class="text-xl leading-snug text-slate-800 font-bold mb-1">Social Media Portal</h3>
-                <div class="sm:w-1/2">
-                    <label class="block text-sm font-medium mt-3" for="owner">Instagram (Link Url)</label>
-                    <input name="ig" id="ig" class="form-input w-full" type="text" placeholder="https://www.instagram.com/yourusername"
-                        value="{{ Auth::user()->ig }}" />
-                </div>
-                <div class="sm:w-1/2">
-                    <label class="block text-sm font-medium mt-3" for="owner">Tiktok (Link Url)</label>
-                    <input name="tiktok" id="tiktok" class="form-input w-full" type="text" placeholder="http://tiktok.com/@yourusername"
-                        value="{{ Auth::user()->tiktok }}" />
-                </div>
-                <div class="sm:w-1/2">
-                    <label class="block text-sm font-medium mt-3" for="owner">Facebook (Link Url)</label>
-                    <input name="fb" id="fb" class="form-input w-full" type="text" placeholder="http://facebook.com/yourusername"
-                        value="{{ Auth::user()->fb }}" />
-                </div>
-               
-            </section>
             <section>
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-1">Profil Toko</h3>
                 <div class="text-sm">Informasi ini akan terlihat pada halaman web dan nota transaksi.</div>
@@ -154,53 +157,49 @@
                     <div class="sm:w-1/2">
                         <label class="block text-sm font-medium mb-1" for="owner">Pemilik Toko/Usaha</label>
                         <input name="owner" id="owner" class="form-input w-full" type="text"
-                            value="{{ Auth::user()->owner }}" />
+                            value="{{ $users->owner }}" />
                     </div>
                     <div class="sm:w-1/2">
                         <label class="block text-sm font-medium mb-1" for="nama_toko">Nama Toko/Usaha</label>
                         <input name="nama_toko" id="nama_toko" class="form-input w-full" type="text"
-                            value="{{ Auth::user()->nama_toko }}" />
+                            value="{{ $users->nama_toko }}" />
                     </div>
                     <div class="sm:w-1/2">
                         <label class="block text-sm font-medium mb-1" for="nomor_hp_toko">Nomor HP/WA Toko</label>
                         <input name="nomor_hp_toko" id="nomor_hp_toko" class="form-input w-full" type="number"
-                            placeholder="6200000000000" value="{{ Auth::user()->nomor_hp_toko }}" />
+                            placeholder="6200000000000" value="{{ $users->nomor_hp_toko }}" />
                     </div>
                     <div class="sm:w-1/2">
                         <label class="block text-sm font-medium mb-1" for="kota">Kota/Kabupaten</label>
                         <input name="kota" id="kota" class="form-input w-full" type="text"
-                            value="{{ Auth::user()->kota }}" />
+                            value="{{ $users->kota }}" />
                     </div>
                 </div>
                 <div class="sm:flex sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-5">
                     <div class="sm:w-1/2">
                         <label class="block text-sm font-medium mb-1" for="bank">Nama BANK</label>
                         <input name="bank" id="bank" class="form-input w-full" type="text"
-                            value="{{ Auth::user()->bank }}" />
+                            value="{{ $users->bank }}" />
                     </div>
                     <div class="sm:w-1/2">
                         <label class="block text-sm font-medium mb-1" for="rekening">Nomor Rekening</label>
                         <input name="rekening" id="rekening" class="form-input w-full" type="number"
-                            value="{{ Auth::user()->rekening }}" />
+                            value="{{ $users->rekening }}" />
                     </div>
                     <div class="sm:w-1/2">
                         <label class="block text-sm font-medium mb-1" for="pemilik_rekening">Nama Pemilik
                             Rekening</label>
                         <input name="pemilik_rekening" id="pemilik_rekening" class="form-input w-full" type="text"
-                            value="{{ Auth::user()->pemilik_rekening }}" />
+                            value="{{ $users->pemilik_rekening }}" />
                     </div>
                 </div>
                 <div class="mt-4">
                     <label class="block text-sm font-medium mb-1" for="deskripsi_toko">Deskripsi Toko/Usaha</label>
-                    <textarea name="deskripsi_toko" id="deskripsi_toko" rows="2" class="w-full">
-                        {{ Auth::user()->deskripsi_toko }}
-                    </textarea>
+                    <textarea name="deskripsi_toko" id="deskripsi_toko" rows="2" class="w-full">{{ $users->deskripsi_toko }}</textarea>
                 </div>
                 <div class="mt-4">
                     <label class="block text-sm font-medium mb-1" for="deskripsi_toko">Alamat Toko</label>
-                    <textarea name="alamat_toko" id="alamat_toko" rows="2" class="w-full">
-                        {{ Auth::user()->alamat_toko }}
-                    </textarea>
+                    <textarea name="alamat_toko" id="alamat_toko" rows="2" class="w-full">{{ $users->alamat_toko }}</textarea>
                 </div>
             </section>
             <!-- Multiple Nomor HP Tambahan -->
@@ -208,7 +207,7 @@
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Nomor HP Tambahan</h3>
                 <div id="phones-wrapper">
                     @php
-                        $phones = old('phones', json_decode(Auth::user()->phones ?? '[]', true));
+                        $phones = old('phones', json_decode($users->phones ?? '[]', true));
                     @endphp
                     @foreach ($phones as $index => $phone)
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2 phone-row">
@@ -229,7 +228,7 @@
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Rekening Bank Tambahan</h3>
                 <div id="banks-wrapper">
                     @php
-                        $banks = old('banks', json_decode(Auth::user()->banks ?? '[]', true));
+                        $banks = old('banks', json_decode($users->banks ?? '[]', true));
                     @endphp
                     @foreach ($banks as $index => $bank)
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2 bank-row">

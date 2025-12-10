@@ -264,7 +264,7 @@ class PurchaseProductController extends Controller
 
                 $purchase->product_name = $productModel->product_name ?? '-';
                 $purchase->cabang_id = getCabangId();
-
+                // dd($request->all(),$productModel,$request->nomor_seri[$i],$productModel->nomor_seri == $request->nomor_seri[$i]);
                 $purchase->save();
 
                 // LOGIKA UPDATE STOK ATAU BUAT PRODUK BARU
@@ -290,9 +290,27 @@ class PurchaseProductController extends Controller
                         }
                         // --- [SELESAI] LOGIKA PENGECEKAN NAMA DUPLIKAT ---
 
+
+                        // --- [MULAI] LOGIKA PENGECEKAN NOMOR SERI DUPLIKAT (BARU) ---
+                        $baseNomorSeri = $request->nomor_seri[$i];
+                        $finalNomorSeri = $baseNomorSeri;
+
+                        // Pastikan nomor seri tidak kosong sebelum dicek
+                        if (!empty($finalNomorSeri)) {
+                            while (Product::where('nomor_seri', $finalNomorSeri)->exists()) {
+                                $finalNomorSeri = $finalNomorSeri . '.';
+                            }
+                        }
+                        // --- [SELESAI] LOGIKA PENGECEKAN NOMOR SERI DUPLIKAT ---
+
                         $productsNew = new Product();
                         $productsNew->product_name = $finalName; // Pakai nama yang sudah ada titiknya
                         $productsNew->categories_id = 1;
+                        $productsNew->warna = $productModel->warna;
+                        $productsNew->kondisi = $productModel->kondisi;
+                        $productsNew->brands_id = $productModel->brands_id;
+                        $productsNew->model_series_id = $productModel->model_series_id;
+                        $productsNew->capacities_id = $productModel->capacities_id;
                         $productsNew->category_name = $namakategori->category_name;
                         $productsNew->capacities_id = $request->capacities_id[$i];
                         $productsNew->harga_modal = $request->product_price[$i];
@@ -300,7 +318,7 @@ class PurchaseProductController extends Controller
                         $productsNew->harga_jual_toko = $request->harga_jual_toko[$i];
                         $productsNew->ram = $request->ram[$i];
                         $productsNew->warna = $request->warna[$i];
-                        $productsNew->nomor_seri = $request->nomor_seri[$i];
+                        $productsNew->nomor_seri = $finalNomorSeri;
                         $productsNew->stok_minimal = 1;
                         $productsNew->stok = $request->quantity[$i];
                         $productsNew->keterangan = $request->keterangan[$i];

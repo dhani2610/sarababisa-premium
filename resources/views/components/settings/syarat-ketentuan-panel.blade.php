@@ -9,9 +9,7 @@
                 <div class="text-sm">Informasi ini akan terlihat pada nota transaksi.</div>
                 <div class="mt-4">
                     <label class="block text-sm font-semibold mb-1" for="description">Pada Nota Terima Servis</label>
-                    <textarea name="description" id="description" rows="3" class="w-full">
-                        {!! $termterima->description ?? '' !!}
-                    </textarea>
+                    <textarea name="description" id="description" rows="3" class="w-full">{!! $termterima->description ?? '' !!}</textarea>
                 </div>
             </section>
         </div>
@@ -34,9 +32,7 @@
             <section>
                 <div class="mt-4">
                     <label class="block text-sm font-semibold mb-1" for="description">Pada Nota Pengambilan Servis</label>
-                    <textarea name="description" id="description" rows="3" class="w-full">
-                        {!! $termpengambilan->description ?? '' !!}
-                    </textarea>
+                    <textarea name="description" id="description" rows="3" class="w-full">{!! $termpengambilan->description ?? '' !!}</textarea>
                 </div>
             </section>
         </div>
@@ -59,9 +55,7 @@
             <section>
                 <div class="mt-4">
                     <label class="block text-sm font-semibold mb-1" for="description">Pada Nota Penjualan</label>
-                    <textarea name="description" id="description" rows="3" class="w-full">
-                        {!! $termpenjualan->description ?? '' !!}
-                    </textarea>
+                    <textarea name="description" id="description" rows="3" class="w-full">{!! $termpenjualan->description ?? '' !!}</textarea>
                 </div>
             </section>
         </div>

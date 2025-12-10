@@ -19,10 +19,19 @@ class AkunController extends Controller
 
         $types = Type::where('cabang_id', $cabangId)->get();
 
-        $users = User::whereNull('deleted_at')
-            ->where('cabang_id', $cabangId)
-            ->with('type')
-            ->paginate(10);
+        if ($cabangId != 1) {
+            $users = User::whereNull('deleted_at')
+                ->where('cabang_id', $cabangId)
+                ->where('id', '!=',1)
+                ->with('type')
+                ->paginate(10);
+        }else{
+            $users = User::whereNull('deleted_at')
+                ->where('cabang_id', $cabangId)
+                ->with('type')
+                ->paginate(10);
+
+        }
 
         $users_count = User::whereNull('deleted_at')
             ->where('cabang_id', $cabangId)

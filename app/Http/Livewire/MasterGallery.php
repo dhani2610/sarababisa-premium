@@ -28,12 +28,12 @@ class MasterGallery extends Component
 
     public function render()
     {
-        $count = Gallery::all()->count();
+        $count = Gallery::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.master-gallery', [
             'count' => $count,
             'galleries' => $this->search === null ?
-                Gallery::latest()->paginate($this->paginate) :
-                Gallery::latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Gallery::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                Gallery::where('cabang_id',getCabangId())->latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

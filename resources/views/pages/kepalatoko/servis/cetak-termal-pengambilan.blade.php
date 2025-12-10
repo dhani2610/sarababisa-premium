@@ -68,8 +68,8 @@
             @endif
             <p>
                 NOTA PENGAMBILAN SERVIS <br>
-                <strong>{{ $toko->nama_toko }}</strong> <br>
-                Telp/WA {{ $toko->nomor_hp_toko }} <br>
+                <strong>{{ $users->nama_toko }}</strong> <br>
+                Telp/WA {{ $users->nomor_hp_toko }} <br>
                 @foreach ($phones as $index => $phone)
                     {{ $phone['title'] }}/WA {{ $phone['nomor'] }} <br>
                 @endforeach
@@ -282,7 +282,7 @@
         <footer class="text-center">
             <small>Dicetak {{ Auth::user()->name }}, <br>
                 [{{ \Carbon\Carbon::now()->translatedFormat('d/m/Y H:i') }}]</small>
-            <p>Rek {{ $toko->bank }} {{ $toko->rekening }} <br> a.n. {{ $toko->pemilik_rekening }}</p>
+            <p>Rek {{ $users->bank }} {{ $users->rekening }} <br> a.n. {{ $users->pemilik_rekening }}</p>
             @foreach ($banks as $index => $bank)
                 <p>Rek {{ $bank['bank'] }} {{ $bank['rekening'] }} <br> a.n. {{ $bank['pemilik'] }}</p>
             @endforeach
@@ -296,7 +296,7 @@
             ">
                 Cek status garansi {{ env('APP_URL') }}/garansi
             </p>
-            <p>Terima kasih atas kepercayaan Anda telah melakukan Servis di {{ $toko->nama_toko }}</p>
+            <p>Terima kasih atas kepercayaan Anda telah melakukan Servis di {{ $users->nama_toko }}</p>
         </footer>
     </div>
 </body>

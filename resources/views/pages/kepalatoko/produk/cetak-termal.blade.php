@@ -62,6 +62,14 @@
           NOTA PENJUALAN <br>
           <strong>{{ $users->nama_toko }}</strong> <br>
           Telp/WA {{ $users->nomor_hp_toko }}
+           @php
+                $phones = old('phones', json_decode($users->phones ?? '[]', true));
+                $banks = old('banks', json_decode($users->banks ?? '[]', true));
+            @endphp
+            Telp/WA {{ $users->nomor_hp_toko }} <br>
+            @foreach ($phones as $index => $phone)
+                {{ $phone['title'] }}/WA {{ $phone['nomor'] }} <br>
+            @endforeach
         </p>
       </div>
 
@@ -191,6 +199,9 @@
       <div class="text-center">
         <small>Dicetak {{ Auth::user()->name }}, <br> [{{ \Carbon\Carbon::now()->translatedFormat('d/m/Y H:i') }}]</small>
         <p style="margin-top: 4px; margin-bottom: 4px;">Rek {{ $users->bank }} {{ $users->rekening }} <br> a.n. {{ $users->pemilik_rekening }}</p>
+        @foreach ($banks as $index => $bank)
+        <p>Rek {{ $bank['bank'] }} {{ $bank['rekening'] }} <br> a.n. {{ $bank['pemilik'] }}</p>
+        @endforeach
         @if ($orderItem->first()->garansi != null)
           <p style="
               margin-top: 4px;

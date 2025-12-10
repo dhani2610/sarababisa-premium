@@ -83,32 +83,33 @@ class MasterMerekController extends Controller
     //         ->with('success', 'Merek berhasil ditambahkan.');
     // }
 
-    public function store(BrandRequest $request)
-    {
-        $data = $request->validated();
-        $data['cabang_id'] = getCabangId();
+public function store(BrandRequest $request)
+{
+    $data = $request->validated();
+    $data['cabang_id'] = getCabangId();
 
-        $namaAsli = $data['name'];
-        $finalName = $namaAsli;
-        $counter = 2;
+    $finalName = $data['name'];
 
-        // Loop Cek Duplikat
-        // Kita gunakan withTrashed() agar pengecekan mencakup data yang sudah dihapus juga.
-        // Jadi kalau ada "Samsung" (Soft Deleted), input baru akan jadi "Samsung (2)"
-        while (Brand::withTrashed()->where('name', $finalName)->exists()) {
-            $finalName = $namaAsli . '.';
-            $counter++;
-        }
-
-        // Set nama final yang sudah unik
-        $data['name'] = $finalName;
-
-        // Langsung Create Baru (Logic restore dihapus)
-        Brand::create($data);
-
-        return redirect()->route('master-merek.index')
-            ->with('success', 'Merek berhasil ditambahkan.');
+    // Loop Cek Duplikat
+    // Jika "Samsung" ada, dia akan ngecek "Samsung."
+    // Jika "Samsung." ada, dia akan ngecek "Samsung.."
+    // Dan seterusnya...
+    while (Brand::withTrashed()->where('name', $finalName)->exists()) {
+        
+        // PERBAIKAN DISINI:
+        // Tambahkan titik ke $finalName, JANGAN ke $namaAsli
+        $finalName = $finalName . '.'; 
+        
     }
+
+    // Set nama final yang sudah unik
+    $data['name'] = $finalName;
+
+    Brand::create($data);
+
+    return redirect()->route('master-merek.index')
+        ->with('success', 'Merek berhasil ditambahkan.');
+}
 
     public function import(Request $request)
     {

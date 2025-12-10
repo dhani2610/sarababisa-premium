@@ -82,7 +82,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="brands_id">Merek</label>
                                     <select id="brands_id" name="brands_id" class="form-select text-sm py-1 w-full selectjs1" style="width: 100%">
-                                        <option selected value="{{ $item->brand->id }}">{{ $item->brand->name }}</option>
+                                        <option selected value="{{ $item->brand->id ?? null }}">{{ $item->brand->name ?? null }}</option>
                                         @foreach ($brands as $brand)
                                             <option value="{{ $brand->id }}">{{ $brand->name }}</option>
                                         @endforeach
@@ -91,7 +91,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="model_series_id">Model Seri</label>
                                     <select id="model_series_id" name="model_series_id" class="form-select text-sm py-1 w-full selectjs2" style="width: 100%">
-                                        <option selected value="{{ $item->model->id }}">{{ $item->model->name }}</option>
+                                        <option selected value="{{ $item->model->id ?? null }}">{{ $item->model->name ?? null }}</option>
                                         @foreach ($model_series as $model)
                                             <option value="{{ $model->id }}">{{ $model->name }}</option>
                                         @endforeach
@@ -112,7 +112,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="capacities_id">Memori</label>
                                     <select id="capacities_id" name="capacities_id" class="form-select text-sm py-1 w-full">
-                                        <option selected value="{{ $item->capacity->id }}">{{ $item->capacity->name }}</option>
+                                        <option selected value="{{ $item->capacity->id ?? null }}">{{ $item->capacity->name ?? null }}</option>
                                         @foreach ($capacities as $capacity)
                                             <option value="{{ $capacity->id }}">{{ $capacity->name }}</option>
                                         @endforeach
@@ -121,7 +121,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="warna">Warna</label>
                                     <select id="warna" name="warna" class="form-select text-sm py-1 w-full">
-                                        <option selected value="{{ $item->warna }}">{{ $item->warna }}</option>
+                                        <option selected value="{{ $item->warna ?? null }}">{{ $item->warna ?? null }}</option>
                                         @foreach ($colors as $color)
                                             <option value="{{ $color->name }}">{{ $color->name }}</option>
                                         @endforeach
@@ -130,7 +130,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="kondisi">Kondisi</label>
                                     <select id="kondisi" name="kondisi" class="form-select text-sm py-1 w-full">
-                                        <option selected value="{{ $item->kondisi }}">{{ $item->kondisi }}</option>
+                                        <option selected value="{{ $item->kondis ?? null }}">{{ $item->kondisi ?? null }}</option>
                                         <option value="NEW">NEW</option>
                                         <option value="SECOND">SECOND</option>
                                     </select>
