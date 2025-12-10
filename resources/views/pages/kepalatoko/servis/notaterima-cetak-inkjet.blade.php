@@ -67,16 +67,16 @@
                         height="70">
                 </td>
                 <td style="height: 50px; vertical-align: middle; text-align: left; line-height: 1.5em;">
-                    <strong>{{ $toko->nama_toko }} ({{ $toko->deskripsi_toko }})</strong> <br>
-                    {{ $toko->alamat_toko }} - {{ $toko->nomor_hp_toko }}
+                    <strong>{{ $users->nama_toko }} ({{ $users->deskripsi_toko }})</strong> <br>
+                    {{ $users->alamat_toko }} - {{ $users->nomor_hp_toko }}
                     @foreach ($phones as $index => $phone)
                         | {{ $phone['title'] }} : {{ $phone['nomor'] }} <br>
                     @endforeach
                 </td>
             @else
-                <td style="text-align: left; line-height: 1.5em;"><strong>{{ $toko->nama_toko }}
-                        ({{ $toko->deskripsi_toko }})</strong> <br>
-                    {{ $toko->alamat_toko }} - {{ $toko->nomor_hp_toko }}
+                <td style="text-align: left; line-height: 1.5em;"><strong>{{ $users->nama_toko }}
+                        ({{ $users->deskripsi_toko }})</strong> <br>
+                    {{ $users->alamat_toko }} - {{ $users->nomor_hp_toko }}
                     @foreach ($phones as $index => $phone)
                         | {{ $phone['title'] }} : {{ $phone['nomor'] }} <br>
                     @endforeach

@@ -585,7 +585,17 @@ class TransaksiServisController extends Controller
     public function cetaktermal($id)
     {
         $items = ServiceTransaction::with('customer')->findOrFail($id);
-        $users = User::find(1);
+        // $users = User::find(1);
+        if ($items->cabang_id == 1) {
+            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }else{
+            $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
+
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
 
@@ -609,7 +619,16 @@ class TransaksiServisController extends Controller
     public function cetakinkjet($id)
     {
         $items = ServiceTransaction::with('customer')->findOrFail($id);
-        $users = User::find(1);
+        // $users = User::find(1);
+        if ($items->cabang_id == 1) {
+            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }else{
+            $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
         $terms = Term::find(1);
 
         $logo = $users->profile_photo_path;
