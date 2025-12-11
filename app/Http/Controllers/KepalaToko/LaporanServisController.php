@@ -316,8 +316,8 @@ class LaporanServisController extends Controller
             ->get();
        
         // return response()->json($services);
-        $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
-        // return view('pages.kepalatoko.cetak-laporan-servis', [
+        // $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
+        return view('pages.kepalatoko.cetak-laporan-servis', [
             'users' => $users,
             'imagePath' => $imagePath,
             'services' => $services,
