@@ -169,8 +169,8 @@
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Kerusakan</th>
                 <td id="data" class="capital">: {{ $items->kerusakan }}</td>
-                <td id="data" scope="row" style="border-left-style: solid;">Fungsi </th>
-                <td id="data" class="row">: {{ route('kepalatoko-cetak-qc', $items->id) }}</td>
+                <td id="data" scope="row" rowspan="2" style="border-left-style: solid;">Fungsi </th>
+                <td id="data" class="row" rowspan="2">: {{ route('kepalatoko-cetak-qc', $items->id) }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">
                     Total Biaya Servis
                     @php
@@ -208,8 +208,8 @@
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Kondisi Servis</th>
                 <td id="data" class="capital">: {{ $items->kondisi_servis }}</td>
-                <td id="data" scope="row" style="border-left-style: solid;">Fungsi</th>
-                <td id="data" class="row">: {{ route('kepalatoko-cetak-qc', $items->id) }}</td>
+                {{-- <td id="data" scope="row" style="border-left-style: solid;">Fungsi</th>
+                <td id="data" class="row">: {{ route('kepalatoko-cetak-qc', $items->id) }}</td> --}}
                 @if ($items->kondisi_servis === 'Dibatalkan')
                     <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
                             <td id="data">: - </td>
