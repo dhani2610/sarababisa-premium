@@ -253,7 +253,6 @@
         <footer>
             <div class="flex flex-col px-6 py-5 border-t border-slate-200">
                 <div class="flex self-end">
-                    {{-- <button class="btn border-slate-200 hover:border-slate-300 text-slate-600">Batal</button> --}}
                     <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white ml-3">Simpan Perubahan</button>
                 </div>
             </div>

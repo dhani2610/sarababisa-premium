@@ -1,8 +1,10 @@
 <div class="grow">
     <!-- Panel body -->
-    <form action="{{ route('informasi-toko-update') }}" method="POST" enctype="multipart/form-data">
-        @csrf
+    {{-- <form action="{{ route('informasi-toko-update') }}" method="POST" enctype="multipart/form-data">
+        @csrf --}}
         <div class="p-6 space-y-6">
+            {{-- <input type="hidden" value="{{ $users->id }}" name="id_kepala_toko"> --}}
+
             <!-- Business Profile -->
             <section>
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-1">Sistem</h3>
@@ -20,15 +22,14 @@
         </div>
 
         <!-- Panel footer -->
-        <footer>
+        {{-- <footer>
             <div class="flex flex-col px-6 py-5 border-t border-slate-200">
                 <div class="flex self-end">
-                    {{-- <button class="btn border-slate-200 hover:border-slate-300 text-slate-600">Batal</button> --}}
                     <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white ml-3">Simpan Perubahan</button>
                 </div>
             </div>
-        </footer>
-    </form>
+        </footer> --}}
+    {{-- </form> --}}
 </div>
 <script>
 window.addEventListener('notify', event => {
