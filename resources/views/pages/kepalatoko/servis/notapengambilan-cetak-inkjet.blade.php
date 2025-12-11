@@ -169,7 +169,7 @@
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Kerusakan</th>
                 <td id="data" class="capital">: {{ $items->kerusakan }}</td>
-                <td id="data" scope="row" rowspan="2" style="border-left-style: solid;">Fungsi </th>
+                <td id="data" scope="row" rowspan="2" style="border-left-style: solid;">Link QC </th>
                 <td id="data" class="row" rowspan="2">: {{ route('kepalatoko-cetak-qc', $items->id) }}</td>
                 <td id="data" scope="row" style="border-left-style: solid;">
                     Total Biaya Servis
