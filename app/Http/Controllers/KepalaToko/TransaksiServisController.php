@@ -134,6 +134,7 @@ class TransaksiServisController extends Controller
             // Kirim Fontee / manual WA button — gunakan JS function kirimFontee(...) di blade
             $tokoName = e(config('app.name'));
             $notaLink = route('kepalatoko-cetak-inkjet', $row->id);
+            $notaQc = route('kepalatoko-cetak-qc', $row->id);
             $trackingLink = env('APP_URL') . '/tracking';
             $message = rawurlencode("*Notifikasi Service*\n" . $tokoName . "\n\n" .
                 "No. Service : " . $row->nomor_servis . "\n" .
@@ -143,7 +144,8 @@ class TransaksiServisController extends Controller
                 "Tanggal : " . Carbon::parse($row->created_at)->translatedFormat('d F Y h:i') . "\n" .
                 "Kerusakan : " . $row->kerusakan . "\n\n" .
                 "Link tracking : " . $trackingLink . "\n" .
-                "Link nota : " . $notaLink . "\n\n" .
+                "Link nota : " . $notaLink . "\n" .
+                "Link QC : " . $notaQc . "\n\n" .
                 "Terimakasih");
 
             if ($fonteeToken && $nomorwa) {
@@ -194,8 +196,17 @@ class TransaksiServisController extends Controller
         })
 
         // Fungsi (qc_masuk)
+        // ->addColumn('qc_masuk', function ($row) {
+        //     return '<div class="font-medium capitalize">' . e($row->qc_masuk) . '</div>';
+        // })
         ->addColumn('qc_masuk', function ($row) {
-            return '<div class="font-medium capitalize">' . e($row->qc_masuk) . '</div>';
+            $url = route('kepalatoko-cetak-qc', $row->id);
+
+            return '
+                <a href="' . $url . '" target="_blank" class="btn bg-indigo-500 hover:bg-indigo-600 text-white " title="Lihat PDF QC">
+                    Lihat QC
+                </a>
+            ';
         })
 
         // Uang muka
@@ -456,6 +467,27 @@ class TransaksiServisController extends Controller
      */
     public function store(Request $request)
     {
+
+        $qc_data = $request->qc_masuk ?? [];
+
+        // Gabungkan dengan baris Custom (jika ada input manual)
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                // Hanya proses jika nama item tidak kosong
+                if (!empty($name)) {
+                    // Ambil value statusnya (OK/Rusak/dll), default '-' jika kosong
+                    $val = $request->custom_qc_masuk[$key] ?? '-';
+
+                    // Masukkan ke array utama
+                    $qc_data[$name] = $val;
+                }
+            }
+        }
+
+        // Ubah array menjadi JSON agar bisa disimpan di database text/longtext
+        $qc_masuk_final = json_encode($qc_data);
+        // dd($qc_masuk_final);
+
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99'));
         $nama_pelanggan = Customer::find($request->customers_id);
         $nama_tipe = Type::find($request->types_id);
@@ -479,7 +511,8 @@ class TransaksiServisController extends Controller
             'capacities_id' => $request->capacities_id,
             'kelengkapan' => $request->kelengkapan,
             'kerusakan' => $request->kerusakan,
-            'qc_masuk' => $request->qc_masuk,
+            // 'qc_masuk' => $request->qc_masuk,
+            'qc_masuk' => $qc_masuk_final,
             'estimasi_pengerjaan' => $request->estimasi_pengerjaan,
             'estimasi_biaya' => $request->estimasi_biaya,
             'uang_muka' => $request->uang_muka,
@@ -649,6 +682,55 @@ class TransaksiServisController extends Controller
         ]);
 
         $filename = 'Nota Terima ' . $invoiceNumber . ' ' . '(' . $namaPelanggan . ')' . '.pdf';
+
+        return $pdf->setOption('isRemoteEnabled', true)->stream($filename);
+    }
+
+    public function cetakQc($id)
+    {
+        $items = ServiceTransaction::with('customer')->findOrFail($id);
+
+        // 1. Decode JSON ke Array
+        $qcMasuk = $items->qc_masuk ? json_decode($items->qc_masuk, true) : [];
+        $qcKeluar = $items->qc_keluar ? json_decode($items->qc_keluar, true) : [];
+       
+        $qcItems = $qcMasuk != null ? array_keys($qcMasuk) : [];
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
+
+        if ($items->cabang_id == 1) {
+            $users = User::where('cabang_id', $items->cabang_id)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+        } else {
+            $users = User::where('cabang_id', $items->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+        }
+
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu...', 'error');
+            return redirect()->back();
+        }
+
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+        $invoiceNumber = $items->nomor_servis;
+        $namaPelanggan = $items->customer->nama;
+
+        $pdf = PDF::loadView('pages.kepalatoko.servis.notaqc-cetak', [
+        // return View('pages.kepalatoko.servis.notaqc-cetak', [
+            'users' => $users,
+            'items' => $items,
+            'imagePath' => $imagePath,
+            'qcMasuk' => $qcMasuk,   // Data Status Masuk (OK/Rusak/Null)
+            'qcKeluar' => $qcKeluar, // Data Status Keluar
+            'qcItems' => $qcItems    // Daftar Nama Item (Dinamis dari DB)
+        ]);
+
+        $filename = 'QC Check ' . $invoiceNumber . ' - ' . $namaPelanggan . '.pdf';
 
         return $pdf->setOption('isRemoteEnabled', true)->stream($filename);
     }

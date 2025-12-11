@@ -95,7 +95,7 @@
                 </tr>
                 <tr>
                     <td class="title">Pengecekan Fungsi</td>
-                    <td class="value">: {{ $items->qc_masuk }}</td>
+                    <td class="value">:{{ route('kepalatoko-cetak-qc', $items->id) }}</td>
                 </tr>
                 @if ($items->estimasi_biaya != null)
                     <tr>

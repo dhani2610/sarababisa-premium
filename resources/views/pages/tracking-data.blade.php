@@ -200,7 +200,6 @@
                                             <span class="text-slate-500 italic text-sm">-</span>
                                         @else
                                             @if ($item->cara_pembayaran === 'Tunai & Transfer')
-                                                {{-- Tampilan Khusus Tunai & Transfer --}}
                                                 <div class="bg-slate-100 rounded-lg p-3">
                                                     <div class="font-bold text-slate-700 text-sm mb-2">Tunai & Transfer</div>
                                                     <div class="space-y-1 text-xs text-slate-600">

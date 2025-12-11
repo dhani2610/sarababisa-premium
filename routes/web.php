@@ -532,6 +532,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 });
 
 // Route::get('izin', [MasterIzinController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
+Route::get('nota-qc/{id}', [KepalaTokoTransaksiServisController::class, 'cetakQc'])->name('kepalatoko-cetak-qc');
 Route::get('nota-terima-inkjet/{id}', [KepalaTokoTransaksiServisController::class, 'cetakinkjet'])->name('kepalatoko-cetak-inkjet');
 Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::class, 'cetakinkjet'])->name('kepalatoko-pengambilan-cetak-inkjet');
 Route::get('transaksi-produk-inkjet/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakinkjet'])->name('lunas-cetak-inkjet');

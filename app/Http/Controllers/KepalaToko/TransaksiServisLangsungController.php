@@ -31,7 +31,6 @@ class TransaksiServisLangsungController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99')).rand(10,90);
         $nama_pelanggan = Customer::find($request->customers_id);
 
@@ -207,6 +206,26 @@ class TransaksiServisLangsungController extends Controller
         }
 
 
+        $qc_masuk_data = $request->qc_masuk ?? [];
+        $qc_keluar_data = $request->qc_keluar ?? [];
+
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                if (!empty($name)) {
+                    $val_in = $request->custom_qc_masuk[$key] ?? '-';
+                    $val_out = $request->custom_qc_keluar[$key] ?? '-';
+
+                    $qc_masuk_data[$name] = $val_in;
+                    $qc_keluar_data[$name] = $val_out;
+                }
+            }
+        }
+
+        $qc_masuk_final = json_encode($qc_masuk_data);
+        $qc_keluar_final = json_encode($qc_keluar_data);
+
+        // dd($request->all(),$qc_masuk_final,$qc_keluar_final);
+
         // Transaction create
         $transaksi = ServiceTransaction::create([
             'nomor_servis' => $nomor_servis,
@@ -223,7 +242,7 @@ class TransaksiServisLangsungController extends Controller
             'warna' => $request->warna,
             'capacities_id' => $request->capacities_id,
             'kelengkapan' => $request->kelengkapan,
-            'qc_masuk' => $request->qc_masuk,
+            'qc_masuk' => $qc_masuk_final,
             'status_servis' => "Sudah Diambil",
             'penerima' => $request->penerima,
             'users_id' => $request->users_id,
@@ -238,7 +257,7 @@ class TransaksiServisLangsungController extends Controller
             'omzet' => $request->biaya,
             'profit' => $profittransaksi,
             'profittoko' => $profittransaksi - ($bagihasil * $persen_teknisi),
-            'qc_keluar' => $request->qc_keluar,
+            'qc_keluar' => $qc_keluar_final,
             'cara_pembayaran' => $request->cara_pembayaran,
             'diskon' => $request->diskon,
             'garansi' => $request->garansi[0],

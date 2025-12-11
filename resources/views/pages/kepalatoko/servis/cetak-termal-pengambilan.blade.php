@@ -258,13 +258,13 @@
                     @endif
                 </tr>
                 <tr>
-                    <td class="title">Pengecekan Masuk</td>
-                    <td class="value">: {{ $items->qc_masuk }}</td>
+                    <td class="title">Pengecekan Fungsi</td>
+                    <td class="value">: {{ route('kepalatoko-cetak-qc', $items->id) }}</td>
                 </tr>
-                <tr>
+                {{-- <tr>
                     <td class="title">Pengecekan Keluar</td>
                     <td class="value">: {{ $items->qc_keluar }}</td>
-                </tr>
+                </tr> --}}
                 <tr>
                     <td class="title">Tgl. Ambil</td>
                     <td class="value">:

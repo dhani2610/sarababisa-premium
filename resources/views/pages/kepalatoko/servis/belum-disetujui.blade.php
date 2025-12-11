@@ -61,8 +61,9 @@
                         @endif
                         {data: 'nama_barang', name: 'nama_barang'},
                         {data: 'kerusakan', name: 'kerusakan'},
-                        {data: 'qc_masuk', name: 'qc_masuk'},
-                        {data: 'qc_keluar', name: 'qc_keluar'},
+                        // {data: 'qc_masuk', name: 'qc_masuk'},
+                        // {data: 'qc_keluar', name: 'qc_keluar'},
+                        {data: 'fungsi', name: 'fungsi'},
                         {data: 'kondisi_servis', name: 'kondisi_servis'},
                         {data: 'tindakan_servis', name: 'tindakan_servis'},
                         {data: 'teknisi', name: 'teknisi'},
