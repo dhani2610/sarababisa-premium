@@ -42,7 +42,7 @@
                         class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
                 </div>
             </section>
-            @if ($users->id == 1)
+            {{-- @if ($users->id == 1) --}}
                 <section>
                     <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Foto Login</h3>
                     <div class="flex items-center">
@@ -148,7 +148,7 @@
                     </div>
 
                 </section>
-            @endif
+            {{-- @endif --}}
 
             <section>
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-1">Profil Toko</h3>

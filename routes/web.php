@@ -174,7 +174,11 @@ use App\Http\Controllers\KepalaToko\MasterOvertimeController;
 |
 */
 
-Route::get('/', [PortalController::class, 'index'])->name('portal');
+// Route::get('/', [PortalController::class, 'index'])->name('portal');
+Route::get('/', [PortalController::class, 'indexHome'])->name('portal.home');
+
+// Halaman Portal per Cabang (Show Produk dll)
+Route::get('/cabang/{id}', [PortalController::class, 'index'])->name('portal.branch');
 Route::get('/detail-produk/{id}', [PortalController::class, 'index'])->name('portal.detail-produk');
 Route::get('/install-app-ios', [PortalController::class, 'installAppIOS'])->name('portal.install-app-ios');
 Route::get('/pembayaran', [PaymentController::class, 'index'])->name('payment');

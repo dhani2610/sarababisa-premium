@@ -142,7 +142,7 @@
         <div class="container" data-aos="fade-up" data-aos-delay="100">
 
             <div class="room-filters" data-aos="fade-up" data-aos-delay="200">
-                <form method="GET" action="{{ route('portal') }}">
+                <form method="GET" action="{{ route('portal.branch', $current_cabang->id) }}">
                     <div class="row g-3 align-items-end">
                         {{-- Category --}}
                         <div class="col-lg-4 col-md-6">
