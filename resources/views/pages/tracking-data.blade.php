@@ -187,13 +187,57 @@
                                     </div>
                                     @endif
 
-                                    <div class="border-t border-slate-200 my-2 pt-2 flex justify-between font-bold text-slate-800 text-base">
-                                        <span>Metode Pembayaran</span>
-                                        <span>{{ $item->cara_pembayaran ?? '-' }}</span>
-                                    </div>
+
                                     <div class="border-t border-slate-200 my-2 pt-2 flex justify-between font-bold text-slate-800 text-base">
                                         <span>Total Biaya</span>
                                         <span>Rp {{ number_format($totalAkhir) }}</span>
+                                    </div>
+
+                                    <div class="mt-5 pt-4 border-t border-slate-200">
+                                        <div class="text-xs uppercase tracking-wider mb-2">Metode Pembayaran</div>
+
+                                        @if ($item->kondisi_servis === 'Dibatalkan')
+                                            <span class="text-slate-500 italic text-sm">-</span>
+                                        @else
+                                            @if ($item->cara_pembayaran === 'Tunai & Transfer')
+                                                {{-- Tampilan Khusus Tunai & Transfer --}}
+                                                <div class="bg-slate-100 rounded-lg p-3">
+                                                    <div class="font-bold text-slate-700 text-sm mb-2">Tunai & Transfer</div>
+                                                    <div class="space-y-1 text-xs text-slate-600">
+                                                        <div class="flex justify-between">
+                                                            <span>💵 Tunai:</span>
+                                                            <span class="font-mono font-medium">Rp {{ number_format($item->tunai) }}</span>
+                                                        </div>
+                                                        <div class="flex justify-between border-t border-slate-200 pt-1 mt-1">
+                                                            <span>💳 Transfer:</span>
+                                                            <span class="font-mono font-medium">Rp {{ number_format($item->transfer) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            @elseif ($item->cara_pembayaran === 'Tunai')
+                                                <div class="text-sm font-semibold text-slate-700 bg-slate-100 inline-block px-3 py-1 rounded-lg">
+                                                    Tunai (Rp {{ number_format($item->tunai) }})
+                                                </div>
+
+                                            @elseif ($item->cara_pembayaran === 'Transfer')
+                                                <div class="text-sm font-semibold text-slate-700 bg-slate-100 inline-block px-3 py-1 rounded-lg">
+                                                    Transfer (Rp {{ number_format($item->transfer) }})
+                                                </div>
+
+                                            @elseif ($item->cara_pembayaran === 'Kredit')
+                                                <div class="text-sm font-semibold text-slate-700 bg-slate-100 inline-block px-3 py-1 rounded-lg">
+                                                    Tempo (Rp {{ number_format($item->due) }})
+                                                </div>
+                                                <div class="text-xs text-red-500 mt-1">
+                                                    Jatuh Tempo: {{ \Carbon\Carbon::parse($item->tempo)->translatedFormat('d F Y') }}
+                                                </div>
+                                            @else
+                                                <div class="text-sm font-semibold text-slate-700 bg-slate-100 inline-block px-3 py-1 rounded-lg">
+                                                    {{ $item->cara_pembayaran ?? 'Belum Lunas' }}
+                                                </div>
+                                            @endif
+                                        @endif
                                     </div>
 
                                     @if($item->uang_muka > 0)
