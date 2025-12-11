@@ -512,11 +512,41 @@
                         url:"{{ route('get-product') }}",
                         type: "GET",
                         data:{categories_id:categories_id},
-                        success:function(data){
+                        // success:function(data){
+                        //     var html = '<option value="">Pilih Produk</option>';
+                        //     $.each(data,function(key,v){
+                        //         html += '<option value=" '+v.id+' "> '+v.product_name+'</option>';
+                        //     });
+                        //     $('#products_id').html(html);
+                        // }
+                        success: function(data) {
                             var html = '<option value="">Pilih Produk</option>';
-                            $.each(data,function(key,v){
-                                html += '<option value=" '+v.id+' "> '+v.product_name+'</option>';
+                            
+                            $.each(data, function(key, v) {
+                                var text = '';
+
+                                if (v.categories_id == 1) {
+                                    
+                                    var capacityName = '-';
+                                    if (v.capacity != null && v.capacity.name != null) {
+                                        capacityName = v.capacity.name;
+                                    }
+
+                                    var kondisi = v.kondisi ? v.kondisi : '';
+                                    var warna = v.warna ? v.warna : '';
+                                    var ram = v.ram ? v.ram : '';
+                                    var nomor_seri = v.nomor_seri ? v.nomor_seri : '';
+
+                                    text = v.product_name + ' ' + kondisi + ' ' + warna + ' ' + ram + ' / ' + capacityName + ' (IMEI ' + nomor_seri + ')';
+                                    
+                                } else {
+                                    var nomor_seri = v.nomor_seri ? v.nomor_seri : '';
+                                    text = v.product_name + ' ' + nomor_seri;
+                                }
+
+                                html += '<option value="' + v.id + '">' + text + '</option>';
                             });
+
                             $('#products_id').html(html);
                         }
                     })

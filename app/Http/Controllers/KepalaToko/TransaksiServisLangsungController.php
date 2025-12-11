@@ -308,7 +308,7 @@ class TransaksiServisLangsungController extends Controller
                 // $orderDetail->total = $spareparts->harga_jual;
                 // $orderDetail->sub_total = $spareparts->harga_jual;
                 $orderDetail->price = $spareparts->harga_modal;
-                $orderDetail->total = $spareparts->harga_modal;
+                $orderDetail->total = 0;
                 $orderDetail->sub_total = $spareparts->harga_modal;
                 $orderDetail->modal = $spareparts->harga_modal;
                 // $orderDetail->profit = $spareparts->harga_jual - $spareparts->harga_modal;
