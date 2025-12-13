@@ -58,10 +58,10 @@ class AksesorisImport implements ToModel, WithHeadingRow, WithBatchInserts
 
         // Cek apakah nama produk ini sudah dipakai secara GLOBAL (di cabang lain)?
         // Jika ya, rename jadi "Casing HP (2)", dst.
-        while (Product::where('product_name', $finalName)->exists()) {
-            $finalName = $namaAsli . '.';
-            $counter++;
-        }
+        // while (Product::where('product_name', $finalName)->exists()) {
+        //     $finalName = $namaAsli . '.';
+        //     $counter++;
+        // }
 
         // Simpan Data Baru
         return new Product([

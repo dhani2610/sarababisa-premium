@@ -94,13 +94,11 @@ public function store(BrandRequest $request)
     // Jika "Samsung" ada, dia akan ngecek "Samsung."
     // Jika "Samsung." ada, dia akan ngecek "Samsung.."
     // Dan seterusnya...
-    while (Brand::withTrashed()->where('name', $finalName)->exists()) {
+    // while (Brand::withTrashed()->where('name', $finalName)->exists()) {
         
-        // PERBAIKAN DISINI:
-        // Tambahkan titik ke $finalName, JANGAN ke $namaAsli
-        $finalName = $finalName . '.'; 
+    //     $finalName = $finalName . '.'; 
         
-    }
+    // }
 
     // Set nama final yang sudah unik
     $data['name'] = $finalName;

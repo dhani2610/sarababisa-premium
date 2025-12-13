@@ -37,22 +37,22 @@ class ServiceActionImport implements ToModel, WithHeadingRow, WithBatchInserts
             return $existingService;
         }
 
-        // == KONDISI CREATE (BARU) ==
-        // Data belum ada di cabang ini. Kita harus buat baru.
-        // TAPI, kita harus cek apakah nama ini sudah dipake secara GLOBAL (di cabang lain)?
+        // // == KONDISI CREATE (BARU) ==
+        // // Data belum ada di cabang ini. Kita harus buat baru.
+        // // TAPI, kita harus cek apakah nama ini sudah dipake secara GLOBAL (di cabang lain)?
 
-        $finalName = $namaTindakanAsli;
-        $counter = 2;
+        // $finalName = $namaTindakanAsli;
+        // $counter = 2;
 
-        // Loop: Selama nama tersebut sudah ada di tabel (milik siapapun/cabang manapun), tambah angka
-        while (ServiceAction::where('nama_tindakan', $finalName)->exists()) {
-            $finalName = $namaTindakanAsli . '.';
-            $counter++;
-        }
+        // // Loop: Selama nama tersebut sudah ada di tabel (milik siapapun/cabang manapun), tambah angka
+        // while (ServiceAction::where('nama_tindakan', $finalName)->exists()) {
+        //     $finalName = $namaTindakanAsli . '.';
+        //     $counter++;
+        // }
 
         // Setelah loop selesai, $finalName pasti unik (misal: "Ganti LCD (2)")
         return new ServiceAction([
-            'nama_tindakan'     => $finalName, // Nama yang sudah aman
+            'nama_tindakan'     => $namaTindakanAsli, // Nama yang sudah aman
             'cabang_id'         => $cabangId,
             'modal_sparepart'   => $row['Modal Sparepart'],
             'harga_toko'        => $row['Harga Pelanggan Toko'],

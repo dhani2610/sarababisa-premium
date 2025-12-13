@@ -109,12 +109,12 @@ class MasterModelSeriController extends Controller
         $finalName = $request->name; 
 
         // Cek keberadaan nama (termasuk yang sudah dihapus/withTrashed)
-        while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
+        // while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
             
-            // Jika ada, tambahkan satu titik di belakang nama yang sedang dicek
-            $finalName = $finalName . '.';
+        //     // Jika ada, tambahkan satu titik di belakang nama yang sedang dicek
+        //     $finalName = $finalName . '.';
             
-        }
+        // }
         // Update nama di array data dengan nama yang sudah unik
         $data['name'] = $finalName;
 

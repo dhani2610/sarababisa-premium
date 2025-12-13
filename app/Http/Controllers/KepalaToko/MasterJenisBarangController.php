@@ -74,10 +74,10 @@ class MasterJenisBarangController extends Controller
         // 2. Loop Cek Duplikat (Logic Create Baru)
         // Mengecek apakah nama 'finalName' sudah ada di database.
         // Loop akan terus berjalan sampai menemukan nama yang belum dipakai.
-        while (Type::where('name', $finalName)->exists()) {
-            $finalName = $namaAsli . '.';
-            $counter++;
-        }
+        // while (Type::where('name', $finalName)->exists()) {
+        //     $finalName = $namaAsli . '.';
+        //     $counter++;
+        // }
 
         // 3. Siapkan Data untuk disimpan
         $data = $request->all();

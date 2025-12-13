@@ -75,10 +75,10 @@ class MasterWarnaController extends Controller
         // Loop Cek Duplikat
         // HANYA cek data aktif (tanpa withTrashed)
         // Jika "Merah" ada, maka akan mencari "Merah (2)", "Merah (3)", dst.
-        while (Color::where('name', $finalName)->exists()) {
-            $finalName = $namaAsli . '.';
-            $counter++;
-        }
+        // while (Color::where('name', $finalName)->exists()) {
+        //     $finalName = $namaAsli . '.';
+        //     $counter++;
+        // }
 
         // Simpan dengan nama unik
         $data['name'] = $finalName;

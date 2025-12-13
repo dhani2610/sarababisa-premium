@@ -114,9 +114,9 @@
                     
                     <h3 class="branch-title">{{ $item->nama_cabang }}</h3>
                     
-                    <p class="branch-address">
+                    {{-- <p class="branch-address">
                         {{ $item->alamat ?? 'Alamat belum tersedia' }}
-                    </p>
+                    </p> --}}
 
                     <span class="btn btn-primary btn-choose">
                         Kunjungi Toko <i class="bi bi-arrow-right ms-1"></i>

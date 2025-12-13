@@ -53,19 +53,19 @@ class ToolImport implements ToModel, WithHeadingRow, WithBatchInserts
         // 2. LOGIKA CREATE (Jika belum ada di cabang ini)
         // ---------------------------------------------------------
 
-        $finalName = $namaAsli;
-        $counter = 2;
+        // $finalName = $namaAsli;
+        // $counter = 2;
 
-        // Cek apakah nama alat ini sudah dipakai secara GLOBAL (di cabang lain)?
-        // Jika ya, rename jadi "Obeng (2)", dst.
-        while (Product::where('product_name', $finalName)->exists()) {
-            $finalName = $namaAsli . '.';
-            $counter++;
-        }
+        // // Cek apakah nama alat ini sudah dipakai secara GLOBAL (di cabang lain)?
+        // // Jika ya, rename jadi "Obeng (2)", dst.
+        // while (Product::where('product_name', $finalName)->exists()) {
+        //     $finalName = $namaAsli . '.';
+        //     $counter++;
+        // }
 
         // Simpan Data Baru
         return new Product([
-            'product_name'      => $finalName, // Nama yang sudah aman
+            'product_name'      => $namaAsli, // Nama yang sudah aman
             'categories_id'     => 4,
             'category_name'     => "Sparepart",
             'sub_categories_id' => $row['ID Sub Kategori'],

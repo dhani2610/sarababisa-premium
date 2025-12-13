@@ -95,7 +95,7 @@
                 </tr>
                 <tr>
                     <td class="title">Pengecekan Fungsi</td>
-                    <td class="value">:{{ route('kepalatoko-cetak-qc', $items->id) }}</td>
+                    <td class="value">: <a href="{{ route('kepalatoko-cetak-qc', $items->id) }}">{{ route('kepalatoko-cetak-qc', $items->id) }}</a></td>
                 </tr>
                 @if ($items->estimasi_biaya != null)
                     <tr>

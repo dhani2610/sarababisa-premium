@@ -165,7 +165,7 @@
             </tr>
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Pengecekan Fungsi</th>
-                <td id="data" class="row">: {{ route('kepalatoko-cetak-qc', $items->id) }}</td>
+                <td id="data" class="row">: <a href="{{ route('kepalatoko-cetak-qc', $items->id) }}">{{ route('kepalatoko-cetak-qc', $items->id) }}</a></td>
                 <td id="data" scope="row" style="border-left-style: solid;">Uang Muka</th>
                     @if ($items->uang_muka != null)
                 <td id="data">: Rp. {{ number_format($items->uang_muka) }}</td>

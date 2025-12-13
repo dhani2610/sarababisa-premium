@@ -68,14 +68,14 @@ class HandphoneImport implements ToModel, WithHeadingRow, WithBatchInserts
 
         // Cek apakah Nomor Seri ini sudah dipakai secara GLOBAL (di cabang lain)?
         // Jika ya, rename SN-nya agar bisa masuk database (unik).
-        while (Product::where('nomor_seri', $finalSn)->exists()) {
-            $finalSn = $snAsli . '.';
-            $counter++;
-        }
+        // while (Product::where('nomor_seri', $finalSn)->exists()) {
+        //     $finalSn = $snAsli . '.';
+        //     $counter++;
+        // }
 
         // Simpan Data Baru
         return new Product([
-            'nomor_seri'        => $finalSn, // SN yang sudah aman
+            'nomor_seri'        => $row['Nomor Seri'], // SN yang sudah aman
             'categories_id'     => 1,
             'category_name'     => 'Handphone',
             'product_name'      => $row['Nama Produk'],

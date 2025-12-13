@@ -50,23 +50,23 @@ class SparepartImport implements ToModel, WithHeadingRow, WithBatchInserts
             return null; // Stop, jangan lanjut create
         }
 
-        // ---------------------------------------------------------
-        // 2. LOGIKA CREATE (Jika belum ada di cabang ini)
-        // ---------------------------------------------------------
+        // // ---------------------------------------------------------
+        // // 2. LOGIKA CREATE (Jika belum ada di cabang ini)
+        // // ---------------------------------------------------------
 
-        $finalName = $namaAsli;
-        $counter = 2;
+        // $finalName = $namaAsli;
+        // $counter = 2;
 
-        // Cek apakah nama sparepart ini sudah dipakai secara GLOBAL (di cabang lain)?
-        // Jika ya, rename jadi "LCD iPhone X (2)", dst.
-        while (Product::where('product_name', $finalName)->exists()) {
-            $finalName = $namaAsli . '.';
-            $counter++;
-        }
+        // // Cek apakah nama sparepart ini sudah dipakai secara GLOBAL (di cabang lain)?
+        // // Jika ya, rename jadi "LCD iPhone X (2)", dst.
+        // while (Product::where('product_name', $finalName)->exists()) {
+        //     $finalName = $namaAsli . '.';
+        //     $counter++;
+        // }
 
         // Simpan Data Baru
         return new Product([
-            'product_name'      => $finalName, // Nama yang sudah aman (unik)
+            'product_name'      => $namaAsli, // Nama yang sudah aman (unik)
             'categories_id'     => 2,
             'category_name'     => 'Sparepart',
             'sub_categories_id' => $row['ID Sub Kategori'],

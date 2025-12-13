@@ -75,10 +75,10 @@ class MasterKapasitasController extends Controller
 
         // Loop Cek Duplikat
         // HANYA cek data aktif (tidak pakai withTrashed), sesuai request "gausah ngecek ke sampah"
-        while (Capacity::where('name', $finalName)->exists()) {
-            $finalName = $namaAsli . '.';
-            $counter++;
-        }
+        // while (Capacity::where('name', $finalName)->exists()) {
+        //     $finalName = $namaAsli . '.';
+        //     $counter++;
+        // }
 
         // Simpan dengan nama yang sudah unik
         $data['name'] = $finalName;

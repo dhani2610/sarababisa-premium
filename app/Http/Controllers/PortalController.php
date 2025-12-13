@@ -63,13 +63,14 @@ public function index(Request $request, $id)
     // Asumsi StoreSetting & User ada kolom cabang_id. 
     // Jika tidak, sesuaikan logic ini.
     $data['toko_setting'] = StoreSetting::where('cabang_id', $id)->first() ?? StoreSetting::first();
-    $data['kepala_toko_setting'] = User::where('cabang_id', $id)->where('role', 'Kepala Toko')->first() ?? User::first(); 
-    
-    // if (getCabangId() == 1) {
-    //         $users = User::where('cabang_id',getCabangId())->where('role','Kepala Toko')->orderBy('id','asc')->first();
-    //     }else{
-    //         $users = User::where('cabang_id',getCabangId())->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
-    //     }
+    // $data['kepala_toko_setting'] = User::where('cabang_id', $id)->where('role', 'Kepala Toko')->orderBy('id','asc')->first() ?? User::first(); 
+    if ($id == 1) {
+        $data['kepala_toko_setting'] = User::where('cabang_id',$id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+    }else{
+        $data['kepala_toko_setting'] = User::where('cabang_id',$id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        // dd($data['kepala_toko_setting']);
+    }
+    // dd($data['kepala_toko_setting']);
 
     $data['pelanggan'] = Customer::where('cabang_id', $id)->count();
     $data['galleries'] = Gallery::where('cabang_id', $id)->orderBy('created_at', 'desc')->get();
