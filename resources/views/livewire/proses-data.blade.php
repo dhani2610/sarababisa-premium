@@ -1,3 +1,17 @@
+<link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+<link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+<script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+
+<style>
+    /* Agar modal filepond terlihat rapi */
+    .filepond--root { font-family: sans-serif; }
+    .filepond--panel-root { background-color: #f1f5f9; border: 1px solid #cbd5e1; }
+    .filepond--drop-label { color: #64748b; }
+</style>
 <div>
 
     <!-- Page header -->
@@ -1062,6 +1076,288 @@
             </div>
         </div>
     </div>
+{{-- <div id="modal-upload-foto" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModalFoto()"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                        <div class="flex justify-between items-center mb-4 border-b pb-2">
+                            <h3 class="text-xl leading-6 font-bold text-gray-900" id="modal-title">
+                                📸 Dokumentasi Foto Servis
+                            </h3>
+                            <button onclick="closeModalFoto()" class="text-gray-400 hover:text-gray-500">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" id="current-servis-id">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <div class="flex items-center mb-2">
+                                    <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">IN</span>
+                                    <label class="block text-sm font-bold text-gray-700">Kondisi Masuk</label>
+                                </div>
+                                <input type="file" class="filepond-masuk" name="file" multiple data-max-file-size="10MB">
+                            </div>
+
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <div class="flex items-center mb-2">
+                                    <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">OUT</span>
+                                    <label class="block text-sm font-bold text-gray-700">Kondisi Selesai</label>
+                                </div>
+                                <input type="file" class="filepond-selesai" name="file" multiple data-max-file-size="10MB">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 text-xs text-gray-500 italic">
+                            * Foto otomatis tersimpan saat berhasil di-upload. Klik 'x' pada gambar untuk menghapus.
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-100 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="closeModalFoto()">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div> --}}
+
+<div id="modal-upload-foto" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        
+        <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" aria-hidden="true" onclick="closeModalFoto()"></div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="inline-block w-full text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl overflow-hidden sm:my-8 sm:align-middle sm:max-w-3xl">
+            
+            <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="w-full mt-3 text-center sm:mt-0 sm:text-left">
+                        
+                        <div class="flex items-center justify-between pb-2 mb-4 border-b">
+                            <h3 class="text-xl font-bold leading-6 text-gray-900" id="modal-title">
+                                📸 Dokumentasi Foto Servis
+                            </h3>
+                            <button onclick="closeModalFoto()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" id="current-servis-id">
+
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <div class="p-4 border rounded-lg bg-slate-50 border-slate-200">
+                                <div class="flex items-center mb-2">
+                                    <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">IN</span>
+                                    <label class="block text-sm font-bold text-gray-700">Kondisi Masuk</label>
+                                </div>
+                                <input type="file" class="filepond-masuk" name="file" multiple data-max-file-size="10MB">
+                            </div>
+
+                            <div class="p-4 border rounded-lg bg-slate-50 border-slate-200">
+                                <div class="flex items-center mb-2">
+                                    <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">OUT</span>
+                                    <label class="block text-sm font-bold text-gray-700">Kondisi Selesai</label>
+                                </div>
+                                <input type="file" class="filepond-selesai" name="file" multiple data-max-file-size="10MB">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 text-xs italic text-gray-500">
+                            * Foto otomatis tersimpan saat berhasil di-upload. Klik foto untuk memperbesar (zoom).
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="closeModalFoto()">
+                    Tutup
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    // 1. Register Plugin
+    FilePond.registerPlugin(
+        FilePondPluginImagePreview,
+        FilePondPluginFileValidateType
+    );
+
+    let pondMasuk, pondSelesai;
+    // Variabel untuk menyimpan instance Viewer.js (untuk zoom)
+    let viewer; 
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 2. Config Dasar FilePond
+        const baseConfig = {
+            allowMultiple: true,
+            acceptedFileTypes: ['image/*'],
+            labelIdle: 'Drag & Drop gambar atau <span class="filepond--label-action">Cari</span>',
+            credits: false,
+            imagePreviewHeight: 150, // Tinggi preview lebih besar
+            
+            // FITUR ZOOM: Dipanggil saat user klik gambar di FilePond
+            onactivatefile: (file) => {
+                // Ambil URL dari metadata (file lama) atau buat URL blob (file baru)
+                let imageUrl = file.getMetadata('url');
+                if (!imageUrl && file.file) {
+                    imageUrl = URL.createObjectURL(file.file);
+                }
+
+                if (imageUrl) {
+                    showImagePopup(imageUrl);
+                }
+            }
+        };
+
+        // 3. Create Instance
+        const inputMasuk = document.querySelector('.filepond-masuk');
+        const inputSelesai = document.querySelector('.filepond-selesai');
+        
+        pondMasuk = FilePond.create(inputMasuk, baseConfig);
+        pondSelesai = FilePond.create(inputSelesai, baseConfig);
+
+        // 4. Event Listener Tombol Buka Modal
+        $(document).on('click', '.btn-upload-foto', function() {
+            let id = $(this).data('id');
+            $('#current-servis-id').val(id);
+            $('#modal-upload-foto').removeClass('hidden');
+
+            // Reset FilePond
+            pondMasuk.removeFiles();
+            pondSelesai.removeFiles();
+
+            // Setup Server Config (Dynamic URL based on ID)
+            setupPondServer(pondMasuk, id, 'masuk');
+            setupPondServer(pondSelesai, id, 'selesai');
+
+            // Load Existing Images
+            loadExistingImages(id);
+        });
+    });
+
+    // --- Config AJAX Server (Upload, Delete, & LOAD Preview) ---
+    function setupPondServer(pondInstance, id, type) {
+        pondInstance.setOptions({
+            server: {
+                // 1. Upload File Baru
+                process: {
+                    url: `/servis/transaksi-servis/${id}/upload-foto`,
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    ondata: (formData) => {
+                        formData.append('type', type);
+                        return formData;
+                    }
+                },
+                
+                // 2. Hapus File yang BARU di-upload (belum direfresh page)
+                revert: {
+                    url: `/servis/transaksi-servis/${id}/delete-foto?type=${type}`,
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                },
+
+                // 3. Hapus File LAMA (yang diload dari database)
+                remove: (source, load, error) => {
+                    // source adalah nama file
+                    fetch(`/servis/transaksi-servis/${id}/delete-foto?type=${type}`, {
+                        method: 'DELETE',
+                        headers: { 
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'text/plain'
+                        },
+                        body: source 
+                    }).then(() => {
+                        load(); // Beritahu FilePond penghapusan sukses
+                    }).catch((err) => {
+                        error('Gagal menghapus');
+                    });
+                },
+
+                // 4. LOAD PREVIEW (Kunci agar gambar muncul, bukan cuma nama)
+                load: (source, load, error, progress, abort, headers) => {
+                    // source disini adalah nama file dari database.
+                    // Kita fetch blob dari url public storage
+                    let myRequest = new Request(`/storage/servis/${source}`);
+                    
+                    fetch(myRequest).then(function(response) {
+                        response.blob().then(function(myBlob) {
+                            load(myBlob); // Masukkan blob gambar ke FilePond
+                        });
+                    }).catch((err) => {
+                        error('Gagal load gambar');
+                    });
+                }
+            }
+        });
+    }
+
+    // --- Load Existing Images ---
+    function loadExistingImages(id) {
+        fetch(`/servis/transaksi-servis/${id}/get-foto`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.masuk) {
+                    pondMasuk.files = data.masuk;
+                }
+                if(data.selesai) {
+                    pondSelesai.files = data.selesai;
+                }
+            })
+            .catch(err => console.error("Gagal load foto", err));
+    }
+
+    // --- Fungsi Zoom Gambar (Viewer.js) ---
+    function showImagePopup(imageUrl) {
+        // Buat elemen gambar temporary hidden
+        const image = new Image();
+        image.src = imageUrl;
+        
+        // Inisialisasi Viewer.js
+        const viewer = new Viewer(image, {
+            hidden: function () {
+                viewer.destroy(); // Hapus instance setelah ditutup
+            },
+            toolbar: {
+                zoomIn: 1,
+                zoomOut: 1,
+                oneToOne: 1,
+                reset: 1,
+                rotateLeft: 1,
+                rotateRight: 1,
+                flipHorizontal: 1,
+                flipVertical: 1,
+            },
+        });
+        
+        // Tampilkan
+        viewer.show();
+    }
+
+    // --- Tutup Modal ---
+    function closeModalFoto() {
+        $('#modal-upload-foto').addClass('hidden');
+    }
+</script>
 <script>
     // --- DATA ITEM STANDAR (Berlaku untuk Tab 1 & Tab 2) ---
     const defaultChecklist = [

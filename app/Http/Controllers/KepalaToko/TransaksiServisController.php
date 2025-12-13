@@ -21,7 +21,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Yajra\DataTables\Facades\DataTables;
-
+use Illuminate\Support\Facades\Storage;
 class TransaksiServisController extends Controller
 {
     /**
@@ -47,6 +47,113 @@ class TransaksiServisController extends Controller
             'bisadiambil',
             'jumlahbisadiambil'
         ));
+    }
+
+
+    public function getFoto($id)
+    {
+        $servis = ServiceTransaction::find($id);
+        
+        $response = [
+            'masuk' => [],
+            'selesai' => []
+        ];
+
+        // Helper untuk format file
+        $formatFile = function($filename) {
+            $path = 'servis/' . $filename; // Sesuaikan path di storage/app/public/servis
+            if(Storage::disk('public')->exists($path)){
+                $fullUrl = asset('storage/servis/' . $filename);
+                return [
+                    'source' => $filename,
+                    'options' => [
+                        'type' => 'local', // Menandakan file ini sudah ada di server
+                        'file' => [
+                            'name' => $filename,
+                            'size' => Storage::disk('public')->size($path),
+                            'type' => Storage::disk('public')->mimeType($path),
+                        ],
+                        'metadata' => [
+                            'poster' => $fullUrl, // Untuk preview
+                            'url' => $fullUrl     // Untuk zoom/popup
+                        ]
+                    ]
+                ];
+            }
+            return null;
+        };
+
+        // Loop Foto Masuk
+        if ($servis->foto_masuk) {
+            $files = json_decode($servis->foto_masuk, true) ?? [];
+            foreach ($files as $file) {
+                if($f = $formatFile($file)) $response['masuk'][] = $f;
+            }
+        }
+
+        // Loop Foto Selesai
+        if ($servis->foto_selesai) {
+            $files = json_decode($servis->foto_selesai, true) ?? [];
+            foreach ($files as $file) {
+                if($f = $formatFile($file)) $response['selesai'][] = $f;
+            }
+        }
+
+        return response()->json($response);
+    }
+    // 2. Upload Foto (Dipanggil saat file di-drop)
+    public function uploadFoto(Request $request, $id)
+    {
+        $servis = ServiceTransaction::find($id);
+        $type = $request->input('type'); // 'masuk' atau 'selesai'
+        
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            
+            // Simpan file ke folder storage/app/public/servis
+            $file->storeAs('public/servis', $filename);
+
+            // Update Database (Append ke array JSON)
+            $column = ($type == 'masuk') ? 'foto_masuk' : 'foto_selesai';
+            $currentFiles = json_decode($servis->$column, true) ?? [];
+            $currentFiles[] = $filename;
+            
+            $servis->$column = json_encode($currentFiles);
+            $servis->save();
+
+            // Return filename agar FilePond tahu ID file ini
+            return response($filename, 200); 
+        }
+        
+        return response()->json(['error' => 'No file'], 400);
+    }
+
+    // 3. Delete Foto (Dipanggil saat tombol silang diklik di FilePond)
+    public function deleteFoto(Request $request, $id)
+    {
+        $servis = ServiceTransaction::find($id);
+        $filename = $request->getContent(); // FilePond mengirim nama file di body
+        $type = $request->input('type'); // dikirim via query string
+
+        $column = ($type == 'masuk') ? 'foto_masuk' : 'foto_selesai';
+        $currentFiles = json_decode($servis->$column, true) ?? [];
+
+        // Cari dan hapus dari array
+        if (($key = array_search($filename, $currentFiles)) !== false) {
+            unset($currentFiles[$key]);
+            
+            // Hapus file fisik dari storage
+            if (Storage::disk('public')->exists('servis/' . $filename)) {
+                Storage::disk('public')->delete('servis/' . $filename);
+            }
+        }
+
+        // Simpan array baru ke DB
+        $servis->$column = json_encode(array_values($currentFiles));
+        $servis->save();
+
+        return response()->json(['success' => true]);
     }
 
 
@@ -258,6 +365,18 @@ class TransaksiServisController extends Controller
             $html = '<div class="space-x-1 flex">';
 
             // PIN & Pola (menyertakan wire:click dari blade asli)
+            $html .= '
+                <button type="button" 
+                        class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1" 
+                        data-id="' . $id . '"
+                        title="Upload Foto Servis">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-camera" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"></path>
+                    <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+                    </svg>
+                </button>
+            ';
             $html .= '
                 <div>
                     <button wire:click="openPinModal(' . $id . ')" class="text-indigo-500 hover:text-indigo-600 rounded-full">

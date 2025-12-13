@@ -338,6 +338,10 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
     Route::get('/transaksi-servis/data', [KepalaTokoTransaksiServisController::class, 'getData'])->name('transaksi-servis.data');
 
+    // Route untuk Fitur Foto Servis (AJAX)
+    Route::get('servis/transaksi-servis/{id}/get-foto', [KepalaTokoTransaksiServisController::class, 'getFoto']);
+    Route::post('servis/transaksi-servis/{id}/upload-foto', [KepalaTokoTransaksiServisController::class, 'uploadFoto']);
+    Route::delete('servis/transaksi-servis/{id}/delete-foto', [KepalaTokoTransaksiServisController::class, 'deleteFoto']);
     Route::resource('servis/transaksi-servis', KepalaTokoTransaksiServisController::class);
     Route::post('servis/transaksi-servis/{id}/update-pin-pola', [KepalaTokoTransaksiServisController::class, 'updatePinPola'])
     ->name('transaksi-servis.update-pin-pola');
