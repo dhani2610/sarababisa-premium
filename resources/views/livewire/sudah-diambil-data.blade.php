@@ -965,13 +965,21 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+<link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+<link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
 
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.min.js"></script>
+<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 <script>
     // 1. Register Plugin
     FilePond.registerPlugin(
-        FilePondPluginImagePreview,
-        FilePondPluginFileValidateType
+        FilePondPluginFileValidateType,
+        FilePondPluginImageResize,
+        FilePondPluginImageTransform,
+        FilePondPluginImagePreview
     );
 
     let pondMasuk, pondSelesai;
@@ -987,63 +995,35 @@
         // 2. Config Dasar FilePond
         const baseConfig = {
             allowMultiple: true,
-            acceptedFileTypes: ['image/*'],
+            acceptedFileTypes: ['image/jpeg', 'image/png', 'image/webp'], // Batasi tipe file agar transform jalan
             labelIdle: 'Drag & Drop gambar atau <span class="filepond--label-action">Cari</span>',
             credits: false,
+            
+            // --- KONFIGURASI RESIZE (DIMENSI) ---
+            allowImageResize: true,
+            imageResizeTargetWidth: 1280,
+            imageResizeTargetHeight: 1280,
+            imageResizeMode: 'contain', 
+            imageResizeUpscale: false,
+
+            // --- KONFIGURASI TRANSFORM (KOMPRESI) ---
+            allowImageTransform: true,
+            imageTransformOutputQuality: 70, // Turunkan sedikit ke 70 agar size lebih kecil
+            imageTransformOutputMimeType: 'image/jpeg', // Paksa convert ke JPEG (lebih kecil dari PNG)
+            
+            // Fix untuk orientasi foto HP (EXIF data)
+            imageTransformOutputStripImageHead: false, 
+
+            // Preview
             imagePreviewHeight: 150,
-
-            // --- LOGIKA KOMPRESI (DIPERBAIKI) ---
-            beforeAddFile: async (fileItem) => {
-                // FilePond kadang membungkus file dalam object, kita ambil file aslinya
-                const file = fileItem instanceof File ? fileItem : fileItem.file;
-
-                console.log("🔍 Menganalisa file:", file.name, "| Size:", (file.size / 1024 / 1024).toFixed(2), "MB");
-
-                // Batas 1 MB
-                if (file.size <= 1048576) {
-                    console.log("✅ File di bawah 1MB, skip kompresi.");
-                    return true; // Lanjut tanpa ubah apa-apa
-                }
-
-                console.log("⚠️ File > 1MB. Memulai kompresi...");
-
-                const options = {
-                    maxSizeMB: 1,
-                    maxWidthOrHeight: 1920,
-                    useWebWorker: true,
-                    fileType: file.type
-                };
-
-                try {
-                    // Proses Kompresi
-                    const compressedBlob = await imageCompression(file, options);
-                    
-                    // PENTING: FilePond butuh object 'File', bukan 'Blob'.
-                    // Kita harus convert Blob hasil kompresi jadi File lagi agar namanya tidak hilang.
-                    const compressedFile = new File([compressedBlob], file.name, {
-                        type: compressedBlob.type,
-                        lastModified: Date.now()
-                    });
-
-                    console.log(`🎉 Kompresi Berhasil! Baru: ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`);
-                    
-                    return compressedFile; // Kembalikan file baru
-                } catch (error) {
-                    console.error("❌ Gagal kompresi:", error);
-                    return true; // Jika gagal, upload file asli saja
-                }
-            },
-            // -------------------------------------
-
-            // FITUR ZOOM
+            
+            // Event Zoom Viewer
             onactivatefile: (file) => {
                 let imageUrl = file.getMetadata('url');
                 if (!imageUrl && file.file) {
                     imageUrl = URL.createObjectURL(file.file);
                 }
-                if (imageUrl) {
-                    showImagePopup(imageUrl);
-                }
+                if (imageUrl) showImagePopup(imageUrl);
             }
         };
 
