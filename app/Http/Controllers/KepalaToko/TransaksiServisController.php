@@ -807,8 +807,8 @@ class TransaksiServisController extends Controller
 
     public function cetakQc($id)
     {
-        $items = ServiceTransaction::with('customer')->findOrFail($id);
-
+        $items = ServiceTransaction::with(['customer','admin'])->findOrFail($id);
+        // dd($items);
         // 1. Decode JSON ke Array
         $qcMasuk = $items->qc_masuk ? json_decode($items->qc_masuk, true) : [];
         $qcKeluar = $items->qc_keluar ? json_decode($items->qc_keluar, true) : [];

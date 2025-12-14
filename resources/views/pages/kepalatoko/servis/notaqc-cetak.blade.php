@@ -171,7 +171,7 @@
                 <tr>
                     <td colspan="2" style="border:1px solid #000; padding: 10px;">
                         <strong>CASHIER/TECHNICIAN:</strong> <br><br><br>
-                        <span class="uppercase">{{ $items->penerima }}</span>
+                        <span class="uppercase">{{ $items->admin->name ?? $items->penerima }}</span>
                     </td>
                     <td colspan="2" style="border:1px solid #000; padding: 10px;">
                         <strong>CUSTOMER:</strong> <br><br><br>
@@ -202,7 +202,7 @@
                 <tr>
                     <td  style="border:1px solid #000; padding: 10px;">
                         <strong>CASHIER/TECHNICIAN:</strong> <br><br><br>
-                        <span class="uppercase">{{ $items->penerima }}</span>
+                        <span class="uppercase">{{ $items->admin->name ?? $items->penerima }}</span>
                     </td>
                     <td  style="border:1px solid #000; padding: 10px;">
                         <strong>CUSTOMER:</strong> <br><br><br>
