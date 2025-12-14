@@ -1194,71 +1194,95 @@
         </div>
     </div>
 </div>
-<script>
-    // 1. Register Plugin
-    FilePond.registerPlugin(
-        FilePondPluginImagePreview,
-        FilePondPluginFileValidateType
-    );
+<link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+<link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
 
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.min.js"></script>
+<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+
+<script>
     let pondMasuk, pondSelesai;
-    // Variabel untuk menyimpan instance Viewer.js (untuk zoom)
-    let viewer; 
 
     document.addEventListener('DOMContentLoaded', function() {
-        // 2. Config Dasar FilePond
+        
+        // 1. Register Plugin (Urutan Sangat Penting: Validate -> Resize -> Transform -> Preview)
+        FilePond.registerPlugin(
+            FilePondPluginFileValidateType,
+            FilePondPluginImageResize,
+            FilePondPluginImageTransform,
+            FilePondPluginImagePreview
+        );
+
+        // 2. Konfigurasi Global FilePond
         const baseConfig = {
             allowMultiple: true,
-            acceptedFileTypes: ['image/*'],
+            acceptedFileTypes: ['image/jpeg', 'image/png', 'image/webp'], // Batasi tipe file agar transform jalan
             labelIdle: 'Drag & Drop gambar atau <span class="filepond--label-action">Cari</span>',
             credits: false,
-            imagePreviewHeight: 150, // Tinggi preview lebih besar
             
-            // FITUR ZOOM: Dipanggil saat user klik gambar di FilePond
+            // --- KONFIGURASI RESIZE (DIMENSI) ---
+            allowImageResize: true,
+            imageResizeTargetWidth: 1280,
+            imageResizeTargetHeight: 1280,
+            imageResizeMode: 'contain', 
+            imageResizeUpscale: false,
+
+            // --- KONFIGURASI TRANSFORM (KOMPRESI) ---
+            allowImageTransform: true,
+            imageTransformOutputQuality: 70, // Turunkan sedikit ke 70 agar size lebih kecil
+            imageTransformOutputMimeType: 'image/jpeg', // Paksa convert ke JPEG (lebih kecil dari PNG)
+            
+            // Fix untuk orientasi foto HP (EXIF data)
+            imageTransformOutputStripImageHead: false, 
+
+            // Preview
+            imagePreviewHeight: 150,
+            
+            // Event Zoom Viewer
             onactivatefile: (file) => {
-                // Ambil URL dari metadata (file lama) atau buat URL blob (file baru)
                 let imageUrl = file.getMetadata('url');
                 if (!imageUrl && file.file) {
                     imageUrl = URL.createObjectURL(file.file);
                 }
-
-                if (imageUrl) {
-                    showImagePopup(imageUrl);
-                }
+                if (imageUrl) showImagePopup(imageUrl);
             }
         };
 
-        // 3. Create Instance
+        // 3. Inisialisasi Instance
+        let pondMasuk, pondSelesai;
         const inputMasuk = document.querySelector('.filepond-masuk');
         const inputSelesai = document.querySelector('.filepond-selesai');
-        
-        pondMasuk = FilePond.create(inputMasuk, baseConfig);
-        pondSelesai = FilePond.create(inputSelesai, baseConfig);
 
-        // 4. Event Listener Tombol Buka Modal
+        if(inputMasuk) pondMasuk = FilePond.create(inputMasuk, baseConfig);
+        if(inputSelesai) pondSelesai = FilePond.create(inputSelesai, baseConfig);
+
+        // 4. Event Listener Modal
         $(document).on('click', '.btn-upload-foto', function() {
             let id = $(this).data('id');
             $('#current-servis-id').val(id);
             $('#modal-upload-foto').removeClass('hidden');
 
-            // Reset FilePond
-            pondMasuk.removeFiles();
-            pondSelesai.removeFiles();
+            if(pondMasuk) {
+                pondMasuk.removeFiles();
+                setupPondServer(pondMasuk, id, 'masuk');
+            }
+            if(pondSelesai) {
+                pondSelesai.removeFiles();
+                setupPondServer(pondSelesai, id, 'selesai');
+            }
 
-            // Setup Server Config (Dynamic URL based on ID)
-            setupPondServer(pondMasuk, id, 'masuk');
-            setupPondServer(pondSelesai, id, 'selesai');
-
-            // Load Existing Images
             loadExistingImages(id);
         });
     });
 
-    // --- Config AJAX Server (Upload, Delete, & LOAD Preview) ---
+    // --- Helper Functions ---
+
     function setupPondServer(pondInstance, id, type) {
         pondInstance.setOptions({
             server: {
-                // 1. Upload File Baru
                 process: {
                     url: `/servis/transaksi-servis/${id}/upload-foto`,
                     method: 'POST',
@@ -1268,92 +1292,52 @@
                         return formData;
                     }
                 },
-                
-                // 2. Hapus File yang BARU di-upload (belum direfresh page)
                 revert: {
                     url: `/servis/transaksi-servis/${id}/delete-foto?type=${type}`,
                     method: 'DELETE',
                     headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
                 },
-
-                // 3. Hapus File LAMA (yang diload dari database)
                 remove: (source, load, error) => {
-                    // source adalah nama file
                     fetch(`/servis/transaksi-servis/${id}/delete-foto?type=${type}`, {
                         method: 'DELETE',
-                        headers: { 
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'text/plain'
-                        },
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'text/plain' },
                         body: source 
-                    }).then(() => {
-                        load(); // Beritahu FilePond penghapusan sukses
-                    }).catch((err) => {
-                        error('Gagal menghapus');
-                    });
+                    }).then(() => load()).catch((err) => error('Gagal menghapus'));
                 },
-
-                // 4. LOAD PREVIEW (Kunci agar gambar muncul, bukan cuma nama)
-                load: (source, load, error, progress, abort, headers) => {
-                    // source disini adalah nama file dari database.
-                    // Kita fetch blob dari url public storage
+                load: (source, load, error) => {
                     let myRequest = new Request(`/storage/servis/${source}`);
-                    
-                    fetch(myRequest).then(function(response) {
-                        response.blob().then(function(myBlob) {
-                            load(myBlob); // Masukkan blob gambar ke FilePond
-                        });
-                    }).catch((err) => {
-                        error('Gagal load gambar');
-                    });
+                    fetch(myRequest).then(res => res.blob()).then(blob => load(blob)).catch(err => error('Gagal load'));
                 }
             }
         });
     }
 
-    // --- Load Existing Images ---
     function loadExistingImages(id) {
         fetch(`/servis/transaksi-servis/${id}/get-foto`)
             .then(res => res.json())
             .then(data => {
-                if(data.masuk) {
-                    pondMasuk.files = data.masuk;
-                }
-                if(data.selesai) {
-                    pondSelesai.files = data.selesai;
-                }
+                console.log(data);
+                
+                if(data.masuk && pondMasuk) pondMasuk.files = data.masuk;
+                if(data.selesai && pondSelesai) pondSelesai.files = data.selesai;
             })
             .catch(err => console.error("Gagal load foto", err));
     }
 
-    // --- Fungsi Zoom Gambar (Viewer.js) ---
     function showImagePopup(imageUrl) {
-        // Buat elemen gambar temporary hidden
         const image = new Image();
         image.src = imageUrl;
-        
-        // Inisialisasi Viewer.js
-        const viewer = new Viewer(image, {
-            hidden: function () {
-                viewer.destroy(); // Hapus instance setelah ditutup
-            },
-            toolbar: {
-                zoomIn: 1,
-                zoomOut: 1,
-                oneToOne: 1,
-                reset: 1,
-                rotateLeft: 1,
-                rotateRight: 1,
-                flipHorizontal: 1,
-                flipVertical: 1,
-            },
-        });
-        
-        // Tampilkan
-        viewer.show();
+        if (typeof Viewer !== 'undefined') {
+            const viewer = new Viewer(image, {
+                hidden: function () { viewer.destroy(); },
+                toolbar: { zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1, rotateLeft: 1, rotateRight: 1, flipHorizontal: 1, flipVertical: 1 },
+            });
+            viewer.show();
+        } else {
+            window.open(imageUrl, '_blank');
+        }
     }
 
-    // --- Tutup Modal ---
     function closeModalFoto() {
         $('#modal-upload-foto').addClass('hidden');
     }
