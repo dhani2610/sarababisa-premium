@@ -1194,11 +1194,21 @@
         </div>
     </div>
 </div>
+<link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+<link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.min.js"></script>
+<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 <script>
     // 1. Register Plugin
     FilePond.registerPlugin(
-        FilePondPluginImagePreview,
-        FilePondPluginFileValidateType
+        FilePondPluginFileValidateType,
+        FilePondPluginImageResize,
+        FilePondPluginImageTransform,
+        FilePondPluginImagePreview
     );
 
     let pondMasuk, pondSelesai;
@@ -1209,22 +1219,35 @@
         // 2. Config Dasar FilePond
         const baseConfig = {
             allowMultiple: true,
-            acceptedFileTypes: ['image/*'],
+            acceptedFileTypes: ['image/jpeg', 'image/png', 'image/webp'], // Batasi tipe file agar transform jalan
             labelIdle: 'Drag & Drop gambar atau <span class="filepond--label-action">Cari</span>',
             credits: false,
-            imagePreviewHeight: 150, // Tinggi preview lebih besar
             
-            // FITUR ZOOM: Dipanggil saat user klik gambar di FilePond
+            // --- KONFIGURASI RESIZE (DIMENSI) ---
+            allowImageResize: true,
+            imageResizeTargetWidth: 1280,
+            imageResizeTargetHeight: 1280,
+            imageResizeMode: 'contain', 
+            imageResizeUpscale: false,
+
+            // --- KONFIGURASI TRANSFORM (KOMPRESI) ---
+            allowImageTransform: true,
+            imageTransformOutputQuality: 70, // Turunkan sedikit ke 70 agar size lebih kecil
+            imageTransformOutputMimeType: 'image/jpeg', // Paksa convert ke JPEG (lebih kecil dari PNG)
+            
+            // Fix untuk orientasi foto HP (EXIF data)
+            imageTransformOutputStripImageHead: false, 
+
+            // Preview
+            imagePreviewHeight: 150,
+            
+            // Event Zoom Viewer
             onactivatefile: (file) => {
-                // Ambil URL dari metadata (file lama) atau buat URL blob (file baru)
                 let imageUrl = file.getMetadata('url');
                 if (!imageUrl && file.file) {
                     imageUrl = URL.createObjectURL(file.file);
                 }
-
-                if (imageUrl) {
-                    showImagePopup(imageUrl);
-                }
+                if (imageUrl) showImagePopup(imageUrl);
             }
         };
 
