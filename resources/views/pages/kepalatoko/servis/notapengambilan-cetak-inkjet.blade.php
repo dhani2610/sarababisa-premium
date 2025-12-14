@@ -554,6 +554,8 @@
                 @endphp
                 <td rowspan="2" class="text-justify" style="font-style: italic; padding-right: 30px;">
                     {!! $terms->description !!}
+                    <br><strong>No. Rekening : {{ $users->rekening }} {{ $users->bank }} An.
+                            {{ $users->pemilik_rekening }} </strong>
                     @foreach ($banks as $index => $bank)
                         <br><strong>No. Rekening : {{ $bank['rekening'] }}, {{ $bank['bank'] }} An.
                             {{ $bank['pemilik'] }} </strong>
