@@ -41,12 +41,12 @@ class ProdukController extends Controller
             // Eager load relationships agar performa cepat
             if (empty($idCat)) {
                 $query = Product::where('cabang_id', $cabangId)
-                    ->with(['capacity', 'category'])
+                    ->with(['capacity', 'category','model'])
                     ->latest();
             }else{
                 $query = Product::where('cabang_id', $cabangId)
                     ->where('categories_id', $idCat)
-                    ->with(['capacity', 'category'])
+                    ->with(['capacity', 'category','model'])
                     ->latest();
             }
 

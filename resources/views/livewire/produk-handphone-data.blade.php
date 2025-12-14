@@ -17,7 +17,7 @@
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Masukkan nama produk" />
+            {{-- <x-search-form placeholder="Masukkan nama produk" /> --}}
 
             <!-- Wrapper Alpine -->
             <div x-data="{ modalTambahStok: false }">
@@ -354,14 +354,14 @@
 
         <!-- Right side -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-            <div>
+            {{-- <div>
                 <select wire:model="paginate" id="" class="form-select">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                 </select>
-            </div>
+            </div> --}}
             <!-- Print button -->
             <div class="relative inline-flex" x-data="{ modalOpen: false }">
                 <button
