@@ -70,6 +70,9 @@ public function index(Request $request, $id)
         $data['kepala_toko_setting'] = User::where('cabang_id',$id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         // dd($data['kepala_toko_setting']);
     }
+    if (empty($data['kepala_toko_setting'])){
+        return redirect()->route('portal.branch',1);
+    }
     // dd($data['kepala_toko_setting']);
 
     $data['pelanggan'] = Customer::where('cabang_id', $id)->count();
