@@ -115,23 +115,13 @@
     <script>
         $(document).ready(function() {
             var table = $('#jenis-barang-table').DataTable({
-                processing: true,
-                serverSide: true,
+                processing: false,
+                serverSide: false,
                 ajax: "{{ route('master-jenis-barang.data') }}",
                 columns: [
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
-                    
-                    // Kolom No. Urut (Client Side Calculation)
-                    { 
-                        data: null, 
-                        sortable: false,
-                        orderable: false,
-                        searchable: false,
-                        render: function (data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        }
-                    },
-
+              
+                    { data: 'id', name: 'id' },
                     { data: 'name', name: 'name' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                 ],
