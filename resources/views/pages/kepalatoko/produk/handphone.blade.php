@@ -94,15 +94,18 @@
             var table = $('#produk-table').DataTable({
                 processing: false,
                 serverSide: false,
-                ajax: "{{ route('produk-item.data') }}?cat=1",
                 columns: [
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
                     {
-                                data: 'DT_RowIndex',
-                                orderable: false,
-                                searchable: false
-                            },
-                    { data: 'created_at', name: 'created_at' },
+                        data: null,
+                        sortable: false,
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row, meta) {
+                            // meta.row adalah index baris internal (mulai dari 0)
+                            return meta.row + 1;
+                        }
+                    },
                     { data: 'nama_produk', name: 'product_name' },
                     { data: 'product_code', name: 'product_code' },
                     { data: 'nomor_seri', name: 'nomor_seri' },
@@ -127,6 +130,33 @@
                 },
                 drawCallback: function() { attachCheckboxHandlers(); }
             });
+
+            // --- custom pagination load bertahap ---
+            let batchSize = 100;
+            let offset = 0;
+            let loading = false;
+
+            function loadBatch() {
+                if (loading) return;
+                loading = true;
+
+                $.ajax({
+                    url: '{{ route('produk-item.data') }}?cat=1&offset=' + offset + '&limit=' + batchSize,
+                    success: function(response) {
+                        if (response.data.length > 0) {
+                            table.rows.add(response.data).draw(false); // tambahkan data batch
+                            offset += batchSize;
+                            loading = false;
+                            setTimeout(loadBatch, 100); // lanjut batch berikutnya
+                        } else {
+                            console.log('Semua data sudah dimuat');
+                        }
+                    }
+                });
+            }
+
+            // mulai load pertama
+            loadBatch();
 
            // 1. Fungsi Buka Modal & Tampilkan Preview Lama
                 window.openFotoModal = function(id, currentFotoUrl) {

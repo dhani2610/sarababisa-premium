@@ -33,24 +33,35 @@ class ProdukController extends Controller
 
     public function getData(Request $request)
     {
-            $idCat = $request->cat;
-            $cabangId = getCabangId();
-            $userRole = Auth::user()->role;
-            $tokoSetting = StoreSetting::where('cabang_id', $cabangId)->first();
 
-            // Eager load relationships agar performa cepat
-            if (empty($idCat)) {
-                $query = Product::where('cabang_id', $cabangId)
-                    ->with(['capacity', 'category','model'])
-                    ->latest();
-            }else{
-                $query = Product::where('cabang_id', $cabangId)
-                    ->where('categories_id', $idCat)
-                    ->with(['capacity', 'category','model'])
-                    ->latest();
-            }
+        $limit = $request->get('limit', 200);
+        $offset = $request->get('offset', 0);
 
-            return DataTables::of($query)
+        $idCat = $request->cat;
+        $cabangId = getCabangId();
+        $userRole = Auth::user()->role;
+        $tokoSetting = StoreSetting::where('cabang_id', $cabangId)->first();
+
+        // Eager load relationships agar performa cepat
+        if (empty($idCat)) {
+            $query = Product::where('cabang_id', $cabangId)
+                ->with(['capacity', 'category','model'])
+                ->latest()
+                ->skip($offset)
+                ->take($limit)
+                ->get();
+
+        }else{
+            $query = Product::where('cabang_id', $cabangId)
+                ->where('categories_id', $idCat)
+                ->with(['capacity', 'category','model'])
+                ->latest()
+                ->skip($offset)
+                ->take($limit)
+                ->get();
+        }
+
+        return DataTables::of($query)
                 ->addIndexColumn()
                 // Kolom Checkbox
                 ->addColumn('checkbox', function ($row) {
@@ -153,7 +164,7 @@ class ProdukController extends Controller
                                 <rect x="7" y="13" width="10" height="8" rx="2" />
                             </svg>
                         </button>
-                      </a>';
+                        </a>';
 
             // Tombol Edit & Delete (Cek Hak Akses)
             if ((int) ($tokoSetting->is_edit_produk ?? 0) == 1 || $userRole == 'Kepala Toko') {
@@ -169,7 +180,7 @@ class ProdukController extends Controller
                                     <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
                                 </svg>
                             </button>
-                          </a>';
+                            </a>';
 
                 // Tombol Delete (Konfirmasi Biasa / Browser Native)
                         $deleteUrl = route('item.destroy', $row->id);
@@ -193,10 +204,10 @@ class ProdukController extends Controller
             $html .= '</div>';
             return $html;
         })
-                // Definisikan kolom yang mengandung HTML agar tidak di-escape
-                ->rawColumns(['checkbox', 'nama_produk', 'category_name', 'product_code', 'keterangan', 'stok', 'stok_minimal', 'harga_modal', 'harga_jual_toko', 'harga_jual', 'garansi', 'is_portal', 'aksi'])
-                ->make(true);
-        }
+            // Definisikan kolom yang mengandung HTML agar tidak di-escape
+            ->rawColumns(['checkbox', 'nama_produk', 'category_name', 'product_code', 'keterangan', 'stok', 'stok_minimal', 'harga_modal', 'harga_jual_toko', 'harga_jual', 'garansi', 'is_portal', 'aksi'])
+            ->make(true);
+    }
 
        public function uploadFotoAjax(Request $request)
         {
