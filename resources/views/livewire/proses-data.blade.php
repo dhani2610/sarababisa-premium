@@ -1204,6 +1204,8 @@
 <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 
 <script>
+    let pondMasuk, pondSelesai;
+
     document.addEventListener('DOMContentLoaded', function() {
         
         // 1. Register Plugin (Urutan Sangat Penting: Validate -> Resize -> Transform -> Preview)
