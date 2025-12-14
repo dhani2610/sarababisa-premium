@@ -148,8 +148,7 @@
                                     <ul class="text-sm space-y-2 text-slate-600">
                                         <li class="flex justify-between border-b border-slate-100 pb-1"><span>IMEI/SN:</span> <span class="font-mono text-slate-800">{{ $item->imei ?? '-' }}</span></li>
                                         <li class="flex justify-between border-b border-slate-100 pb-1"><span>Kelengkapan:</span> <span class="text-slate-800 text-right">{{ $item->kelengkapan ?? 'Unit Only' }}</span></li>
-                                        <li class="flex justify-between border-b border-slate-100 pb-1"><span>Kondisi Awal (QC):</span> <span class="text-slate-800">{{ $item->qc_masuk ?? '-' }}</span></li>
-                                        <li class="flex justify-between border-b border-slate-100 pb-1"><span>Kondisi Akhir (QC):</span> <span class="text-slate-800">{{ $item->qc_keluar ?? '-' }}</span></li>
+                                        <li class="flex justify-between border-b border-slate-100 pb-1"><span>Pengecekan Fungsi (QC):</span> <span class="text-slate-800"><a target="_blank" href="{{ route('kepalatoko-cetak-qc', $item->id) }}">{{ route('kepalatoko-cetak-qc', $item->id) }}</a></span></li>
                                         <li class="flex justify-between pb-1"><span>Teknisi:</span> <span class="text-slate-800">{{ $item->user->name ?? '-' }}</span></li>
                                     </ul>
 
@@ -230,10 +229,10 @@
                                     Dokumentasi QC
                                 </h4>
 
-                                <div class="flex justify-between text-slate-600 mt-2 mb-2">
+                                {{-- <div class="flex justify-between text-slate-600 mt-2 mb-2">
                                     <span>Link QC</span>
                                     <span> <a target="_blank" href="{{ route('kepalatoko-cetak-qc', $item->id) }}">{{ route('kepalatoko-cetak-qc', $item->id) }}</a> </span>
-                                </div>
+                                </div> --}}
 
                                 <div x-show="loading" class="text-center py-4 text-slate-500 text-sm animate-pulse">
                                     Mengambil data foto...
