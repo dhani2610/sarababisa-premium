@@ -17,7 +17,7 @@
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Masukkan nama produk" />
+            {{-- <x-search-form placeholder="Masukkan nama produk" /> --}}
 
             <!-- Wrapper Alpine -->
             <div x-data="{ modalTambahStok: false }">
@@ -869,14 +869,14 @@
                     </div>
                 </div>
             </div>
-            <div>
+            {{-- <div>
                 <select wire:model="paginate" id="" class="form-select">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                 </select>
-            </div>
+            </div> --}}
         </div>
     </div>
 
@@ -995,7 +995,7 @@
                     </div>
                 </div>
 
-                <table class="table-auto w-full">
+                <table id="produk-table" class="table-auto w-full">
                     <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
@@ -1058,7 +1058,7 @@
                     <!-- Table body -->
                     <tbody class="text-sm divide-y divide-slate-200">
                         <!-- Row -->
-                        @php
+                        {{-- @php
                             $i = 1
                         @endphp
                         @foreach($products as $item)
@@ -1266,7 +1266,7 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @endforeach --}}
                     </tbody>
                 </table>
             </div>
@@ -1351,7 +1351,7 @@
     </script>
 
     <!-- Pagination -->
-    <div class="mt-8">
+    {{-- <div class="mt-8">
         {{ $products->links() }}
-    </div>
+    </div> --}}
 </div>

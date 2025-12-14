@@ -32,6 +32,7 @@ class Product extends Model
         'capacities_id',
         'created_at',
         'cabang_id',
+        'foto',
     ];
 
     protected $appends = [

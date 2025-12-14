@@ -456,10 +456,12 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::resource('produk/sub-kategori', KepalaTokoSubKategoriController::class);
     Route::resource('produk/supplier', KepalaTokoSupplierController::class);
 
-
     Route::get('produk/item/data', [ProdukController::class, 'getData'])->name('produk-item.data');
-    
+    Route::post('produk/item/upload-foto', [ProdukController::class, 'uploadFotoAjax'])->name('produk-item.upload-foto');
     // Route Bulk Actions
+    Route::post('produk/item/delete-batch', [ProdukController::class, 'deleteBatch'])->name('produk-item.delete-batch');
+    Route::post('produk/item/update-portal', [ProdukController::class, 'updatePortal'])->name('produk-item.update-portal');
+
     Route::resource('produk/item', KepalaTokoProdukController::class);
     Route::post('/products/update-portal', [KepalaTokoProdukController::class, 'updatePortal'])->name('products.updatePortal');
     Route::get('top-produk', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk');

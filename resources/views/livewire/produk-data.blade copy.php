@@ -1274,6 +1274,13 @@
     </div>
 
     <script>
+        function openLivewireFotoModal(id) {
+            @this.openFotoModal(id); // Memanggil method Livewire dari JS
+        }
+        
+        function openDeleteModal(id) {
+            window.dispatchEvent(new CustomEvent('open-delete-modal', { detail: id })); // Trigger Alpine Modal
+        }
         document.addEventListener('alpine:init', () => {
             Alpine.data('handleSelect', () => ({
                 selectall: false,
