@@ -333,6 +333,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::delete('/accounts/delete', [KepalaTokoAkunController::class, 'deleteSelected']);
     Route::post('/servis/transaksi-servis-langsung', [KepalaTokoTransaksiServisLangsungController::class, 'store'])->name('servis-langsung');
     Route::resource('servis/tindakan-servis', KepalaTokoTindakanServisController::class);
+    
+    Route::get('pelanggan/data', [KepalaTokoPelangganController::class, 'getData'])->name('pelanggan.data');
     Route::resource('pelanggan', KepalaTokoPelangganController::class);
     Route::post('pelanggan-broadcast', [KepalaTokoPelangganController::class,'broadcast'])->name('pelanggan.broadcast');
 
