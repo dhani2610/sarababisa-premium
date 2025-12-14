@@ -32,15 +32,23 @@ class ProdukController extends Controller
     }
 
     public function getData(Request $request)
-        {
+    {
+            $idCat = $request->cat;
             $cabangId = getCabangId();
             $userRole = Auth::user()->role;
             $tokoSetting = StoreSetting::where('cabang_id', $cabangId)->first();
 
             // Eager load relationships agar performa cepat
-            $query = Product::where('cabang_id', $cabangId)
-                ->with(['capacity', 'category'])
-                ->latest();
+            if (empty($idCat)) {
+                $query = Product::where('cabang_id', $cabangId)
+                    ->with(['capacity', 'category'])
+                    ->latest();
+            }else{
+                $query = Product::where('cabang_id', $cabangId)
+                    ->where('categories_id', $idCat)
+                    ->with(['capacity', 'category'])
+                    ->latest();
+            }
 
             return DataTables::of($query)
                 ->addIndexColumn()
