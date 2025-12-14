@@ -237,7 +237,7 @@ Route::delete('/categories/delete', [KepalaTokoKategoriController::class, 'delet
 Route::delete('/sub-categories/delete', [KepalaTokoSubKategoriController::class, 'deleteSelected']);
 Route::delete('/suppliers/delete', [KepalaTokoSupplierController::class, 'deleteSelected']);
 Route::delete('/products/delete', [KepalaTokoProdukController::class, 'deleteSelected']);
-Route::delete('/types/delete', [KepalaTokoMasterJenisBarangController::class, 'deleteSelected']);
+Route::delete('/types/delete', [KepalaTokoMasterJenisBarangController::class, 'deleteSelected'])->name('master-jenis-barang.deleteSelected');
 Route::delete('/brands/delete', [KepalaTokoMasterMerekController::class, 'deleteSelected']);
 Route::delete('/model-series/delete', [KepalaTokoMasterModelSeriController::class, 'deleteSelected']);
 Route::delete('/capacities/delete', [KepalaTokoMasterKapasitasController::class, 'deleteSelected']);
@@ -320,6 +320,12 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::get('/json-data-target', [DataTargetController::class, 'getDataTarget'])->name('json_data_target');
     Route::get('/json-data-target-persen', [DataTargetPersenController::class, 'getDataTargetPersen'])->name('json_data_target-persen');
     Route::get('/json-data-pengeluaran', [DataPengeluaranController::class, 'getDataPengeluaran'])->name('pengeluaran');
+
+
+    Route::get('/akun/data', [KepalaTokoAkunController::class, 'getData'])->name('akun.data');
+    
+    // Route Bulk Delete
+    Route::post('/akun/delete-batch', [KepalaTokoAkunController::class, 'deleteBatch'])->name('akun.delete-batch');
     Route::get('/akun', [KepalaTokoAkunController::class, 'index'])->name('akun');
     Route::get('/akun/setting', [KepalaTokoAkunController::class, 'setting'])->name('setting');
     Route::post('/akun/setting/update-exp-date', [KepalaTokoAkunController::class, 'updateExpDate'])
@@ -372,10 +378,25 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::get('servis/log-servis', [KepalaTokoLogServisController::class, 'index'])->name('log-servis');
     Route::post('servis/log-servis-destroy/{model}', [KepalaTokoLogServisController::class, 'destroy'])->name('log-servis-destroy');
 
+    Route::get('master-jenis-barang/data', [KepalaTokoMasterJenisBarangController::class, 'getData'])->name('master-jenis-barang.data');
     Route::resource('master/master-jenis-barang', KepalaTokoMasterJenisBarangController::class);
+
+
+    Route::get('master-warna/data', [KepalaTokoMasterWarnaController::class, 'getData'])->name('master-warna.data');
+    
+    Route::post('master-warna/delete-batch', [KepalaTokoMasterWarnaController::class, 'deleteBatch'])->name('master-warna.delete-batch');
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
+
+
+    Route::get('master-tipe-os/data', [TipeOsController::class, 'getData'])->name('master-tipe-os.data');
+    Route::post('master-tipe-os/delete-batch', [TipeOsController::class, 'deleteBatch'])->name('master-tipe-os.delete-batch');
     Route::resource('master/master-tipe-os', TipeOsController::class);
     Route::resource('master/master-gallery', GalleryController::class);
+
+
+    Route::get('master-cabang/data', [CabangController::class, 'getData'])->name('master-cabang.data');
+    
+    Route::post('master-cabang/delete-batch', [CabangController::class, 'deleteBatch'])->name('master-cabang.delete-batch');
     Route::resource('master/master-cabang', CabangController::class);
 
 
@@ -398,8 +419,17 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::post('shift/delete-selected', [\App\Http\Controllers\KepalaToko\ShiftController::class, 'deleteSelected'])->name('shift.deleteSelected');
 
 
+    Route::get('master-merek/data', [KepalaTokoMasterMerekController::class, 'getData'])->name('master-merek.data');
+    Route::post('master-merek/delete-batch', [KepalaTokoMasterMerekController::class, 'deleteBatch'])->name('master-merek.delete-batch');
     Route::resource('master/master-merek', KepalaTokoMasterMerekController::class);
+
+
+    Route::get('master-kapasitas/data', [KepalaTokoMasterKapasitasController::class, 'getData'])->name('master-kapasitas.data');
+    Route::post('master-kapasitas/delete-batch', [KepalaTokoMasterKapasitasController::class, 'deleteBatch'])->name('master-kapasitas.delete-batch');
     Route::resource('master/master-kapasitas', KepalaTokoMasterKapasitasController::class);
+
+    Route::get('master-model-seri/data', [KepalaTokoMasterModelSeriController::class, 'getData'])->name('master-model-seri.data');
+    Route::post('master-model-seri/delete-batch', [KepalaTokoMasterModelSeriController::class, 'deleteBatch'])->name('master-model-seri.delete-batch');
     Route::resource('master/master-model-seri', KepalaTokoMasterModelSeriController::class);
     Route::resource('manajemen/anggaran', KepalaTokoAnggaranController::class);
     Route::resource('target', KepalaTokoTargetController::class);
@@ -425,6 +455,11 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::resource('produk/kategori', KepalaTokoKategoriController::class);
     Route::resource('produk/sub-kategori', KepalaTokoSubKategoriController::class);
     Route::resource('produk/supplier', KepalaTokoSupplierController::class);
+
+
+    Route::get('produk/item/data', [ProdukController::class, 'getData'])->name('produk-item.data');
+    
+    // Route Bulk Actions
     Route::resource('produk/item', KepalaTokoProdukController::class);
     Route::post('/products/update-portal', [KepalaTokoProdukController::class, 'updatePortal'])->name('products.updatePortal');
     Route::get('top-produk', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk');

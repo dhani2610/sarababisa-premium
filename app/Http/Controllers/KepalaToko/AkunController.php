@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\KepalaToko\UserRequest;
 use App\Models\Shift;
-
+use Yajra\DataTables\Facades\DataTables;
 class AkunController extends Controller
 {
     public function index()
@@ -41,13 +41,187 @@ class AkunController extends Controller
 
         $shift = Shift::where('cabang_id', $cabangId)->get();
 
+        $count = User::whereNull('deleted_at')
+            ->where('cabang_id', $cabangId)
+            ->count();
         return view('pages/kepalatoko/akun', compact(
             'users',
             'users_count',
+            'count',
             'types',
             'workers',
             'shift'
         ));
+    }
+
+
+    public function getData(Request $request)
+    {
+        $cabangId = getCabangId();
+
+        // Query Dasar (Eager load shift dan type untuk performa)
+        $query = User::whereNull('deleted_at')
+            ->where('cabang_id', $cabangId)
+            ->with(['shift', 'type']) 
+            ->latest();
+
+        // Sembunyikan Super Admin (ID 1) jika bukan di cabang pusat
+        if ($cabangId != 1) {
+            $query->where('id', '!=', 1);
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            
+            // 1. Checkbox
+            ->addColumn('checkbox', function ($row) {
+                if ($row->id == Auth::id() || $row->id == 1) return ''; // Jangan hapus diri sendiri/admin
+                return '<input type="checkbox" class="table-item form-checkbox" value="' . $row->id . '" />';
+            })
+
+            // 2. Cabang (Menggunakan helper getCabangName)
+            ->addColumn('cabang_name', function ($row) {
+                return getCabangName($row->cabang_id);
+            })
+
+            // 3. Nama
+            ->editColumn('name', function ($row) {
+                return '<div class="font-medium">' . e($row->name) . '</div>';
+            })
+
+            // 4. Username
+            ->editColumn('username', function ($row) {
+                return '<div class="font-medium">' . e($row->username) . '</div>';
+            })
+
+            // 5. Bagian Teknisi
+            ->addColumn('bagian_teknisi', function ($row) {
+                return '<div class="font-medium">' . ($row->bagian_teknisi ?? '-') . '</div>';
+            })
+
+            // 6. NIK
+            ->addColumn('nik', function ($row) {
+                return '<div class="font-medium">' . e($row->nik) . '</div>';
+            })
+
+            // 7. Alamat
+            ->addColumn('alamat', function ($row) {
+                return '<div class="font-medium">' . e($row->alamat) . '</div>';
+            })
+
+            // 8. HP
+            ->addColumn('nomor_hp', function ($row) {
+                return '<div class="font-medium">' . e($row->nomor_hp) . '</div>';
+            })
+
+            // 9. Hak Akses (Role + Tipe Barang jika ada)
+            ->addColumn('hak_akses', function ($row) {
+                $text = e($row->role);
+                if ($row->types_id != null && $row->type) {
+                    $text .= ' ' . e($row->type->name);
+                }
+                return '<div class="font-medium text-slate-800">' . $text . '</div>';
+            })
+
+            // 10. Persen
+            ->addColumn('persen', function ($row) {
+                return '<div class="font-medium text-slate-800">' . e($row->persen) . '</div>';
+            })
+
+            // 11. PDF Investor
+            ->addColumn('pdf_investor', function ($row) {
+                if ($row->role == 'Investor' && $row->pdf_investor) {
+                    $url = asset('storage/' . $row->pdf_investor);
+                    return '<p class="text-sm mt-1">📎 
+                                <a href="' . $url . '" target="_blank" class="text-indigo-500 underline">Lihat PDF</a>
+                            </p>';
+                }
+                return '';
+            })
+
+            // 12. Shift
+            ->addColumn('shift_name', function ($row) {
+                return '<div class="font-medium">' . ($row->shift ? e($row->shift->nama_shift) : '-') . '</div>';
+            })
+
+            // 13. Aksi
+            ->addColumn('aksi', function ($row) {
+                // Cegah edit/hapus Super Admin jika bukan Super Admin
+                if ($row->id == 1 && Auth::id() != 1) return '';
+
+                $editUrl = route('akun-edit', $row->id); // Sesuaikan nama route edit Anda
+                $deleteUrl = route('akun-destroy', $row->id); // Sesuaikan nama route destroy Anda
+                $csrf = csrf_field();
+                $method = method_field('DELETE');
+
+                $deleteBtn = '';
+                // Tombol delete hanya muncul jika bukan diri sendiri
+                if ($row->id != Auth::id()) {
+                    $deleteBtn = '
+                        <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Yakin ingin menghapus akun ini?\');">
+                            ' . $csrf . $method . '
+                            <button type="submit" class="text-rose-500 hover:text-rose-600 rounded-full">
+                                <span class="sr-only">Delete</span>
+                                <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                                    <path d="M13 15h2v6h-2zM17 15h2v6h-2z" />
+                                    <path d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z" />
+                                </svg>
+                            </button>
+                        </form>
+                    ';
+                }
+
+                return '
+                    <div class="flex space-x-1">
+                        <a href="' . $editUrl . '">
+                            <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                                <span class="sr-only">Edit</span>
+                                <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                                    <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
+                                </svg>
+                            </button>
+                        </a>
+                        ' . $deleteBtn . '
+                    </div>
+                ';
+            })
+            ->rawColumns(['checkbox', 'name', 'username', 'bagian_teknisi', 'nik', 'alamat', 'nomor_hp', 'hak_akses', 'persen', 'pdf_investor', 'shift_name', 'aksi'])
+            ->make(true);
+    }
+
+    public function deleteBatch(Request $request)
+    {
+        $selectedIds = $request->input('ids');
+
+        if (empty($selectedIds)) {
+            return response()->json(['message' => 'Tidak ada data yang dipilih.'], 400);
+        }
+
+        // Cek Relasi
+        $hasRelation = User::whereIn('id', $selectedIds)
+            ->where(function ($query) {
+                $query->whereHas('relasiService')
+                    ->orWhereHas('relasiSale')
+                    ->orWhereHas('expense')
+                    ->orWhereHas('salary');
+            })
+            ->exists();
+
+        if ($hasRelation) {
+            return response()->json(['message' => 'Gagal: Salah satu akun memiliki riwayat transaksi/gaji.'], 422);
+        }
+
+        // Soft Delete Manual
+        $users = User::whereIn('id', $selectedIds)->get();
+        foreach ($users as $user) {
+            // Jangan hapus diri sendiri atau Admin Pusat
+            if ($user->id == Auth::id() || $user->id == 1) continue;
+
+            $user->deleted_at = now();
+            $user->save();
+        }
+
+        return response()->json(['message' => 'Data Akun berhasil dihapus.']);
     }
 
 
