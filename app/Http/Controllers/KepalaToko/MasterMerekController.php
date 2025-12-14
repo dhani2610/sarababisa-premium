@@ -28,7 +28,7 @@ class MasterMerekController extends Controller
     // Method DataTables AJAX
     public function getData(Request $request)
     {
-        $query = Brand::latest();
+        $query = Brand::where('cabang_id',getCabangId())->latest();
 
         return DataTables::of($query)
             // Kolom Checkbox

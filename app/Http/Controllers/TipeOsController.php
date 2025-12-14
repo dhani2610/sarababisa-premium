@@ -20,7 +20,7 @@ class TipeOsController extends Controller
 
     public function getData(Request $request)
     {
-        $query = TipeOs::latest();
+        $query = TipeOs::where('cabang_id',getCabangId())->latest();
 
         return DataTables::of($query)
             // Kolom Checkbox

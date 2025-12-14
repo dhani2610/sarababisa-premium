@@ -27,7 +27,7 @@ class MasterModelSeriController extends Controller
     public function getData(Request $request)
     {
         // Eager load relasi brand agar query lebih efisien
-        $query = ModelSerie::with('brand')->latest();
+        $query = ModelSerie::with('brand')->where('cabang_id',getCabangId())->latest();
 
         return DataTables::of($query)
             // Kolom Checkbox

@@ -23,7 +23,7 @@ class MasterWarnaController extends Controller
 
     public function getData(Request $request)
     {
-        $query = Color::latest();
+        $query = Color::where('cabang_id',getCabangId())->latest();
 
         return DataTables::of($query)
             // Kolom Checkbox

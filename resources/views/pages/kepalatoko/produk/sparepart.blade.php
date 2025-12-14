@@ -129,7 +129,7 @@
 
 
              // --- custom pagination load bertahap ---
-            let batchSize = 100;
+            let batchSize = 50;
             let offset = 0;
             let loading = false;
 
