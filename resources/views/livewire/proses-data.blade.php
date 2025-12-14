@@ -1194,101 +1194,91 @@
         </div>
     </div>
 </div>
+<link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+<link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
 
-<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
-<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
-<script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
-<script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.js"></script>
-<script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.min.js"></script>
+<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 
 <script>
-    // 1. Register Plugin
-    FilePond.registerPlugin(
-        FilePondPluginImagePreview,
-        FilePondPluginFileValidateType
-    );
-
-    let pondMasuk, pondSelesai;
-    let viewer; 
-
     document.addEventListener('DOMContentLoaded', function() {
         
-        // Cek apakah library kompresi sudah jalan
-        if (typeof imageCompression === 'undefined') {
-            console.error("ERROR: Library browser-image-compression belum terload! Cek koneksi internet atau script tag.");
-        }
+        // 1. Register Plugin (Urutan Sangat Penting: Validate -> Resize -> Transform -> Preview)
+        FilePond.registerPlugin(
+            FilePondPluginFileValidateType,
+            FilePondPluginImageResize,
+            FilePondPluginImageTransform,
+            FilePondPluginImagePreview
+        );
 
-        // 3. Config Dasar FilePond dengan Kompresi Otomatis
+        // 2. Konfigurasi Global FilePond
         const baseConfig = {
             allowMultiple: true,
-            acceptedFileTypes: ['image/*'],
+            acceptedFileTypes: ['image/jpeg', 'image/png', 'image/webp'], // Batasi tipe file agar transform jalan
             labelIdle: 'Drag & Drop gambar atau <span class="filepond--label-action">Cari</span>',
             credits: false,
-            imagePreviewHeight: 150,
-
-            // --- KONFIGURASI KOMPRESI OTOMATIS OLEH FILEPOND ---
             
-            // 1. Resize Gambar jika terlalu besar (Misal lebar/tinggi > 1280px)
+            // --- KONFIGURASI RESIZE (DIMENSI) ---
             allowImageResize: true,
             imageResizeTargetWidth: 1280,
             imageResizeTargetHeight: 1280,
-            imageResizeMode: 'contain', // Menjaga aspek rasio, tidak crop
-            imageResizeUpscale: false,  // Jangan perbesar gambar kecil
+            imageResizeMode: 'contain', 
+            imageResizeUpscale: false,
 
-            // 2. Transform/Kompresi (Wajib 'allowImageTransform: true')
+            // --- KONFIGURASI TRANSFORM (KOMPRESI) ---
             allowImageTransform: true,
-            // Paksa output jadi JPEG (agar bisa dikompres quality-nya)
-            imageTransformOutputMimeType: 'image/jpeg', 
-            // Kualitas kompresi 0-100 (80 sudah sangat cukup & file jadi kecil)
-            imageTransformOutputQuality: 80, 
-
-            // Matikan strip metadata jika ingin orientasi foto HP tetap benar (opsional)
-            imageTransformOutputStripImageHead: false, 
+            imageTransformOutputQuality: 70, // Turunkan sedikit ke 70 agar size lebih kecil
+            imageTransformOutputMimeType: 'image/jpeg', // Paksa convert ke JPEG (lebih kecil dari PNG)
             
-            // ---------------------------------------------------
+            // Fix untuk orientasi foto HP (EXIF data)
+            imageTransformOutputStripImageHead: false, 
 
-            // Event Zoom (Viewer.js)
+            // Preview
+            imagePreviewHeight: 150,
+            
+            // Event Zoom Viewer
             onactivatefile: (file) => {
                 let imageUrl = file.getMetadata('url');
                 if (!imageUrl && file.file) {
                     imageUrl = URL.createObjectURL(file.file);
                 }
-                if (imageUrl) {
-                    showImagePopup(imageUrl);
-                }
+                if (imageUrl) showImagePopup(imageUrl);
             }
         };
 
-        // 3. Create Instance
+        // 3. Inisialisasi Instance
+        let pondMasuk, pondSelesai;
         const inputMasuk = document.querySelector('.filepond-masuk');
         const inputSelesai = document.querySelector('.filepond-selesai');
-        
-        // Cek element ada atau tidak sebelum create
+
         if(inputMasuk) pondMasuk = FilePond.create(inputMasuk, baseConfig);
         if(inputSelesai) pondSelesai = FilePond.create(inputSelesai, baseConfig);
 
-        // 4. Event Listener Tombol Modal
+        // 4. Event Listener Modal
         $(document).on('click', '.btn-upload-foto', function() {
             let id = $(this).data('id');
             $('#current-servis-id').val(id);
             $('#modal-upload-foto').removeClass('hidden');
 
-            if(pondMasuk) pondMasuk.removeFiles();
-            if(pondSelesai) pondSelesai.removeFiles();
-
-            if(pondMasuk) setupPondServer(pondMasuk, id, 'masuk');
-            if(pondSelesai) setupPondServer(pondSelesai, id, 'selesai');
+            if(pondMasuk) {
+                pondMasuk.removeFiles();
+                setupPondServer(pondMasuk, id, 'masuk');
+            }
+            if(pondSelesai) {
+                pondSelesai.removeFiles();
+                setupPondServer(pondSelesai, id, 'selesai');
+            }
 
             loadExistingImages(id);
         });
     });
 
-    // ... (Fungsi setupPondServer, loadExistingImages, showImagePopup sama seperti sebelumnya) ...
-    // ... Copy paste fungsi-fungsi helper di bawah sini ...
+    // --- Helper Functions ---
 
     function setupPondServer(pondInstance, id, type) {
-       // (Paste kode setupPondServer sebelumnya disini)
-       // Pastikan kode server process/revert/remove/load ada disini
         pondInstance.setOptions({
             server: {
                 process: {
@@ -1333,11 +1323,15 @@
     function showImagePopup(imageUrl) {
         const image = new Image();
         image.src = imageUrl;
-        const viewer = new Viewer(image, {
-            hidden: function () { viewer.destroy(); },
-            toolbar: { zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1, rotateLeft: 1, rotateRight: 1, flipHorizontal: 1, flipVertical: 1 },
-        });
-        viewer.show();
+        if (typeof Viewer !== 'undefined') {
+            const viewer = new Viewer(image, {
+                hidden: function () { viewer.destroy(); },
+                toolbar: { zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1, rotateLeft: 1, rotateRight: 1, flipHorizontal: 1, flipVertical: 1 },
+            });
+            viewer.show();
+        } else {
+            window.open(imageUrl, '_blank');
+        }
     }
 
     function closeModalFoto() {
