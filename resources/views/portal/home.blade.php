@@ -130,13 +130,13 @@
                         <div class="branch-icon">
                             @if ($kepalaToko && $kepalaToko->profile_photo_path)
                                 <img src="{{ asset('storage/' . $kepalaToko->profile_photo_path) }}" 
-                                     alt="{{ $item->nama_toko }}">
+                                     alt="{{ $kepalaToko->nama_toko }}">
                             @else
                                 <i class="bi bi-geo-alt-fill"></i>
                             @endif
                         </div>
                         
-                        <h3 class="branch-title">{{ $item->nama_toko }}</h3>
+                        <h3 class="branch-title">{{ $kepalaToko->nama_toko }}</h3>
                         
                         <span class="btn btn-primary btn-choose">
                             Kunjungi Toko <i class="bi bi-arrow-right ms-1"></i>
