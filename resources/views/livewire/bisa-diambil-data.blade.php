@@ -533,6 +533,7 @@
                                     <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">IN</span>
                                     <label class="block text-sm font-bold text-gray-700">Kondisi Masuk</label>
                                 </div>
+                                <small class="text-rose-500">*Klik lagi untuk menambah foto lainnya (Multi-upload).</small>
                                 <input type="file" class="filepond-masuk" name="file" multiple data-max-file-size="10MB">
                             </div>
 
@@ -541,6 +542,7 @@
                                     <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">OUT</span>
                                     <label class="block text-sm font-bold text-gray-700">Kondisi Selesai</label>
                                 </div>
+                                <small class="text-rose-500">*Klik lagi untuk menambah foto lainnya (Multi-upload).</small>
                                 <input type="file" class="filepond-selesai" name="file" multiple data-max-file-size="10MB">
                             </div>
                         </div>
