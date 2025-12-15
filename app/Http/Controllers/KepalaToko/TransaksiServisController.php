@@ -803,6 +803,60 @@ class TransaksiServisController extends Controller
         return $pdf->setOption('isRemoteEnabled', true)->stream($filename);
     }
 
+    private function convertJsonSignatureToBase64($jsonPola)
+    {
+        // 1. Decode JSON
+        $strokes = json_decode($jsonPola, true);
+
+        if (empty($strokes)) {
+            return null;
+        }
+
+        // 2. Buat Canvas Image (Ukuran sesuaikan dengan canvas signature pad, misal 500x300)
+        // Gunakan ukuran yang cukup besar agar tidak terpotong
+        $width = 500; 
+        $height = 300; 
+        $image = imagecreatetruecolor($width, $height);
+
+        // 3. Set Background Transparan
+        imagesavealpha($image, true);
+        $transparent = imagecolorallocatealpha($image, 0, 0, 0, 127);
+        imagefill($image, 0, 0, $transparent);
+
+        // 4. Set Warna Garis (Hitam)
+        $black = imagecolorallocate($image, 0, 0, 0);
+        
+        // Set ketebalan garis
+        imagesetthickness($image, 3);
+
+        // 5. Loop Koordinat dan Gambar Garis
+        foreach ($strokes as $stroke) {
+            $points = $stroke['points'];
+            $count = count($points);
+            
+            // Perlu minimal 2 titik untuk membuat garis
+            for ($i = 0; $i < $count - 1; $i++) {
+                imageline(
+                    $image, 
+                    $points[$i]['x'], 
+                    $points[$i]['y'], 
+                    $points[$i + 1]['x'], 
+                    $points[$i + 1]['y'], 
+                    $black
+                );
+            }
+        }
+
+        // 6. Output ke Base64
+        ob_start();
+        imagepng($image);
+        $imageData = ob_get_contents();
+        ob_end_clean();
+        imagedestroy($image);
+
+        return 'data:image/png;base64,' . base64_encode($imageData);
+    }
+
     public function cetakinkjet($id)
     {
         $items = ServiceTransaction::with('customer')->findOrFail($id);
@@ -826,6 +880,28 @@ class TransaksiServisController extends Controller
         $namaPelanggan = $items->customer->nama;
         $toko = StoreSetting::where('cabang_id', getCabangId())->first();
 
+        // --- BAGIAN BARU: KONVERSI POLA ---
+        // Cek apakah pola ada isinya dan berupa JSON (bukan URL gambar lama)
+        $polaImage = null;
+        
+        if (!empty($items->pola)) {
+            // Cek sederhana apakah ini JSON koordinat atau sudah base64/url
+            // Kalau JSON biasanya diawali kurung siku '['
+            if (substr(trim($items->pola), 0, 1) === '[') {
+                // Konversi JSON ke Gambar Base64
+                $polaImage = $this->convertJsonSignatureToBase64($items->pola);
+            } else {
+                // Jika data lama (sudah berupa URL/Base64), pakai langsung
+                $polaImage = $items->pola;
+            }
+        }
+        
+        // Jika hasil konversi null atau data kosong, pakai gambar default
+        if (empty($polaImage)) {
+            $polaImage = public_path('images/pola.png'); 
+        }
+        // ----------------------------------
+        // dd($items,$polaImage);
         $pdf = PDF::loadView('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
         // return view('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
             'toko' => $toko,
@@ -833,6 +909,7 @@ class TransaksiServisController extends Controller
             'items' => $items,
             'terms' => $terms,
             'imagePath' => $imagePath,
+            'polaImage' => $polaImage,
         ]);
 
         $filename = 'Nota Terima ' . $invoiceNumber . ' ' . '(' . $namaPelanggan . ')' . '.pdf';
