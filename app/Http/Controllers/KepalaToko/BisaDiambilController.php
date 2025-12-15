@@ -92,15 +92,15 @@ class BisaDiambilController extends Controller
 
                 $nomor = $row->customer->nomor_hp ?? null;
                 if (!$nomor) return '-';
-                
+
                 // Format nomor ke 628...
                 $nomorwa = preg_replace('/^08/', '628', $nomor);
-                
+
                 // Ambil data toko & token
                 $toko = User::find(1);
                 $fonteeToken = StoreSetting::first()->fonnte ?? null;
                 $notaQc = route('kepalatoko-cetak-qc', $row->id);
-                
+
                 // --- SUSUN PESAN (Gunakan \n untuk enter, jangan %0A manual dulu) ---
                 $rawPesan = "*Notifikasi | {$toko->nama_toko}*\n" .
                             "Barang Servis: *{$row->nama_barang}*\n" .
@@ -121,7 +121,7 @@ class BisaDiambilController extends Controller
                 $waLinkPesan = rawurlencode($rawPesan);
 
                 // Escape untuk Javascript (Fonnte) agar kutip/enter tidak bikin error JS
-                $jsPesan = json_encode($rawPesan); 
+                $jsPesan = json_encode($rawPesan);
                 // Kita trim kutip dua di awal/akhir dari hasil json_encode agar pas masuk ke function JS
                 $jsPesan = trim($jsPesan, '"');
 
@@ -137,7 +137,7 @@ class BisaDiambilController extends Controller
                 // --- RETURN TAMPILAN 2 IKON ---
                 return '
                     <div class="flex space-x-2">
-                        
+
                         <a href="https://wa.me/'.$nomorwa.'" target="_blank" title="Chat Kosong/Manual">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#00b341" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 11.5a8.38 8.38 0 0 1 -.9 3.8 8.5 8.5 0 0 1 -7.6 4.7 8.38 8.38 0 0 1 -3.8 -.9l-5.1 1.2l1.2 -5.1a8.38 8.38 0 0 1 -.9 -3.8 8.5 8.5 0 0 1 4.7 -7.6 8.38 8.38 0 0 1 3.8 -.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
@@ -154,7 +154,7 @@ class BisaDiambilController extends Controller
             })
             ->addColumn('nama_barang', fn($r) => '<div class="font-medium">'.e($r->nama_barang).'</div>')
             ->addColumn('kerusakan', fn($r) => '<div class="font-medium">'.e($r->kerusakan).'</div>')
-            
+
             ->addColumn('fungsi', function ($row)  {
                 $url = route('kepalatoko-cetak-qc', $row->id);
 
@@ -200,8 +200,8 @@ class BisaDiambilController extends Controller
                 }
                 return '
                     <div class="space-x-1 flex">
-                          <button type="button" 
-                                class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1" 
+                          <button type="button"
+                                class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1"
                                 data-id="' . $row->id . '"
                                 title="Upload Foto Servis">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-camera" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -211,7 +211,7 @@ class BisaDiambilController extends Controller
                             </svg>
                         </button>
                             <div>
-                                <button wire:click="openPinModal('.$row->id.')" class="text-indigo-500 hover:text-indigo-600 rounded-full">
+                                <button onclick="openPinModal(' . $row->id . ')" class="text-indigo-500 hover:text-indigo-600 rounded-full">
                                     <span class="sr-only">Service PIN & Pola</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-lock" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#6366f1" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -273,7 +273,7 @@ class BisaDiambilController extends Controller
                                 <path d="M9 14l2 2l4 -4" />
                             </svg>
                         </a>
-                       
+
                         <a href="'.route('transaksi-servis-bisa-diambil.show', $row->id).'" >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#000" fill="none" viewBox="0 0 24 24">
                                 <path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" />

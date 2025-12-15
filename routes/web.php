@@ -323,7 +323,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
 
     Route::get('/akun/data', [KepalaTokoAkunController::class, 'getData'])->name('akun.data');
-    
+
     // Route Bulk Delete
     Route::post('/akun/delete-batch', [KepalaTokoAkunController::class, 'deleteBatch'])->name('akun.delete-batch');
     Route::get('/akun', [KepalaTokoAkunController::class, 'index'])->name('akun');
@@ -339,13 +339,14 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::delete('/accounts/delete', [KepalaTokoAkunController::class, 'deleteSelected']);
     Route::post('/servis/transaksi-servis-langsung', [KepalaTokoTransaksiServisLangsungController::class, 'store'])->name('servis-langsung');
     Route::resource('servis/tindakan-servis', KepalaTokoTindakanServisController::class);
-    
+
     Route::get('pelanggan/data', [KepalaTokoPelangganController::class, 'getData'])->name('pelanggan.data');
     Route::resource('pelanggan', KepalaTokoPelangganController::class);
     Route::post('pelanggan-broadcast', [KepalaTokoPelangganController::class,'broadcast'])->name('pelanggan.broadcast');
 
     Route::get('/transaksi-servis/data', [KepalaTokoTransaksiServisController::class, 'getData'])->name('transaksi-servis.data');
-
+    Route::get('/transaksi-servis/get-pin-pola/{id}', [KepalaTokoTransaksiServisController::class, 'getPinPola'])->name('transaksi-servis.get-pin-pola');
+    Route::post('/transaksi-servis/update-pin-pola/{id}', [KepalaTokoTransaksiServisController::class, 'updatePinPolaNew'])->name('transaksi-servis.update-pin-pola');
     // Route untuk Fitur Foto Servis (AJAX)
     Route::get('servis/transaksi-servis/{id}/get-foto', [KepalaTokoTransaksiServisController::class, 'getFoto']);
     Route::post('servis/transaksi-servis/{id}/upload-foto', [KepalaTokoTransaksiServisController::class, 'uploadFoto']);
@@ -383,7 +384,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
 
     Route::get('master-warna/data', [KepalaTokoMasterWarnaController::class, 'getData'])->name('master-warna.data');
-    
+
     Route::post('master-warna/delete-batch', [KepalaTokoMasterWarnaController::class, 'deleteBatch'])->name('master-warna.delete-batch');
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
 
@@ -395,7 +396,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
 
     Route::get('master-cabang/data', [CabangController::class, 'getData'])->name('master-cabang.data');
-    
+
     Route::post('master-cabang/delete-batch', [CabangController::class, 'deleteBatch'])->name('master-cabang.delete-batch');
     Route::resource('master/master-cabang', CabangController::class);
 

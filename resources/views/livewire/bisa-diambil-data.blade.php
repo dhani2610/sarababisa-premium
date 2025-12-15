@@ -493,27 +493,27 @@
                             @endif
                         </tr>
                     </thead>
-                    
+
                 </table>
 
             </div>
         </div>
     </div>
-    
+
 <div id="modal-upload-foto" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    
+
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        
+
         <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" aria-hidden="true" onclick="closeModalFoto()"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
         <div class="inline-block w-full text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl overflow-hidden sm:my-8 sm:align-middle sm:max-w-3xl">
-            
+
             <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
                     <div class="w-full mt-3 text-center sm:mt-0 sm:text-left">
-                        
+
                         <div class="flex items-center justify-between pb-2 mb-4 border-b">
                             <h3 class="text-xl font-bold leading-6 text-gray-900" id="modal-title">
                                 📸 Dokumentasi Foto Servis
@@ -524,7 +524,7 @@
                                 </svg>
                             </button>
                         </div>
-                        
+
                         <input type="hidden" id="current-servis-id">
 
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -544,7 +544,7 @@
                                 <input type="file" class="filepond-selesai" name="file" multiple data-max-file-size="10MB">
                             </div>
                         </div>
-                        
+
                         <div class="mt-4 text-xs italic text-gray-500">
                             * Foto otomatis tersimpan saat berhasil di-upload. Klik foto untuk memperbesar (zoom).
                         </div>
@@ -580,10 +580,10 @@
     );
 
     let pondMasuk, pondSelesai;
-    let viewer; 
+    let viewer;
 
     document.addEventListener('DOMContentLoaded', function() {
-        
+
         // Cek apakah library kompresi sudah jalan
         if (typeof imageCompression === 'undefined') {
             console.error("ERROR: Library browser-image-compression belum terload! Cek koneksi internet atau script tag.");
@@ -595,25 +595,25 @@
             acceptedFileTypes: ['image/jpeg', 'image/png', 'image/webp'], // Batasi tipe file agar transform jalan
             labelIdle: 'Drag & Drop gambar atau <span class="filepond--label-action">Cari</span>',
             credits: false,
-            
+
             // --- KONFIGURASI RESIZE (DIMENSI) ---
             allowImageResize: true,
             imageResizeTargetWidth: 1280,
             imageResizeTargetHeight: 1280,
-            imageResizeMode: 'contain', 
+            imageResizeMode: 'contain',
             imageResizeUpscale: false,
 
             // --- KONFIGURASI TRANSFORM (KOMPRESI) ---
             allowImageTransform: true,
             imageTransformOutputQuality: 70, // Turunkan sedikit ke 70 agar size lebih kecil
             imageTransformOutputMimeType: 'image/jpeg', // Paksa convert ke JPEG (lebih kecil dari PNG)
-            
+
             // Fix untuk orientasi foto HP (EXIF data)
-            imageTransformOutputStripImageHead: false, 
+            imageTransformOutputStripImageHead: false,
 
             // Preview
             imagePreviewHeight: 150,
-            
+
             // Event Zoom Viewer
             onactivatefile: (file) => {
                 let imageUrl = file.getMetadata('url');
@@ -627,7 +627,7 @@
         // 3. Create Instance
         const inputMasuk = document.querySelector('.filepond-masuk');
         const inputSelesai = document.querySelector('.filepond-selesai');
-        
+
         // Cek element ada atau tidak sebelum create
         if(inputMasuk) pondMasuk = FilePond.create(inputMasuk, baseConfig);
         if(inputSelesai) pondSelesai = FilePond.create(inputSelesai, baseConfig);
@@ -674,7 +674,7 @@
                     fetch(`/servis/transaksi-servis/${id}/delete-foto?type=${type}`, {
                         method: 'DELETE',
                         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'text/plain' },
-                        body: source 
+                        body: source
                     }).then(() => load()).catch((err) => error('Gagal menghapus'));
                 },
                 load: (source, load, error) => {
@@ -962,5 +962,125 @@ function kirimFontee(token, phone, message) {
     })
     .catch(() => alert('❌ Terjadi kesalahan saat mengirim ke Fontee.'));
 }
+</script>
+
+ <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+<div id="genericPinModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <div class="flex justify-between items-center border-b pb-2 mb-4">
+            <h2 class="text-lg font-semibold text-gray-700">Service PIN & Pola</h2>
+            <button onclick="closePinModal()" type="button" class="text-gray-400 hover:text-gray-600">&times;</button>
+        </div>
+
+        <input type="hidden" id="currentServiceId">
+
+        <div class="space-y-4">
+            <div>
+                <label class="text-sm font-medium text-gray-600">PIN</label> <br>
+                <input type="number" id="modalPinInput" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
+            </div>
+
+            <div>
+                <label class="text-sm font-medium text-gray-600">Pola</label>
+                <div class="border rounded bg-gray-100">
+                    <canvas id="signature-pad" class="w-full h-48 block" width="400" height="200"></canvas>
+                </div>
+                <small class="text-gray-400">Gambar pola pada area di atas</small>
+            </div>
+
+            <button type="button" onclick="clearSignature()" class="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600">Reset Pola</button>
+        </div>
+
+        <div class="mt-6 flex justify-end space-x-2">
+            <button onclick="closePinModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Batal</button>
+            <button onclick="savePinPola()" class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Simpan</button>
+        </div>
+    </div>
+</div>
+<script>
+    let signaturePad;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Signature Pad on the canvas
+        var canvas = document.getElementById('signature-pad');
+        signaturePad = new SignaturePad(canvas, {
+            backgroundColor: 'rgba(255, 255, 255, 0)' // Transparent background
+        });
+    });
+
+    // 1. Function to Open Modal & Fetch Data
+    function openPinModal(id) {
+        // Show loading state if needed
+
+        // AJAX to fetch existing data
+        $.ajax({
+            url: '/transaksi-servis/get-pin-pola/' + id, // URL matches the route defined above
+            type: 'GET',
+            success: function(response) {
+                if(response.status === 'success') {
+                    // Populate ID
+                    $('#currentServiceId').val(response.data.id);
+
+                    // Populate PIN
+                    $('#modalPinInput').val(response.data.pin);
+
+                    // Populate Canvas (Pola)
+                    signaturePad.clear(); // Clear first
+                    if (response.data.pola) {
+                        // Load existing signature data
+                        signaturePad.fromData(JSON.parse(response.data.pola));
+                    }
+
+                    // Show Modal
+                    $('#genericPinModal').removeClass('hidden');
+                }
+            },
+            error: function(err) {
+                alert('Gagal mengambil data PIN/Pola');
+            }
+        });
+    }
+
+    // 2. Function to Close Modal
+    function closePinModal() {
+        $('#genericPinModal').addClass('hidden');
+    }
+
+    // 3. Function to Clear Signature Pad
+    function clearSignature() {
+        signaturePad.clear();
+    }
+
+    // 4. Function to Save Data via AJAX
+    function savePinPola() {
+        let id = $('#currentServiceId').val();
+        let pin = $('#modalPinInput').val();
+
+        // Get canvas data as JSON string (to save structure, allowing re-editing)
+        // If you strictly want an image, use signaturePad.toDataURL()
+        // But for editing later, toData() is better.
+        let polaData = JSON.stringify(signaturePad.toData());
+
+        $.ajax({
+            url: '/transaksi-servis/update-pin-pola/' + id,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}', // CSRF Token for Laravel
+                pin: pin,
+                pola: polaData
+            },
+            success: function(response) {
+                if(response.status === 'success') {
+                    alert(response.message);
+                    closePinModal();
+                    // Optional: Refresh DataTable if you show indicator of "Has PIN"
+                    $('#transaksiTable').DataTable().ajax.reload(null, false);
+                }
+            },
+            error: function(err) {
+                alert('Gagal menyimpan data');
+            }
+        });
+    }
 </script>
 

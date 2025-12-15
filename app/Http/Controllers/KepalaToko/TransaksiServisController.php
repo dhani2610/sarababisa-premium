@@ -53,7 +53,7 @@ class TransaksiServisController extends Controller
     public function getFoto($id)
     {
         $servis = ServiceTransaction::find($id);
-        
+
         $response = [
             'masuk' => [],
             'selesai' => []
@@ -106,11 +106,11 @@ class TransaksiServisController extends Controller
     {
         $servis = ServiceTransaction::find($id);
         $type = $request->input('type'); // 'masuk' atau 'selesai'
-        
+
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            
+
             // Simpan file ke folder storage/app/public/servis
             $file->storeAs('public/servis', $filename);
 
@@ -118,14 +118,14 @@ class TransaksiServisController extends Controller
             $column = ($type == 'masuk') ? 'foto_masuk' : 'foto_selesai';
             $currentFiles = json_decode($servis->$column, true) ?? [];
             $currentFiles[] = $filename;
-            
+
             $servis->$column = json_encode($currentFiles);
             $servis->save();
 
             // Return filename agar FilePond tahu ID file ini
-            return response($filename, 200); 
+            return response($filename, 200);
         }
-        
+
         return response()->json(['error' => 'No file'], 400);
     }
 
@@ -142,7 +142,7 @@ class TransaksiServisController extends Controller
         // Cari dan hapus dari array
         if (($key = array_search($filename, $currentFiles)) !== false) {
             unset($currentFiles[$key]);
-            
+
             // Hapus file fisik dari storage
             if (Storage::disk('public')->exists('servis/' . $filename)) {
                 Storage::disk('public')->delete('servis/' . $filename);
@@ -366,8 +366,8 @@ class TransaksiServisController extends Controller
 
             // PIN & Pola (menyertakan wire:click dari blade asli)
             $html .= '
-                <button type="button" 
-                        class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1" 
+                <button type="button"
+                        class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1"
                         data-id="' . $id . '"
                         title="Upload Foto Servis">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-camera" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -379,7 +379,7 @@ class TransaksiServisController extends Controller
             ';
             $html .= '
                 <div>
-                    <button wire:click="openPinModal(' . $id . ')" class="text-indigo-500 hover:text-indigo-600 rounded-full">
+                    <button onclick="openPinModal(' . $id . ')" class="text-indigo-500 hover:text-indigo-600 rounded-full">
                         <span class="sr-only">Service PIN & Pola</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-lock" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#6366f1" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -538,6 +538,41 @@ class TransaksiServisController extends Controller
             'uang_muka','estimasi_biaya','estimasi_pengerjaan','status','aksi'
         ])
         ->make(true);
+    }
+
+    // Fetch current data for the modal
+    public function getPinPola($id)
+    {
+        $service = ServiceTransaction::find($id);
+
+        if (!$service) {
+            return response()->json(['status' => 'error', 'message' => 'Data not found'], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'id' => $service->id,
+                'pin' => $service->pin,
+                'pola' => $service->pola // This is the JSON string of the canvas drawing
+            ]
+        ]);
+    }
+
+    // Save the submitted data
+    public function updatePinPolaNew(Request $request, $id)
+    {
+        $service = ServiceTransaction::find($id);
+
+        if (!$service) {
+            return response()->json(['status' => 'error', 'message' => 'Data not found'], 404);
+        }
+
+        $service->pin = $request->pin;
+        $service->pola = $request->pola; // Save canvas JSON data
+        $service->save();
+
+        return response()->json(['status' => 'success', 'message' => 'PIN & Pola berhasil disimpan']);
     }
 
 
@@ -812,7 +847,7 @@ class TransaksiServisController extends Controller
         // 1. Decode JSON ke Array
         $qcMasuk = $items->qc_masuk ? json_decode($items->qc_masuk, true) : [];
         $qcKeluar = $items->qc_keluar ? json_decode($items->qc_keluar, true) : [];
-       
+
         $qcItems = $qcMasuk != null ? array_keys($qcMasuk) : [];
 
         if (empty($qcItems) && !empty($qcKeluar)) {
