@@ -517,9 +517,9 @@
                 <th class="text-right w-75">
                     {{-- <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">Terbilang : {{ terbilang($totalWithPpn) }}</span> --}}
                 </th>
-                <th class="text-right w-75" colspan="4">
+                <th class="text-right w-75" colspan="3">
                     <i>
-                        <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">
+                        <span style="text-transform: capitalize; font-size: 10px; font-weight: normal;text-align:right">
                             <b>
                                 Terbilang : {{ terbilang($totalWithPpn) }}
                             </b>
