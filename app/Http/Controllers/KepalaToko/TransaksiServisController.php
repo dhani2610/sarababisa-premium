@@ -976,14 +976,31 @@ class TransaksiServisController extends Controller
     public function edit($id)
     {
         $item = ServiceTransaction::findOrFail($id);
-        $customers = Customer::all();
-        $types = Type::all();
-        $brands = Brand::all();
-        $model_series = ModelSerie::all();
-        $service_actions = ServiceAction::all();
-        $capacities = Capacity::all();
-        $users = User::where('role', 'Teknisi')->get();
-        $workers = Worker::where('jabatan', 'like', '%' . 'teknisi')->get();
+        $qcMasuk = $item->qc_masuk ? json_decode($item->qc_masuk, true) : [];
+        $qcKeluar = $item->qc_keluar ? json_decode($item->qc_keluar, true) : [];
+        // dd($qcMasuk,$items->qc_masuk);
+        if ($qcMasuk != null) {
+            # code...
+            $qcItems = array_keys($qcMasuk);
+        }else{
+            $qcItems = [];
+        }
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
+        $customers = Customer::where('cabang_id',getCabangId())->get();
+        $types = Type::where('cabang_id',getCabangId())->get();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
+        $workers = Worker::where('cabang_id',getCabangId())->where('jabatan', 'like', '%' . 'teknisi')->get();
 
         return view('pages.kepalatoko.servis.transaksi-servis-edit', [
             'item' => $item,
@@ -994,7 +1011,10 @@ class TransaksiServisController extends Controller
             'service_actions' => $service_actions,
             'capacities' => $capacities,
             'users' => $users,
-            'workers' => $workers
+            'workers' => $workers,
+            'qcItems' => $qcItems,
+            'qcMasuk' => $qcMasuk,
+            'qcKeluar' => $qcKeluar,
         ]);
     }
 
@@ -1014,6 +1034,23 @@ class TransaksiServisController extends Controller
         $nama_model = ModelSerie::find($request->model_series_id);
         $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
 
+        $qc_masuk_data = $request->qc_masuk ?? [];
+        $qc_keluar_data = $request->qc_keluar ?? [];
+
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                if (!empty($name)) {
+                    $val_in = $request->custom_qc_masuk[$key] ?? '-';
+                    $val_out = $request->custom_qc_keluar[$key] ?? '-';
+
+                    $qc_masuk_data[$name] = $val_in;
+                    $qc_keluar_data[$name] = $val_out;
+                }
+            }
+        }
+
+        $qc_masuk_final = json_encode($qc_masuk_data);
+        $qc_keluar_final = json_encode($qc_keluar_data);
         // Transaction update
         $item->update([
             'created_at' => $request->created_at,
@@ -1028,7 +1065,8 @@ class TransaksiServisController extends Controller
             'capacities_id' => $request->capacities_id,
             'kelengkapan' => $request->kelengkapan,
             'kerusakan' => $request->kerusakan,
-            'qc_masuk' => $request->qc_masuk,
+            'qc_masuk' => $qc_masuk_final,
+            'qc_keluar' => $qc_keluar_final,
             'estimasi_pengerjaan' => $request->estimasi_pengerjaan,
             'estimasi_biaya' => $request->estimasi_biaya,
             'uang_muka' => $request->uang_muka,
