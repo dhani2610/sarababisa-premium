@@ -17,11 +17,10 @@ class BrandImport implements ToModel, WithHeadingRow, WithBatchInserts
         }
 
         $cabangId = getCabangId();
-  
 
         // Simpan Data Baru dengan nama yang sudah aman
         return new Brand([
-            'id'          => $row['ID Merek'],
+            // 'id'          => $row['ID Merek'],
             'name'          => $row['Nama Merek'],
             'cabang_id'   => $cabangId,
         ]);
