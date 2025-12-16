@@ -71,7 +71,7 @@ class TipeOsController extends Controller
         }
 
         // Cek Relasi
-      
+
         // Uncomment jika validasi relasi ingin diaktifkan
         // if ($hasRelation) {
         //    return response()->json(['message' => 'Data Tipe OS yang memiliki riwayat transaksi tidak bisa dihapus.'], 422);
@@ -121,6 +121,7 @@ class TipeOsController extends Controller
 
         // dd($request->all());
         $data = new TipeOs();
+        $data->cabang_id = getCabangId();
         $data->nama = $request->nama;
         $data->nominal_bonus = $request->nominal_bonus;
         $data->save();
