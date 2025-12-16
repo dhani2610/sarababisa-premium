@@ -28,7 +28,7 @@ class MasterTipeOs extends Component
 
     public function render()
     {
-        $count = TipeOs::all()->count();
+        $count = TipeOs::where('cabang_id', getCabangId())->get()->count();
         return view('livewire.master-tipe-os', [
             'count' => $count,
             'TipeOs' => $this->search === null ?
