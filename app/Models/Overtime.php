@@ -19,6 +19,7 @@ class Overtime extends Model
         'waktu_end',
         'approve_by',
         'status',
+        'cabang_id',
     ];
 
     protected $dates = ['tanggal'];
