@@ -40,14 +40,15 @@ class KasbonController extends Controller
      */
     public function store(Request $request)
     {
-        
         $request->merge([
             'total' => (int) str_replace('.', '', $request->total),
         ]);
-        $data['cabang_id'] = getCabangId();
         $data = $request->all();
+        $data['cabang_id'] = getCabangId();
 
-        Debt::create($data);
+        $dataKasbon = Debt::create($data);
+        // dd($request->all(),$dataKasbon);
+
 
         return redirect()->route('admin-kasbon.index');
     }
