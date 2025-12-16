@@ -25,8 +25,8 @@
                             <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                         </svg>
                         <span class="hidden xs:block ml-2">Tambah Model Seri</span>
-                </button>                      
-                
+                </button>
+
             </div>
 
         </div>
@@ -101,9 +101,8 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="brands_id">Merek</label>
                                     <select id="brands_id" name="brands_id" class="form-select text-sm w-full">
-                                        <option selected value="{{ $item->brand->id }}">{{ $item->brand->name }}</option>
                                         @foreach ($brands as $brand)
-                                            <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                            <option value="{{ $brand->id }}" {{ $item->brand->id == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -134,6 +133,6 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 </x-toko-layout>
