@@ -98,7 +98,7 @@ class BisaDiambilController extends Controller
 
                 // Ambil data toko & token
                 $toko = User::find(1);
-                $fonteeToken = StoreSetting::first()->fonnte ?? null;
+                $fonteeToken = StoreSetting::where('cabang_id',getCabangId())->first()->fonnte ?? null;
                 $notaQc = route('kepalatoko-cetak-qc', $row->id);
 
                 // --- SUSUN PESAN (Gunakan \n untuk enter, jangan %0A manual dulu) ---
