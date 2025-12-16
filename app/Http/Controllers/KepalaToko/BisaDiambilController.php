@@ -342,7 +342,7 @@ class BisaDiambilController extends Controller
                                             </div>
                                             <!-- Modal footer -->
                                             <div class="flex flex-wrap justify-end space-x-2">
-                                                <form action="'.$delurl.' method="post">
+                                                <form action="'.$delurl.'" method="post">
                                                 ' . method_field('delete') . csrf_field() . '
                                                     <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
                                                 </form>
