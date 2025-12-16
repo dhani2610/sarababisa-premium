@@ -65,7 +65,7 @@
                         {data: 'kondisi_servis', name: 'kondisi_servis'},
                         {data: 'tindakan_servis', name: 'tindakan_servis'},
                         {data: 'teknisi', name: 'teknisi'},
-                        @if (Auth::user()->role != 'Investor' && $storeSetting->is_modal == 1)
+                        @if (Auth::user()->role == 'Kepala Toko' || $storeSetting->is_modal == 1)
                             {data: 'modal_sparepart', name: 'modal_sparepart'},
                         @endif
                         {data: 'biaya', name: 'biaya'},

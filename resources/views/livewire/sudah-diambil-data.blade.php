@@ -393,7 +393,7 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Pengecekan Fungsi</div>
                             </th>
-                           
+
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Kondisi</div>
                             </th>
@@ -403,7 +403,7 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Teknisi</div>
                             </th>
-                            @if (Auth::user()->role != 'Investor' && $storeSetting->is_modal == 1)
+                            @if (Auth::user()->role == 'Kepala Toko' || $storeSetting->is_modal == 1)
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Modal Sparepart</div>
                             </th>
@@ -902,21 +902,21 @@
         </div>
     </div>
 
-    
+
 <div id="modal-upload-foto" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    
+
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        
+
         <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" aria-hidden="true" onclick="closeModalFoto()"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
         <div class="inline-block w-full text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl overflow-hidden sm:my-8 sm:align-middle sm:max-w-3xl">
-            
+
             <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
                     <div class="w-full mt-3 text-center sm:mt-0 sm:text-left">
-                        
+
                         <div class="flex items-center justify-between pb-2 mb-4 border-b">
                             <h3 class="text-xl font-bold leading-6 text-gray-900" id="modal-title">
                                 📸 Dokumentasi Foto Servis
@@ -927,7 +927,7 @@
                                 </svg>
                             </button>
                         </div>
-                        
+
                         <input type="hidden" id="current-servis-id">
 
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -947,7 +947,7 @@
                                 <input type="file" class="filepond-selesai" name="file" multiple data-max-file-size="10MB">
                             </div>
                         </div>
-                        
+
                         <div class="mt-4 text-xs italic text-gray-500">
                             * Foto otomatis tersimpan saat berhasil di-upload. Klik foto untuk memperbesar (zoom).
                         </div>
@@ -983,10 +983,10 @@
     );
 
     let pondMasuk, pondSelesai;
-    let viewer; 
+    let viewer;
 
     document.addEventListener('DOMContentLoaded', function() {
-        
+
         // Cek apakah library kompresi sudah jalan
         if (typeof imageCompression === 'undefined') {
             console.error("ERROR: Library browser-image-compression belum terload! Cek koneksi internet atau script tag.");
@@ -998,25 +998,25 @@
             acceptedFileTypes: ['image/jpeg', 'image/png', 'image/webp'], // Batasi tipe file agar transform jalan
             labelIdle: 'Drag & Drop gambar atau <span class="filepond--label-action">Cari</span>',
             credits: false,
-            
+
             // --- KONFIGURASI RESIZE (DIMENSI) ---
             allowImageResize: true,
             imageResizeTargetWidth: 1280,
             imageResizeTargetHeight: 1280,
-            imageResizeMode: 'contain', 
+            imageResizeMode: 'contain',
             imageResizeUpscale: false,
 
             // --- KONFIGURASI TRANSFORM (KOMPRESI) ---
             allowImageTransform: true,
             imageTransformOutputQuality: 70, // Turunkan sedikit ke 70 agar size lebih kecil
             imageTransformOutputMimeType: 'image/jpeg', // Paksa convert ke JPEG (lebih kecil dari PNG)
-            
+
             // Fix untuk orientasi foto HP (EXIF data)
-            imageTransformOutputStripImageHead: false, 
+            imageTransformOutputStripImageHead: false,
 
             // Preview
             imagePreviewHeight: 150,
-            
+
             // Event Zoom Viewer
             onactivatefile: (file) => {
                 let imageUrl = file.getMetadata('url');
@@ -1030,7 +1030,7 @@
         // 3. Create Instance
         const inputMasuk = document.querySelector('.filepond-masuk');
         const inputSelesai = document.querySelector('.filepond-selesai');
-        
+
         // Cek element ada atau tidak sebelum create
         if(inputMasuk) pondMasuk = FilePond.create(inputMasuk, baseConfig);
         if(inputSelesai) pondSelesai = FilePond.create(inputSelesai, baseConfig);
@@ -1077,7 +1077,7 @@
                     fetch(`/servis/transaksi-servis/${id}/delete-foto?type=${type}`, {
                         method: 'DELETE',
                         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'text/plain' },
-                        body: source 
+                        body: source
                     }).then(() => load()).catch((err) => error('Gagal menghapus'));
                 },
                 load: (source, load, error) => {
