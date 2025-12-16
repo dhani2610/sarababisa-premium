@@ -117,7 +117,7 @@
                 @php
 
                     if ($item->id == 1) {
-                        $kepalaToko = \App\Models\User::where('role','Kepala Toko')->orderBy('id','asc')->first();
+                        $kepalaToko = \App\Models\User::find(1);
                     }else{
                         $kepalaToko = \App\Models\User::where('cabang_id',$item->id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
                         // dd($data['kepala_toko_setting']);

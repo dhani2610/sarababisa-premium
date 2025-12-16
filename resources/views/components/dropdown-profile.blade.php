@@ -13,10 +13,9 @@
         @php
             $cabangId = getCabangId();
             if ($cabangId == 1) {
-                $kepalaToko = \App\Models\User::where('cabang_id',$cabangId)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+                $kepalaToko = \App\Models\User::find(1);
             }else{
                 $kepalaToko = \App\Models\User::where('cabang_id',$cabangId)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
-                // dd($data['kepala_toko_setting']);
             }
         @endphp
         @if ($kepalaToko->profile_photo_path != null)
