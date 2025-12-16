@@ -177,6 +177,12 @@ class LaporanServisController extends Controller
             $expenseQuery->where('users_id', $userId);
         }
 
+
+        $total_insiden = Incident::whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
+            ->sum('biaya_toko');
+
         $totalInsiden = Incident::where('cabang_id',getCabangId())
             ->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
@@ -194,6 +200,7 @@ class LaporanServisController extends Controller
             ->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
             ->get();
+
 
         // return response()->json($services);
         $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
@@ -221,7 +228,7 @@ class LaporanServisController extends Controller
             'total_pengeluaran' => $total_pengeluaran,
             'total_kredit' => $total_kredit,
             'insiden' => $insiden,
-            'totalInsiden' => $totalInsiden,
+            'total_insiden' => $totalInsiden,
         ]);
 
         $filename = 'Laporan Transaksi Servis' . ' ' . $start_date . ' ' . 'sd' . ' ' . $end_date . '.pdf';
