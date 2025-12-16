@@ -93,10 +93,17 @@ class MasterIzin extends Component
             ]
         ];
 
-        $users = $user->role === 'Kepala Toko'
-            ? User::where('cabang_id',getCabangId())->whereIn('role', ['Teknisi', 'Sales', 'Admin Toko'])->select('id', 'name')->get()
-            : User::where('cabang_id',getCabangId())->where('id', $user->id)->select('id', 'name')->get();
+        // $users = $user->role === 'Kepala Toko'
+        //     ? User::where('cabang_id',getCabangId())->whereIn('role', ['Teknisi', 'Sales', 'Admin Toko'])->select('id', 'name')->get()
+        //     : User::where('cabang_id',getCabangId())->where('id', $user->id)->select('id', 'name')->get();
 
+        if ($user->role == 'Kepala Toko') {
+            $users = User::where('cabang_id',getCabangId())->whereIn('role', ['Teknisi', 'Sales','Admin Toko'])->select('id', 'name')->get();
+        }else if($user->role == 'Admin Toko'){
+            $users = User::where('cabang_id',getCabangId())->whereIn('role', ['Teknisi', 'Sales'])->select('id', 'name')->get();
+        }else{
+            $users = User::where('cabang_id',getCabangId())->where('id', $user->id)->select('id', 'name')->get();
+        }
         return view('livewire.master-izin', [
             'izins' => $query->paginate($this->paginate),
             'users' => $users,

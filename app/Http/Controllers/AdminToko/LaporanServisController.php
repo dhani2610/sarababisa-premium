@@ -10,6 +10,7 @@ use App\Models\ServiceTransaction;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Expense;
+use App\Models\Incident;
 use Illuminate\Support\Facades\Auth;
 
 class LaporanServisController extends Controller
@@ -176,11 +177,23 @@ class LaporanServisController extends Controller
             $expenseQuery->where('users_id', $userId);
         }
 
+        $totalInsiden = Incident::where('cabang_id',getCabangId())
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get()
+            ->sum('biaya_toko');
+
         $total_pengeluaran = $expenseQuery->sum('price');
         $pengeluaran_data = $expenseQuery->get();
 
         // Hitung saldo akhir
-        $saldo_akhir = $total_profit - $total_pengeluaran;
+        $saldo_akhir = $total_profit - $total_pengeluaran - $totalInsiden;
+
+
+        $insiden = Incident::where('cabang_id',getCabangId())
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get();
 
         // return response()->json($services);
         $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
@@ -206,7 +219,9 @@ class LaporanServisController extends Controller
             'saldo_akhir' => $saldo_akhir,
             'pengeluaran_data' => $pengeluaran_data,
             'total_pengeluaran' => $total_pengeluaran,
-            'total_kredit' => $total_kredit
+            'total_kredit' => $total_kredit,
+            'insiden' => $insiden,
+            'totalInsiden' => $totalInsiden,
         ]);
 
         $filename = 'Laporan Transaksi Servis' . ' ' . $start_date . ' ' . 'sd' . ' ' . $end_date . '.pdf';

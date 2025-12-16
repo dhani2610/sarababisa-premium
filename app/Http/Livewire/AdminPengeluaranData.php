@@ -28,7 +28,7 @@ class AdminPengeluaranData extends Component
 
     public function render()
     {
-        $users = User::where('cabang_id',getCabangId())->get();
+        $users = User::where('id','!=',1)->where('cabang_id',getCabangId())->get();
         $expenses_count = Expense::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.admin-pengeluaran-data', [
             'users' => $users,
