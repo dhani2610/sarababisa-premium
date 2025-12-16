@@ -17,8 +17,8 @@ class KasbonController extends Controller
      */
     public function index()
     {
-        $workers = Worker::all();
-        $debts = Debt::all();
+        $workers = Worker::where('cabang_id',getCabangId())->get();
+        $debts = Debt::where('cabang_id',getCabangId())->get();
         return view('pages/admintoko/kasbon/index', compact('workers', 'debts'));
     }
 
