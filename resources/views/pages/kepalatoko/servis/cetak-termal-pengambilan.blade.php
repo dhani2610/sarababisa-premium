@@ -294,7 +294,8 @@
                 overflow-wrap: break-word;
                 white-space: normal;
             ">
-                Cek status garansi {{ env('APP_URL') }}/garansi
+                Cek status garansi 
+                <a href="{{ env('APP_URL') }}/garansi">{{ env('APP_URL') }}/garansi</a>
             </p>
             <p>Terima kasih atas kepercayaan Anda telah melakukan Servis di {{ $users->nama_toko }}</p>
         </footer>
