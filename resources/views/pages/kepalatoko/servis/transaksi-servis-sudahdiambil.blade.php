@@ -129,7 +129,7 @@
                                     <input id="qc_keluar" name="qc_keluar" class="form-input w-full px-2 py-1" type="text" placeholder="Contoh: Tombol, Kamera, Speaker, dll" required/>
                                 </div> --}}
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (IN & OUT) <span class="text-rose-500">*</span></label>
+                                    <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (Masuk & Keluar) <span class="text-rose-500">*</span></label>
                                     <small class="text-rose-500">*Jika ingin cepat silahkan isi kolom other.</small>
                                     <div class="overflow-x-auto border rounded-sm">
                                         <table class="w-full text-xs text-left border-collapse" id="table-qc-tab2">

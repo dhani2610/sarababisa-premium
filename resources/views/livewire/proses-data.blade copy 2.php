@@ -264,7 +264,7 @@
                                                 placeholder="Contoh: Tombol, Kamera, Speaker, dll" />
                                         </div> --}}
                                         <div>
-                                            <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (IN) <span class="text-rose-500">*</span></label>
+                                            <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (Masuk) <span class="text-rose-500">*</span></label>
                                             <div class="overflow-x-auto border rounded-sm">
                                                 <table class="w-full text-xs text-left border-collapse" id="table-qc-tab1">
                                                     <thead class="bg-slate-100 uppercase text-slate-500 font-semibold">
@@ -454,7 +454,7 @@
                                                 placeholder="Contoh: Tombol, Kamera, Speaker, dll" />
                                         </div> --}}
                                         <div>
-                                            <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (IN & OUT) <span class="text-rose-500">*</span></label>
+                                            <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (Masukk & Keluar) <span class="text-rose-500">*</span></label>
                                             <div class="overflow-x-auto border rounded-sm">
                                                 <table class="w-full text-xs text-left border-collapse" id="table-qc-tab2">
                                                     <thead class="bg-slate-100 uppercase text-slate-500 font-semibold">
