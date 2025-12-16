@@ -23,7 +23,9 @@ class ProdukAksesorisController extends Controller
      */
     public function index()
     {
-        return view('pages/kepalatoko/produk/aksesoris');
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+
+        return view('pages/kepalatoko/produk/aksesoris',compact('toko'));
     }
 
     public function deleteSelected(Request $request)

@@ -22,7 +22,9 @@ class ProdukToolController extends Controller
      */
     public function index()
     {
-        return view('pages/kepalatoko/produk/tool');
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+
+        return view('pages/kepalatoko/produk/tool',compact('toko'));
     }
 
     public function deleteSelected(Request $request)

@@ -28,7 +28,9 @@ class ProdukController extends Controller
      */
     public function index()
     {
-        return view('pages/kepalatoko/produk/index');
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+
+        return view('pages/kepalatoko/produk/index',compact('toko'));
     }
 
     public function getData(Request $request)
@@ -72,12 +74,12 @@ class ProdukController extends Controller
                     if ($row->categories_id == 1) {
                         // Kategori Handphone
                         $cap = $row->capacity ? $row->capacity->name : '-';
-                        return '<div class="font-medium">' . 
-                            e($row->product_name) . ' ' . 
-                            e($row->kondisi) . ' ' . 
-                            e($row->warna) . ' ' . 
-                            e($row->ram) . ' / ' . 
-                            e($cap) . 
+                        return '<div class="font-medium">' .
+                            e($row->product_name) . ' ' .
+                            e($row->kondisi) . ' ' .
+                            e($row->warna) . ' ' .
+                            e($row->ram) . ' / ' .
+                            e($cap) .
                             ' (IMEI ' . e($row->nomor_seri) . ')</div>';
                     } else {
                         // Kategori Lain (Sparepart/Aksesoris/Tool)
@@ -140,7 +142,7 @@ class ProdukController extends Controller
                 // Aksi
                 ->addColumn('aksi', function ($row) use ($userRole, $tokoSetting) {
             $html = '<div class="space-x-1 flex">';
-            
+
             $fotoUrl = $row->foto ? asset('storage/'.$row->foto) : '';
             // Tombol Upload Foto (Trigger JS Global -> Livewire)
             $html .= '<button onclick="openFotoModal('.$row->id.', \''.$fotoUrl.'\')" class="text-blue-500 hover:text-blue-700 rounded-full" title="Upload Foto">
@@ -224,14 +226,14 @@ class ProdukController extends Controller
                 if ($product->foto && Storage::disk('public')->exists($product->foto)) {
                     // Opsional: Hapus file lama jika extension berubah (misal dari .jpg ke .png)
                     // Tapi karena kita pakai storeAs, file dengan nama sama akan tertimpa otomatis.
-                    // Storage::disk('public')->delete($product->foto); 
+                    // Storage::disk('public')->delete($product->foto);
                 }
 
                 $file = $request->file('foto');
-                
+
                 // Format nama file: produk_{id}.{ext}
                 $filename = 'produk_' . $request->id . '.' . $file->getClientOriginalExtension();
-                
+
                 // Simpan ke storage (public/produk-foto)
                 $path = $file->storeAs('produk-foto', $filename, 'public');
 
@@ -239,7 +241,7 @@ class ProdukController extends Controller
                 $product->update(['foto' => $path]);
 
                 return response()->json([
-                    'status' => 'success', 
+                    'status' => 'success',
                     'message' => 'Foto berhasil diupload!',
                     'new_image_url' => Storage::url($path) . '?t=' . time() // Cache busting
                 ]);
@@ -267,7 +269,7 @@ class ProdukController extends Controller
             return response()->json(['message' => 'Data produk berhasil dihapus.']);
         }
 
-     
+
 
     public function deleteSelected(Request $request)
     {
