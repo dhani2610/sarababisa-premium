@@ -21,7 +21,7 @@ class HistoryGaransiController extends Controller
 {
     public function index()
     {
-        $users = User::where('cabang_id',getCabangId())->get();
+        $users = User::where('id','!=',1)->where('cabang_id',getCabangId())->get();
         return view('pages.kepalatoko.history.garansi', compact(
             'users'
         ));
