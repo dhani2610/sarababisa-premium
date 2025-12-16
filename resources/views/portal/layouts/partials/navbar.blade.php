@@ -18,7 +18,7 @@
                         </a>
                     </li> --}}
 
-                    <li><a href="{{ url('/login') }}" class="active">Login</a></li>
+                    <li><a href="{{ url('/login') }}?cabang_id={{ $kepala_toko_setting->cabang_id }}" class="active">Login</a></li>
                     <li><a id="installApp" style="display:none;" class="active">Install App</a></li>
                     <li><a href="{{ url('install-app-ios') }}" style="" class="active">Install App IOS</a></li>
 

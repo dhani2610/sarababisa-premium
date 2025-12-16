@@ -1,4 +1,4 @@
-<x-authentication-layout>
+    <x-authentication-layout>
     <h1 class="text-3xl text-slate-800 font-bold mb-6">{{ __('Atur ulang kata sandi') }} ✨</h1>
     @if (session('status'))
         <div class="mb-4 font-medium text-sm text-green-600">
