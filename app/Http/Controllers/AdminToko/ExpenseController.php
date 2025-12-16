@@ -45,6 +45,7 @@ class ExpenseController extends Controller
             'name' => $request->name,
             'price' => $request->price,
             'users_id' => $request->users_id,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('admin-pengeluaran.index');
