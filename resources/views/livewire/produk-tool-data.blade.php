@@ -14,6 +14,7 @@
         </div>
 
         <!-- Right: Actions -->
+        @if (Auth::user()->role != 'Sales')
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
@@ -285,6 +286,7 @@
             </div>
 
         </div>
+        @endif
 
     </div>
 
@@ -322,6 +324,7 @@
         </div>
 
         <!-- Right side -->
+        @if (Auth::user()->role != 'Sales')
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
             {{-- <div>
                 <select wire:model="paginate" id="" class="form-select">
@@ -441,6 +444,7 @@
             </div>
             <!-- End Import Excel-->
         </div>
+        @endif
     </div>
 
     @if ($errors->any())
@@ -564,7 +568,7 @@
                     </thead>
                     <!-- Table body -->
                     <tbody class="text-sm divide-y divide-slate-200">
-                     
+
                     </tbody>
                 </table>
             </div>

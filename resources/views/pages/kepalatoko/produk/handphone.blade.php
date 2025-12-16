@@ -24,10 +24,10 @@
         <div id="modalUploadFoto" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
             <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Upload Foto Produk</h2>
-                
+
                 <form id="formUploadFoto" enctype="multipart/form-data">
                     <input type="hidden" id="upload_product_id" name="id">
-                    
+
                     <div class="mb-4">
                         <div id="imagePreviewContainer" class="mb-3 hidden text-center bg-gray-50 p-2 rounded border border-dashed border-gray-300">
                              <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Preview Foto</label>
@@ -35,13 +35,13 @@
                         </div>
 
                         <label class="block text-sm font-medium text-gray-700 mb-1">Pilih File Baru</label>
-                        <input type="file" id="inputFoto" name="foto" 
+                        <input type="file" id="inputFoto" name="foto"
                                class="block w-full text-sm text-gray-500
                                       file:mr-4 file:py-2 file:px-4
                                       file:rounded-full file:border-0
                                       file:text-sm file:font-semibold
                                       file:bg-indigo-50 file:text-indigo-700
-                                      hover:file:bg-indigo-100" 
+                                      hover:file:bg-indigo-100"
                                accept=".jpg,.jpeg,.png,.webp" />
                         <p class="text-xs text-gray-400 mt-1">Format: JPG, PNG, WEBP. Maksimal 1MB.</p>
                     </div>
@@ -86,7 +86,7 @@
                     'error':   'Ooops, ada kesalahan.'
                 }
             });
-            
+
             // Simpan instance dropify ke variabel global
             dropifyDr = drEvent.data('dropify');
 
@@ -122,9 +122,11 @@
                     { data: 'garansi_imei', name: 'garansi_imei' },
                     { data: 'garansi', name: 'garansi' },
                     { data: 'is_portal', name: 'is_portal' },
+                    @if (Auth::user()->role != 'Sales')
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
+                    @endif
                 ],
-                order: [[1, 'asc']], 
+                order: [[1, 'asc']],
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
                 },
@@ -162,7 +164,7 @@
                 window.openFotoModal = function(id, currentFotoUrl) {
                     $('#upload_product_id').val(id);
                     $('#inputFoto').val(''); // Reset input file
-                    
+
                     var container = $('#imagePreviewContainer');
                     var img = $('#imagePreview');
                     console.log('====================================');
@@ -201,7 +203,7 @@
                 // 4. Submit Form via AJAX
                 $('#formUploadFoto').on('submit', function(e) {
                     e.preventDefault();
-                    
+
                     var formData = new FormData(this);
                     formData.append('_token', '{{ csrf_token() }}');
 
@@ -218,7 +220,7 @@
                         success: function(response) {
                             alert(response.message);
                             closeFotoModal();
-                            table.ajax.reload(null, false); 
+                            table.ajax.reload(null, false);
                         },
                         error: function(xhr) {
                             try {

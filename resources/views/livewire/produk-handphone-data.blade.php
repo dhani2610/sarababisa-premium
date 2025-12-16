@@ -13,6 +13,7 @@
             <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Item Produk ✨</h1>
         </div>
 
+        @if (Auth::user()->role != 'Sales')
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
@@ -316,7 +317,7 @@
             </div>
 
         </div>
-
+        @endif
     </div>
 
     <!-- More actions -->
@@ -352,6 +353,7 @@
             </ul>
         </div>
 
+        @if (Auth::user()->role != 'Sales')
         <!-- Right side -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
             {{-- <div>
@@ -551,6 +553,7 @@
             </div>
             <!-- End Import Excel-->
         </div>
+        @endif
     </div>
 
     @if ($errors->any())
@@ -715,7 +718,7 @@
                     </thead>
                     <!-- Table body -->
                     <tbody class="text-sm divide-y divide-slate-200">
-                       
+
                     </tbody>
                 </table>
             </div>

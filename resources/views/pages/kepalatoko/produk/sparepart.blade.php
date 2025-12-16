@@ -118,7 +118,7 @@
                     { data: 'keterangan', name: 'keterangan' },
                     { data: 'garansi', name: 'garansi' },
                     { data: 'is_portal', name: 'is_portal' },
-                    @if (Auth::user()->role != 'Teknisi')
+                    @if (Auth::user()->role != 'Teknisi' && Auth::user()->role != 'Sales')
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                     @endif
                 ],

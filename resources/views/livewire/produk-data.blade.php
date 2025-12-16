@@ -14,6 +14,7 @@
         </div>
 
         <!-- Right: Actions -->
+        @if (Auth::user()->role != 'Sales')
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
@@ -752,6 +753,7 @@
             </div>
 
         </div>
+        @endif
 
     </div>
 
@@ -789,6 +791,7 @@
         </div>
 
         <!-- Right side -->
+        @if (Auth::user()->role != 'Sales')
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
             <!-- Print button -->
             <div class="relative inline-flex" x-data="{ modalOpen: false }">
@@ -878,6 +881,7 @@
                 </select>
             </div> --}}
         </div>
+        @endif
     </div>
 
     @if ($errors->any())
@@ -1050,9 +1054,11 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Show Portal</div>
                             </th>
+                            @if (Auth::user()->role != 'Sales')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-center">Aksi</div>
                             </th>
+                            @endif
                         </tr>
                     </thead>
                     <!-- Table body -->
