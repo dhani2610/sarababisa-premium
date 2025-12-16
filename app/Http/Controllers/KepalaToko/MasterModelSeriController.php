@@ -37,7 +37,8 @@ class MasterModelSeriController extends Controller
 
             // Kolom Nama Brand (Merek)
             ->addColumn('brand_name', function ($row) {
-                return $row->brand ? e($row->brand->name) : '<div class="text-rose-600">Data merek telah dihapus</div>';
+                return '<span title="Brand ID: ' . $row->brand->id . '" class="cursor-help border-b border-dotted border-gray-400">' . e($row->brand->name) . '</span>';
+                // return $row->brand ? e($row->brand->name) : '<div class="text-rose-600">Data merek telah dihapus</div>';
             })
 
             // Kolom Tipe OS (Manual query cek, sesuai logic lama bapak)
