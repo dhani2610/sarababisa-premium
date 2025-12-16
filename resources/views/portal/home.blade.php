@@ -10,14 +10,14 @@
         background: #f3f5fa;
         padding: 80px 0;
     }
-    
+
     .section-header h2 {
         font-size: 2.5rem;
         font-weight: 700;
         color: #2c3e50;
         margin-bottom: 10px;
     }
-    
+
     .section-header p {
         color: #7f8c8d;
         font-size: 1.1rem;
@@ -106,7 +106,7 @@
 
 <section id="branch-selection" class="branch-section">
     <div class="container">
-        
+
         <div class="text-center mb-5 section-header" data-aos="fade-down">
             <h2>Pilih Lokasi Cabang</h2>
             <p>Silakan pilih cabang terdekat untuk layanan terbaik kami</p>
@@ -117,27 +117,27 @@
                 @php
 
                     if ($item->id == 1) {
-                        $kepalaToko = \App\Models\User::where('cabang_id',$item->id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+                        $kepalaToko = \App\Models\User::where('role','Kepala Toko')->orderBy('id','asc')->first();
                     }else{
                         $kepalaToko = \App\Models\User::where('cabang_id',$item->id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
                         // dd($data['kepala_toko_setting']);
                     }
                 @endphp
 
+                {{-- @dd($kepalaToko,$item->id); --}}
                 <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 100 }}">
                     <a href="{{ route('portal.branch', $item->id) }}" class="branch-card">
-                        
                         <div class="branch-icon">
                             @if ($kepalaToko && $kepalaToko->profile_photo_path)
-                                <img src="{{ asset('storage/' . $kepalaToko->profile_photo_path) }}" 
+                                <img src="{{ asset('storage/' . $kepalaToko->profile_photo_path) }}"
                                      alt="{{ $kepalaToko->nama_toko ?? $item->nama_toko }}">
                             @else
                                 <i class="bi bi-geo-alt-fill"></i>
                             @endif
                         </div>
-                        
+
                         <h3 class="branch-title">{{ $kepalaToko->nama_toko ?? $item->nama_toko }}</h3>
-                        
+
                         <span class="btn btn-primary btn-choose">
                             Kunjungi Toko <i class="bi bi-arrow-right ms-1"></i>
                         </span>

@@ -13,7 +13,7 @@ class InformasiTokoController extends Controller
     public function index()
     {
         if (getCabangId() == 1) {
-            $users = User::where('cabang_id',getCabangId())->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',getCabangId())->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
