@@ -32,8 +32,8 @@ class MasterTipeOs extends Component
         return view('livewire.master-tipe-os', [
             'count' => $count,
             'TipeOs' => $this->search === null ?
-                TipeOs::latest()->paginate($this->paginate) :
-                TipeOs::latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                TipeOs::where('cabang_id', getCabangId())->latest()->paginate($this->paginate) :
+                TipeOs::where('cabang_id', getCabangId())->latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }
