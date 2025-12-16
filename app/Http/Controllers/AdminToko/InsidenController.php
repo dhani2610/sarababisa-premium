@@ -82,6 +82,7 @@ class InsidenController extends Controller
         Incident::create([
             'name' => $request->name,
             'price' => $request->price,
+            'cabang_id' => getCabangId(),
             'workers_id' => $request->workers_id,
             'persen_teknisi' => $request->persen_teknisi,
             'biaya_teknisi' => $request->price * $request->persen_teknisi / 100,
@@ -111,7 +112,7 @@ class InsidenController extends Controller
     public function edit($id)
     {
         $item = Incident::findOrFail($id);
-        $users = Worker::where('jabatan', 'like', '%' . 'Teknisi' . '%')->get();
+        $users = Worker::where('cabang_id',getCabangId())->where('jabatan', 'like', '%' . 'Teknisi' . '%')->get();
 
         return view('pages.admintoko.insiden-edit', [
             'item' => $item,

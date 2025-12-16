@@ -44,6 +44,7 @@ class KasbonController extends Controller
         $request->merge([
             'total' => (int) str_replace('.', '', $request->total),
         ]);
+        $data['cabang_id'] = getCabangId();
         $data = $request->all();
 
         Debt::create($data);
@@ -70,8 +71,8 @@ class KasbonController extends Controller
      */
     public function edit($id)
     {
-        $item = Debt::with('worker')->findOrFail($id);
-        $workers = Worker::all();
+        $item = Debt::where('cabang_id',getCabangId())->with('worker')->findOrFail($id);
+        $workers = Worker::where('cabang_id',getCabangId())->all();
 
         return view('pages.admintoko.kasbon.edit', [
             'item' => $item,
