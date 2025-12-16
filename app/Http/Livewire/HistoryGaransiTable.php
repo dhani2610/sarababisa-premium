@@ -77,6 +77,7 @@ class HistoryGaransiTable extends Component
                 ->get();
         } else {
             $users = User::where('cabang_id', $cabang)
+                ->where('id','!=',1)
                 ->where('role', '!=', 'Investor')
                 ->get();
         }
@@ -84,7 +85,7 @@ class HistoryGaransiTable extends Component
         /** --------------------------------------------------------
          *  DATA PENDUKUNG
          *  -------------------------------------------------------*/
-        $customer = Customer::all();
+        $customer = Customer::where('cabang_id',getCabangId())->get();
         $serviceTransactions = ServiceTransaction::where('cabang_id', $cabang)
             ->latest()
             ->get();

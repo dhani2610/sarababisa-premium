@@ -37,7 +37,7 @@ class MasterOvertimeController extends Controller
         $hours = $end->diffInMinutes($start) / 60;
         $nominal = round($hours * $ratePerHour);
 
-        Overtime::create([
+        $data = Overtime::create([
             'id_user' => $user->id,
             'tanggal' => $request->tanggal,
             'waktu_start' => $request->waktu_start,
