@@ -22,7 +22,7 @@ class MasterJenisBarangController extends Controller
 
     public function getData(Request $request)
     {
-        $query = Type::latest();
+        $query = Type::where('cabang_id',getCabangId())->latest();
 
         return DataTables::of($query)
             // Kolom Checkbox
