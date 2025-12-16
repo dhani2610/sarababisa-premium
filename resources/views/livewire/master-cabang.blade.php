@@ -150,7 +150,7 @@
                         { data: 'nama_cabang', name: 'nama_cabang' },
                         { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                     ],
-                    order: [[2, 'asc']], // Default urut berdasarkan Nama Cabang (index ke-2)
+                    order: [[1, 'asc']], // Default urut berdasarkan Nama Cabang (index ke-2)
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
                         search: "Cari:",

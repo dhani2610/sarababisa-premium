@@ -14,9 +14,9 @@
                     </svg>
                     <span class="hidden xs:block ml-2">Tambah Model Seri</span>
                 </button>
-                
+
                 <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-100" x-cloak></div>
-                
+
                 <div class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="modalOpen" x-transition:enter="transition ease-in-out duration-200" x-cloak>
                     <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalOpen = false">
                         <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center">
@@ -124,10 +124,10 @@
     @endif
 
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
-        
+
         <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
             <h2 class="font-semibold text-slate-800">Semua Model Seri <span class="text-slate-400 font-medium">{{ $model_series_count }}</span></h2>
-            
+
             <div class="relative inline-flex">
                 <div class="table-items-action hidden">
                     <div class="flex items-center">
@@ -195,7 +195,7 @@
                     { data: 'nominal_bonus', name: 'nominal_bonus' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                 ],
-                order: [[2, 'asc']], // Default urut berdasarkan Nama Model (index ke-2)
+                order: [[1, 'asc']], // Default urut berdasarkan Nama Model (index ke-2)
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
                     search: "Cari:",
