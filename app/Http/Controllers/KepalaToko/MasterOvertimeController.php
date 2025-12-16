@@ -28,6 +28,8 @@ class MasterOvertimeController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
+        // dd($request->all());
+
         $user = Auth::user();
         $store = StoreSetting::where('cabang_id',getCabangId())->first();
         $ratePerHour = $store->nominal_overtime ?? 0;

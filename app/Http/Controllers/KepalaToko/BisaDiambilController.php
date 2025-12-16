@@ -493,6 +493,25 @@ class BisaDiambilController extends Controller
         $users = User::where('role', 'Teknisi')->get();
         $workers = Worker::where('jabatan', 'like', '%' . 'teknisi')->get();
 
+
+         // 1. Decode JSON ke Array
+        $qcMasuk = $item->qc_masuk ? json_decode($item->qc_masuk, true) : [];
+        $qcKeluar = $item->qc_keluar ? json_decode($item->qc_keluar, true) : [];
+        // dd($qcMasuk,$items->qc_masuk);
+        if ($qcMasuk != null) {
+            # code...
+            $qcItems = array_keys($qcMasuk);
+        }else{
+            $qcItems = [];
+        }
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
         return view('pages.kepalatoko.servis.bisa-diambil-edit', [
             'item' => $item,
             'types' => $types,
@@ -503,7 +522,10 @@ class BisaDiambilController extends Controller
             'products' => $products,
             'capacities' => $capacities,
             'users' => $users,
-            'workers' => $workers
+            'workers' => $workers,
+            'qcItems' => $qcItems,
+            'qcMasuk' => $qcMasuk,
+            'qcKeluar' => $qcKeluar,
         ]);
     }
 
@@ -541,6 +563,24 @@ class BisaDiambilController extends Controller
         $bagihasil = $profittransaksi / 100;
         $nama_pelanggan = Customer::find($request->customers_id);
 
+
+        $qc_masuk_data = $request->qc_masuk ?? [];
+        $qc_keluar_data = $request->qc_keluar ?? [];
+
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                if (!empty($name)) {
+                    $val_in = $request->custom_qc_masuk[$key] ?? '-';
+                    $val_out = $request->custom_qc_keluar[$key] ?? '-';
+
+                    $qc_masuk_data[$name] = $val_in;
+                    $qc_keluar_data[$name] = $val_out;
+                }
+            }
+        }
+
+        $qc_masuk_final = json_encode($qc_masuk_data);
+        $qc_keluar_final = json_encode($qc_keluar_data);
         // Transaction update
         $item->update([
             'created_at' => $request->created_at,
@@ -553,7 +593,8 @@ class BisaDiambilController extends Controller
             'model_series_id' => $request->model_series_id,
             'nama_barang' => $nama_barang,
             'kerusakan' => $request->kerusakan,
-            'qc_masuk' => $request->qc_masuk,
+            'qc_masuk' => $qc_masuk_data,
+            'qc_keluar' => $qc_keluar_final,
             'kondisi_servis' => $request->kondisi_servis,
             'service_actions_id' => $request->service_actions_id,
             'products_id' => $request->products_id,
