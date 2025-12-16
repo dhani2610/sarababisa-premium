@@ -156,7 +156,9 @@
                 overflow-wrap: break-word;
                 white-space: normal;
             ">
-                Cek status servis {{ env('APP_URL') }}/tracking
+           
+            Cek status 
+             <a href="{{ env('APP_URL') }}/tracking">{{ env('APP_URL') }}/tracking</a> 
             </p>
             <p>Silahkan bawa Nota Tanda Terima Servis ini pada saat pengambilan barang. Terima kasih.</p>
         </footer>

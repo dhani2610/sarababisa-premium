@@ -118,7 +118,7 @@
             <td>:</td>
             <td>
                 {{ \Carbon\Carbon::parse($items->created_at)->format('d-m-Y') }} /
-                <strong>{{ $items->nomor_servis }}</strong>
+                <strong>{{ $items->kerusakan }}</strong>
             </td>
         </tr>
     </table>

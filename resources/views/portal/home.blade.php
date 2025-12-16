@@ -7,7 +7,7 @@
         min-height: 100vh;
         display: flex;
         align-items: center;
-        background: #f3f5fa; /* Sesuaikan dengan warna tema */
+        background: #f3f5fa;
         padding: 80px 0;
     }
     
@@ -36,15 +36,14 @@
         position: relative;
         overflow: hidden;
         cursor: pointer;
-        display: block; /* Agar tag <a> full cover */
+        display: block;
         text-decoration: none;
     }
 
-    /* Hover Effects */
     .branch-card:hover {
         transform: translateY(-10px);
         box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        border-color: var(--bs-primary); /* Menggunakan warna primary bootstrap */
+        border-color: var(--bs-primary);
     }
 
     .branch-icon {
@@ -59,10 +58,19 @@
         margin: 0 auto 20px;
         font-size: 2rem;
         transition: all 0.4s ease;
+        overflow: hidden; /* PENTING: Agar gambar tidak keluar dari lingkaran */
+    }
+
+    /* TAMBAHAN: Agar gambar pas sebesar lingkaran */
+    .branch-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Agar gambar tidak gepeng/terdistorsi */
+        display: block;
     }
 
     .branch-card:hover .branch-icon {
-        background: var(--bs-primary);
+        /* background: var(--bs-primary); */
         color: #fff;
         transform: scale(1.1) rotate(5deg);
     }
@@ -106,23 +114,35 @@
 
         <div class="row g-4 justify-content-center">
             @foreach ($cabang as $item)
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 100 }}">
-                <a href="{{ route('portal.branch', $item->id) }}" class="branch-card">
-                    
-                    <div class="branch-icon">
-                        <i class="bi bi-geo-alt-fill"></i> </div>
-                    
-                    <h3 class="branch-title">{{ $item->nama_cabang }}</h3>
-                    
-                    {{-- <p class="branch-address">
-                        {{ $item->alamat ?? 'Alamat belum tersedia' }}
-                    </p> --}}
+                @php
 
-                    <span class="btn btn-primary btn-choose">
-                        Kunjungi Toko <i class="bi bi-arrow-right ms-1"></i>
-                    </span>
-                </a>
-            </div>
+                    if ($item->id == 1) {
+                        $kepalaToko = \App\Models\User::where('cabang_id',$item->id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+                    }else{
+                        $kepalaToko = \App\Models\User::where('cabang_id',$item->id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+                        // dd($data['kepala_toko_setting']);
+                    }
+                @endphp
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 100 }}">
+                    <a href="{{ route('portal.branch', $item->id) }}" class="branch-card">
+                        
+                        <div class="branch-icon">
+                            @if ($kepalaToko && $kepalaToko->profile_photo_path)
+                                <img src="{{ asset('storage/' . $kepalaToko->profile_photo_path) }}" 
+                                     alt="{{ $kepalaToko->nama_toko ?? $item->nama_toko }}">
+                            @else
+                                <i class="bi bi-geo-alt-fill"></i>
+                            @endif
+                        </div>
+                        
+                        <h3 class="branch-title">{{ $kepalaToko->nama_toko ?? $item->nama_toko }}</h3>
+                        
+                        <span class="btn btn-primary btn-choose">
+                            Kunjungi Toko <i class="bi bi-arrow-right ms-1"></i>
+                        </span>
+                    </a>
+                </div>
             @endforeach
         </div>
 

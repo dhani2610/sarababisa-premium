@@ -160,7 +160,7 @@
                 <td id="data">: -</td>
                 @endif
                 <td id="data" colspan="2" style="border-left-style: solid;" class="text-center">
-                    <p>{{ env('APP_URL') . '/tracking' }} </p>
+                    <p><a href="{{ env('APP_URL') }}/tracking">{{ env('APP_URL') }}/tracking</a> </p>
                 </td>
             </tr>
             <tr style="border-right-style: solid;">
@@ -230,7 +230,7 @@
                     <hr style="border-top: 1px dashed;">
                 </td>
                 @endif
-                <td class="text-center"><img src="{{ $items->pola != null ? $items->pola : asset('images/pola.png') }}" alt=""
+                <td class="text-center"><img src="{{ $polaImage }}" alt=""
                         style="height: 40"></td>
                 <td class="text-center capital" style="padding-top: 36px;">{{ $items->customer->nama }}</td>
                 <td class="text-center capital" style="padding-top: 36px;">{{ $items->penerima }}</td>

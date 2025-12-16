@@ -265,6 +265,7 @@
                                         </div> --}}
                                         <div>
                                             <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (IN) <span class="text-rose-500">*</span></label>
+                                            <small class="text-rose-500">*Jika ingin cepat silahkan isi kolom other.</small>
                                             <div class="overflow-x-auto border rounded-sm">
                                                 <table class="w-full text-xs text-left border-collapse" id="table-qc-tab1">
                                                     <thead class="bg-slate-100 uppercase text-slate-500 font-semibold">
@@ -455,6 +456,8 @@
                                         </div> --}}
                                         <div>
                                             <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (IN & OUT) <span class="text-rose-500">*</span></label>
+                                            <small class="text-rose-500">*Jika ingin cepat silahkan isi kolom other.</small>
+
                                             <div class="overflow-x-auto border rounded-sm">
                                                 <table class="w-full text-xs text-left border-collapse" id="table-qc-tab2">
                                                     <thead class="bg-slate-100 uppercase text-slate-500 font-semibold">
@@ -1026,8 +1029,9 @@
                             <div class="p-4 border rounded-lg bg-slate-50 border-slate-200">
                                 <div class="flex items-center mb-2">
                                     <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">IN</span>
-                                    <label class="block text-sm font-bold text-gray-700">Kondisi Masuk</label>
+                                    <label class="block text-sm font-bold text-gray-700">Kondisi Masuk</label> <br>
                                 </div>
+                                <small class="text-rose-500">*Klik lagi untuk menambah foto lainnya (Multi-upload).</small>
                                 <input type="file" class="filepond-masuk" name="file" multiple data-max-file-size="10MB">
                             </div>
 
@@ -1036,6 +1040,7 @@
                                     <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">OUT</span>
                                     <label class="block text-sm font-bold text-gray-700">Kondisi Selesai</label>
                                 </div>
+                                <small class="text-rose-500">*Klik lagi untuk menambah foto lainnya (Multi-upload).</small>
                                 <input type="file" class="filepond-selesai" name="file" multiple data-max-file-size="10MB">
                             </div>
                         </div>
