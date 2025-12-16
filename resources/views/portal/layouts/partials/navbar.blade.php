@@ -5,7 +5,7 @@
             <a href="{{ url('/') }}" class="logo d-flex align-items-center">
                 <!-- Uncomment the line below if you also wish to use an image logo -->
                 {{-- <img src="portal/assets/img/logo.webp" alt=""> --}}
-                <h1 class="sitename">{{ $kepala_toko_setting->nama_toko }}</h1>
+                <h1 class="sitename">{{ $kepala_toko_setting->nama_portal ?? $kepala_toko_setting->nama_toko }}</h1>
             </a>
 
             <nav id="navmenu" class="navmenu">
@@ -17,7 +17,7 @@
                             Kontak
                         </a>
                     </li> --}}
-                   
+
                     <li><a href="{{ url('/login') }}" class="active">Login</a></li>
                     <li><a id="installApp" style="display:none;" class="active">Install App</a></li>
                     <li><a href="{{ url('install-app-ios') }}" style="" class="active">Install App IOS</a></li>

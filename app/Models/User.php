@@ -27,6 +27,7 @@ class User extends Authenticatable
      * @var string[]
      */
     protected $fillable = [
+        'nama_portal',
         'name',
         'email',
         'password',

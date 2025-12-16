@@ -31,6 +31,13 @@
             @endif
 
             <!-- Picture -->
+            @if ($users->id == 1)
+            <section>
+                <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Nama Portal</h3>
+                <input name="nama_portal" id="nama_portal" class="form-input w-full" type="text"
+                            value="{{ $users->nama_portal }}" />
+            </section>
+            @endif
             <section>
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Logo Toko</h3>
                 <div class="flex items-center">
