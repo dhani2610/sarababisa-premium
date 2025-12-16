@@ -19,7 +19,7 @@ class CabangController extends Controller
     {
         // Data untuk header count dan modal (allowShow)
         $cabang_count = Cabang::count();
-        
+
         // Cek limit cabang user
         $total_cabang_user = Auth::user()->total_cabang;
         $allowShow = $cabang_count < $total_cabang_user;
@@ -36,7 +36,7 @@ class CabangController extends Controller
             // Kolom Checkbox
             ->addColumn('checkbox', function ($row) {
                 // Cabang ID 1 (Pusat/Default) biasanya tidak boleh dihapus
-                if ($row->id == 1) return ''; 
+                if ($row->id == 1) return '';
                 return '<input type="checkbox" class="table-item form-checkbox" value="' . $row->id . '" />';
             })
             // Kolom Aksi
@@ -139,12 +139,7 @@ class CabangController extends Controller
         }
         $storeSetting->owner = $request->owner;
         $storeSetting->nama_toko = $request->nama_toko;
-        $storeSetting->deskripsi_toko = $request->deskripsi_toko;
         $storeSetting->nomor_hp_toko = $request->nomor_hp_toko;
-        $storeSetting->bank = $request->bank;
-        $storeSetting->rekening = $request->rekening;
-        $storeSetting->pemilik_rekening = $request->pemilik_rekening;
-        $storeSetting->alamat_toko = $request->alamat_toko;
         $storeSetting->cabang_id = $data->id;
         $storeSetting->is_tax = 0;
         $storeSetting->is_bonus = 1;
@@ -207,13 +202,7 @@ class CabangController extends Controller
         }
         $storeSetting->owner = $request->owner;
         $storeSetting->nama_toko = $request->nama_toko;
-        $storeSetting->alamat_toko = $request->alamat_toko;
-        $storeSetting->deskripsi_toko = $request->deskripsi_toko;
-        $storeSetting->alamat_toko = $request->alamat_toko;
         $storeSetting->nomor_hp_toko = $request->nomor_hp_toko;
-        $storeSetting->bank = $request->bank;
-        $storeSetting->rekening = $request->rekening;
-        $storeSetting->pemilik_rekening = $request->pemilik_rekening;
         $storeSetting->save();
 
         return redirect()->route('master-cabang.index');

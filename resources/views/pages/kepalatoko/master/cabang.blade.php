@@ -28,7 +28,7 @@
                     @endif
 
                     <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-100" x-cloak></div>
-                    
+
                     <div class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="modalOpen" x-transition:enter="transition ease-in-out duration-200" x-cloak>
                         <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalOpen = false">
                             <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center">
@@ -52,28 +52,8 @@
                                             <input id="nama_toko" name="nama_toko" class="form-input w-full px-2 py-1" type="text" required />
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium mb-1" for="deskripsi_toko">Deskripsi Toko <span class="text-rose-500">*</span></label>
-                                            <input id="deskripsi_toko" name="deskripsi_toko" class="form-input w-full px-2 py-1" type="text" required />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="alamat_toko">Alamat Toko <span class="text-rose-500">*</span></label>
-                                            <input id="alamat_toko" name="alamat_toko" class="form-input w-full px-2 py-1" type="text" required />
-                                        </div>
-                                        <div>
                                             <label class="block text-sm font-medium mb-1" for="nomor_hp_toko">Nomor Toko <span class="text-rose-500">*</span></label>
                                             <input id="nomor_hp_toko" name="nomor_hp_toko" class="form-input w-full px-2 py-1" type="text" required />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="bank">Bank <span class="text-rose-500">*</span></label>
-                                            <input id="bank" name="bank" class="form-input w-full px-2 py-1" type="text" required />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="rekening">Rekening <span class="text-rose-500">*</span></label>
-                                            <input id="rekening" name="rekening" class="form-input w-full px-2 py-1" type="text" required />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="pemilik_rekening">Pemilik Rekening <span class="text-rose-500">*</span></label>
-                                            <input id="pemilik_rekening" name="pemilik_rekening" class="form-input w-full px-2 py-1" type="text" required />
                                         </div>
                                     </div>
                                 </div>
@@ -103,10 +83,10 @@
         @endif
 
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
-            
+
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 <h2 class="font-semibold text-slate-800">Semua Cabang <span class="text-slate-400 font-medium">{{ $cabang_count }}</span></h2>
-                
+
                 <div class="relative inline-flex">
                     <div class="table-items-action hidden">
                         <div class="flex items-center">
@@ -161,7 +141,7 @@
                     ajax: "{{ route('master-cabang.data') }}",
                     columns: [
                         { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
-                      
+
                         { data: 'id', name: 'id' },
                         { data: 'nama_cabang', name: 'nama_cabang' },
                         { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
