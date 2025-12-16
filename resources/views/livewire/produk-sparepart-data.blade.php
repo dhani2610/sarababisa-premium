@@ -13,6 +13,7 @@
             <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Item Produk ✨</h1>
         </div>
 
+        @if (Auth::user()->role != 'Teknisi')
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
@@ -294,12 +295,14 @@
             </div>
 
         </div>
+        @endif
 
     </div>
 
     <!-- More actions -->
     <div class="sm:flex sm:justify-between sm:items-center mb-5">
         <!-- Left side -->
+        @if (Auth::user()->role != 'Teknisi')
         <div class="mb-4 sm:mb-0">
             <ul class="flex flex-wrap -m-1">
                 <li class="m-1">
@@ -329,8 +332,11 @@
                 </li>
             </ul>
         </div>
+        @endif
 
         <!-- Right side -->
+        @if (Auth::user()->role != 'Teknisi')
+
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
             {{-- <div>
                 <select wire:model="paginate" id="" class="form-select">
@@ -529,6 +535,8 @@
             </div>
             <!-- End Import Excel-->
         </div>
+        @endif
+
     </div>
 
     @if ($errors->any())
@@ -626,14 +634,16 @@
                              <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Show Portal</div>
                             </th>
+                            @if (Auth::user()->role != 'Teknisi')
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Aksi</div>
                             </th>
+                            @endif
                         </tr>
                     </thead>
                     <!-- Table body -->
                     <tbody class="text-sm divide-y divide-slate-200">
-                       
+
                     </tbody>
                 </table>
             </div>
