@@ -80,7 +80,7 @@ class DashboardController extends Controller
         // $totalbonus = ($adminbiayaservis / 100 + $adminprofitpenjualan / 100) * Auth::user()->persen;
         // dd(($adminbiayaservis / 100 + $adminprofitpenjualan / 100),$adminbiayaservis,$adminprofitpenjualan,$totalbonus);
 
-        $totalbudgets = Budget::all()->sum('total');
+        $totalbudgets = Budget::where('cabang_id',getCabangId())->all()->sum('total');
         $totalbiayaservis = ServiceTransaction::where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', $currentYear)
             ->whereMonth('tgl_disetujui', $currentMonth)
