@@ -422,6 +422,11 @@ class ProdukController extends Controller
         // Mengambil logo dan nama toko
         $users = User::find(1);
 
+        if (getCabangId() == 1) {
+            $users = User::where('cabang_id',getCabangId())->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }else{
+            $users = User::where('cabang_id',getCabangId())->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
 
