@@ -42,7 +42,7 @@ class MasterOvertime extends Component
 
         $query = Overtime::with('user')->latest();
 
-        if ($user->role !== 'Kepala Toko') {
+        if ($user->role !== 'Kepala Toko' && $user->role !== 'Admin Toko') {
             $query->where('id_user', $user->id);
         }
 
@@ -59,7 +59,8 @@ class MasterOvertime extends Component
         // Statistik
         $today = Carbon::today();
         $statQuery = Overtime::query();
-        if ($user->role !== 'Kepala Toko') {
+        if ($user->role !== 'Kepala Toko' && $user->role !== 'Admin Toko') {
+
             $statQuery->where('id_user', $user->id);
         }
 
