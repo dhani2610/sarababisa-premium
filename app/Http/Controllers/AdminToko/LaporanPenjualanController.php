@@ -22,6 +22,7 @@ class LaporanPenjualanController extends Controller
             $currentMonth = now()->month;
             $currentYear = now()->year;
             $query->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
                 ->whereYear('tgl_disetujui', $currentYear)
                 ->whereMonth('tgl_disetujui', $currentMonth)
                 ->whereDate('tgl_disetujui', today());
@@ -42,6 +43,7 @@ class LaporanPenjualanController extends Controller
             $currentYear = now()->year;
 
             $query->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
                 ->whereYear('tgl_disetujui', $currentYear)
                 ->whereMonth('tgl_disetujui', $currentMonth)
                 ->whereDate('tgl_disetujui', today());
@@ -59,6 +61,7 @@ class LaporanPenjualanController extends Controller
 
         $rumusomzetbulan = Order::whereHas('detailOrders', function ($query) {
             $query->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
                 ->whereYear('tgl_disetujui', now()->year)
                 ->whereMonth('tgl_disetujui', now()->month);
         })
@@ -75,6 +78,7 @@ class LaporanPenjualanController extends Controller
 
         $rumusprofitbulan = Order::whereHas('detailOrders', function ($query) {
             $query->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
                 ->whereYear('tgl_disetujui', now()->year)
                 ->whereMonth('tgl_disetujui', now()->month);
         })
@@ -91,6 +95,7 @@ class LaporanPenjualanController extends Controller
 
         $rumusomzettahun = Order::whereHas('detailOrders', function ($query) {
             $query->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
                 ->whereYear('tgl_disetujui', now()->year);
         })
             ->with(['detailOrders' => function ($query) {
@@ -106,6 +111,7 @@ class LaporanPenjualanController extends Controller
 
         $rumusprofittahun = Order::whereHas('detailOrders', function ($query) {
             $query->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
                 ->whereYear('tgl_disetujui', now()->year);
         })
             ->with(['detailOrders' => function ($query) {
@@ -129,6 +135,12 @@ class LaporanPenjualanController extends Controller
         // Mengambil logo dan nama toko
         $users = User::find(1);
 
+        if (getCabangId() == 1) {
+            $users = User::where('cabang_id',getCabangId())->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }else{
+            $users = User::where('cabang_id',getCabangId())->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
 
@@ -139,51 +151,61 @@ class LaporanPenjualanController extends Controller
         // Mengambil data penjualan
         $orders = OrderDetail::with('order')->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->orderBy('created_at', 'asc')
             ->get();
 
         // Menghitung total biaya
         $total_biaya = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->sum('total');
 
         // Menghitung total profit
         $total_profit = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->sum('profit');
 
         // Menghitung total item penjualan
         $total_penjualan = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->sum('quantity');;
 
         // Menghitung total modal
         $total_modal = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->sum('modal');
 
         // Menghitung total diskon
         $total = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->sum('total');
         $sub_total = OrderDetail::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->sum('sub_total');
         $total_diskon = $sub_total - $total;
 
         // Menghitung total pembayaran tunai
         $total_tunai = Order::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->sum('tunai');
 
         // Menghitung total pembayaran transfer
         $total_transfer = Order::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->sum('transfer');
 
         // Menghitung total pembayaran kredit
         $total_kredit = Order::whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
             ->sum('due');
 
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
