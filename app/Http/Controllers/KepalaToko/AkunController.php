@@ -41,9 +41,20 @@ class AkunController extends Controller
 
         $shift = Shift::where('cabang_id', $cabangId)->get();
 
-        $count = User::whereNull('deleted_at')
-            ->where('cabang_id', $cabangId)
-            ->count();
+       if ($cabangId != 1) {
+            $count = User::whereNull('deleted_at')
+                ->where('cabang_id', $cabangId)
+                ->where('id', '!=',1)
+                ->with('type')
+                ->count();
+        }else{
+            $count = User::whereNull('deleted_at')
+                ->where('cabang_id', $cabangId)
+                ->with('type')
+                ->count();
+
+        }
+
         return view('pages/kepalatoko/akun', compact(
             'users',
             'users_count',
@@ -62,7 +73,7 @@ class AkunController extends Controller
         // Query Dasar (Eager load shift dan type untuk performa)
         $query = User::whereNull('deleted_at')
             ->where('cabang_id', $cabangId)
-            ->with(['shift', 'type']) 
+            ->with(['shift', 'type'])
             ->latest();
 
         // Sembunyikan Super Admin (ID 1) jika bukan di cabang pusat
@@ -72,7 +83,7 @@ class AkunController extends Controller
 
         return DataTables::of($query)
             ->addIndexColumn()
-            
+
             // 1. Checkbox
             ->addColumn('checkbox', function ($row) {
                 if ($row->id == Auth::id() || $row->id == 1) return ''; // Jangan hapus diri sendiri/admin
@@ -132,7 +143,7 @@ class AkunController extends Controller
             ->addColumn('pdf_investor', function ($row) {
                 if ($row->role == 'Investor' && $row->pdf_investor) {
                     $url = asset('storage/' . $row->pdf_investor);
-                    return '<p class="text-sm mt-1">📎 
+                    return '<p class="text-sm mt-1">📎
                                 <a href="' . $url . '" target="_blank" class="text-indigo-500 underline">Lihat PDF</a>
                             </p>';
                 }

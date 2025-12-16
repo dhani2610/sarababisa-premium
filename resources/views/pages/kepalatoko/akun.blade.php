@@ -457,9 +457,16 @@
                     ajax: "{{ route('akun.data') }}",
                     columns: [
                         { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
-                        
+                        {
+                            data: null,
+                            sortable: false,
+                            orderable: false,
+                            searchable: false,
+                            render: function (data, type, row, meta) {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            }
+                        },
 
-                        { data: 'id', name: 'id', orderable: false, searchable: false },
                         { data: 'cabang_name', name: 'cabang_name', orderable: false, searchable: false },
                         { data: 'name', name: 'name' },
                         { data: 'username', name: 'username' },
@@ -473,7 +480,7 @@
                         { data: 'shift_name', name: 'shift.nama_shift' },
                         { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                     ],
-                    order: [[3, 'asc']], // Default urut berdasarkan Nama (index ke-3)
+                    order: [[1, 'asc']], // Default urut berdasarkan Nama (index ke-3)
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
                         search: "Cari:",
