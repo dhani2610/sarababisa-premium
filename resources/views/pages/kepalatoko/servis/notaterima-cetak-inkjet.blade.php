@@ -199,8 +199,17 @@
                 <th colspan="6" style="text-align: left">Syarat & Ketentuan</th>
             </tr>
             <tr>
+                @php
+                    $banks = old('banks', json_decode($users->banks ?? '[]', true));
+                @endphp
                 <td colspan="6" style="text-align: justify">
                     {!! $terms->description !!}
+                    <br><strong>No. Rekening : {{ $users->rekening }} {{ $users->bank }} An.
+                            {{ $users->pemilik_rekening }} </strong>
+                    @foreach ($banks as $index => $bank)
+                        <br><strong>No. Rekening : {{ $bank['rekening'] }}, {{ $bank['bank'] }} An.
+                            {{ $bank['pemilik'] }} </strong>
+                    @endforeach
                 </td>
             </tr>
             <tr>
