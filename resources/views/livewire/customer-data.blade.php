@@ -663,14 +663,22 @@
                 ajax: "{{ route('pelanggan.data') }}",
                 columns: [
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
-                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                    {
+                        data: null,
+                        sortable: false,
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
                     { data: 'nama', name: 'nama' },
                     { data: 'kategori', name: 'kategori' },
                     { data: 'nomor_hp', name: 'nomor_hp' },
                     { data: 'alamat', name: 'alamat' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                 ],
-                order: [[2, 'asc']], // Default order by Nama
+                order: [[1, 'asc']], // Default order by Nama
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
                     search: "Cari:",
@@ -759,7 +767,7 @@
                     sortField: { field: "text", direction: "asc" }
                 });
             }
-            
+
             const checkboxAll = document.getElementById('select-all-customers');
             const selectBroad = document.getElementById('broadcast-select');
             if(checkboxAll && selectBroad){
