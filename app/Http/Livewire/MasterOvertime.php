@@ -63,6 +63,7 @@ class MasterOvertime extends Component
 
             $statQuery->where('id_user', $user->id);
         }
+        $statQuery->where('cabang_id',getCabangId());
 
         $stats = [
             'hariIni' => [
