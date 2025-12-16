@@ -34,7 +34,7 @@ class MasterModelSeriController extends Controller
             ->addColumn('checkbox', function ($row) {
                 return '<input type="checkbox" class="table-item form-checkbox" value="' . $row->id . '" />';
             })
-            
+
             // Kolom Nama Brand (Merek)
             ->addColumn('brand_name', function ($row) {
                 return $row->brand ? e($row->brand->name) : '<div class="text-rose-600">Data merek telah dihapus</div>';
@@ -197,14 +197,14 @@ class MasterModelSeriController extends Controller
         //     $counter++;
         // }
 
-        $finalName = $request->name; 
+        $finalName = $request->name;
 
         // Cek keberadaan nama (termasuk yang sudah dihapus/withTrashed)
         // while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
-            
+
         //     // Jika ada, tambahkan satu titik di belakang nama yang sedang dicek
         //     $finalName = $finalName . '.';
-            
+
         // }
         // Update nama di array data dengan nama yang sudah unik
         $data['name'] = $finalName;
@@ -249,9 +249,9 @@ class MasterModelSeriController extends Controller
      */
     public function edit($id)
     {
-        $item = ModelSerie::with('brand')->findOrFail($id);
-        $brands = Brand::all();
-        $tipe = TipeOs::get();
+        $item = ModelSerie::where('cabang_id',getCabangId())->with('brand')->findOrFail($id);
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $tipe = TipeOs::where('cabang_id',getCabangId())->get();
 
         return view('pages.kepalatoko.master.model-seri-edit', [
             'item' => $item,

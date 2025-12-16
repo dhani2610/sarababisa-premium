@@ -75,6 +75,8 @@ class ProsesData extends Component
         $brands = Brand::where('cabang_id',getCabangId())->get();
         $capacities = Capacity::where('cabang_id',getCabangId())->get();
         $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        // dd($brands,$model_series);
+
         $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
         $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
         $penerima = User::where('cabang_id',getCabangId())->whereNotIn('role',['Investor','Kepala Toko'])->get();
