@@ -50,7 +50,8 @@ class MasterIzin extends Component
         $query = Izin::where('cabang_id',getCabangId())->with('user')->latest();
 
         // Filter user jika bukan kepala toko
-        if ($user->role !== 'Kepala Toko') {
+        if ($user->role !== 'Kepala Toko' && $user->role !== 'Admin Toko') {
+
             $query->where('user_id', $user->id);
         }
 
@@ -79,10 +80,10 @@ class MasterIzin extends Component
         $today = Carbon::today();
 
         $statQuery = Izin::query();
-        if ($user->role !== 'Kepala Toko') {
+        if ($user->role !== 'Kepala Toko' && $user->role !== 'Admin Toko') {
             $statQuery->where('user_id', $user->id);
-            $statQuery->where('cabang_id',getCabangId());
         }
+        $statQuery->where('cabang_id',getCabangId());
 
         $stats = [
             'hariIni' => [
