@@ -101,6 +101,8 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="brands_id">Merek</label>
                                     <select id="brands_id" name="brands_id" class="form-select text-sm w-full">
+                                        <option value="">Pilih Brand</option>
+
                                         @foreach ($brands as $brand)
                                             <option value="{{ $brand->id }}" {{ $item->brand->id == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
                                         @endforeach
