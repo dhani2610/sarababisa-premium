@@ -115,9 +115,9 @@ class DashboardController extends Controller
             return $transaction->created_at->addDays($reminderThreshold)->isPast();
         })->count();
 
-        $stokhabis = Product::where('stok', 0)->count();
+        $stokhabis = Product::where('cabang_id',getCabangId())->where('stok', 0)->count();
 
-        $inventories = Inventory::where('masa_penggantian', '<', $currentDate)->count();
+        $inventories = Inventory::where('cabang_id',getCabangId())->where('masa_penggantian', '<', $currentDate)->count();
 
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
