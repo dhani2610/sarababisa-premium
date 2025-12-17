@@ -29,8 +29,12 @@ public function indexHome(Request $request)
 public function index(Request $request, $id)
 {
     // 1. Validasi Cabang
-    // $cabang = Cabang::findOrFail($id);
-    // $data['current_cabang'] = $cabang;
+    $cabang = Cabang::find($id);
+    if (empty($cabang)) {
+        $data['current_cabang'] = [];
+    }else{
+        $data['current_cabang'] = $cabang;
+    }
 
     // 2. Filter Kategori (Mungkin perlu filter by cabang jika kategori spesifik per cabang)
     $data['productCategory'] = Category::where('show_portal', 1)
