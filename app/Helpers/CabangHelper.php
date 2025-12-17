@@ -95,9 +95,9 @@ if (!function_exists('allowTransaksiCabang')) {
     {
         $cbg = Cabang::find(getCabangId());
         if (!empty($cbg)) {
-            $data = $cbg->allow_transaksi ?? 0;
+            $data = $cbg->allow_transaksi ?? 1;
         }else{
-            $data = 0;
+            $data = 1;
         }
         return $data;
     }
