@@ -22,24 +22,30 @@ class InsidenController extends Controller
         $currentYear = now()->year;
 
         $jumlahhari = Incident::whereDate('created_at', today())
+        ->where('cabang_id',getCabangId())
             ->count();
         $totalbiaya = Incident::whereDate('created_at', today())
+        ->where('cabang_id',getCabangId())
             ->get()
             ->sum('biaya_toko');
         $jumlahbulan = Incident::whereMonth('created_at', $currentMonth)
+        ->where('cabang_id',getCabangId())
             ->count();
         $totalbiayabulan = Incident::whereMonth('created_at', $currentMonth)
+        ->where('cabang_id',getCabangId())
             ->get()
             ->sum('biaya_toko');
         $jumlahtahun = Incident::whereYear('created_at', $currentYear)
+        ->where('cabang_id',getCabangId())
             ->count();
         $totalbiayatahun = Incident::whereYear('created_at', $currentYear)
             ->get()
+            ->where('cabang_id',getCabangId())
             ->sum('biaya_toko');
 
-        $users = Worker::where('jabatan', 'like', '%' . 'Teknisi' . '%')->get();
-        $incidents = Incident::with('worker')->get();
-        $incidents_count = Incident::all()->count();
+        $users = Worker::where('cabang_id',getCabangId())->where('jabatan', 'like', '%' . 'Teknisi' . '%')->get();
+        $incidents = Incident::where('cabang_id',getCabangId())->with('worker')->get();
+        $incidents_count = Incident::where('cabang_id',getCabangId())->get()->count();
 
         return view('pages/admintoko/insiden', compact(
             'users',
@@ -76,6 +82,7 @@ class InsidenController extends Controller
         Incident::create([
             'name' => $request->name,
             'price' => $request->price,
+            'cabang_id' => getCabangId(),
             'workers_id' => $request->workers_id,
             'persen_teknisi' => $request->persen_teknisi,
             'biaya_teknisi' => $request->price * $request->persen_teknisi / 100,
@@ -105,7 +112,7 @@ class InsidenController extends Controller
     public function edit($id)
     {
         $item = Incident::findOrFail($id);
-        $users = Worker::where('jabatan', 'like', '%' . 'Teknisi' . '%')->get();
+        $users = Worker::where('cabang_id',getCabangId())->where('jabatan', 'like', '%' . 'Teknisi' . '%')->get();
 
         return view('pages.admintoko.insiden-edit', [
             'item' => $item,

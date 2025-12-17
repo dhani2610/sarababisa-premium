@@ -151,13 +151,35 @@
                                     <label class="block text-sm font-medium mb-1" for="kerusakan">Kerusakan</label>
                                     <input id="kerusakan" name="kerusakan" class="form-input w-full px-2 py-1" type="text" value="{{ $item->kerusakan }}"/>
                                 </div>
-                                <div>
+                                {{-- <div>
                                     <label class="block text-sm font-medium mb-1" for="qc_masuk">Pengecekan Fungsi Masuk</label>
                                     <input id="qc_masuk" name="qc_masuk" class="form-input w-full px-2 py-1" type="text" value="{{ $item->qc_masuk }}"/>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="qc_keluar">Pengecekan Fungsi Keluar</label>
                                     <input id="qc_keluar" name="qc_keluar" class="form-input w-full px-2 py-1" type="text" value="{{ $item->qc_keluar }}"/>
+                                </div> --}}
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (Masuk & Keluar) <span class="text-rose-500">*</span></label>
+                                    <small class="text-rose-500">*Jika ingin cepat silahkan isi kolom other.</small>
+                                    <div class="overflow-x-auto border rounded-sm">
+                                        <table class="w-full text-xs text-left border-collapse" id="table-qc-tab2">
+                                            <thead class="bg-slate-100 uppercase text-slate-500 font-semibold">
+                                                <tr>
+                                                    <th class="border border-slate-300 p-2 w-8 text-center">No</th>
+                                                    <th class="border border-slate-300 p-2 w-1/3">ITEM</th>
+                                                    <th class="border border-slate-300 p-2 bg-blue-50 text-center">REMARK IN</th>
+                                                    <th class="border border-slate-300 p-2 bg-blue-50 text-center">REMARK OUT</th>
+                                                    <th class="border border-slate-300 p-2 w-8 text-center"></th> </tr>
+                                            </thead>
+                                            <tbody id="checklist-tbody-tab2" class="text-slate-700">
+                                                </tbody>
+                                        </table>
+                                    </div>
+                                    <button type="button" onclick="addCustomRowTab2()" class="mt-2 text-xs flex items-center text-indigo-600 font-bold hover:text-indigo-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                                        Tambah Baris Custom
+                                    </button>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="kondisi_servis">Kondisi Servis  </label>
@@ -447,6 +469,102 @@
                 $('#selectjs4').select2();
             });
         </script>
+<script>
+    // Struktur: [ArrayStandar, ObjectMasuk, ObjectKeluar]
+    const fullData = @json([$qcItems, $qcMasuk, $qcKeluar]); 
+    
+    // Pecah data ke variabel biar mudah dibaca
+    const standardItems = fullData[0];       // List Nama Item
+    const dataMasuk     = fullData[1] || {}; // Data Value Masuk
+    const dataKeluar    = fullData[2] || {}; // Data Value Keluar
+
+    document.addEventListener('DOMContentLoaded', function() {
+        renderAllChecklists();
+    });
+
+    // --- FUNGSI RENDER UTAMA ---
+    function renderAllChecklists() {
+        const tbodyTab2 = document.getElementById('checklist-tbody-tab2');
+        tbodyTab2.innerHTML = '';
+        
+        standardItems.forEach((item, index) => {
+            let valMasuk = dataMasuk[item] || ''; 
+            let valKeluar = dataKeluar[item] || '';
+
+            if(valMasuk === null) valMasuk = '';
+            if(valKeluar === null) valKeluar = '';
+
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-slate-200 hover:bg-slate-50";
+            
+            tr.innerHTML = `
+                <td class="border border-slate-300 p-1 text-center font-bold row-num">${index + 1}</td>
+                <td class="border border-slate-300 p-1 font-medium bg-slate-50">${item}</td>
+                <td class="border border-slate-300 p-0">
+                    <input type="text" name="qc_masuk[${item}]" value="${valMasuk}" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent text-center" placeholder="-">
+                </td>
+                <td class="border border-slate-300 p-0">
+                    <input type="text" name="qc_keluar[${item}]" value="${valKeluar}" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent text-center" placeholder="-">
+                </td>
+                <td class="border border-slate-300 p-1 text-center">
+                    <button type="button" class="text-rose-500 hover:text-rose-700" onclick="deleteRow(this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="7" x2="20" y2="7" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+                    </button>
+                </td>
+            `;
+            tbodyTab2.appendChild(tr);
+        });
+
+        const allKeys = new Set([...Object.keys(dataMasuk), ...Object.keys(dataKeluar)]);
+        
+        allKeys.forEach(key => {
+            if (!standardItems.includes(key)) {
+                let valMasuk = dataMasuk[key] || '';
+                let valKeluar = dataKeluar[key] || '';
+                
+                addCustomRowTab2(key, valMasuk, valKeluar);
+            }
+        });
+    }
+
+    // --- MODIFIKASI FUNGSI CUSTOM ROW ---
+    // Tambahkan parameter agar bisa diisi value-nya saat load data
+    function addCustomRowTab2(name = '', valMasuk = '', valKeluar = '') {
+        const tbody = document.getElementById('checklist-tbody-tab2');
+        const rowCount = tbody.rows.length + 1;
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-slate-200 hover:bg-yellow-50";
+
+        tr.innerHTML = `
+            <td class="border border-slate-300 p-1 text-center font-bold row-num">${rowCount}</td>
+            <td class="border border-slate-300 p-0">
+                <input type="text" name="custom_item_name[]" value="${name}" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent font-medium text-indigo-600" placeholder="Ketik Nama Item..." required>
+            </td>
+            <td class="border border-slate-300 p-0">
+                <input type="text" name="custom_qc_masuk[]" value="${valMasuk}" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent text-center" placeholder="-">
+            </td>
+            <td class="border border-slate-300 p-0">
+                <input type="text" name="custom_qc_keluar[]" value="${valKeluar}" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent text-center" placeholder="-">
+            </td>
+            <td class="border border-slate-300 p-1 text-center">
+                <button type="button" class="text-rose-500 hover:text-rose-700" onclick="deleteRow(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="7" x2="20" y2="7" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function deleteRow(btn) {
+        const row = btn.closest('tr');
+        const tbody = row.parentNode;
+        row.remove();
+        Array.from(tbody.rows).forEach((r, index) => {
+            const numCell = r.querySelector('.row-num');
+            if(numCell) numCell.innerText = index + 1;
+        });
+    }
+</script>
 <script>
 $(document).ready(function() {
 

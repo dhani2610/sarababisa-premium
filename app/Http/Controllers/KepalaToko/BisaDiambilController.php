@@ -92,42 +92,79 @@ class BisaDiambilController extends Controller
 
                 $nomor = $row->customer->nomor_hp ?? null;
                 if (!$nomor) return '-';
+
+                // Format nomor ke 628...
                 $nomorwa = preg_replace('/^08/', '628', $nomor);
+
+                // Ambil data toko & token
                 $toko = User::find(1);
-                $fonteeToken = StoreSetting::first()->fonnte ?? null;
+                $fonteeToken = StoreSetting::where('cabang_id',getCabangId())->first()->fonnte ?? null;
+                $notaQc = route('kepalatoko-cetak-qc', $row->id);
 
-                $pesan = rawurlencode("*Notifikasi | {$toko->nama_toko}*%0ABarang Servis *{$row->nama_barang}*%0A"
-                    ."No. Servis *{$row->nomor_servis}*%0AKondisi: *{$row->kondisi_servis}*%0A"
-                    ."Tanggal: ".Carbon::parse($row->tgl_selesai)->translatedFormat('d F Y')."%0A"
-                    ."Status: *{$row->status_servis}*%0ABiaya: Rp. ".number_format($row->biaya)."%0A%0ATerima Kasih.");
+                // --- SUSUN PESAN (Gunakan \n untuk enter, jangan %0A manual dulu) ---
+                $rawPesan = "*Notifikasi | {$toko->nama_toko}*\n" .
+                            "Barang Servis: *{$row->nama_barang}*\n" .
+                            "No. Servis: *{$row->nomor_servis}*\n" .
+                            "Kondisi: *{$row->kondisi_servis}*\n" .
+                            "Tanggal: " . Carbon::parse($row->tgl_selesai)->translatedFormat('d F Y') . "\n" .
+                            "Status: *{$row->status_servis}*\n" .
+                            "Biaya: Rp. " . number_format($row->biaya) . "\n\n" .
+                            "Link QC: {$notaQc}\n\n" .
+                            "Terima Kasih.";
 
+                // $pesan = rawurlencode("*Notifikasi | {$toko->nama_toko}*%0ABarang Servis *{$row->nama_barang}*%0A"
+                //     ."No. Servis *{$row->nomor_servis}*%0AKondisi: *{$row->kondisi_servis}*%0A"
+                //     ."Tanggal: ".Carbon::parse($row->tgl_selesai)->translatedFormat('d F Y')."%0A"
+                //     ."Status: *{$row->status_servis}*%0ABiaya: Rp. ".number_format($row->biaya)."%0A%0ALink QC: {$notaQc}%0A"."%0A%0ATerima Kasih.");
+
+                // Encode untuk Link WA Biasa (mengubah spasi jadi %20, enter jadi %0A, dll)
+                $waLinkPesan = rawurlencode($rawPesan);
+
+                // Escape untuk Javascript (Fonnte) agar kutip/enter tidak bikin error JS
+                $jsPesan = json_encode($rawPesan);
+                // Kita trim kutip dua di awal/akhir dari hasil json_encode agar pas masuk ke function JS
+                $jsPesan = trim($jsPesan, '"');
+
+                // --- LOGIKA TOMBOL NOTIFIKASI (TOMBOL KE-2) ---
+                if ($fonteeToken) {
+                    // Jika pakai Fonnte
+                    $btnNotif = '<a href="javascript:void(0)" onclick="kirimFontee(\''.$fonteeToken.'\', \''.$nomorwa.'\', \''.$jsPesan.'\')" title="Kirim Notifikasi (Fonnte)">';
+                } else {
+                    // Jika pakai WA API Biasa (Gratis)
+                    $btnNotif = '<a href="https://wa.me/'.$nomorwa.'?text='.$waLinkPesan.'" target="_blank" title="Kirim Notifikasi (WA Biasa)">';
+                }
+
+                // --- RETURN TAMPILAN 2 IKON ---
                 return '
-                    <div class="flex space-x-1">
-                        <a href="https://api.whatsapp.com/send?phone='.$nomorwa.'&text=" target="_blank" title="Kirim manual">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#00b341" fill="none" viewBox="0 0 24 24">
-                                <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
-                                <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1" />
+                    <div class="flex space-x-2">
+
+                        <a href="https://wa.me/'.$nomorwa.'" target="_blank" title="Chat Kosong/Manual">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#00b341" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 11.5a8.38 8.38 0 0 1 -.9 3.8 8.5 8.5 0 0 1 -7.6 4.7 8.38 8.38 0 0 1 -3.8 -.9l-5.1 1.2l1.2 -5.1a8.38 8.38 0 0 1 -.9 -3.8 8.5 8.5 0 0 1 4.7 -7.6 8.38 8.38 0 0 1 3.8 -.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
                             </svg>
                         </a>
-                        <a href="javascript:void(0)" onclick="
-                            '.($fonteeToken
-                                ? "kirimFontee('{$fonteeToken}', '{$nomorwa}', '{$pesan}')"
-                                : "window.open('https://wa.me/{$nomorwa}/?text={$pesan}', '_blank')"
-                            ).'
-                        ">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#00abfb" fill="none" viewBox="0 0 24 24">
-                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                <line x1="9" y1="7" x2="10" y2="7" />
-                                <line x1="9" y1="13" x2="15" y2="13" />
-                                <line x1="13" y1="17" x2="15" y2="17" />
+
+                        '.$btnNotif.'
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#00abfb" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4" />
                             </svg>
                         </a>
+
                     </div>';
             })
             ->addColumn('nama_barang', fn($r) => '<div class="font-medium">'.e($r->nama_barang).'</div>')
             ->addColumn('kerusakan', fn($r) => '<div class="font-medium">'.e($r->kerusakan).'</div>')
-            ->addColumn('fungsi', fn($r) => '<div class="font-medium">'.e($r->qc_masuk).'</div>')
+
+            ->addColumn('fungsi', function ($row)  {
+                $url = route('kepalatoko-cetak-qc', $row->id);
+
+                return '
+                    <a href="' . $url . '" target="_blank" class="btn bg-indigo-500 hover:bg-indigo-600 text-white " title="Lihat PDF QC">
+                        Lihat QC
+                    </a>
+                ';
+            })
+            // ->addColumn('fungsi', fn($r) => '<div class="font-medium">'.e($r->qc_masuk).'</div>')
             ->addColumn('kondisi', function ($row) {
                 $color = match ($row->kondisi_servis) {
                     'Sudah jadi' => 'bg-emerald-100 text-emerald-600',
@@ -163,8 +200,18 @@ class BisaDiambilController extends Controller
                 }
                 return '
                     <div class="space-x-1 flex">
+                          <button type="button"
+                                class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1"
+                                data-id="' . $row->id . '"
+                                title="Upload Foto Servis">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-camera" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"></path>
+                            <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+                            </svg>
+                        </button>
                             <div>
-                                <button wire:click="openPinModal('.$row->id.')" class="text-indigo-500 hover:text-indigo-600 rounded-full">
+                                <button onclick="openPinModal(' . $row->id . ')" class="text-indigo-500 hover:text-indigo-600 rounded-full">
                                     <span class="sr-only">Service PIN & Pola</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-lock" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#6366f1" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -226,6 +273,7 @@ class BisaDiambilController extends Controller
                                 <path d="M9 14l2 2l4 -4" />
                             </svg>
                         </a>
+
                         <a href="'.route('transaksi-servis-bisa-diambil.show', $row->id).'" >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#000" fill="none" viewBox="0 0 24 24">
                                 <path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" />
@@ -294,7 +342,7 @@ class BisaDiambilController extends Controller
                                             </div>
                                             <!-- Modal footer -->
                                             <div class="flex flex-wrap justify-end space-x-2">
-                                                <form action="'.$delurl.' method="post">
+                                                <form action="'.$delurl.'" method="post">
                                                 ' . method_field('delete') . csrf_field() . '
                                                     <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
                                                 </form>
@@ -306,7 +354,7 @@ class BisaDiambilController extends Controller
                         </div>
                     </div>';
             })
-            ->rawColumns(['checkbox','nomor_servis','penerima','pelanggan','hubungi','nama_barang','kerusakan','fungsi','kondisi','tindakan','teknisi','modal_sparepart','biaya','tgl_selesai','aksi'])
+            ->rawColumns(['checkbox','nomor_servis','penerima','pelanggan','hubungi','nama_barang','kerusakan','fungsi','kondisi','tindakan','teknisi','modal_sparepart','biaya','tgl_selesai','aksi','fungsi'])
             ->make(true);
     }
 
@@ -445,6 +493,25 @@ class BisaDiambilController extends Controller
         $users = User::where('role', 'Teknisi')->get();
         $workers = Worker::where('jabatan', 'like', '%' . 'teknisi')->get();
 
+
+         // 1. Decode JSON ke Array
+        $qcMasuk = $item->qc_masuk ? json_decode($item->qc_masuk, true) : [];
+        $qcKeluar = $item->qc_keluar ? json_decode($item->qc_keluar, true) : [];
+        // dd($qcMasuk,$items->qc_masuk);
+        if ($qcMasuk != null) {
+            # code...
+            $qcItems = array_keys($qcMasuk);
+        }else{
+            $qcItems = [];
+        }
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
         return view('pages.kepalatoko.servis.bisa-diambil-edit', [
             'item' => $item,
             'types' => $types,
@@ -455,7 +522,10 @@ class BisaDiambilController extends Controller
             'products' => $products,
             'capacities' => $capacities,
             'users' => $users,
-            'workers' => $workers
+            'workers' => $workers,
+            'qcItems' => $qcItems,
+            'qcMasuk' => $qcMasuk,
+            'qcKeluar' => $qcKeluar,
         ]);
     }
 
@@ -493,6 +563,24 @@ class BisaDiambilController extends Controller
         $bagihasil = $profittransaksi / 100;
         $nama_pelanggan = Customer::find($request->customers_id);
 
+
+        $qc_masuk_data = $request->qc_masuk ?? [];
+        $qc_keluar_data = $request->qc_keluar ?? [];
+
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                if (!empty($name)) {
+                    $val_in = $request->custom_qc_masuk[$key] ?? '-';
+                    $val_out = $request->custom_qc_keluar[$key] ?? '-';
+
+                    $qc_masuk_data[$name] = $val_in;
+                    $qc_keluar_data[$name] = $val_out;
+                }
+            }
+        }
+
+        $qc_masuk_final = json_encode($qc_masuk_data);
+        $qc_keluar_final = json_encode($qc_keluar_data);
         // Transaction update
         $item->update([
             'created_at' => $request->created_at,
@@ -505,7 +593,8 @@ class BisaDiambilController extends Controller
             'model_series_id' => $request->model_series_id,
             'nama_barang' => $nama_barang,
             'kerusakan' => $request->kerusakan,
-            'qc_masuk' => $request->qc_masuk,
+            'qc_masuk' => $qc_masuk_data,
+            'qc_keluar' => $qc_keluar_final,
             'kondisi_servis' => $request->kondisi_servis,
             'service_actions_id' => $request->service_actions_id,
             'products_id' => $request->products_id,

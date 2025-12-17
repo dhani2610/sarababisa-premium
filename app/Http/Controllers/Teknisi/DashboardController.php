@@ -55,7 +55,7 @@ class DashboardController extends Controller
         $totalbonus = $bonusservis + $bonusServisInterface;
 
         // Ambil data transaksi servis yang memiliki status "Belum cek"
-        $transactions = ServiceTransaction::where('status_servis', 'Belum cek')->get();
+        $transactions = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Belum cek')->get();
 
         // Cek apakah ada transaksi yang lebih dari 7 hari dari data dibuat
         $currentDate = Carbon::now();

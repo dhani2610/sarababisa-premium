@@ -285,9 +285,9 @@ class PurchaseProductController extends Controller
 
                         // Selama nama tersebut masih ada di database, tambahkan titik (.)
                         // Gunakan withTrashed() jika ingin mengecek data yang sudah dihapus juga
-                        while (Product::where('product_name', $finalName)->exists()) {
-                            $finalName = $finalName . '.';
-                        }
+                        // while (Product::where('product_name', $finalName)->exists()) {
+                        //     $finalName = $finalName . '.';
+                        // }
                         // --- [SELESAI] LOGIKA PENGECEKAN NAMA DUPLIKAT ---
 
 
@@ -304,7 +304,7 @@ class PurchaseProductController extends Controller
                         // --- [SELESAI] LOGIKA PENGECEKAN NOMOR SERI DUPLIKAT ---
 
                         $productsNew = new Product();
-                        $productsNew->product_name = $finalName; // Pakai nama yang sudah ada titiknya
+                        $productsNew->product_name = $baseName; // Pakai nama yang sudah ada titiknya
                         $productsNew->categories_id = 1;
                         $productsNew->warna = $productModel->warna;
                         $productsNew->kondisi = $productModel->kondisi;

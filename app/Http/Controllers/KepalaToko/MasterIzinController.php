@@ -64,6 +64,7 @@ class MasterIzinController extends Controller
             // dd($data);
             $data['cabang_id'] = getCabangId();
             $izin = Izin::create($data);
+            // dd($izin);
 
             try {
                 $user = User::find($izin->user_id);

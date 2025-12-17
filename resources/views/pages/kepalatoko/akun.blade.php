@@ -5,21 +5,17 @@
 <x-toko-layout>
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
-        <!-- Page header -->
         <div class="sm:flex sm:justify-between sm:items-center mb-5">
 
-            <!-- Left: Title -->
             <div class="mb-4 sm:mb-0">
                 <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Akun ✨</h1>
             </div>
 
-            <!-- Right: Actions -->
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
-                <!-- Search form -->
-                <x-search-form placeholder="Cari berdasarkan nama" />
+                {{-- <x-search-form placeholder="Cari berdasarkan nama" /> --}}
+                {{-- Search sudah dihandle DataTables --}}
 
-                <!-- Create invoice button -->
                 <div x-data="{ modalOpen: false }">
                     <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true"
                         aria-controls="tambah-modal">
@@ -29,13 +25,11 @@
                         </svg>
                         <span class="hidden xs:block ml-2">Tambah Akun</span>
                     </button>
-                    <!-- Modal backdrop -->
                     <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen"
                         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
                         x-transition:enter-end="opacity-100" x-transition:leave="transition ease-out duration-100"
                         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" aria-hidden="true"
                         x-cloak></div>
-                    <!-- Modal dialog -->
                     <div id="tambah-modal"
                         class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
                         role="dialog" aria-modal="true" x-show="modalOpen"
@@ -47,7 +41,6 @@
                         x-transition:leave-end="opacity-0 translate-y-4" x-cloak>
                         <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full"
                             @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
-                            <!-- Modal header -->
                             <div class="px-5 py-3 border-b border-slate-200">
                                 <div class="flex justify-between items-center">
                                     <div class="font-semibold text-slate-800">Tambah Akun</div>
@@ -60,7 +53,6 @@
                                     </button>
                                 </div>
                             </div>
-                            <!-- Modal content -->
                             <form action="{{ route('akun-store') }}" method="post" enctype="multipart/form-data">
                                 @csrf
                                 <div class="px-5 py-4">
@@ -124,8 +116,6 @@
                                             </select>
                                         </div>
 
-
-
                                         <div id="upload-investor" style="display: none;">
                                             <label class="block text-sm font-medium mb-1" for="pdf_investor">
                                                 Upload PDF Investor <span class="text-rose-500">*</span>
@@ -134,8 +124,6 @@
                                                 type="file" accept="application/pdf" />
                                         </div>
 
-
-                                        <!-- Inputan bawah (dibungkus agar bisa di-hide semua sekaligus) -->
                                         <div id="extra-fields">
                                             <div id="bonus-interface-input">
                                                 <label class="block text-sm font-medium mb-1"
@@ -214,7 +202,6 @@
                                                     </select>
                                                 </div>
 
-                                                <!-- Input nominal (untuk bonus tetap) -->
                                                 <div id="bonus-tetap" class="mt-3" style="display: none;">
                                                     <label class="block text-sm font-medium mb-1" for="nominal_bonus_admin">
                                                         Nominal Bonus per Nota <span class="text-rose-500">*</span>
@@ -225,7 +212,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Input persen -->
                                             <div id="bonus-persen" style="display: none;">
                                                 <label class="block text-sm font-medium mb-1" for="persen">
                                                    Bonus Hardware Persentase <span class="text-rose-500">*</span>
@@ -234,12 +220,9 @@
                                                     class="form-input w-full px-2 py-1" type="number"
                                                     placeholder="Contoh: 10" />
                                             </div>
-
                                         </div>
-
                                     </div>
                                 </div>
-                                <!-- Modal footer -->
                                 <div class="px-5 py-4 border-t border-slate-200">
                                     <div class="flex flex-wrap justify-end space-x-2">
                                         <button
@@ -250,12 +233,10 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </div>
 
-        <div class="bg-emerald-100 rounded border border-emerald-200 text-emerald-600 p-4">
+        <div class="bg-emerald-100 rounded border border-emerald-200 text-emerald-600 p-4 mb-5">
             <div class="text-left md:flex md:items-center md:space-x-2">
                 <div class="text-sm">
                     Silahkan atur persen pada tiap-tiap akun untuk implementasi pembagian hasil. Persen Kepala Toko
@@ -265,7 +246,7 @@
         </div>
 
         @if ($errors->any())
-            <div x-show="open" x-data="{ open: true }">
+            <div x-show="open" x-data="{ open: true }" class="mb-5">
                 <div class="px-4 py-2 rounded-sm text-sm bg-rose-500 text-white">
                     <div class="flex w-full justify-between items-start">
                         <div class="flex">
@@ -273,9 +254,11 @@
                                 <path
                                     d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm1 12H7V7h2v5zM8 6c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z" />
                             </svg>
-                            @foreach ($errors->all() as $error)
-                                <div class="font-medium">{{ $error }}</div>
-                            @endforeach
+                            <div>
+                                @foreach ($errors->all() as $error)
+                                    <div class="font-medium">{{ $error }}</div>
+                                @endforeach
+                            </div>
                         </div>
                         <button class="opacity-70 hover:opacity-80 ml-3 mt-[3px]" @click="open = false">
                             <div class="sr-only">Close</div>
@@ -289,88 +272,290 @@
             </div>
         @endif
 
-        <!-- Table -->
-        <x-kepalatoko.akun-table :users="$users" :count="$users_count" />
+        @if (session()->has('message'))
+            <div x-show="open" x-data="{ open: true }" class="mb-5">
+                <div class="px-4 py-2 rounded-sm text-sm bg-emerald-500 text-white">
+                    <div class="flex w-full justify-between items-start">
+                        <div class="flex">
+                            <div class="font-medium">{{ session('message') }}</div>
+                        </div>
+                        <button class="opacity-70 hover:opacity-80 ml-3 mt-[3px]" @click="open = false">
+                            <svg class="w-4 h-4 fill-current"><path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
 
-        <!-- Pagination -->
-        <div class="mt-8">
-            {{ $users->links() }}
+        <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
+            <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
+                {{-- Left side --}}
+                <h2 class="font-semibold text-slate-800">Semua Akun <span class="text-slate-400 font-medium">{{ $count }}</span></h2>
+                {{-- Right side --}}
+                <div class="relative inline-flex">
+                    <div class="table-items-action hidden">
+                        <div class="flex items-center">
+                            <div class="text-sm italic mr-2 whitespace-nowrap"><span class="table-items-count"></span> item yang dipilih</div>
+                            <button class="btn bg-white border-slate-200 hover:border-slate-300 text-rose-500 hover:text-rose-600" onclick="deleteSelected()">Hapus</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overflow-x-auto p-4">
+                <table id="akun-table" class="table-auto w-full">
+                    <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
+                        <tr>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                                <div class="flex items-center">
+                                    <label class="inline-flex">
+                                        <span class="sr-only">Select all</span>
+                                        <input id="parent-checkbox" class="form-checkbox" type="checkbox" />
+                                    </label>
+                                </div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">No.</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Cabang</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Nama</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Nama Pengguna</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Bagian Teknisi</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">NIK</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Alamat</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">HP</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Hak Akses</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Persen</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">PDF Investor</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Shift</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Aksi</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-slate-200">
+                        </tbody>
+                </table>
+            </div>
         </div>
 
     </div>
 
+    <script>
+    function toggleInputs() {
+        const role = document.getElementById('role').value;
+        const extraFields = document.getElementById('extra-fields');
+        const uploadInvestor = document.getElementById('upload-investor');
+        const bonusAdmin = document.getElementById('bonus-admin');
+        const spesialisInput = document.getElementById('spesialis-input');
+        const bonusPersen = document.getElementById('bonus-persen');
+        const bonusInterfaceInput = document.getElementById('bonus-interface-input');
 
-<script>
-function toggleInputs() {
-    const role = document.getElementById('role').value;
-    const extraFields = document.getElementById('extra-fields');
-    const uploadInvestor = document.getElementById('upload-investor');
-    const bonusAdmin = document.getElementById('bonus-admin');
-    const spesialisInput = document.getElementById('spesialis-input');
-    const bonusPersen = document.getElementById('bonus-persen');
-    const bonusInterfaceInput = document.getElementById('bonus-interface-input');
-
-    if (role === 'Investor') {
-        extraFields.style.display = 'none';
-        uploadInvestor.style.display = 'block';
-        bonusAdmin.style.display = 'none';
-        spesialisInput.style.display = 'none';
-        bonusInterfaceInput.style.display = 'none';
-    } else if (role === 'Kepala Toko') {
-        extraFields.style.display = 'none';
-        uploadInvestor.style.display = 'none';
-        bonusAdmin.style.display = 'none';
-        spesialisInput.style.display = 'none';
-        bonusInterfaceInput.style.display = 'none';
-    } else if (role === 'Admin Toko') {
-        extraFields.style.display = 'block';
-        uploadInvestor.style.display = 'none';
-        bonusAdmin.style.display = 'block';
-        spesialisInput.style.display = 'none';
-        bonusInterfaceInput.style.display = 'none';
-    } else if (role === 'Teknisi') {
-        extraFields.style.display = 'block';
-        uploadInvestor.style.display = 'none';
-        bonusAdmin.style.display = 'none';
-        spesialisInput.style.display = 'block';
-        bonusPersen.style.display = 'block';
-        bonusInterfaceInput.style.display = 'block';
-    } else if (role === 'Sales') {
-        extraFields.style.display = 'block';
-        uploadInvestor.style.display = 'none';
-        bonusAdmin.style.display = 'none';
-        spesialisInput.style.display = 'none';
-        bonusPersen.style.display = 'block';
-        bonusInterfaceInput.style.display = 'none';
-    }
-}
-
-// Jalankan saat pertama kali halaman dimuat
-document.addEventListener('DOMContentLoaded', toggleInputs);
-document.getElementById('role').addEventListener('change', toggleInputs);
-</script>
-
-<script>
-function toggleBonusType() {
-    const tipe = document.getElementById('tipe_bonus_admin').value;
-    const bonusTetap = document.getElementById('bonus-tetap');
-    const bonusPersen = document.getElementById('bonus-persen');
-    const roleAkun = document.getElementById('role').value;
-
-    bonusTetap.style.display = 'none';
-    bonusPersen.style.display = 'none';
-
-    if (roleAkun == 'Admin Toko') {
-        if (tipe === 'Tetap') {
-            bonusTetap.style.display = 'block';
-        } else if (tipe === 'Persen') {
+        if (role === 'Investor') {
+            extraFields.style.display = 'none';
+            uploadInvestor.style.display = 'block';
+            bonusAdmin.style.display = 'none';
+            spesialisInput.style.display = 'none';
+            bonusInterfaceInput.style.display = 'none';
+        } else if (role === 'Kepala Toko') {
+            extraFields.style.display = 'none';
+            uploadInvestor.style.display = 'none';
+            bonusAdmin.style.display = 'none';
+            spesialisInput.style.display = 'none';
+            bonusInterfaceInput.style.display = 'none';
+        } else if (role === 'Admin Toko') {
+            extraFields.style.display = 'block';
+            uploadInvestor.style.display = 'none';
+            bonusAdmin.style.display = 'block';
+            spesialisInput.style.display = 'none';
+            bonusInterfaceInput.style.display = 'none';
+        } else if (role === 'Teknisi') {
+            extraFields.style.display = 'block';
+            uploadInvestor.style.display = 'none';
+            bonusAdmin.style.display = 'none';
+            spesialisInput.style.display = 'block';
             bonusPersen.style.display = 'block';
+            bonusInterfaceInput.style.display = 'block';
+        } else if (role === 'Sales') {
+            extraFields.style.display = 'block';
+            uploadInvestor.style.display = 'none';
+            bonusAdmin.style.display = 'none';
+            spesialisInput.style.display = 'none';
+            bonusPersen.style.display = 'block';
+            bonusInterfaceInput.style.display = 'none';
         }
     }
-}
 
-document.addEventListener('DOMContentLoaded', toggleBonusType);
-</script>
+    // Jalankan saat pertama kali halaman dimuat
+    document.addEventListener('DOMContentLoaded', toggleInputs);
+    document.getElementById('role').addEventListener('change', toggleInputs);
+    </script>
 
+    <script>
+    function toggleBonusType() {
+        const tipe = document.getElementById('tipe_bonus_admin').value;
+        const bonusTetap = document.getElementById('bonus-tetap');
+        const bonusPersen = document.getElementById('bonus-persen');
+        const roleAkun = document.getElementById('role').value;
+
+        bonusTetap.style.display = 'none';
+        bonusPersen.style.display = 'none';
+
+        if (roleAkun == 'Admin Toko') {
+            if (tipe === 'Tetap') {
+                bonusTetap.style.display = 'block';
+            } else if (tipe === 'Persen') {
+                bonusPersen.style.display = 'block';
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', toggleBonusType);
+    </script>
+
+    @push('styles')
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+        <style>
+            .dataTables_wrapper .dataTables_length select {
+                padding-right: 30px;
+                width: auto;
+            }
+        </style>
+    @endpush
+
+    @push('scripts')
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                var table = $('#akun-table').DataTable({
+                    processing: false,
+                    serverSide: false,
+                    ajax: "{{ route('akun.data') }}",
+                    columns: [
+                        { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
+                        {
+                            data: null,
+                            sortable: false,
+                            orderable: false,
+                            searchable: false,
+                            render: function (data, type, row, meta) {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            }
+                        },
+
+                        { data: 'cabang_name', name: 'cabang_name', orderable: false, searchable: false },
+                        { data: 'name', name: 'name' },
+                        { data: 'username', name: 'username' },
+                        { data: 'bagian_teknisi', name: 'bagian_teknisi' },
+                        { data: 'nik', name: 'nik' },
+                        { data: 'alamat', name: 'alamat' },
+                        { data: 'nomor_hp', name: 'nomor_hp' },
+                        { data: 'hak_akses', name: 'role' }, // Searchable by role
+                        { data: 'persen', name: 'persen' },
+                        { data: 'pdf_investor', name: 'pdf_investor', orderable: false, searchable: false },
+                        { data: 'shift_name', name: 'shift.nama_shift' },
+                        { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
+                    ],
+                    order: [[1, 'asc']], // Default urut berdasarkan Nama (index ke-3)
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
+                        search: "Cari:",
+                        lengthMenu: "Tampilkan _MENU_ data",
+                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                        paginate: {
+                            first: "Awal",
+                            last: "Akhir",
+                            next: "Lanjut",
+                            previous: "Kembali"
+                        }
+                    },
+                    drawCallback: function() {
+                        attachCheckboxHandlers();
+                    }
+                });
+
+                // Logic Checkbox & Bulk Delete
+                function attachCheckboxHandlers() {
+                    $('#parent-checkbox').prop('checked', false);
+                    toggleBulkAction();
+
+                    $('#parent-checkbox').off('click').on('click', function() {
+                        var checked = $(this).is(':checked');
+                        $('input.table-item').prop('checked', checked);
+                        toggleBulkAction();
+                    });
+
+                    $('#akun-table').off('change', '.table-item').on('change', '.table-item', function() {
+                        var all = $('input.table-item').length;
+                        var checked = $('input.table-item:checked').length;
+                        $('#parent-checkbox').prop('checked', all === checked && all > 0);
+                        toggleBulkAction();
+                    });
+                }
+
+                function toggleBulkAction() {
+                    var checkedCount = $('input.table-item:checked').length;
+                    $('.table-items-count').text(checkedCount);
+                    if (checkedCount > 0) {
+                        $('.table-items-action').removeClass('hidden');
+                    } else {
+                        $('.table-items-action').addClass('hidden');
+                    }
+                }
+
+                // Fungsi Bulk Delete
+                window.deleteSelected = function() {
+                    var selectedIds = $('input.table-item:checked').map(function() {
+                        return $(this).val();
+                    }).get();
+
+                    if (selectedIds.length === 0) return alert('Pilih data terlebih dahulu.');
+                    if (!confirm('Yakin ingin menghapus ' + selectedIds.length + ' akun ini?')) return;
+
+                    $.ajax({
+                        url: "{{ route('akun.delete-batch') }}",
+                        method: 'POST',
+                        data: {
+                            ids: selectedIds,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            alert(response.message);
+                            table.ajax.reload();
+                            $('.table-items-action').addClass('hidden');
+                        },
+                        error: function(xhr) {
+                            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Gagal menghapus data.';
+                            alert(msg);
+                        }
+                    });
+                };
+            });
+        </script>
+    @endpush
 
 </x-toko-layout>

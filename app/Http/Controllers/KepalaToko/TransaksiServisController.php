@@ -21,7 +21,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Yajra\DataTables\Facades\DataTables;
-
+use Illuminate\Support\Facades\Storage;
 class TransaksiServisController extends Controller
 {
     /**
@@ -47,6 +47,113 @@ class TransaksiServisController extends Controller
             'bisadiambil',
             'jumlahbisadiambil'
         ));
+    }
+
+
+    public function getFoto($id)
+    {
+        $servis = ServiceTransaction::find($id);
+
+        $response = [
+            'masuk' => [],
+            'selesai' => []
+        ];
+
+        // Helper untuk format file
+        $formatFile = function($filename) {
+            $path = 'servis/' . $filename; // Sesuaikan path di storage/app/public/servis
+            if(Storage::disk('public')->exists($path)){
+                $fullUrl = asset('storage/servis/' . $filename);
+                return [
+                    'source' => $filename,
+                    'options' => [
+                        'type' => 'local', // Menandakan file ini sudah ada di server
+                        'file' => [
+                            'name' => $filename,
+                            'size' => Storage::disk('public')->size($path),
+                            'type' => Storage::disk('public')->mimeType($path),
+                        ],
+                        'metadata' => [
+                            'poster' => $fullUrl, // Untuk preview
+                            'url' => $fullUrl     // Untuk zoom/popup
+                        ]
+                    ]
+                ];
+            }
+            return null;
+        };
+
+        // Loop Foto Masuk
+        if ($servis->foto_masuk) {
+            $files = json_decode($servis->foto_masuk, true) ?? [];
+            foreach ($files as $file) {
+                if($f = $formatFile($file)) $response['masuk'][] = $f;
+            }
+        }
+
+        // Loop Foto Selesai
+        if ($servis->foto_selesai) {
+            $files = json_decode($servis->foto_selesai, true) ?? [];
+            foreach ($files as $file) {
+                if($f = $formatFile($file)) $response['selesai'][] = $f;
+            }
+        }
+
+        return response()->json($response);
+    }
+    // 2. Upload Foto (Dipanggil saat file di-drop)
+    public function uploadFoto(Request $request, $id)
+    {
+        $servis = ServiceTransaction::find($id);
+        $type = $request->input('type'); // 'masuk' atau 'selesai'
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+            // Simpan file ke folder storage/app/public/servis
+            $file->storeAs('public/servis', $filename);
+
+            // Update Database (Append ke array JSON)
+            $column = ($type == 'masuk') ? 'foto_masuk' : 'foto_selesai';
+            $currentFiles = json_decode($servis->$column, true) ?? [];
+            $currentFiles[] = $filename;
+
+            $servis->$column = json_encode($currentFiles);
+            $servis->save();
+
+            // Return filename agar FilePond tahu ID file ini
+            return response($filename, 200);
+        }
+
+        return response()->json(['error' => 'No file'], 400);
+    }
+
+    // 3. Delete Foto (Dipanggil saat tombol silang diklik di FilePond)
+    public function deleteFoto(Request $request, $id)
+    {
+        $servis = ServiceTransaction::find($id);
+        $filename = $request->getContent(); // FilePond mengirim nama file di body
+        $type = $request->input('type'); // dikirim via query string
+
+        $column = ($type == 'masuk') ? 'foto_masuk' : 'foto_selesai';
+        $currentFiles = json_decode($servis->$column, true) ?? [];
+
+        // Cari dan hapus dari array
+        if (($key = array_search($filename, $currentFiles)) !== false) {
+            unset($currentFiles[$key]);
+
+            // Hapus file fisik dari storage
+            if (Storage::disk('public')->exists('servis/' . $filename)) {
+                Storage::disk('public')->delete('servis/' . $filename);
+            }
+        }
+
+        // Simpan array baru ke DB
+        $servis->$column = json_encode(array_values($currentFiles));
+        $servis->save();
+
+        return response()->json(['success' => true]);
     }
 
 
@@ -115,7 +222,7 @@ class TransaksiServisController extends Controller
         ->addColumn('hubungi', function ($row) {
             $nomor = $row->customer->nomor_hp ?? null;
             $nomorwa = $nomor ? preg_replace('/^08/', '628', preg_replace('/\D+/', '', $nomor)) : null;
-            $fonteeToken = StoreSetting::first()->fonnte ?? null;
+            $fonteeToken = StoreSetting::where('cabang_id',getCabangId())->first()->fonnte ?? null;
             $toko = optional($row->customer)->nama ?? config('app.name');
 
             $html = '<div class="flex space-x-1">';
@@ -134,6 +241,7 @@ class TransaksiServisController extends Controller
             // Kirim Fontee / manual WA button — gunakan JS function kirimFontee(...) di blade
             $tokoName = e(config('app.name'));
             $notaLink = route('kepalatoko-cetak-inkjet', $row->id);
+            $notaQc = route('kepalatoko-cetak-qc', $row->id);
             $trackingLink = env('APP_URL') . '/tracking';
             $message = rawurlencode("*Notifikasi Service*\n" . $tokoName . "\n\n" .
                 "No. Service : " . $row->nomor_servis . "\n" .
@@ -143,7 +251,8 @@ class TransaksiServisController extends Controller
                 "Tanggal : " . Carbon::parse($row->created_at)->translatedFormat('d F Y h:i') . "\n" .
                 "Kerusakan : " . $row->kerusakan . "\n\n" .
                 "Link tracking : " . $trackingLink . "\n" .
-                "Link nota : " . $notaLink . "\n\n" .
+                "Link nota : " . $notaLink . "\n" .
+                "Link QC : " . $notaQc . "\n\n" .
                 "Terimakasih");
 
             if ($fonteeToken && $nomorwa) {
@@ -194,8 +303,17 @@ class TransaksiServisController extends Controller
         })
 
         // Fungsi (qc_masuk)
+        // ->addColumn('qc_masuk', function ($row) {
+        //     return '<div class="font-medium capitalize">' . e($row->qc_masuk) . '</div>';
+        // })
         ->addColumn('qc_masuk', function ($row) {
-            return '<div class="font-medium capitalize">' . e($row->qc_masuk) . '</div>';
+            $url = route('kepalatoko-cetak-qc', $row->id);
+
+            return '
+                <a href="' . $url . '" target="_blank" class="btn bg-indigo-500 hover:bg-indigo-600 text-white " title="Lihat PDF QC">
+                    Lihat QC
+                </a>
+            ';
         })
 
         // Uang muka
@@ -248,8 +366,20 @@ class TransaksiServisController extends Controller
 
             // PIN & Pola (menyertakan wire:click dari blade asli)
             $html .= '
+                <button type="button"
+                        class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1"
+                        data-id="' . $id . '"
+                        title="Upload Foto Servis">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-camera" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"></path>
+                    <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+                    </svg>
+                </button>
+            ';
+            $html .= '
                 <div>
-                    <button wire:click="openPinModal(' . $id . ')" class="text-indigo-500 hover:text-indigo-600 rounded-full">
+                    <button onclick="openPinModal(' . $id . ')" class="text-indigo-500 hover:text-indigo-600 rounded-full">
                         <span class="sr-only">Service PIN & Pola</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-lock" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#6366f1" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -410,6 +540,41 @@ class TransaksiServisController extends Controller
         ->make(true);
     }
 
+    // Fetch current data for the modal
+    public function getPinPola($id)
+    {
+        $service = ServiceTransaction::find($id);
+
+        if (!$service) {
+            return response()->json(['status' => 'error', 'message' => 'Data not found'], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'id' => $service->id,
+                'pin' => $service->pin,
+                'pola' => $service->pola // This is the JSON string of the canvas drawing
+            ]
+        ]);
+    }
+
+    // Save the submitted data
+    public function updatePinPolaNew(Request $request, $id)
+    {
+        $service = ServiceTransaction::find($id);
+
+        if (!$service) {
+            return response()->json(['status' => 'error', 'message' => 'Data not found'], 404);
+        }
+
+        $service->pin = $request->pin;
+        $service->pola = $request->pola; // Save canvas JSON data
+        $service->save();
+
+        return response()->json(['status' => 'success', 'message' => 'PIN & Pola berhasil disimpan']);
+    }
+
 
 
     public function updatePinPola(Request $request, $id)
@@ -456,6 +621,27 @@ class TransaksiServisController extends Controller
      */
     public function store(Request $request)
     {
+
+        $qc_data = $request->qc_masuk ?? [];
+
+        // Gabungkan dengan baris Custom (jika ada input manual)
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                // Hanya proses jika nama item tidak kosong
+                if (!empty($name)) {
+                    // Ambil value statusnya (OK/Rusak/dll), default '-' jika kosong
+                    $val = $request->custom_qc_masuk[$key] ?? '-';
+
+                    // Masukkan ke array utama
+                    $qc_data[$name] = $val;
+                }
+            }
+        }
+
+        // Ubah array menjadi JSON agar bisa disimpan di database text/longtext
+        $qc_masuk_final = json_encode($qc_data);
+        // dd($qc_masuk_final);
+
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99'));
         $nama_pelanggan = Customer::find($request->customers_id);
         $nama_tipe = Type::find($request->types_id);
@@ -479,7 +665,8 @@ class TransaksiServisController extends Controller
             'capacities_id' => $request->capacities_id,
             'kelengkapan' => $request->kelengkapan,
             'kerusakan' => $request->kerusakan,
-            'qc_masuk' => $request->qc_masuk,
+            // 'qc_masuk' => $request->qc_masuk,
+            'qc_masuk' => $qc_masuk_final,
             'estimasi_pengerjaan' => $request->estimasi_pengerjaan,
             'estimasi_biaya' => $request->estimasi_biaya,
             'uang_muka' => $request->uang_muka,
@@ -616,6 +803,60 @@ class TransaksiServisController extends Controller
         return $pdf->setOption('isRemoteEnabled', true)->stream($filename);
     }
 
+    private function convertJsonSignatureToBase64($jsonPola)
+    {
+        // 1. Decode JSON
+        $strokes = json_decode($jsonPola, true);
+
+        if (empty($strokes)) {
+            return null;
+        }
+
+        // 2. Buat Canvas Image (Ukuran sesuaikan dengan canvas signature pad, misal 500x300)
+        // Gunakan ukuran yang cukup besar agar tidak terpotong
+        $width = 500; 
+        $height = 300; 
+        $image = imagecreatetruecolor($width, $height);
+
+        // 3. Set Background Transparan
+        imagesavealpha($image, true);
+        $transparent = imagecolorallocatealpha($image, 0, 0, 0, 127);
+        imagefill($image, 0, 0, $transparent);
+
+        // 4. Set Warna Garis (Hitam)
+        $black = imagecolorallocate($image, 0, 0, 0);
+        
+        // Set ketebalan garis
+        imagesetthickness($image, 3);
+
+        // 5. Loop Koordinat dan Gambar Garis
+        foreach ($strokes as $stroke) {
+            $points = $stroke['points'];
+            $count = count($points);
+            
+            // Perlu minimal 2 titik untuk membuat garis
+            for ($i = 0; $i < $count - 1; $i++) {
+                imageline(
+                    $image, 
+                    $points[$i]['x'], 
+                    $points[$i]['y'], 
+                    $points[$i + 1]['x'], 
+                    $points[$i + 1]['y'], 
+                    $black
+                );
+            }
+        }
+
+        // 6. Output ke Base64
+        ob_start();
+        imagepng($image);
+        $imageData = ob_get_contents();
+        ob_end_clean();
+        imagedestroy($image);
+
+        return 'data:image/png;base64,' . base64_encode($imageData);
+    }
+
     public function cetakinkjet($id)
     {
         $items = ServiceTransaction::with('customer')->findOrFail($id);
@@ -639,6 +880,28 @@ class TransaksiServisController extends Controller
         $namaPelanggan = $items->customer->nama;
         $toko = StoreSetting::where('cabang_id', getCabangId())->first();
 
+        // --- BAGIAN BARU: KONVERSI POLA ---
+        // Cek apakah pola ada isinya dan berupa JSON (bukan URL gambar lama)
+        $polaImage = null;
+        
+        if (!empty($items->pola)) {
+            // Cek sederhana apakah ini JSON koordinat atau sudah base64/url
+            // Kalau JSON biasanya diawali kurung siku '['
+            if (substr(trim($items->pola), 0, 1) === '[') {
+                // Konversi JSON ke Gambar Base64
+                $polaImage = $this->convertJsonSignatureToBase64($items->pola);
+            } else {
+                // Jika data lama (sudah berupa URL/Base64), pakai langsung
+                $polaImage = $items->pola;
+            }
+        }
+        
+        // Jika hasil konversi null atau data kosong, pakai gambar default
+        if (empty($polaImage)) {
+            $polaImage = public_path('images/pola.png'); 
+        }
+        // ----------------------------------
+        // dd($items,$polaImage);
         $pdf = PDF::loadView('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
         // return view('pages.kepalatoko.servis.notaterima-cetak-inkjet', [
             'toko' => $toko,
@@ -646,9 +909,59 @@ class TransaksiServisController extends Controller
             'items' => $items,
             'terms' => $terms,
             'imagePath' => $imagePath,
+            'polaImage' => $polaImage,
         ]);
 
         $filename = 'Nota Terima ' . $invoiceNumber . ' ' . '(' . $namaPelanggan . ')' . '.pdf';
+
+        return $pdf->setOption('isRemoteEnabled', true)->stream($filename);
+    }
+
+    public function cetakQc($id)
+    {
+        $items = ServiceTransaction::with(['customer','admin'])->findOrFail($id);
+        // dd($items);
+        // 1. Decode JSON ke Array
+        $qcMasuk = $items->qc_masuk ? json_decode($items->qc_masuk, true) : [];
+        $qcKeluar = $items->qc_keluar ? json_decode($items->qc_keluar, true) : [];
+
+        $qcItems = $qcMasuk != null ? array_keys($qcMasuk) : [];
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
+
+        if ($items->cabang_id == 1) {
+            $users = User::where('cabang_id', $items->cabang_id)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+        } else {
+            $users = User::where('cabang_id', $items->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+        }
+
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu...', 'error');
+            return redirect()->back();
+        }
+
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+        $invoiceNumber = $items->nomor_servis;
+        $namaPelanggan = $items->customer->nama;
+
+        $pdf = PDF::loadView('pages.kepalatoko.servis.notaqc-cetak', [
+        // return View('pages.kepalatoko.servis.notaqc-cetak', [
+            'users' => $users,
+            'items' => $items,
+            'imagePath' => $imagePath,
+            'qcMasuk' => $qcMasuk,   // Data Status Masuk (OK/Rusak/Null)
+            'qcKeluar' => $qcKeluar, // Data Status Keluar
+            'qcItems' => $qcItems    // Daftar Nama Item (Dinamis dari DB)
+        ]);
+
+        $filename = 'QC Check ' . $invoiceNumber . ' - ' . $namaPelanggan . '.pdf';
 
         return $pdf->setOption('isRemoteEnabled', true)->stream($filename);
     }
@@ -663,14 +976,31 @@ class TransaksiServisController extends Controller
     public function edit($id)
     {
         $item = ServiceTransaction::findOrFail($id);
-        $customers = Customer::all();
-        $types = Type::all();
-        $brands = Brand::all();
-        $model_series = ModelSerie::all();
-        $service_actions = ServiceAction::all();
-        $capacities = Capacity::all();
-        $users = User::where('role', 'Teknisi')->get();
-        $workers = Worker::where('jabatan', 'like', '%' . 'teknisi')->get();
+        $qcMasuk = $item->qc_masuk ? json_decode($item->qc_masuk, true) : [];
+        $qcKeluar = $item->qc_keluar ? json_decode($item->qc_keluar, true) : [];
+        // dd($qcMasuk,$items->qc_masuk);
+        if ($qcMasuk != null) {
+            # code...
+            $qcItems = array_keys($qcMasuk);
+        }else{
+            $qcItems = [];
+        }
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
+        $customers = Customer::where('cabang_id',getCabangId())->get();
+        $types = Type::where('cabang_id',getCabangId())->get();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
+        $workers = Worker::where('cabang_id',getCabangId())->where('jabatan', 'like', '%' . 'teknisi')->get();
 
         return view('pages.kepalatoko.servis.transaksi-servis-edit', [
             'item' => $item,
@@ -681,7 +1011,10 @@ class TransaksiServisController extends Controller
             'service_actions' => $service_actions,
             'capacities' => $capacities,
             'users' => $users,
-            'workers' => $workers
+            'workers' => $workers,
+            'qcItems' => $qcItems,
+            'qcMasuk' => $qcMasuk,
+            'qcKeluar' => $qcKeluar,
         ]);
     }
 
@@ -701,6 +1034,23 @@ class TransaksiServisController extends Controller
         $nama_model = ModelSerie::find($request->model_series_id);
         $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
 
+        $qc_masuk_data = $request->qc_masuk ?? [];
+        $qc_keluar_data = $request->qc_keluar ?? [];
+
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                if (!empty($name)) {
+                    $val_in = $request->custom_qc_masuk[$key] ?? '-';
+                    $val_out = $request->custom_qc_keluar[$key] ?? '-';
+
+                    $qc_masuk_data[$name] = $val_in;
+                    $qc_keluar_data[$name] = $val_out;
+                }
+            }
+        }
+
+        $qc_masuk_final = json_encode($qc_masuk_data);
+        $qc_keluar_final = json_encode($qc_keluar_data);
         // Transaction update
         $item->update([
             'created_at' => $request->created_at,
@@ -715,7 +1065,8 @@ class TransaksiServisController extends Controller
             'capacities_id' => $request->capacities_id,
             'kelengkapan' => $request->kelengkapan,
             'kerusakan' => $request->kerusakan,
-            'qc_masuk' => $request->qc_masuk,
+            'qc_masuk' => $qc_masuk_final,
+            'qc_keluar' => $qc_keluar_final,
             'estimasi_pengerjaan' => $request->estimasi_pengerjaan,
             'estimasi_biaya' => $request->estimasi_biaya,
             'uang_muka' => $request->uang_muka,

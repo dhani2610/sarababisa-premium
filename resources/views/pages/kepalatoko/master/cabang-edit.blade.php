@@ -82,28 +82,8 @@ Edit Cabang
                                         <input id="nama_toko" value="{{  $storeSetting->nama_toko ?? ''  }}" name="nama_toko" class="form-input w-full px-2 py-1" type="text" required />
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium mb-1" for="owner">Deskripsi Toko <span class="text-rose-500">*</span></label>
-                                        <input id="deskripsi_toko" value="{{  $storeSetting->deskripsi_toko ?? ''  }}" name="deskripsi_toko" class="form-input w-full px-2 py-1" type="text" required />
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="owner">Alamat Toko <span class="text-rose-500">*</span></label>
-                                        <input id="deskripsi_toko" value="{{  $storeSetting->alamat_toko ?? ''  }}" name="alamat_toko" class="form-input w-full px-2 py-1" type="text" required />
-                                    </div>
-                                    <div>
                                         <label class="block text-sm font-medium mb-1" for="owner">Nomor Toko <span class="text-rose-500">*</span></label>
                                         <input id="nomor_hp_toko" value="{{  $storeSetting->nomor_hp_toko ?? ''  }}" name="nomor_hp_toko" class="form-input w-full px-2 py-1" type="text" required />
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="owner">Bank <span class="text-rose-500">*</span></label>
-                                        <input id="bank" value="{{  $storeSetting->bank ?? ''  }}" name="bank" class="form-input w-full px-2 py-1" type="text" required />
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="owner">Rekening <span class="text-rose-500">*</span></label>
-                                        <input id="rekening" value="{{  $storeSetting->rekening ?? ''  }}" name="rekening" class="form-input w-full px-2 py-1" type="text" required />
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="owner">Pemilik Rekening <span class="text-rose-500">*</span></label>
-                                        <input id="pemilik_rekening" value="{{  $storeSetting->pemilik_rekening ?? ''  }}" name="pemilik_rekening" class="form-input w-full px-2 py-1" type="text" required />
                                     </div>
                                 </div>
                             </div>

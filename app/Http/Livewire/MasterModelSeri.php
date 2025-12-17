@@ -30,7 +30,7 @@ class MasterModelSeri extends Component
     public function render()
     {
         $brands = Brand::where('cabang_id',getCabangId())->get();
-        $tipe = TipeOs::get();
+        $tipe = TipeOs::where('cabang_id',getCabangId())->get();
         $model_series_count = ModelSerie::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.master-model-seri', [
             'brands' => $brands,

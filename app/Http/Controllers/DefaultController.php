@@ -14,14 +14,14 @@ class DefaultController extends Controller
         $brands_id = $request->brands_id;
         $allModelSerie = ModelSerie::where('cabang_id',getCabangId())->where('brands_id', $brands_id)->get();
         return response()->json($allModelSerie);
-    } // End Mehtod 
+    } // End Mehtod
 
     public function GetProduct(Request $request)
     {
         $categories_id = $request->categories_id;
         $allProduct = Product::where('cabang_id',getCabangId())->where('categories_id', $categories_id)->get();
         return response()->json($allProduct);
-    } // End Mehtod 
+    } // End Mehtod
 
 
 

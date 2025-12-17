@@ -101,7 +101,8 @@ class ServisBelumDisetujuiController extends Controller
                         . "Garansi sampai : " . ($row->exp_garansi ? Carbon::parse($row->exp_garansi)->translatedFormat('d F Y') : 'Tidak ada garansi') . "\n"
                         . "Pembayaran : {$row->cara_pembayaran}\n\n"
                         . "Link tracking : " . env('APP_URL') . "/tracking\n"
-                        . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $row->id)  . "\n\n"
+                        . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $row->id)  . "\n"
+                        . "Link QC : " . route('kepalatoko-cetak-qc', $row->id)  . "\n\n"
                         . "Terimakasih";
 
                     $waMessage = rawurlencode($message);
@@ -176,6 +177,16 @@ class ServisBelumDisetujuiController extends Controller
             ->addColumn('qc_masuk', fn($row) => ucfirst($row->qc_masuk))
             ->addColumn('qc_keluar', fn($row) => ucfirst($row->qc_keluar))
 
+              
+            ->addColumn('fungsi', function ($row)  {
+                $url = route('kepalatoko-cetak-qc', $row->id);
+
+                return '
+                    <a href="' . $url . '" target="_blank" class="btn bg-indigo-500 hover:bg-indigo-600 text-white " title="Lihat PDF QC">
+                        Lihat QC
+                    </a>
+                ';
+            })
             // ✅ Kondisi Servis
             ->addColumn('kondisi_servis', function ($row) {
                 $colors = [
@@ -297,7 +308,7 @@ class ServisBelumDisetujuiController extends Controller
             })
 
 
-            ->rawColumns(['checkbox', 'nomor_servis', 'hubungi', 'kondisi_servis', 'status', 'aksi', 'exp_garansi'])
+            ->rawColumns(['checkbox', 'nomor_servis', 'hubungi', 'kondisi_servis', 'status', 'aksi', 'exp_garansi','fungsi'])
             ->make(true);
     }
 
@@ -325,6 +336,19 @@ class ServisBelumDisetujuiController extends Controller
         })->where('stok', '>=', 1)->where('cabang_id',getCabangId())->get();
         $sales = User::where('role', 'Sales')->where('cabang_id',getCabangId())->get();
 
+           // 1. Decode JSON ke Array
+        $qcMasuk = $item->qc_masuk ? json_decode($item->qc_masuk, true) : [];
+        $qcKeluar = $item->qc_keluar ? json_decode($item->qc_keluar, true) : [];
+        // dd($qcMasuk,$items->qc_masuk);
+        $qcItems = array_keys($qcMasuk);
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
         return view('pages.kepalatoko.servis.belum-disetujui-edit', [
             'sales' => $sales,
             'item' => $item,
@@ -336,7 +360,10 @@ class ServisBelumDisetujuiController extends Controller
             'capacities' => $capacities,
             'users' => $users,
             'workers' => $workers,
-            'products' => $products
+            'products' => $products,
+            'qcItems' => $qcItems,
+            'qcMasuk' => $qcMasuk,
+            'qcKeluar' => $qcKeluar,
         ]);
     }
 

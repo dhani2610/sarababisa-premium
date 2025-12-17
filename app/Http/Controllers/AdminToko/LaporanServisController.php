@@ -10,6 +10,7 @@ use App\Models\ServiceTransaction;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Expense;
+use App\Models\Incident;
 use Illuminate\Support\Facades\Auth;
 
 class LaporanServisController extends Controller
@@ -22,31 +23,37 @@ class LaporanServisController extends Controller
         $omzethari = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->whereDate('tgl_disetujui', today())
+            ->where('cabang_id',getCabangId())
             ->get()
             ->sum('omzet');
         $profithari = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->whereDate('tgl_disetujui', today())
+            ->where('cabang_id',getCabangId())
             ->get()
             ->sum('profittoko');
         $omzetbulan = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->whereMonth('tgl_disetujui', $currentMonth)
+            ->where('cabang_id',getCabangId())
             ->get()
             ->sum('omzet');
         $profitbulan = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->whereMonth('tgl_disetujui', $currentMonth)
+            ->where('cabang_id',getCabangId())
             ->get()
             ->sum('profittoko');
         $omzettahun = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', $currentYear)
+            ->where('cabang_id',getCabangId())
             ->get()
             ->sum('omzet');
         $profittahun = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', $currentYear)
+            ->where('cabang_id',getCabangId())
             ->get()
             ->sum('profittoko');
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
@@ -57,6 +64,13 @@ class LaporanServisController extends Controller
     {
         // Mengambil logo dan nama toko
         $users = User::find(1);
+
+        if (getCabangId() == 1) {
+            $users = User::find(1);
+        }else{
+            $users = User::where('cabang_id',getCabangId())->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 
         $logo = $users->profile_photo_path;
@@ -75,9 +89,12 @@ class LaporanServisController extends Controller
 
         // Query dasar untuk ServiceTransaction
         $serviceQuery = ServiceTransaction::with('brand', 'modelserie', 'user')
+            ->where('service_transactions.cabang_id', getCabangId())
+
             ->where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date);
+            // ->where('cabang_id', getCabangId());
 
         if ($isTeknisi) {
             $serviceQuery->where('users_id', $userId);
@@ -143,6 +160,7 @@ class LaporanServisController extends Controller
         $total_diskon = ServiceTransaction::where('is_approve', 'Setuju')
             ->where('kondisi_servis', 'Sudah jadi')
             ->whereDate('tgl_ambil', '>=', $start_date)
+            ->where('cabang_id', getCabangId())
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->when($isTeknisi, fn($q) => $q->where('users_id', $userId))
             ->sum('diskon');
@@ -152,17 +170,37 @@ class LaporanServisController extends Controller
 
         // Query untuk Expense (pengeluaran)
         $expenseQuery = Expense::whereDate('created_at', '>=', $start_date)
+            ->where('cabang_id', getCabangId())
             ->whereDate('created_at', '<=', $end_date);
 
         if ($isTeknisi) {
             $expenseQuery->where('users_id', $userId);
         }
 
+
+        $total_insiden = Incident::whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id',getCabangId())
+            ->sum('biaya_toko');
+
+        $totalInsiden = Incident::where('cabang_id',getCabangId())
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get()
+            ->sum('biaya_toko');
+
         $total_pengeluaran = $expenseQuery->sum('price');
         $pengeluaran_data = $expenseQuery->get();
 
         // Hitung saldo akhir
-        $saldo_akhir = $total_profit - $total_pengeluaran;
+        $saldo_akhir = $total_profit - $total_pengeluaran - $totalInsiden;
+
+
+        $insiden = Incident::where('cabang_id',getCabangId())
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get();
+
 
         // return response()->json($services);
         $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
@@ -188,7 +226,9 @@ class LaporanServisController extends Controller
             'saldo_akhir' => $saldo_akhir,
             'pengeluaran_data' => $pengeluaran_data,
             'total_pengeluaran' => $total_pengeluaran,
-            'total_kredit' => $total_kredit
+            'total_kredit' => $total_kredit,
+            'insiden' => $insiden,
+            'total_insiden' => $totalInsiden,
         ]);
 
         $filename = 'Laporan Transaksi Servis' . ' ' . $start_date . ' ' . 'sd' . ' ' . $end_date . '.pdf';

@@ -45,6 +45,7 @@ class ExpenseController extends Controller
             'name' => $request->name,
             'price' => $request->price,
             'users_id' => $request->users_id,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('admin-pengeluaran.index');
@@ -70,7 +71,7 @@ class ExpenseController extends Controller
     public function edit($id)
     {
         $item = Expense::findOrFail($id);
-        $users = User::all();
+        $users = User::where('cabang_id',getCabangId())->get();
 
         return view('pages.admintoko.pengeluaran.edit', [
             'item' => $item,

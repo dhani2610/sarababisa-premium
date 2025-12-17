@@ -16,8 +16,8 @@ class Debt extends Model
         'total',
         'is_approve',
         'tgl_disetujui',
-        'created_at',
         'cabang_id',
+        'created_at',
     ];
 
     public function worker()

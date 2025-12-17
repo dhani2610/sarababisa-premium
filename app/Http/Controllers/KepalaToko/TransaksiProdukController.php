@@ -14,6 +14,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Auth;
 
 class TransaksiProdukController extends Controller
 {
@@ -41,15 +42,28 @@ class TransaksiProdukController extends Controller
         $limit = $request->get('limit', 200);
         $offset = $request->get('offset', 0);
 
-        $orders = Order::select('orders.*', 'order_details.modal')
-            ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
-            ->with(['user', 'customer'])
-            ->where('orders.cabang_id',getCabangId())
-            ->orderByRaw('is_approve IS NULL DESC')
-            ->latest()
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        if (Auth::user()->role != 'Sales') {
+            $orders = Order::select('orders.*', 'order_details.modal')
+                ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
+                ->with(['user', 'customer'])
+                ->where('orders.cabang_id',getCabangId())
+                ->orderByRaw('is_approve IS NULL DESC')
+                ->latest()
+                ->skip($offset)
+                ->take($limit)
+                ->get();
+        }else{
+            $orders = Order::select('orders.*', 'order_details.modal')
+                ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
+                ->with(['user', 'customer'])
+                ->where('orders.users_id',Auth::user()->id)
+                ->where('orders.cabang_id',getCabangId())
+                ->orderByRaw('is_approve IS NULL DESC')
+                ->latest()
+                ->skip($offset)
+                ->take($limit)
+                ->get();
+        }
 
         return DataTables::of($orders)
             ->addIndexColumn()
@@ -267,16 +281,31 @@ class TransaksiProdukController extends Controller
         $limit = $request->get('limit', 200);
         $offset = $request->get('offset', 0);
 
-        $orders = Order::select('orders.*', 'order_details.modal')
-            ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
-            ->where('orders.cabang_id',getCabangId())
-            ->with(['user', 'customer'])
-            ->where('due', '0')
-            ->orderByRaw('is_approve IS NULL DESC')
-            ->latest()
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        if (Auth::user()->role != 'Sales') {
+            $orders = Order::select('orders.*', 'order_details.modal')
+                ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
+                ->where('orders.cabang_id',getCabangId())
+                ->with(['user', 'customer'])
+                ->where('due', '0')
+                ->orderByRaw('is_approve IS NULL DESC')
+                ->latest()
+                ->skip($offset)
+                ->take($limit)
+                ->get();
+        }else{
+            $orders = Order::select('orders.*', 'order_details.modal')
+                ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
+                ->where('orders.users_id',Auth::user()->id)
+                ->where('orders.cabang_id',getCabangId())
+                ->with(['user', 'customer'])
+                ->where('due', '0')
+                ->orderByRaw('is_approve IS NULL DESC')
+                ->latest()
+                ->skip($offset)
+                ->take($limit)
+                ->get();
+
+        }
 
         return DataTables::of($orders)
             ->addIndexColumn()
@@ -487,13 +516,25 @@ class TransaksiProdukController extends Controller
     }
     public function dataDue(Request $request)
     {
-        $orders = Order::select('orders.*', 'order_details.modal')
-            ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
-            ->with(['user', 'customer'])
-            ->where('orders.cabang_id',getCabangId())
-            ->where('due','>', '0')
-            ->orderByRaw('is_approve IS NULL DESC')
-            ->latest();
+        if (Auth::user()->role != 'Sales') {
+            $orders = Order::select('orders.*', 'order_details.modal')
+                ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
+                ->with(['user', 'customer'])
+                ->where('orders.cabang_id',getCabangId())
+                ->where('due','>', '0')
+                ->orderByRaw('is_approve IS NULL DESC')
+                ->latest();
+        }else{
+            $orders = Order::select('orders.*', 'order_details.modal')
+                ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
+                ->with(['user', 'customer'])
+                ->where('orders.users_id', Auth::user()->id)
+                ->where('orders.cabang_id',getCabangId())
+                ->where('due','>', '0')
+                ->orderByRaw('is_approve IS NULL DESC')
+                ->latest();
+
+        }
 
         return DataTables::of($orders)
             ->addIndexColumn()

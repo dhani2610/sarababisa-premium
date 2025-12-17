@@ -65,7 +65,10 @@
         @yield('content')
     </main>
 
-    @include('portal.layouts.partials.footer')
+    {{-- @include('portal.layouts.partials.footer') --}}
+    @if (!request()->is('/'))
+        @include('portal.layouts.partials.footer')
+    @endif
 
     <!-- Scroll Top -->
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i

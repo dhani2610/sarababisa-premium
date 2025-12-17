@@ -16,8 +16,8 @@ class PelangganController extends Controller
      */
     public function index()
     {
-        $customers = Customer::paginate(10);
-        $customers_count = Customer::all()->count();
+        $customers = Customer::where('cabang_id',getCabangId())->paginate(10);
+        $customers_count = Customer::where('cabang_id',getCabangId())->get()->count();
         return view('pages/teknisi/pelanggan', compact('customers', 'customers_count'));
     }
 

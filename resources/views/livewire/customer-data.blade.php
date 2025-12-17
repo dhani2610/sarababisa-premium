@@ -5,6 +5,18 @@
             /* Atur sesuai kebutuhan */
             overflow-y: auto !important;
         }
+        .dataTables_wrapper .dataTables_length {
+            float: left;
+            margin-left: 3%;
+        }
+        div.dataTables_wrapper div.dataTables_length select {
+            width: 41%!important;
+            display: inline-block;
+        }
+        div.dataTables_wrapper div.dataTables_filter {
+            text-align: right;
+            margin-right: 2%!important;
+        }
     </style>
 
     @include('layouts.messages')
@@ -158,7 +170,7 @@
 
 
             <!-- Search form -->
-            <x-search-form placeholder="Masukkan nama pelanggan" />
+            {{-- <x-search-form placeholder="Masukkan nama pelanggan" /> --}}
 
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
@@ -369,7 +381,7 @@
             </div>
             <!-- Table -->
             <div class="overflow-x-auto">
-                <table class="table-auto w-full">
+                <table id="pelanggan-table" class="table-auto w-full">
                     <!-- Table header -->
                     <thead
                         class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
@@ -405,7 +417,7 @@
                     </thead>
                     <!-- Table body -->
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <!-- Row -->
+                        {{-- <!-- Row -->
                         <?php $no = 0; ?>
                         @foreach ($customers as $customer)
                             <?php $no++; ?>
@@ -526,7 +538,7 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @endforeach --}}
                     </tbody>
                 </table>
             </div>
@@ -632,7 +644,145 @@
 
 
     <!-- Pagination -->
-    <div class="mt-8">
+    {{-- <div class="mt-8">
         {{ $customers->links() }}
-    </div>
+    </div> --}}
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#pelanggan-table').DataTable({
+                processing: false,
+                serverSide: false, // Mengaktifkan Server Side Pagination & Search
+                ajax: "{{ route('pelanggan.data') }}",
+                columns: [
+                    { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
+                    {
+                        data: null,
+                        sortable: false,
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    { data: 'nama', name: 'nama' },
+                    { data: 'kategori', name: 'kategori' },
+                    { data: 'nomor_hp', name: 'nomor_hp' },
+                    { data: 'alamat', name: 'alamat' },
+                    { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
+                ],
+                order: [[1, 'asc']], // Default order by Nama
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    paginate: {
+                        first: "Awal",
+                        last: "Akhir",
+                        next: "Lanjut",
+                        previous: "Kembali"
+                    }
+                },
+                drawCallback: function() {
+                    // Re-attach listeners after table redraw (pagination/search)
+                    attachCheckboxHandlers();
+                }
+            });
+
+            // --- Logic Bulk Action Checkbox ---
+            function attachCheckboxHandlers() {
+                // Reset parent checkbox
+                $('#parent-checkbox').prop('checked', false);
+                toggleBulkAction();
+
+                // Handler Select All
+                $('#parent-checkbox').off('click').on('click', function() {
+                    var checked = $(this).is(':checked');
+                    $('input.table-item').prop('checked', checked);
+                    toggleBulkAction();
+                });
+
+                // Handler Individual Checkbox
+                $('#pelanggan-table').off('change', '.table-item').on('change', '.table-item', function() {
+                    var all = $('input.table-item').length;
+                    var checked = $('input.table-item:checked').length;
+                    $('#parent-checkbox').prop('checked', all === checked && all > 0);
+                    toggleBulkAction();
+                });
+            }
+
+            function toggleBulkAction() {
+                var checkedCount = $('input.table-item:checked').length;
+                $('.table-items-count').text(checkedCount);
+                if (checkedCount > 0) {
+                    $('.table-items-action').removeClass('hidden');
+                } else {
+                    $('.table-items-action').addClass('hidden');
+                }
+            }
+
+            // Fungsi Global untuk delete selected (agar bisa dipanggil onclick html)
+            window.deleteSelected = function() {
+                var selectedIds = $('input.table-item:checked').map(function() {
+                    return $(this).val();
+                }).get();
+
+                if (selectedIds.length === 0) return alert('Pilih data terlebih dahulu.');
+
+                if (!confirm('Apakah anda yakin ingin menghapus ' + selectedIds.length + ' data pelanggan ini?')) return;
+
+                $.ajax({
+                    url: "/customers/delete",
+                    method: 'POST',
+                    data: {
+                        ids: selectedIds,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        alert(response.message);
+                        table.ajax.reload(); // Reload tabel otomatis
+                        $('.table-items-action').addClass('hidden'); // Sembunyikan bulk action
+                    },
+                    error: function(xhr) {
+                        alert('Gagal menghapus data.');
+                        console.error(xhr);
+                    }
+                });
+            };
+        });
+
+        // Script tambahan untuk Tom Select Broadcast (dari kode lama anda)
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.getElementById("broadcast")){
+                 new TomSelect("#broadcast", {
+                    create: false,
+                    sortField: { field: "text", direction: "asc" }
+                });
+            }
+
+            const checkboxAll = document.getElementById('select-all-customers');
+            const selectBroad = document.getElementById('broadcast-select');
+            if(checkboxAll && selectBroad){
+                checkboxAll.addEventListener('change', function() {
+                    if (this.checked) {
+                        selectBroad.style.display = 'none';
+                        const selectEl = selectBroad.querySelector('select');
+                        if(selectEl) selectEl.required = false;
+                    } else {
+                        selectBroad.style.display = 'block';
+                         const selectEl = selectBroad.querySelector('select');
+                        if(selectEl) selectEl.required = true;
+                    }
+                });
+            }
+        });
+    </script>
 </div>

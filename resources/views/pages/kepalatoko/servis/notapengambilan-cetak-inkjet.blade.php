@@ -169,8 +169,8 @@
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Kerusakan</th>
                 <td id="data" class="capital">: {{ $items->kerusakan }}</td>
-                <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Masuk)</th>
-                <td id="data" class="capital">: {{ $items->qc_masuk }}</td>
+                <td id="data" scope="row" rowspan="2" style="border-left-style: solid;">Link QC </th>
+                <td id="data" class="row" rowspan="2">: <a href="{{ route('kepalatoko-cetak-qc', $items->id) }}">{{ route('kepalatoko-cetak-qc', $items->id) }}</a> </td>
                 <td id="data" scope="row" style="border-left-style: solid;">
                     Total Biaya Servis
                     @php
@@ -208,8 +208,8 @@
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Kondisi Servis</th>
                 <td id="data" class="capital">: {{ $items->kondisi_servis }}</td>
-                <td id="data" scope="row" style="border-left-style: solid;">Fungsi (Keluar)</th>
-                <td id="data" class="capital">: {{ $items->qc_keluar }}</td>
+                {{-- <td id="data" scope="row" style="border-left-style: solid;">Fungsi</th>
+                <td id="data" class="row">: {{ route('kepalatoko-cetak-qc', $items->id) }}</td> --}}
                 @if ($items->kondisi_servis === 'Dibatalkan')
                     <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
                             <td id="data">: - </td>
@@ -517,9 +517,9 @@
                 <th class="text-right w-75">
                     {{-- <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">Terbilang : {{ terbilang($totalWithPpn) }}</span> --}}
                 </th>
-                <th class="text-right w-75" colspan="4">
+                <th class="text-right w-75" colspan="3">
                     <i>
-                        <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">
+                        <span style="text-transform: capitalize; font-size: 10px; font-weight: normal;text-align:right">
                             <b>
                                 Terbilang : {{ terbilang($totalWithPpn) }}
                             </b>
@@ -554,6 +554,8 @@
                 @endphp
                 <td rowspan="2" class="text-justify" style="font-style: italic; padding-right: 30px;">
                     {!! $terms->description !!}
+                    <br><strong>No. Rekening : {{ $users->rekening }} {{ $users->bank }} An.
+                            {{ $users->pemilik_rekening }} </strong>
                     @foreach ($banks as $index => $bank)
                         <br><strong>No. Rekening : {{ $bank['rekening'] }}, {{ $bank['bank'] }} An.
                             {{ $bank['pemilik'] }} </strong>

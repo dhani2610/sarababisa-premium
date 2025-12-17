@@ -258,13 +258,13 @@
                     @endif
                 </tr>
                 <tr>
-                    <td class="title">Pengecekan Masuk</td>
-                    <td class="value">: {{ $items->qc_masuk }}</td>
+                    <td class="title">Pengecekan Fungsi</td>
+                    <td class="value">: <a href="{{ route('kepalatoko-cetak-qc', $items->id) }}">{{ route('kepalatoko-cetak-qc', $items->id) }}</a> </td>
                 </tr>
-                <tr>
+                {{-- <tr>
                     <td class="title">Pengecekan Keluar</td>
                     <td class="value">: {{ $items->qc_keluar }}</td>
-                </tr>
+                </tr> --}}
                 <tr>
                     <td class="title">Tgl. Ambil</td>
                     <td class="value">:
@@ -294,7 +294,8 @@
                 overflow-wrap: break-word;
                 white-space: normal;
             ">
-                Cek status garansi {{ env('APP_URL') }}/garansi
+                Cek status garansi 
+                <a href="{{ env('APP_URL') }}/garansi">{{ env('APP_URL') }}/garansi</a>
             </p>
             <p>Terima kasih atas kepercayaan Anda telah melakukan Servis di {{ $users->nama_toko }}</p>
         </footer>

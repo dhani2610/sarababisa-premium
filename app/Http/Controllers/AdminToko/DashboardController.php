@@ -80,7 +80,7 @@ class DashboardController extends Controller
         // $totalbonus = ($adminbiayaservis / 100 + $adminprofitpenjualan / 100) * Auth::user()->persen;
         // dd(($adminbiayaservis / 100 + $adminprofitpenjualan / 100),$adminbiayaservis,$adminprofitpenjualan,$totalbonus);
 
-        $totalbudgets = Budget::all()->sum('total');
+        $totalbudgets = Budget::where('cabang_id',getCabangId())->get()->sum('total');
         $totalbiayaservis = ServiceTransaction::where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', $currentYear)
             ->whereMonth('tgl_disetujui', $currentMonth)
@@ -115,9 +115,9 @@ class DashboardController extends Controller
             return $transaction->created_at->addDays($reminderThreshold)->isPast();
         })->count();
 
-        $stokhabis = Product::where('stok', 0)->count();
+        $stokhabis = Product::where('cabang_id',getCabangId())->where('stok', 0)->count();
 
-        $inventories = Inventory::where('masa_penggantian', '<', $currentDate)->count();
+        $inventories = Inventory::where('cabang_id',getCabangId())->where('masa_penggantian', '<', $currentDate)->count();
 
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 

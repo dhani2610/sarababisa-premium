@@ -30,17 +30,17 @@ class HandphoneRequest extends FormRequest
             'nomor_seri' => [
                 'required',
                 'max:100',
-                function ($attribute, $value, $fail) {
-                    $cabangId = getCabangId();
+                // function ($attribute, $value, $fail) {
+                //     $cabangId = getCabangId();
 
-                    $exists = Product::where('nomor_seri', $value)
-                        ->where('cabang_id', $cabangId)
-                        ->exists();
+                //     $exists = Product::where('nomor_seri', $value)
+                //         ->where('cabang_id', $cabangId)
+                //         ->exists();
 
-                    if ($exists) {
-                        $fail('Mohon maaf, handphone dengan nomor seri ini sudah tersedia di cabang ini.');
-                    }
-                }
+                //     if ($exists) {
+                //         $fail('Mohon maaf, handphone dengan nomor seri ini sudah tersedia di cabang ini.');
+                //     }
+                // }
             ],
             'categories_id' => ['exists:categories,id'],
             'brands_id' => ['exists:brands,id'],

@@ -55,34 +55,34 @@ class ProdukImport implements ToModel, WithHeadingRow, WithBatchInserts
             return null;
         }
 
-        // ---------------------------------------------------------
-        // 2. LOGIKA CREATE (Cek Global & Rename)
-        // ---------------------------------------------------------
+        // // ---------------------------------------------------------
+        // // 2. LOGIKA CREATE (Cek Global & Rename)
+        // // ---------------------------------------------------------
 
-        $finalSn = $snAsli;
-        $finalName = $namaAsli;
-        $counter = 2;
+        // $finalSn = $snAsli;
+        // $finalName = $namaAsli;
+        // $counter = 2;
 
-        if ($hasSn) {
-            // KASUS BARANG BERSERI (HP):
-            // Cek apakah SN ini sudah dipakai di cabang lain? Rename SN-nya.
-            while (Product::where('nomor_seri', $finalSn)->exists()) {
-                $finalSn = $snAsli . '.';
-                $counter++;
-            }
-        } else {
-            // KASUS BARANG NON-SERI (Aksesoris):
-            // Cek apakah Nama Produk sudah dipakai di cabang lain? Rename Namanya.
-            while (Product::where('product_name', $finalName)->exists()) {
-                $finalName = $namaAsli . '.';
-                $counter++;
-            }
-        }
+        // if ($hasSn) {
+        //     // KASUS BARANG BERSERI (HP):
+        //     // Cek apakah SN ini sudah dipakai di cabang lain? Rename SN-nya.
+        //     while (Product::where('nomor_seri', $finalSn)->exists()) {
+        //         $finalSn = $snAsli . '.';
+        //         $counter++;
+        //     }
+        // } else {
+        //     // KASUS BARANG NON-SERI (Aksesoris):
+        //     // Cek apakah Nama Produk sudah dipakai di cabang lain? Rename Namanya.
+        //     while (Product::where('product_name', $finalName)->exists()) {
+        //         $finalName = $namaAsli . '.';
+        //         $counter++;
+        //     }
+        // }
 
         // Simpan Data Baru
         return new Product([
-            'nomor_seri'        => $finalSn,   // SN yang sudah aman/kosong
-            'product_name'      => $finalName, // Nama yang sudah aman
+            'nomor_seri'        => $snAsli,   // SN yang sudah aman/kosong
+            'product_name'      => $namaAsli, // Nama yang sudah aman
             'product_code'      => $row['Kode Produk'],
             'sub_categories_id' => $row['ID Sub Kategori'],
             'category_name'     => $row['Nama Sub Kategori'],

@@ -28,6 +28,8 @@ class MasterOvertimeController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
+        // dd($request->all());
+
         $user = Auth::user();
         $store = StoreSetting::where('cabang_id',getCabangId())->first();
         $ratePerHour = $store->nominal_overtime ?? 0;
@@ -37,7 +39,7 @@ class MasterOvertimeController extends Controller
         $hours = $end->diffInMinutes($start) / 60;
         $nominal = round($hours * $ratePerHour);
 
-        Overtime::create([
+        $data = Overtime::create([
             'id_user' => $user->id,
             'tanggal' => $request->tanggal,
             'waktu_start' => $request->waktu_start,

@@ -53,6 +53,7 @@ class RefundController extends Controller
         // Query data pengembalian dana berdasarkan periode
         $query = Refund::where('cabang_id',getCabangId())->with(['ServiceTransaction.user', 'teknisi'])
             ->whereBetween('created_at', [$start_date, Carbon::parse($end_date)->endOfDay()])
+            ->where('cabang_id',getCabangId())
             ->orderBy('created_at', 'desc');
 
         // Kalau role user teknisi, hanya ambil refund dia
@@ -128,7 +129,8 @@ class RefundController extends Controller
             Expense::create([
                 'name' => 'Refund #'. $servis->nomor_servis,
                 'price' => $servis->biaya,
-                'users_id' => auth()->user()->id
+                'users_id' => auth()->user()->id,
+                'cabang_id' => getCabangId()
             ]);
         }
 

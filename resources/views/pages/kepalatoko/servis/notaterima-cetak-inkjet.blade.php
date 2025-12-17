@@ -160,12 +160,12 @@
                 <td id="data">: -</td>
                 @endif
                 <td id="data" colspan="2" style="border-left-style: solid;" class="text-center">
-                    <p>{{ env('APP_URL') . '/tracking' }} </p>
+                    <p><a href="{{ env('APP_URL') }}/tracking">{{ env('APP_URL') }}/tracking</a> </p>
                 </td>
             </tr>
             <tr style="border-right-style: solid;">
                 <td id="data" scope="row" style="border-left-style: solid;">Pengecekan Fungsi</th>
-                <td id="data" class="capital">: {{ $items->qc_masuk }}</td>
+                <td id="data" class="row">: <a href="{{ route('kepalatoko-cetak-qc', $items->id) }}">{{ route('kepalatoko-cetak-qc', $items->id) }}</a></td>
                 <td id="data" scope="row" style="border-left-style: solid;">Uang Muka</th>
                     @if ($items->uang_muka != null)
                 <td id="data">: Rp. {{ number_format($items->uang_muka) }}</td>
@@ -199,8 +199,17 @@
                 <th colspan="6" style="text-align: left">Syarat & Ketentuan</th>
             </tr>
             <tr>
+                @php
+                    $banks = old('banks', json_decode($users->banks ?? '[]', true));
+                @endphp
                 <td colspan="6" style="text-align: justify">
                     {!! $terms->description !!}
+                    <br><strong>No. Rekening : {{ $users->rekening }} {{ $users->bank }} An.
+                            {{ $users->pemilik_rekening }} </strong>
+                    @foreach ($banks as $index => $bank)
+                        <br><strong>No. Rekening : {{ $bank['rekening'] }}, {{ $bank['bank'] }} An.
+                            {{ $bank['pemilik'] }} </strong>
+                    @endforeach
                 </td>
             </tr>
             <tr>
@@ -230,7 +239,7 @@
                     <hr style="border-top: 1px dashed;">
                 </td>
                 @endif
-                <td class="text-center"><img src="{{ $items->pola != null ? $items->pola : asset('images/pola.png') }}" alt=""
+                <td class="text-center"><img src="{{ $polaImage }}" alt=""
                         style="height: 40"></td>
                 <td class="text-center capital" style="padding-top: 36px;">{{ $items->customer->nama }}</td>
                 <td class="text-center capital" style="padding-top: 36px;">{{ $items->penerima }}</td>

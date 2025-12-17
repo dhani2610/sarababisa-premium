@@ -13,11 +13,12 @@
             <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Item Produk ✨</h1>
         </div>
 
+        @if (Auth::user()->role != 'Sales')
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Masukkan nama produk" />
+            {{-- <x-search-form placeholder="Masukkan nama produk" /> --}}
 
             <!-- Wrapper Alpine -->
             <div x-data="{ modalTambahStok: false }">
@@ -316,7 +317,7 @@
             </div>
 
         </div>
-
+        @endif
     </div>
 
     <!-- More actions -->
@@ -352,16 +353,17 @@
             </ul>
         </div>
 
+        @if (Auth::user()->role != 'Sales')
         <!-- Right side -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-            <div>
+            {{-- <div>
                 <select wire:model="paginate" id="" class="form-select">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                 </select>
-            </div>
+            </div> --}}
             <!-- Print button -->
             <div class="relative inline-flex" x-data="{ modalOpen: false }">
                 <button
@@ -551,6 +553,7 @@
             </div>
             <!-- End Import Excel-->
         </div>
+        @endif
     </div>
 
     @if ($errors->any())
@@ -641,7 +644,7 @@
             </div>
             <!-- Table -->
             <div class="overflow-x-auto">
-                <table class="table-auto w-full">
+                <table id="produk-table" class="table-auto w-full">
                     <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
@@ -661,9 +664,9 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">No.</div>
                             </th>
-                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            {{-- <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Tgl Masuk</div>
-                            </th>
+                            </th> --}}
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Nama Produk</div>
                             </th>
@@ -715,198 +718,7 @@
                     </thead>
                     <!-- Table body -->
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <!-- Row -->
-                        @php
-                            $i = 1
-                        @endphp
-                        @foreach($products as $item)
-                            <tr>
-                                @if ((int) ($tokoSetting->is_edit_produk ?? 0) == 1 || Auth::user()->role == 'Kepala Toko')
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
-                                    <div class="flex items-center">
-                                        <label class="inline-flex">
-                                            <span class="sr-only">Select</span>
-                                            <input class="table-item form-checkbox" type="checkbox" value="{{ $item->id }}" @click="uncheckParent" />
-                                        </label>
-                                    </div>
-                                </td>
-                                @endif
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $i++ }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $item->product_name }} {{ $item->kondisi }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">
-                                        @if ($item->product_code != null)
-                                            {{ $item->product_code }}
-                                        @else
-                                            -
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">
-                                        @if ($item->nomor_seri != null)
-                                            {{ $item->nomor_seri }}
-                                        @else
-                                            -
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $item->ram }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">
-                                        @if ($item->capacity != null)
-                                            {{ $item->capacity->name }}
-                                        @else
-                                            -
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $item->warna }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $item->keterangan }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $item->stok }}</div>
-                                </td>
-                                @if (Auth::user()->role == 'Kepala Toko' || $toko->is_modal_produk === 1)
-                                    <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                        <div class="font-medium">Rp. {{ number_format($item->harga_modal) }}</div>
-                                    </td>
-                                @endif
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">Rp. {{ number_format($item->harga_jual_toko) }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">Rp. {{ number_format($item->harga_jual) }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">
-                                        @if ($item->garansi != null)
-                                            {{ $item->garansi }} hari
-                                        @else
-                                            -
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">
-                                        @if ($item->garansi_imei != null)
-                                            {{ $item->garansi_imei }} hari
-                                        @else
-                                            -
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $item->is_portal == 1 ? 'Show' : 'Not Show' }}</div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
-                                    <div class="space-x-1 flex">
-                                        <button wire:click="openFotoModal({{ $item->id }})" class="text-blue-500 hover:text-blue-700 rounded-full">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-photo" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#1d4ed8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                <line x1="15" y1="8" x2="15.01" y2="8" />
-                                                <rect x="4" y="4" width="16" height="16" rx="3" />
-                                                <path d="M4 15l4 -4a3 5 0 0 1 3 0l5 5" />
-                                                <path d="M14 14l1 -1a3 5 0 0 1 3 0l2 2" />
-                                            </svg>
-                                        </button>
-                                        <a href="{{ route('download-barcode', $item->id) }}">
-                                            <button class="text-slate-400 hover:text-slate-500 mt-3 rounded-full">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
-                                                    <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
-                                                    <rect x="7" y="13" width="10" height="8" rx="2" />
-                                                </svg>
-                                            </button>
-                                        </a>
 
-                                        @if ((int) ($tokoSetting->is_edit_produk ?? 0) == 1 || Auth::user()->role == 'Kepala Toko')
-                                            <a href="{{ route('handphone.edit', $item->id) }}">
-                                                <button class="text-slate-400 hover:text-slate-500 rounded-full">
-                                                    <span class="sr-only">Edit</span>
-                                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                                        <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
-                                                    </svg>
-                                                </button>
-                                            </a>
-                                            <!-- Start -->
-                                            <div x-data="{ showDelete: false, deleteId: null }" x-show = "showDelete" x-on:open-delete.window="showDelete = true; deleteId = $event.detail.id" x-on:close-delete.window = "showDelete = false" x-on:keydown.escape.window = "showDelete = false" class="fixed z-50 inset-0">
-                                                <!-- Modal backdrop -->
-                                                <div x-on:click="showDelete = false" class="fixed inset-0 bg-slate-900 bg-opacity-40" x-cloak></div>
-                                                <!-- Modal dialog -->
-                                                <div
-                                                    id="danger-modal"
-                                                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                                                    role="dialog"
-                                                    aria-modal="true"
-                                                    x-show="showDelete"
-                                                    x-cloak
-                                                >
-                                                    <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
-                                                        <div class="p-5 flex space-x-4">
-                                                            <!-- Icon -->
-                                                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
-                                                                <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16">
-                                                                    <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
-                                                                </svg>
-                                                            </div>
-                                                            <!-- Content -->
-                                                            <div>
-                                                                <!-- Modal header -->
-                                                                <div class="mb-2">
-                                                                    <div class="text-lg font-semibold text-slate-800">Apakah anda sudah yakin ?</div>
-                                                                </div>
-                                                                <!-- Modal content -->
-                                                                <div class="text-sm mb-10">
-                                                                    <div class="space-y-2">
-                                                                        <p>Jika sudah terhapus, maka tidak bisa dikembalikan lagi.</p>
-                                                                    </div>
-                                                                </div>
-                                                                <!-- Modal footer -->
-                                                                <div class="flex flex-wrap justify-end space-x-2">
-                                                                    <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" x-on:click="$dispatch('close-delete')">Batal</button>
-                                                                    <form x-bind:action="'{{ route('handphone.destroy', '') }}/' + deleteId" method="post">
-                                                                        @method('delete')
-                                                                        @csrf
-                                                                        <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
-                                                                    </form>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- End -->
-
-                                            <button x-data x-on:click="$dispatch('open-delete', { id: {{ $item->id }} })" class="text-rose-500 hover:text-rose-600 rounded-full">
-                                                <span class="sr-only">Delete</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ff2825" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <line x1="4" y1="7" x2="20" y2="7" />
-                                                    <line x1="10" y1="11" x2="10" y2="17" />
-                                                    <line x1="14" y1="11" x2="14" y2="17" />
-                                                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                                                </svg>
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -992,7 +804,7 @@
     </script>
 
     <!-- Pagination -->
-    <div class="mt-8">
+    {{-- <div class="mt-8">
         {{ $products->links() }}
-    </div>
+    </div> --}}
 </div>

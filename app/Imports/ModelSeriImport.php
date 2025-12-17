@@ -41,18 +41,18 @@ class ModelSeriImport implements ToModel, WithHeadingRow, WithBatchInserts
         // Data belum ada di cabang ini, kita buat baru.
         // TAPI cek dulu, apakah nama ini sudah dipakai cabang lain?
 
-        $finalName = $namaAsli;
-        $counter = 2;
+        // $finalName = $namaAsli;
+        // $counter = 2;
 
-        // Loop: Jika nama sudah ada di database (milik cabang manapun), tambah angka (2), (3)...
-        while (ModelSerie::where('name', $finalName)->exists()) {
-            $finalName = $namaAsli . '.';
-            $counter++;
-        }
+        // // Loop: Jika nama sudah ada di database (milik cabang manapun), tambah angka (2), (3)...
+        // while (ModelSerie::where('name', $finalName)->exists()) {
+        //     $finalName = $namaAsli . '.';
+        //     $counter++;
+        // }
 
         // Simpan Data Baru dengan nama yang sudah aman
         return new ModelSerie([
-            'name'           => $finalName, // Nama unik
+            'name'           => $row['Nama Model Seri'], // Nama unik
             'brands_id'      => $row['ID Merek'],
             'id_tipe_os'     => $row['ID TIPE OS'],
             'nominal_bonus'  => $row['Nominal Bonus'] ?? 0,

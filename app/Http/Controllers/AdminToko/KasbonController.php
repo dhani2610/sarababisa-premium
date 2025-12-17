@@ -17,8 +17,8 @@ class KasbonController extends Controller
      */
     public function index()
     {
-        $workers = Worker::all();
-        $debts = Debt::all();
+        $workers = Worker::where('cabang_id',getCabangId())->get();
+        $debts = Debt::where('cabang_id',getCabangId())->get();
         return view('pages/admintoko/kasbon/index', compact('workers', 'debts'));
     }
 
@@ -40,13 +40,15 @@ class KasbonController extends Controller
      */
     public function store(Request $request)
     {
-        
         $request->merge([
             'total' => (int) str_replace('.', '', $request->total),
         ]);
         $data = $request->all();
+        $data['cabang_id'] = getCabangId();
 
-        Debt::create($data);
+        $dataKasbon = Debt::create($data);
+        // dd($request->all(),$dataKasbon);
+
 
         return redirect()->route('admin-kasbon.index');
     }
@@ -70,8 +72,8 @@ class KasbonController extends Controller
      */
     public function edit($id)
     {
-        $item = Debt::with('worker')->findOrFail($id);
-        $workers = Worker::all();
+        $item = Debt::where('cabang_id',getCabangId())->with('worker')->findOrFail($id);
+        $workers = Worker::where('cabang_id',getCabangId())->all();
 
         return view('pages.admintoko.kasbon.edit', [
             'item' => $item,

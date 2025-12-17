@@ -34,12 +34,22 @@
         <div class="text-sm text-slate-500">
             <p>{{ $pesan_tambahan }}</p>
         </div>
+            
+    <div class="flex flex-wrap gap-3 items- mt-3">
+        <a href="/" class="inline-flex items-center bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-6 rounded-lg transition duration-200">
+            &larr; <span class="ml-2">Kembali ke Halaman Utama</span>
+        </a>
 
-        <div class="mt-8">
-            <a href="/" class="inline-block bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-6 rounded-lg transition duration-200">
-                &larr; Kembali ke Halaman Utama
-            </a>
-        </div>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="inline-flex items-center bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-200 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                {{ __('Keluar') }}
+            </button>
+        </form>
+    </div>
 
     </div>
 

@@ -101,7 +101,10 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Pengecekan Fungsi</label>
-                                    <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->qc_masuk }}" disabled />
+                                    
+                                    <a href="{{ route('kepalatoko-cetak-qc', $item->id) }}" target="_blank" class="btn bg-indigo-500 hover:bg-indigo-600 text-white " title="Lihat PDF QC">
+                                        Lihat QC
+                                    </a>
                                 </div>
                                 <div x-data="{ showDetails: true }">
                                     <label class="block text-sm font-medium mb-1" for="kondisi_servis">Kondisi Servis <span class="text-rose-500">*</span></label>

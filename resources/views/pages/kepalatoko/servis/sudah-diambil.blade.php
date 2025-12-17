@@ -61,12 +61,11 @@
                         @endif
                         {data: 'nama_barang', name: 'nama_barang'},
                         {data: 'kerusakan', name: 'kerusakan'},
-                        {data: 'qc_masuk', name: 'qc_masuk'},
-                        {data: 'qc_keluar', name: 'qc_keluar'},
+                        {data: 'fungsi', name: 'fungsi'},
                         {data: 'kondisi_servis', name: 'kondisi_servis'},
                         {data: 'tindakan_servis', name: 'tindakan_servis'},
                         {data: 'teknisi', name: 'teknisi'},
-                        @if (Auth::user()->role != 'Investor' && $storeSetting->is_modal == 1)
+                        @if (Auth::user()->role == 'Kepala Toko' || $storeSetting->is_modal == 1)
                             {data: 'modal_sparepart', name: 'modal_sparepart'},
                         @endif
                         {data: 'biaya', name: 'biaya'},
@@ -91,7 +90,7 @@
                 });
 
                 // --- custom pagination load bertahap ---
-                let batchSize = 100;
+                let batchSize = 20;
                 let offset = 0;
                 let loading = false;
 

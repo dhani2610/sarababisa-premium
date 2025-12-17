@@ -107,7 +107,8 @@ class SudahDiambilController extends Controller
                         . "Garansi sampai : " . ($row->exp_garansi ? Carbon::parse($row->exp_garansi)->translatedFormat('d F Y') : 'Tidak ada garansi') . "\n"
                         . "Pembayaran : {$row->cara_pembayaran}\n\n"
                         . "Link tracking : " . env('APP_URL') . "/tracking\n"
-                        . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $row->id)  . "\n\n"
+                        . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $row->id)  . "\n"
+                        . "Link QC : " . route('kepalatoko-cetak-qc', $row->id)  . "\n\n"
                         . "Terimakasih";
 
                     $waMessage = rawurlencode($message);
@@ -181,6 +182,15 @@ class SudahDiambilController extends Controller
             // ✅ QC Masuk & QC Keluar
             ->addColumn('qc_masuk', fn($row) => ucfirst($row->qc_masuk))
             ->addColumn('qc_keluar', fn($row) => ucfirst($row->qc_keluar))
+            ->addColumn('fungsi', function ($row)  {
+                $url = route('kepalatoko-cetak-qc', $row->id);
+
+                return '
+                    <a href="' . $url . '" target="_blank" class="btn bg-indigo-500 hover:bg-indigo-600 text-white " title="Lihat PDF QC">
+                        Lihat QC
+                    </a>
+                ';
+            })
 
             // ✅ Kondisi Servis
             ->addColumn('kondisi_servis', function ($row) {
@@ -254,6 +264,17 @@ class SudahDiambilController extends Controller
 
                 return '
                 <div class="space-x-1 flex">
+
+                    <button type="button" 
+                                class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1" 
+                                data-id="' . $row->id . '"
+                                title="Upload Foto Servis">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-camera" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"></path>
+                            <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+                            </svg>
+                        </button>
 
                     <!-- Start Printer -->
                     <div x-data="{ showPrint : false, printId: null }"
@@ -410,7 +431,7 @@ class SudahDiambilController extends Controller
             })
 
 
-            ->rawColumns(['checkbox', 'nomor_servis', 'hubungi', 'kondisi_servis', 'status', 'aksi', 'exp_garansi'])
+            ->rawColumns(['fungsi','checkbox', 'nomor_servis', 'hubungi', 'kondisi_servis', 'status', 'aksi', 'exp_garansi'])
             ->make(true);
     }
 
@@ -558,6 +579,21 @@ class SudahDiambilController extends Controller
             });
         })->where('stok', '>=', 1)->where('cabang_id',getCabangId())->get();
         $sales = User::where('role', 'Sales')->where('cabang_id',getCabangId())->get();
+
+        // 1. Decode JSON ke Array
+        $qcMasuk = $item->qc_masuk ? json_decode($item->qc_masuk, true) : [];
+        $qcKeluar = $item->qc_keluar ? json_decode($item->qc_keluar, true) : [];
+        // dd($qcMasuk,$items->qc_masuk);
+        $qcItems = array_keys($qcMasuk);
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
+
         return view('pages.kepalatoko.servis.sudah-diambil-edit', [
             'item' => $item,
             'types' => $types,
@@ -570,7 +606,10 @@ class SudahDiambilController extends Controller
             'workers' => $workers,
             'products' => $products,
             'sales' => $sales,
-            'penerima' => $penerima
+            'penerima' => $penerima,
+            'qcItems' => $qcItems,
+            'qcMasuk' => $qcMasuk,
+            'qcKeluar' => $qcKeluar,
         ]);
     }
 
@@ -931,6 +970,23 @@ class SudahDiambilController extends Controller
             $bonus_interface = 0;
         }
 
+        $qc_masuk_data = $request->qc_masuk ?? [];
+        $qc_keluar_data = $request->qc_keluar ?? [];
+
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                if (!empty($name)) {
+                    $val_in = $request->custom_qc_masuk[$key] ?? '-';
+                    $val_out = $request->custom_qc_keluar[$key] ?? '-';
+
+                    $qc_masuk_data[$name] = $val_in;
+                    $qc_keluar_data[$name] = $val_out;
+                }
+            }
+        }
+
+        $qc_masuk_final = json_encode($qc_masuk_data);
+        $qc_keluar_final = json_encode($qc_keluar_data);
         // Transaction create
         $item->update([
             'created_at' => $request->created_at,
@@ -946,8 +1002,8 @@ class SudahDiambilController extends Controller
             'tipe' => $request->tipe,
             'nama_barang' => $nama_barang,
             'kerusakan' => $request->kerusakan,
-            'qc_masuk' => $request->qc_masuk,
-            'qc_keluar' => $request->qc_keluar,
+            'qc_masuk' => $qc_masuk_data,
+            'qc_keluar' => $qc_keluar_data,
             'kondisi_servis' => $request->kondisi_servis,
             'service_actions_id' => $request->service_actions_id,
             'products_id' => $request->products_id,

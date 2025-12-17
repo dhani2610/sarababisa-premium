@@ -97,9 +97,32 @@ class UbahSudahDiambilController extends Controller
         $item = ServiceTransaction::findOrFail($id);
         $service_actions = ServiceAction::all();
 
+        // 1. Decode JSON ke Array
+        $qcMasuk = $item->qc_masuk ? json_decode($item->qc_masuk, true) : [];
+        $qcKeluar = $item->qc_keluar ? json_decode($item->qc_keluar, true) : [];
+        // dd($qcMasuk,$items->qc_masuk);
+        if ($qcMasuk != null) {
+            # code...
+            $qcItems = array_keys($qcMasuk);
+        }else{
+            $qcItems = [];
+        }
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
+        // return response()->json([$qcItems,$qcMasuk,$qcKeluar]);
+
         return view('pages.kepalatoko.servis.transaksi-servis-sudahdiambil', [
             'item' => $item,
-            'service_actions' => $service_actions
+            'service_actions' => $service_actions,
+            'qcItems' => $qcItems,
+            'qcMasuk' => $qcMasuk,
+            'qcKeluar' => $qcKeluar,
         ]);
     }
 
@@ -222,9 +245,29 @@ class UbahSudahDiambilController extends Controller
             }
         }
 
+        
+        $qc_masuk_data = $request->qc_masuk ?? [];
+        $qc_keluar_data = $request->qc_keluar ?? [];
+
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                if (!empty($name)) {
+                    $val_in = $request->custom_qc_masuk[$key] ?? '-';
+                    $val_out = $request->custom_qc_keluar[$key] ?? '-';
+
+                    $qc_masuk_data[$name] = $val_in;
+                    $qc_keluar_data[$name] = $val_out;
+                }
+            }
+        }
+
+        $qc_masuk_final = json_encode($qc_masuk_data);
+        $qc_keluar_final = json_encode($qc_keluar_data);
+        // return response()->json([$request->all(),$qc_masuk_final,$qc_keluar_final]);
         // Transaction create
         $item->update([
-            'qc_keluar' => $request->qc_keluar,
+            'qc_masuk' => $qc_masuk_data,
+            'qc_keluar' => $qc_keluar_final,
             'cara_pembayaran' => $request->cara_pembayaran,
             'diskon' => $request->diskon,
             'garansi'       => !empty($request->garansi) && isset($request->garansi[0]) ? $request->garansi[0] : null,

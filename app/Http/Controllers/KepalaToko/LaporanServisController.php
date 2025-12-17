@@ -330,7 +330,7 @@ class LaporanServisController extends Controller
             'total_biaya' => $total_biaya,
             'total_diskon' => $total_diskon,
             'total_profit' => $total_profit,
-            'total_insiden' => $total_insiden,
+            'total_insiden' => $totalInsiden,
             'total_pengeluaran' => $total_pengeluaran,
             'topbrands' => $topbrands,
             'topmodelseries' => $topmodelseries,

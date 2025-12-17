@@ -31,6 +31,13 @@
             @endif
 
             <!-- Picture -->
+            @if ($users->id == 1)
+            <section>
+                <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Nama Portal</h3>
+                <input name="nama_portal" id="nama_portal" class="form-input w-full" type="text"
+                            value="{{ $users->nama_portal }}" />
+            </section>
+            @endif
             <section>
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Logo Toko</h3>
                 <div class="flex items-center">
@@ -42,7 +49,7 @@
                         class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
                 </div>
             </section>
-            @if ($users->id == 1)
+            {{-- @if ($users->id == 1) --}}
                 <section>
                     <h3 class="text-xl leading-snug text-slate-800 font-bold mb-2">Foto Login</h3>
                     <div class="flex items-center">
@@ -148,7 +155,7 @@
                     </div>
 
                 </section>
-            @endif
+            {{-- @endif --}}
 
             <section>
                 <h3 class="text-xl leading-snug text-slate-800 font-bold mb-1">Profil Toko</h3>
@@ -253,7 +260,6 @@
         <footer>
             <div class="flex flex-col px-6 py-5 border-t border-slate-200">
                 <div class="flex self-end">
-                    {{-- <button class="btn border-slate-200 hover:border-slate-300 text-slate-600">Batal</button> --}}
                     <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white ml-3">Simpan Perubahan</button>
                 </div>
             </div>

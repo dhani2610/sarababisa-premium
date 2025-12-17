@@ -9,8 +9,17 @@
         @click.prevent="open = !open"
         :aria-expanded="open"
     >
-        @if (Auth::user()->profile_photo_path != null)
-            <img class="w-8 h-8 rounded-full" src="{{ Storage::url(Auth::user()->profile_photo_path ) }}" width="32" height="32" alt="{{ Auth::user()->name }}" />
+
+        @php
+            $cabangId = getCabangId();
+            if ($cabangId == 1) {
+                $kepalaToko = \App\Models\User::find(1);
+            }else{
+                $kepalaToko = \App\Models\User::where('cabang_id',$cabangId)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            }
+        @endphp
+        @if ($kepalaToko->profile_photo_path != null)
+            <img class="w-8 h-8 rounded-full" src="{{ Storage::url($kepalaToko->profile_photo_path ) }}" width="32" height="32" alt="{{ getCabangNameUser() ?? Auth::user()->name }}" />
         @else
             <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_url }}" width="32" height="32" alt="{{ Auth::user()->name }}" />
         @endif
@@ -36,7 +45,7 @@
     >
         <div class="pt-0.5 pb-2 px-3 mb-1 border-b border-slate-200">
             {{-- <div class="font-medium text-slate-800">{{ Auth::user()->name }}</div> --}}
-            <div class="font-medium text-slate-800">{{ getCabangNameUser()  }}</div>
+            <div class="font-medium text-slate-800">{{ getCabangNameUser() ?? Auth::user()->name }}</div>
             <div class="text-xs text-slate-500 italic">{{ Auth::user()->role }}</div>
         </div>
         <ul>

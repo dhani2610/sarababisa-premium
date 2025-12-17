@@ -28,14 +28,14 @@ class AdminPengeluaranData extends Component
 
     public function render()
     {
-        $users = User::all();
-        $expenses_count = Expense::all()->count();
+        $users = User::where('id','!=',1)->where('cabang_id',getCabangId())->get();
+        $expenses_count = Expense::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.admin-pengeluaran-data', [
             'users' => $users,
             'expenses_count' => $expenses_count,
             'expenses' => $this->search === null ?
-                Expense::latest()->paginate($this->paginate) :
-                Expense::latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Expense::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                Expense::where('cabang_id',getCabangId())->latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

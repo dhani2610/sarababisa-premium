@@ -29,14 +29,14 @@ class AdminKasbonData extends Component
 
     public function render()
     {
-        $workers = Worker::all();
-        $debts_count = Debt::all()->count();
+        $workers = Worker::where('cabang_id',getCabangId())->get();
+        $debts_count = Debt::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.admin-kasbon-data', [
             'workers' => $workers,
             'debts_count' => $debts_count,
             'debts' => $this->search === null ?
-                Debt::latest()->paginate($this->paginate) :
-                Debt::latest()->where('item', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Debt::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                Debt::where('cabang_id',getCabangId())->latest()->where('item', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

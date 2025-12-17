@@ -21,7 +21,7 @@ class HistoryGaransiController extends Controller
 {
     public function index()
     {
-        $users = User::where('cabang_id',getCabangId())->get();
+        $users = User::where('id','!=',1)->where('cabang_id',getCabangId())->get();
         return view('pages.kepalatoko.history.garansi', compact(
             'users'
         ));
@@ -315,7 +315,7 @@ class HistoryGaransiController extends Controller
         $customer = Customer::get();
 
         $serviceActions = ServiceAction::where('cabang_id',getCabangId())->get();
-        $users = User::where('cabang_id',getCabangId())->where('role','!=','Investor')->get();
+        $users = User::where('id','!=',1)->where('cabang_id',getCabangId())->where('role','!=','Investor')->get();
         return view('pages.kepalatoko.history.edit', compact(
             'users','historyGaransi','serviceTransactions','products','serviceActions','customer'
         ));
