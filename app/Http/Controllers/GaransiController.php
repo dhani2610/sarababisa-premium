@@ -23,6 +23,46 @@ class GaransiController extends Controller
             $order->where('invoice_no', $_GET['invoice_no']);
         })->get();
         $users = User::find(1);
+
         return view('pages/garansi-data', compact('product_transactions', 'users'));
+    }
+
+    public function indexServis()
+    {
+        return view('pages.garansi-servis');
+    }
+
+    public function dataServis(Request $request)
+    {
+        $invoice_no = $request->input('no_invoice');
+
+        if (!$invoice_no) {
+            return redirect()->back()->with('error', 'Nomor HP wajib diisi');
+        }
+
+
+        // $services = ServiceTransaction::with(['customer', 'type', 'brand', 'modelserie', 'capacity', 'user'])
+        $item = ServiceTransaction::with(['customer', 'type', 'brand', 'modelserie', 'capacity', 'user'])
+            ->where('nomor_servis',$invoice_no)
+            ->orderByDesc('created_at')
+            ->first();
+        // dd($services);
+
+        $totalbiaya = ServiceTransaction::where('nomor_servis',$invoice_no)->sum('biaya');
+
+        $customers = Customer::find($item->customers_id);
+
+        $users = User::find(1);
+
+        if ($item->cabang_id == 1) {
+            $users = User::find(1);
+        }else{
+            $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            return redirect()->back()->with('error', 'Tidak ditemukan');
+        }
+
+        return view('pages.garansi-servis-data', compact('item', 'totalbiaya', 'users','customers'));
     }
 }
