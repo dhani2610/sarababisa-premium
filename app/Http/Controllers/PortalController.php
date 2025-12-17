@@ -17,7 +17,7 @@ public function indexHome(Request $request)
 {
     // Ambil data cabang untuk ditampilkan di kartu
     $data['cabang'] = Cabang::orderBy('created_at', 'asc')->get();
-    if (count($data['cabang'])) {
+    if (count($data['cabang']) == 0) {
         return redirect()->route('portal.branch', 1);
     }
     $data['kepala_toko_setting'] = User::where('cabang_id', 1)->where('role', 'Kepala Toko')->first() ?? User::first();
