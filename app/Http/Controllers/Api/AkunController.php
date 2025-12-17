@@ -46,37 +46,45 @@ class AkunController extends Controller
     }
 
     public function updateExpiredDateCabang(Request $request)
-    {
-        try {
-            // Validasi input
-            $request->validate([
-                'id' => 'required',
-                'expired_date' => 'required|date'
-            ]);
+{
+    try {
+        $request->validate([
+            'id' => 'required',
+            // 'expired_date' => 'required|date' // Hapus validasi required agar bisa update parsial
+        ]);
 
-            $id = $request->id;
-            $expired_date = $request->expired_date;
+        $id = $request->id;
+        $cabang = Cabang::find($id);
 
-            $cabang = Cabang::find($id);
-            if (!$cabang) {
-                return response()->json(['status' => 'gagal', 'msg' => 'Cabang tidak ditemukan'], 404);
-            }
-
-            $cabang->expired_date = $expired_date;
-            $cabang->save();
-
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Berhasil update expired cabang ' . $cabang->nama_cabang,
-                'data' => $cabang
-            ]);
-
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => 'gagal',
-                'msg' => $th->getMessage(),
-            ], 500);
+        if (!$cabang) {
+            return response()->json(['status' => 'gagal', 'msg' => 'Cabang tidak ditemukan'], 404);
         }
+
+        // Update Expired Date jika dikirim
+        if ($request->has('expired_date')) {
+            $cabang->expired_date = $request->expired_date;
+        }
+
+        // Update Allow Transaksi jika dikirim
+        if ($request->has('allow_transaksi')) {
+            // Pastikan nilai jadi integer (1 atau 0)
+            $cabang->allow_transaksi = (int) $request->allow_transaksi;
+        }
+
+        $cabang->save();
+
+        return response()->json([
+            'status' => 'success',
+            'msg' => 'Data cabang ' . $cabang->nama_cabang . ' berhasil diperbarui',
+            'data' => $cabang
+        ]);
+
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => 'gagal',
+            'msg' => $th->getMessage(),
+        ], 500);
     }
+}
 
 }
