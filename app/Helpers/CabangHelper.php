@@ -71,9 +71,9 @@ if (!function_exists('getCabangNameUser')) {
     {
         $cbg = Cabang::find(getCabangId());
         if (!empty($cbg)) {
-            $data = $cbg->nama_cabang ?? '-';
+            $data = $cbg->nama_cabang ?? null;
         }else{
-            $data = '-';
+            $data = null;
         }
         return $data;
     }
