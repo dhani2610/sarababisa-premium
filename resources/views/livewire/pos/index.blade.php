@@ -17,11 +17,13 @@
 
         <livewire:product-cart :cartInstance="'sale'" />
 
+        @if (allowTransaksiCabang() == 1)
         <button
             class="w-full inline-flex items-center px-4 py-2 border border-transparent rounded-md font-bold text-xs text-white uppercase tracking-widest disabled:opacity-25 transition ease-in-out duration-150 bg-indigo-500 hover:bg-indigo-600"
             type="submit" wire:click="proceed">
             Proses Pembayaran
         </button>
+        @endif
 
     </div>
 

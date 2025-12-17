@@ -110,6 +110,7 @@
             @if (Auth::user()->role != 'Investor')
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
+                @if (allowTransaksiCabang() == 1)
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true"
                     aria-controls="tambah-modal">
                     <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
@@ -118,6 +119,7 @@
                     </svg>
                     <span class="hidden xs:block ml-2">Tambah Transaksi Baru</span>
                 </button>
+                @endif
                 <!-- Modal backdrop -->
                 <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen"
                     x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"

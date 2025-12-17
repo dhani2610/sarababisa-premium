@@ -90,4 +90,16 @@ if (!function_exists('expiredDateCabang')) {
         return $data;
     }
 }
+if (!function_exists('allowTransaksiCabang')) {
+    function allowTransaksiCabang()
+    {
+        $cbg = Cabang::find(getCabangId());
+        if (!empty($cbg)) {
+            $data = $cbg->allow_transaksi ?? 0;
+        }else{
+            $data = 0;
+        }
+        return $data;
+    }
+}
 
