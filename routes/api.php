@@ -23,4 +23,6 @@ Route::get('customers', 'Api\Customers@index')->name('api-customers');
 
 Route::get('/get-total-cabang', [AkunController::class, 'getDataTotalCabang'])->name('get-total-cabang');
 Route::post('/update-total-cabang', [AkunController::class, 'updateTotalCabang'])->name('update-total-cabang');
+Route::get('/get-setting-cabang', [AkunController::class, 'getCabangWithExpiredDate'])->name('get-setting-cabang');
+Route::post('/update-expired-date-cabang', [AkunController::class, 'updateExpiredDateCabang'])->name('update-expired-date-cabang');
 

@@ -292,6 +292,16 @@ Route::post('/set-cabang', function () {
     return back();
 })->name('set.cabang');
 
+Route::post('/change-cabang', function () {
+    $id = request('cabang_id');
+
+    $user = Auth::user();
+    $user->cabang_id = $id;
+    $user->save();
+
+    return redirect('hak-akses');
+})->name('change-cabang');
+
 
 // Livewire page (index)
 // Route::get('master/master-absensi', MasterAbsensi::class)->name('master-absensi.index');

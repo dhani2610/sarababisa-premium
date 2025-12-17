@@ -53,24 +53,24 @@
                 <a class="font-medium text-sm text-indigo-500 hover:text-indigo-600 flex items-center py-1 px-3" href="{{ route('profile.show') }}" @click="open = false" @focus="open = true" @focusout="open = false">Pengaturan</a>
             </li> --}}
             @if (Auth::user()->role == 'Kepala Toko')
-                @if (count(getCabang()) > 0)
-                <li class="px-3 py-2 border-b border-slate-200">
-                    <form action="{{ route('set.cabang') }}" method="POST">
-                        @csrf
-                        <label class="text-xs text-slate-500">Pilih Cabang</label>
-                        <select name="cabang_id"
-                                onchange="this.form.submit()"
-                                class="mt-1 w-full text-sm border-slate-300 rounded py-1 px-2">
-                            @foreach (getCabang() as $item)
-                                <option value="{{ $item->id }}"
-                                    {{ getCabangId() == $item->id ? 'selected' : '' }}>
-                                    {{ $item->nama_cabang }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </form>
-                </li>
-                @endif
+            <li class="px-3 py-2 border-b border-slate-200">
+                <form action="{{ route('set.cabang') }}" method="POST">
+                    @csrf
+                    <label class="text-xs text-slate-500">Pilih Cabang</label>
+                    <select name="cabang_id"
+                            onchange="this.form.submit()"
+                            class="mt-1 w-full text-sm border-slate-300 rounded py-1 px-2">
+                        @foreach (getCabang() as $item)
+                            @if ($item->expired_date > now())
+                            <option value="{{ $item->id }}"
+                                {{ getCabangId() == $item->id ? 'selected' : '' }}>
+                                {{ $item->nama_cabang }}
+                            </option>
+                            @endif
+                        @endforeach
+                    </select>
+                </form>
+            </li>
             @endif
 
             <li>

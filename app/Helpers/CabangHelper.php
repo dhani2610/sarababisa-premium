@@ -78,4 +78,16 @@ if (!function_exists('getCabangNameUser')) {
         return $data;
     }
 }
+if (!function_exists('expiredDateCabang')) {
+    function expiredDateCabang()
+    {
+        $cbg = Cabang::find(getCabangId());
+        if (!empty($cbg)) {
+            $data = $cbg->expired_date ?? null;
+        }else{
+            $data = null;
+        }
+        return $data;
+    }
+}
 

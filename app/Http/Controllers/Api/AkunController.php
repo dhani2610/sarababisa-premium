@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\KepalaToko\UserRequest;
 use App\Models\Shift;
+use App\Models\Cabang;
 
 class AkunController extends Controller
 {
@@ -38,5 +39,44 @@ class AkunController extends Controller
         }
     }
 
+    public function getCabangWithExpiredDate(Request $request)
+    {
+        $cabang = Cabang::get();
+        return response()->json($cabang);
+    }
+
+    public function updateExpiredDateCabang(Request $request)
+    {
+        try {
+            // Validasi input
+            $request->validate([
+                'id' => 'required',
+                'expired_date' => 'required|date'
+            ]);
+
+            $id = $request->id;
+            $expired_date = $request->expired_date;
+
+            $cabang = Cabang::find($id);
+            if (!$cabang) {
+                return response()->json(['status' => 'gagal', 'msg' => 'Cabang tidak ditemukan'], 404);
+            }
+
+            $cabang->expired_date = $expired_date;
+            $cabang->save();
+
+            return response()->json([
+                'status' => 'success',
+                'msg' => 'Berhasil update expired cabang ' . $cabang->nama_cabang,
+                'data' => $cabang
+            ]);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'gagal',
+                'msg' => $th->getMessage(),
+            ], 500);
+        }
+    }
 
 }
