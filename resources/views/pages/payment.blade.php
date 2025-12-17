@@ -103,7 +103,7 @@
                                                         class="mt-1 w-full text-sm border-slate-300 rounded py-1 px-2">
                                                     <option value="" selected >Pilih cabang</option>
                                                     @foreach (getCabang() as $item)
-                                                        @if ($item->expired_date > now())
+                                                        @if ($item->expired_date >= now())
                                                             <option value="{{ $item->id }}"
                                                                 {{ getCabangId() == $item->id ? 'selected' : '' }}>
                                                                 {{ $item->nama_cabang }}
