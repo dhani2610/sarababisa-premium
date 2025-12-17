@@ -17,8 +17,11 @@ public function indexHome(Request $request)
 {
     // Ambil data cabang untuk ditampilkan di kartu
     $data['cabang'] = Cabang::orderBy('created_at', 'asc')->get();
-    $data['kepala_toko_setting'] = User::where('cabang_id', 1)->where('role', 'Kepala Toko')->first() ?? User::first(); 
-    
+    if (count($data['cabang'])) {
+        return redirect()->route('portal.branch', 1);
+    }
+    $data['kepala_toko_setting'] = User::where('cabang_id', 1)->where('role', 'Kepala Toko')->first() ?? User::first();
+
     // Return ke view baru khusus pemilihan cabang
     return view('portal.home', $data);
 }
@@ -59,11 +62,11 @@ public function index(Request $request, $id)
         ->where('cabang_id', $id)
         ->whereIn('categories_id', $data['productCategory']->pluck('id'))
         ->count();
-        
-    // Asumsi StoreSetting & User ada kolom cabang_id. 
+
+    // Asumsi StoreSetting & User ada kolom cabang_id.
     // Jika tidak, sesuaikan logic ini.
     $data['toko_setting'] = StoreSetting::where('cabang_id', $id)->first() ?? StoreSetting::first();
-    // $data['kepala_toko_setting'] = User::where('cabang_id', $id)->where('role', 'Kepala Toko')->orderBy('id','asc')->first() ?? User::first(); 
+    // $data['kepala_toko_setting'] = User::where('cabang_id', $id)->where('role', 'Kepala Toko')->orderBy('id','asc')->first() ?? User::first();
     if ($id == 1) {
         $data['kepala_toko_setting'] = User::where('cabang_id',$id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
     }else{
