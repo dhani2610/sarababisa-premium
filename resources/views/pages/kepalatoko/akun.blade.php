@@ -64,6 +64,12 @@
                                                 type="text" required />
                                         </div>
                                         <div>
+                                            <label class="block text-sm font-medium mb-1" for="username">Email
+                                                <span class="text-rose-500">*</span></label>
+                                            <input id="email" name="email" class="form-input w-full px-2 py-1"
+                                                type="email" required />
+                                        </div>
+                                        <div>
                                             <label class="block text-sm font-medium mb-1" for="username">Nama Pengguna
                                                 <span class="text-rose-500">*</span></label>
                                             <input id="username" name="username" class="form-input w-full px-2 py-1"
@@ -93,10 +99,9 @@
                                             <textarea id="alamat" name="alamat" class="form-textarea w-full px-2 py-1" rows="2" required></textarea>
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium mb-1" for="shift_id">Shift <span
-                                                    class="text-rose-500">*</span></label>
+                                            <label class="block text-sm font-medium mb-1" for="shift_id">Shift</label>
                                             <select id="shift_id" name="shift_id"
-                                                class="form-select text-sm py-1 w-full" required>
+                                                class="form-select text-sm py-1 w-full">
                                                 @foreach ($shift as $item)
                                                     <option value="{{ $item->id }}">{{ $item->nama_shift }}</option>
                                                 @endforeach
@@ -323,6 +328,9 @@
                                 <div class="font-semibold text-left">Nama</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Email</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Nama Pengguna</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -469,6 +477,7 @@
 
                         { data: 'cabang_name', name: 'cabang_name', orderable: false, searchable: false },
                         { data: 'name', name: 'name' },
+                        { data: 'email', name: 'email' },
                         { data: 'username', name: 'username' },
                         { data: 'bagian_teknisi', name: 'bagian_teknisi' },
                         { data: 'nik', name: 'nik' },
