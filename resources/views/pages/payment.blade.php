@@ -94,25 +94,27 @@
 
                                     @if (Auth::user()->role == 'Kepala Toko')
                                         @if (count(getCabang()) > 0)
-                                        {{-- <li class="px-3 py-2 border-b border-slate-200"> --}}
-                                            <form action="{{ route('change-cabang') }}" method="POST">
-                                                @csrf
-                                                <label class="text-xs text-slate-500">Pilih Cabang lain jika masih memiliki cabang lain yang masih aktif</label>
-                                                <select name="cabang_id"
-                                                        onchange="this.form.submit()"
-                                                        class="mt-1 w-full text-sm border-slate-300 rounded py-1 px-2">
-                                                    <option value="" selected >Pilih cabang</option>
-                                                    @foreach (getCabang() as $item)
-                                                        @if ($item->expired_date >= date('Y-m-d'))
-                                                            <option value="{{ $item->id }}"
-                                                                {{ getCabangId() == $item->id ? 'selected' : '' }}>
-                                                                {{ $item->nama_cabang }}
-                                                            </option>
-                                                        @endif
-                                                    @endforeach
-                                                </select>
-                                            </form>
-                                        {{-- </li> --}}
+                                            @if (Auth::user()->id == 1)
+                                            {{-- <li class="px-3 py-2 border-b border-slate-200"> --}}
+                                                <form action="{{ route('change-cabang') }}" method="POST">
+                                                    @csrf
+                                                    <label class="text-xs text-slate-500">Pilih Cabang lain jika masih memiliki cabang yang masih aktif</label>
+                                                    <select name="cabang_id"
+                                                            onchange="this.form.submit()"
+                                                            class="mt-1 w-full text-sm border-slate-300 rounded py-1 px-2">
+                                                        <option value="" selected >Pilih cabang</option>
+                                                        @foreach (getCabang() as $item)
+                                                            @if ($item->expired_date >= date('Y-m-d'))
+                                                                <option value="{{ $item->id }}"
+                                                                    {{ getCabangId() == $item->id ? 'selected' : '' }}>
+                                                                    {{ $item->nama_cabang }}
+                                                                </option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </form>
+                                            {{-- </li> --}}
+                                            @endif
                                         @endif
                                     @endif
 

@@ -24,7 +24,7 @@ class CheckSubscription
                 return redirect()->route('payment'); // Gantilah 'payment' dengan nama rute halaman pembayaran Anda
             }
         }else{
-            if (expiredDateCabang() < now()) {
+            if (date('Y-m-d') > expiredDateCabang()) {
                 // Berlangganan telah kadaluarsa, arahkan pengguna ke halaman pembayaran
                 return redirect()->route('payment'); // Gantilah 'payment' dengan nama rute halaman pembayaran Anda
             }
