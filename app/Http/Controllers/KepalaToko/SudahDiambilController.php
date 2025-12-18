@@ -265,8 +265,8 @@ class SudahDiambilController extends Controller
                 return '
                 <div class="space-x-1 flex">
 
-                    <button type="button" 
-                                class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1" 
+                    <button type="button"
+                                class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1"
                                 data-id="' . $row->id . '"
                                 title="Upload Foto Servis">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-camera" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -584,7 +584,11 @@ class SudahDiambilController extends Controller
         $qcMasuk = $item->qc_masuk ? json_decode($item->qc_masuk, true) : [];
         $qcKeluar = $item->qc_keluar ? json_decode($item->qc_keluar, true) : [];
         // dd($qcMasuk,$items->qc_masuk);
-        $qcItems = array_keys($qcMasuk);
+        if ($qcMasuk != null) {
+            $qcItems = array_keys($qcMasuk);
+        }else{
+            $qcItems = [];
+        }
 
         if (empty($qcItems) && !empty($qcKeluar)) {
             $qcItems = array_keys($qcKeluar);
