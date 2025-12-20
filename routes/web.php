@@ -199,6 +199,21 @@ Route::controller(DefaultController::class)->group(function () {
     Route::get('/get-product', 'GetProduct')->name('get-product');
 });
 
+Route::get('/test-mail', function () {
+    $data = [
+        'name' => 'Test User',
+        'url' => 'https://example.com/verify-link'
+    ];
+
+    Mail::send('mail.password', $data, function ($message) {
+        $message->to('andakaramdhanisantoso@gmail.com')
+                ->subject('Test Email with View');
+    });
+
+    return 'HTML mail sent using Blade view!';
+});
+
+
 // Keranjang Sampah
 Route::get('/keranjang-servis', [RecycleBinController::class, 'service'])->name('keranjang-servis');
 Route::delete('/{id}/hapus-keranjang-servis', [RecycleBinController::class, 'permanentlyDelete'])->name('hapus-keranjang-servis');

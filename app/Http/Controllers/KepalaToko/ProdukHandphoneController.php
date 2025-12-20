@@ -102,6 +102,7 @@ class ProdukHandphoneController extends Controller
         ]);
 
         // return redirect()->route('handphone.index');
+        toast('Data berhasil disimpan.', 'success');
         return redirect()->back();
     }
 

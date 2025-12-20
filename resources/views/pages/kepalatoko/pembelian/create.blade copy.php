@@ -13,7 +13,6 @@
                 <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Tambah Pembelian Produk ✨</h1>
             </div>
 
-
             <!-- Right: Actions -->
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
@@ -92,9 +91,7 @@
         </div>
 
         <div class="space-y-8 mt-8 mb-6">
-                @include('pages.kepalatoko.pos.components.cms-produk')
             <div class="grid gap-5 md:grid-cols-3">
-
                 <div>
                     <label class="block text-sm font-medium mb-1">Tipe</label>
                     <select id="tipe_select" class="form-select text-sm w-full" required>
@@ -156,9 +153,7 @@
                 @endforeach
             </select>
         </div>
-
-        <div class="mt-3">
-
+        <div>
             <select id="products_id" name="products_id" class="form-select text-sm w-full selectjs1" required>
                 <option value="">Pilih Produk</option>
                 @foreach (App\Models\Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get() as $item)
@@ -526,12 +521,12 @@
                         // }
                         success: function(data) {
                             var html = '<option value="">Pilih Produk</option>';
-
+                            
                             $.each(data, function(key, v) {
                                 var text = '';
 
                                 if (v.categories_id == 1) {
-
+                                    
                                     var capacityName = '-';
                                     if (v.capacity != null && v.capacity.name != null) {
                                         capacityName = v.capacity.name;
@@ -543,7 +538,7 @@
                                     var nomor_seri = v.nomor_seri ? v.nomor_seri : '';
 
                                     text = v.product_name + ' ' + kondisi + ' ' + warna + ' ' + ram + ' / ' + capacityName + ' (IMEI ' + nomor_seri + ')';
-
+                                    
                                 } else {
                                     var nomor_seri = v.nomor_seri ? v.nomor_seri : '';
                                     text = v.product_name + ' ' + nomor_seri;

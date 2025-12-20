@@ -86,6 +86,7 @@ class ProdukAksesorisController extends Controller
         ]);
 
         // return redirect()->route('aksesoris.index');
+        toast('Data berhasil disimpan.', 'success');
         return redirect()->back();
 
     }

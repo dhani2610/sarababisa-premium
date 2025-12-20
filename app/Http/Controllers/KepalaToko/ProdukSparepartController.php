@@ -89,6 +89,7 @@ class ProdukSparepartController extends Controller
         ]);
 
         // return redirect()->route('sparepart.index');
+        toast('Data berhasil disimpan.', 'success');
         return redirect()->back();
 
     }

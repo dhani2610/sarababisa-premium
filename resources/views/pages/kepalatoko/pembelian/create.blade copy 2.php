@@ -5,19 +5,14 @@
 <x-toko-layout background="bg-white">
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
-        <!-- Page header -->
         <div class="sm:flex sm:justify-between sm:items-center">
 
-            <!-- Left: Title -->
             <div class="mb-4 sm:mb-0">
                 <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Tambah Pembelian Produk ✨</h1>
             </div>
 
-
-            <!-- Right: Actions -->
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
-                <!-- Start -->
                 <div x-data="{ modalOpen: false }">
                     <button class="btn bg-slate-500 hover:bg-slate-600 text-white" @click.prevent="modalOpen = true" aria-controls="danger-modal">
                         <span class="sr-only">Exit</span>
@@ -25,7 +20,6 @@
                             <path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
                         </svg>
                     </button>
-                    <!-- Modal backdrop -->
                     <div
                         class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
                         x-show="modalOpen"
@@ -38,7 +32,6 @@
                         aria-hidden="true"
                         x-cloak
                     ></div>
-                    <!-- Modal dialog -->
                     <div
                         id="danger-modal"
                         class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
@@ -55,25 +48,20 @@
                     >
                         <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
                             <div class="p-5 flex space-x-4">
-                                <!-- Icon -->
                                 <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
                                     <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16">
                                         <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
                                     </svg>
                                 </div>
-                                <!-- Content -->
                                 <div>
-                                    <!-- Modal header -->
                                     <div class="mb-2">
                                         <div class="text-lg font-semibold text-slate-800">Tinggalkan halaman ini ?</div>
                                     </div>
-                                    <!-- Modal content -->
                                     <div class="text-sm mb-10">
                                         <div class="space-y-2">
                                             <p>Jika Anda keluar, inputan Anda tidak akan disimpan.</p>
                                         </div>
                                     </div>
-                                    <!-- Modal footer -->
                                     <div class="flex flex-wrap justify-end space-x-2">
                                         <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white" @click="modalOpen = false">Tetap Disini</button>
                                         <a href="{{ route('purchase.index') }}" class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600">
@@ -85,16 +73,12 @@
                         </div>
                     </div>
                 </div>
-                <!-- End -->
-
-            </div>
+                </div>
 
         </div>
 
         <div class="space-y-8 mt-8 mb-6">
-                @include('pages.kepalatoko.pos.components.cms-produk')
             <div class="grid gap-5 md:grid-cols-3">
-
                 <div>
                     <label class="block text-sm font-medium mb-1">Tipe</label>
                     <select id="tipe_select" class="form-select text-sm w-full" required>
@@ -104,7 +88,6 @@
                     </select>
                 </div>
 
-                <!-- Supplier Dropdown -->
                 <div id="supplier_box" class="hidden">
                     <label class="block text-sm font-medium mb-1">Supplier</label>
                     <select id="supplier_select" name="supplier_id" class="supplier_id form-select text-sm w-full">
@@ -115,7 +98,6 @@
                     </select>
                 </div>
 
-                <!-- Pelanggan Dropdown -->
                 <div id="pelanggan_box" class="hidden">
                     <label class="block text-sm font-medium mb-1">Pelanggan</label>
                     <select id="pelanggan_select" name="suppliers_id" class="supplier_id form-select text-sm w-full">
@@ -128,22 +110,18 @@
 
 
                 <div>
-                    <!-- Start -->
                     <div>
                         <label class="block text-sm font-medium mb-1" for="reference_number">No. Referensi</label>
                         <input id="reference_number" name="reference_number" class="form-input w-full" type="text" />
                     </div>
-                    <!-- End -->
-                </div>
+                    </div>
 
                 <div>
-                    <!-- Start -->
                     <div>
                         <label class="block text-sm font-medium mb-1" for="date">Tanggal</label>
                         <input id="date" name="date" class="form-input w-full" type="date" value="<?php echo date('Y-m-d'); ?>"/>
                     </div>
-                    <!-- End -->
-                </div>
+                    </div>
             </div>
         </div>
 
@@ -156,9 +134,7 @@
                 @endforeach
             </select>
         </div>
-
-        <div class="mt-3">
-
+        <div>
             <select id="products_id" name="products_id" class="form-select text-sm w-full selectjs1" required>
                 <option value="">Pilih Produk</option>
                 @foreach (App\Models\Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get() as $item)
@@ -181,16 +157,16 @@
                 <header class="px-5 py-4">
                     <h2 class="font-semibold text-slate-800">Data Produk</h2>
                 </header>
-                <!-- Table -->
                 {{-- <div class=""> --}}
                     <div class="overflow-x-auto w-full">
                         <table class="min-w-max w-full">
-                            <!-- Table header -->
                             <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                                 <tr>
                                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                         <div class="font-semibold text-left">Nama Produk</div>
                                     </th>
+
+                                    {{-- Kolom Khusus HP --}}
                                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="kapasitas">
                                         <div class="font-semibold text-left">Kapasitas</div>
                                     </th>
@@ -203,6 +179,16 @@
                                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="imei">
                                         <div class="font-semibold text-left">Imei</div>
                                     </th>
+
+                                    {{-- Kolom Khusus Kategori 2 (Sparepart) - Default Hidden --}}
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap hidden" data-cat2-field="sub_kategori">
+                                        <div class="font-semibold text-left">Sub Kategori</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap hidden" data-cat2-field="model_seri">
+                                        <div class="font-semibold text-left">Model Seri</div>
+                                    </th>
+                                    {{-- End Kolom Khusus --}}
+
                                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                         <div class="font-semibold text-left">Kuantitas</div>
                                     </th>
@@ -232,9 +218,7 @@
 
                             </tbody>
 
-                            <!-- Table body -->
                             <tbody class="text-sm divide-y divide-slate-200">
-                                <!-- Row -->
                                 <tr>
                                     <td>
                                         <div class="font-semibold ml-3">Subtotal</div>
@@ -282,6 +266,7 @@
                     <input type="hidden" name="products_id[]" value="@{{products_id}}">
                 </td>
 
+                {{-- Kolom HP --}}
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="kapasitas">
                     <select id="capacities_id" name="capacities_id[]" class="form-input text-sm " >
                         <option selected value="">Pilih Memori</option>
@@ -313,6 +298,25 @@
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap" data-hp-field="imei">
                     <input id="nomor_seri" name="nomor_seri[]" class="form-input " type="text" />
                 </td>
+
+                {{-- Kolom Kategori 2 (Sparepart) --}}
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap hidden" data-cat2-field="sub_kategori">
+                     <select id="sub_categories_id" name="sub_categories_id[]" class="form-select text-sm ">
+                        <option selected value="">Pilih Sub Kategori</option>
+                        @foreach ($spareparts as $sparepart)
+                            <option value="{{ $sparepart->id }}">{{ $sparepart->name }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap hidden" data-cat2-field="model_seri">
+                     <select id="selectjs3" name="model_series_id[]" class="form-select text-sm py-1 " >
+                        <option selected value="">Pilih Model Seri</option>
+                        @foreach ($model_series as $model)
+                            <option value="{{ $model->id }}">{{ $model->name }}</option>
+                        @endforeach
+                    </select>
+                </td>
+
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                     <input type="number" min="1" class="form-input quantity text-right w-full px-2 py-1" name="quantity[]" value="">
                 </td>
@@ -372,29 +376,58 @@
                 $(this).val(clean);
             });
         });
+
+        // FUNGSI UTAMA UNTUK CEK TAMPILAN KOLOM
+        function checkCategoryFields(categoryId) {
+             if (categoryId == 2) {
+                // Jika Kategori 2 (Sparepart)
+                $('[data-hp-field]').hide();
+                $('[data-cat2-field]').show();
+
+                // Tetap tampilkan harga jual toko & pelanggan karena diminta "tetep ada harga"
+                // Kita override hide di atas khusus untuk kolom harga
+                $('[data-hp-field="harga_jual_toko"]').show();
+                $('[data-hp-field="harga_jual_pelanggan"]').show();
+
+                // Kosongkan value field HP agar bersih
+                $('[data-hp-field]:not([data-hp-field="harga_jual_toko"]):not([data-hp-field="harga_jual_pelanggan"]) select, [data-hp-field]:not([data-hp-field="harga_jual_toko"]):not([data-hp-field="harga_jual_pelanggan"]) input').val('');
+
+                // Remove hidden class manually for table cells created dynamically
+                $('.delete_add_more_item').find('[data-cat2-field]').removeClass('hidden');
+
+            } else if (categoryId == 1) {
+                // Jika Kategori 1 (HP)
+                $('[data-hp-field]').show();
+                $('[data-cat2-field]').hide();
+
+                // Kosongkan value field Sparepart
+                $('[data-cat2-field] select').val('');
+
+                 // Add hidden class manually for table cells
+                $('.delete_add_more_item').find('[data-cat2-field]').addClass('hidden');
+            } else {
+                // Default / Lainnya
+                $('[data-hp-field]').hide();
+                $('[data-cat2-field]').hide();
+
+                // Tampilkan harga
+                $('[data-hp-field="harga_jual_toko"]').show();
+                $('[data-hp-field="harga_jual_pelanggan"]').show();
+            }
+        }
+
         // Ketika kategori berubah
         $("#categories_id").on("change", function () {
             const categoryId = $(this).val();
-
-            // Jika kategori BUKAN 1, hide kapasitias, ram, warna, imei
-            if (categoryId != 1) {
-                $('[data-hp-field]').hide();
-                $('[data-hp-field] select, [data-hp-field] input').val('');
-            } else {
-                $('[data-hp-field]').show();
-            }
+            checkCategoryFields(categoryId);
         });
 
         // Ketika user klik "Masukkan Produk", cek lagi kategori
         $(document).on("click", ".addeventmore", function () {
             setTimeout(() => {
                 const categoryId = $("#categories_id").val();
-                if (categoryId != 1) {
-                    $('[data-hp-field]').hide();
-                } else {
-                    $('[data-hp-field]').show();
-                }
-            }, 200);
+                checkCategoryFields(categoryId);
+            }, 100); // Delay sedikit agar element ter-render dulu
         });
 
         document.getElementById("tipe_select").addEventListener("change", function () {
@@ -518,11 +551,11 @@
                         type: "GET",
                         data:{categories_id:categories_id},
                         // success:function(data){
-                        //     var html = '<option value="">Pilih Produk</option>';
-                        //     $.each(data,function(key,v){
-                        //         html += '<option value=" '+v.id+' "> '+v.product_name+'</option>';
-                        //     });
-                        //     $('#products_id').html(html);
+                        //      var html = '<option value="">Pilih Produk</option>';
+                        //      $.each(data,function(key,v){
+                        //          html += '<option value=" '+v.id+' "> '+v.product_name+'</option>';
+                        //      });
+                        //      $('#products_id').html(html);
                         // }
                         success: function(data) {
                             var html = '<option value="">Pilih Produk</option>';
