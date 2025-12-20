@@ -130,13 +130,32 @@ class HistoryGaransiController extends Controller
             'keluhan'    => 'required|string',
         ]);
 
+         $qc_data = $request->qc_masuk ?? [];
+
+        // Gabungkan dengan baris Custom (jika ada input manual)
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                // Hanya proses jika nama item tidak kosong
+                if (!empty($name)) {
+                    // Ambil value statusnya (OK/Rusak/dll), default '-' jika kosong
+                    $val = $request->custom_qc_masuk[$key] ?? '-';
+
+                    // Masukkan ke array utama
+                    $qc_data[$name] = $val;
+                }
+            }
+        }
+
+        // Ubah array menjadi JSON agar bisa disimpan di database text/longtext
+        $qc_masuk_final = json_encode($qc_data);
+
         $data = new HistoryGaransi();
         $data->date        = $request->date;
         $data->service_id  = $request->service_id;
         $data->penerima_id = $request->penerima_id;
         $data->id_customer = $request->id_customer;
         $data->estimasi_pengerjaan = $request->estimasi_pengerjaan;
-        $data->fungsi_masuk = $request->fungsi_masuk;
+        $data->fungsi_masuk = $qc_masuk_final;
         $data->teknisi_id  = 0;
         $data->keluhan  = $request->keluhan;
         $data->tindakan    = [];
@@ -155,6 +174,25 @@ class HistoryGaransiController extends Controller
     public function update(Request $request,$id)
     {
 
+        $qc_masuk_data = $request->qc_masuk ?? [];
+        $qc_keluar_data = $request->qc_keluar ?? [];
+
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                if (!empty($name)) {
+                    $val_in = $request->custom_qc_masuk[$key] ?? '-';
+                    $val_out = $request->custom_qc_keluar[$key] ?? '-';
+
+                    $qc_masuk_data[$name] = $val_in;
+                    $qc_keluar_data[$name] = $val_out;
+                }
+            }
+        }
+
+        $qc_masuk_final = json_encode($qc_masuk_data);
+        $qc_keluar_final = json_encode($qc_keluar_data);
+
+
         $data = HistoryGaransi::find($id);
         if ($request->status == 2 || $request->status == 3) {
             $data->tgl_selesai = date('Y-m-d');
@@ -170,7 +208,8 @@ class HistoryGaransiController extends Controller
         $data->total_biaya = $request->total_biaya;
         $data->catatan     = $request->catatan;
         $data->status     = $request->status;
-        $data->fungsi_keluar = $request->fungsi_keluar;
+        $data->fungsi_masuk = $qc_masuk_data;
+        $data->fungsi_keluar = $qc_keluar_data;
         $data->save();
 
         if ($data->status == 3) {
@@ -359,6 +398,55 @@ class HistoryGaransiController extends Controller
         } catch (\Throwable $th) {
             return response()->json([]);
         }
+    }
+
+    public function cetakQcGaransi($id)
+    {
+        $items = HistoryGaransi::with(['pelanggan','penerima','service'])->findOrFail($id);
+        // dd($items);
+        // 1. Decode JSON ke Array
+        $qcMasuk = $items->fungsi_masuk ? json_decode($items->fungsi_masuk, true) : [];
+        $qcKeluar = $items->fungsi_keluar ? json_decode($items->fungsi_keluar, true) : [];
+
+        $qcItems = $qcMasuk != null ? array_keys($qcMasuk) : [];
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
+
+        if ($items->cabang_id == 1) {
+            $users = User::find(1);
+        } else {
+            $users = User::where('cabang_id', $items->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+        }
+
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu...', 'error');
+            return redirect()->back();
+        }
+
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+        $invoiceNumber = $items->nomor_servis;
+        $namaPelanggan = $items->pelanggan->nama;
+
+        $pdf = PDF::loadView('pages.kepalatoko.servis.notaqc-cetak-garansi', [
+        // return View('pages.kepalatoko.servis.notaqc-cetak', [
+            'users' => $users,
+            'items' => $items,
+            'imagePath' => $imagePath,
+            'qcMasuk' => $qcMasuk,   // Data Status Masuk (OK/Rusak/Null)
+            'qcKeluar' => $qcKeluar, // Data Status Keluar
+            'qcItems' => $qcItems    // Daftar Nama Item (Dinamis dari DB)
+        ]);
+
+        $filename = 'QC Check ' . $invoiceNumber . ' - ' . $namaPelanggan . '.pdf';
+
+        return $pdf->setOption('isRemoteEnabled', true)->stream($filename);
     }
 
 

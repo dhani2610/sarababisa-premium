@@ -41,6 +41,26 @@ class EditHistoryGaransi extends Component
 
         $serviceActions = ServiceAction::where('cabang_id',getCabangId())->get();
         $customer = Customer::get();
+        // $historyGaransi = HIstoryGaransi::find
+
+          // 1. Decode JSON ke Array
+        $qcMasuk = $this->historyGaransi->fungsi_masuk ? json_decode($this->historyGaransi->fungsi_masuk, true) : [];
+        $qcKeluar = $this->historyGaransi->fungsi_keluar ? json_decode($this->historyGaransi->fungsi_keluar, true) : [];
+        // dd($qcMasuk,$items->qc_masuk);
+        if ($qcMasuk != null) {
+            # code...
+            $qcItems = array_keys($qcMasuk);
+        }else{
+            $qcItems = [];
+        }
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
 
         return view('livewire.edit-history-garansi', [
             'serviceTransactions' => $serviceTransactions,
@@ -48,6 +68,9 @@ class EditHistoryGaransi extends Component
             'serviceActions' => $serviceActions,
             'users' => $users,
             'customer' => $customer,
+            'qcItems' => $qcItems,
+            'qcMasuk' => $qcMasuk,
+            'qcKeluar' => $qcKeluar,
         ]);
     }
 }

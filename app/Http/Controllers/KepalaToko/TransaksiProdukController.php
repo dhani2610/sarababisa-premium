@@ -866,7 +866,7 @@ class TransaksiProdukController extends Controller
         $totalWithoutTax = $order->sub_total - $totalTax;
         // $users = User::find(1);
         if ($order->cabang_id == 1) {
-            $users = User::where('cabang_id',$order->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$order->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
@@ -908,7 +908,7 @@ class TransaksiProdukController extends Controller
         // $users = User::find(1);
 
         if ($order->cabang_id == 1) {
-            $users = User::where('cabang_id',$order->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$order->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }

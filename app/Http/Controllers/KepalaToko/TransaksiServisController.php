@@ -774,7 +774,7 @@ class TransaksiServisController extends Controller
         $items = ServiceTransaction::with('customer')->findOrFail($id);
         // $users = User::find(1);
         if ($items->cabang_id == 1) {
-            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
@@ -814,8 +814,8 @@ class TransaksiServisController extends Controller
 
         // 2. Buat Canvas Image (Ukuran sesuaikan dengan canvas signature pad, misal 500x300)
         // Gunakan ukuran yang cukup besar agar tidak terpotong
-        $width = 500; 
-        $height = 300; 
+        $width = 500;
+        $height = 300;
         $image = imagecreatetruecolor($width, $height);
 
         // 3. Set Background Transparan
@@ -825,7 +825,7 @@ class TransaksiServisController extends Controller
 
         // 4. Set Warna Garis (Hitam)
         $black = imagecolorallocate($image, 0, 0, 0);
-        
+
         // Set ketebalan garis
         imagesetthickness($image, 3);
 
@@ -833,15 +833,15 @@ class TransaksiServisController extends Controller
         foreach ($strokes as $stroke) {
             $points = $stroke['points'];
             $count = count($points);
-            
+
             // Perlu minimal 2 titik untuk membuat garis
             for ($i = 0; $i < $count - 1; $i++) {
                 imageline(
-                    $image, 
-                    $points[$i]['x'], 
-                    $points[$i]['y'], 
-                    $points[$i + 1]['x'], 
-                    $points[$i + 1]['y'], 
+                    $image,
+                    $points[$i]['x'],
+                    $points[$i]['y'],
+                    $points[$i + 1]['x'],
+                    $points[$i + 1]['y'],
                     $black
                 );
             }
@@ -862,7 +862,7 @@ class TransaksiServisController extends Controller
         $items = ServiceTransaction::with('customer')->findOrFail($id);
         // $users = User::find(1);
         if ($items->cabang_id == 1) {
-            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
@@ -883,7 +883,7 @@ class TransaksiServisController extends Controller
         // --- BAGIAN BARU: KONVERSI POLA ---
         // Cek apakah pola ada isinya dan berupa JSON (bukan URL gambar lama)
         $polaImage = null;
-        
+
         if (!empty($items->pola)) {
             // Cek sederhana apakah ini JSON koordinat atau sudah base64/url
             // Kalau JSON biasanya diawali kurung siku '['
@@ -895,10 +895,10 @@ class TransaksiServisController extends Controller
                 $polaImage = $items->pola;
             }
         }
-        
+
         // Jika hasil konversi null atau data kosong, pakai gambar default
         if (empty($polaImage)) {
-            $polaImage = public_path('images/pola.png'); 
+            $polaImage = public_path('images/pola.png');
         }
         // ----------------------------------
         // dd($items,$polaImage);
@@ -936,7 +936,7 @@ class TransaksiServisController extends Controller
         }
 
         if ($items->cabang_id == 1) {
-            $users = User::where('cabang_id', $items->cabang_id)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+            $users = User::find(1);
         } else {
             $users = User::where('cabang_id', $items->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
         }

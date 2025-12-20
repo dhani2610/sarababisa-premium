@@ -525,7 +525,7 @@ class SudahDiambilController extends Controller
         // $users = User::find(1);
 
         if ($items->cabang_id == 1) {
-            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
@@ -1048,7 +1048,7 @@ class SudahDiambilController extends Controller
         $terms = Term::find(2);
 
         if ($items->cabang_id == 1) {
-            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
