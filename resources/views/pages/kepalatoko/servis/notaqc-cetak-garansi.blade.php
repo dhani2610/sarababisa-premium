@@ -191,11 +191,11 @@
             </thead>
             <tbody>
                 <td>
-                    {{ $items->qc_masuk }}
+                    {{ $items->fungsi_masuk }}
 
                 </td>
                 <td>
-                    {{ $items->qc_keluar ?? '-' }}
+                    {{ $items->fungsi_keluar ?? '-' }}
                 </td>
             </tbody>
             <tfoot>
