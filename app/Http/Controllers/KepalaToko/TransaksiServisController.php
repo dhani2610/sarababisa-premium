@@ -225,6 +225,12 @@ class TransaksiServisController extends Controller
             $fonteeToken = StoreSetting::where('cabang_id',getCabangId())->first()->fonnte ?? null;
             $toko = optional($row->customer)->nama ?? config('app.name');
 
+            if ($row->cabang_id == 1) {
+                $kp = User::find(1);
+            } else {
+                $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+            }
+
             $html = '<div class="flex space-x-1">';
             if ($nomorwa) {
                 $html .= '
@@ -243,17 +249,50 @@ class TransaksiServisController extends Controller
             $notaLink = route('kepalatoko-cetak-inkjet', $row->id);
             $notaQc = route('kepalatoko-cetak-qc', $row->id);
             $trackingLink = env('APP_URL') . '/tracking';
-            $message = rawurlencode("*Notifikasi Service*\n" . $tokoName . "\n\n" .
-                "No. Service : " . $row->nomor_servis . "\n" .
-                "Nama user : *" . $row->nama_pelanggan . "*\n" .
-                "Unit : " . $row->nama_barang . "\n" .
-                "Diterima : " . $row->penerima . "\n" .
-                "Tanggal : " . Carbon::parse($row->created_at)->translatedFormat('d F Y h:i') . "\n" .
-                "Kerusakan : " . $row->kerusakan . "\n\n" .
-                "Link tracking : " . $trackingLink . "\n" .
-                "Link nota : " . $notaLink . "\n" .
-                "Link QC : " . $notaQc . "\n\n" .
-                "Terimakasih");
+            // $message = rawurlencode("*Notifikasi Service*\n" . $tokoName . "\n\n" .
+            //     "No. Service : " . $row->nomor_servis . "\n" .
+            //     "Nama user : *" . $row->nama_pelanggan . "*\n" .
+            //     "Unit : " . $row->nama_barang . "\n" .
+            //     "Diterima : " . $row->penerima . "\n" .
+            //     "Tanggal : " . Carbon::parse($row->created_at)->translatedFormat('d F Y h:i') . "\n" .
+            //     "Kerusakan : " . $row->kerusakan . "\n\n" .
+            //     "Link tracking : " . $trackingLink . "\n" .
+            //     "Link nota : " . $notaLink . "\n" .
+            //     "Link QC : " . $notaQc . "\n\n" .
+            //     "Terimakasih");
+
+            $banks = old('banks', json_decode($kp->banks ?? '[]', true));
+
+            // 1. Definisikan bagian awal pesan
+            $text = "*Notifikasi Service*\n" . $tokoName . "\n\n" .
+                    "No. Service : " . $row->nomor_servis . "\n" .
+                    "Nama user : *" . $row->nama_pelanggan . "*\n" .
+                    "Unit : " . $row->nama_barang . "\n" .
+                    "Diterima : " . $row->penerima . "\n" .
+                    "Tanggal : " . Carbon::parse($row->created_at)->translatedFormat('d F Y h:i') . "\n" .
+                    "Kerusakan : " . $row->kerusakan . "\n\n" .
+                    "Link tracking : " . $trackingLink . "\n" .
+                    "Link nota : " . $notaLink . "\n" .
+                    "Link QC : " . $notaQc . "\n\n";
+
+
+            $text .= 'Informasi Pembayaran :' ."\n";
+
+            $text .= 'Bank : '. $kp->bank . "\n";
+            $text .= 'Norek : '. $kp->rekening . "\n";
+            $text .= 'a.n : '. $kp->pemilik_rekening . "\n";
+
+            if (!empty($banks)) {
+                foreach ($banks as $bank) {
+                    $text .= 'Bank : '. $bank['bank'] . "\n";
+                    $text .= 'Norek : '. $bank['rekening'] . "\n";
+                    $text .= 'a.n : '. $bank['pemilik'] . "\n";
+                }
+            }
+
+            $text .= "Terimakasih";
+
+            $message = rawurlencode($text);
 
             if ($fonteeToken && $nomorwa) {
                 // call kirimFontee JS with token & number & message

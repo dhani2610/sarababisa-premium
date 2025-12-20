@@ -97,7 +97,14 @@ class SudahDiambilController extends Controller
                     $fonnteToken = $toko->fonnte ?? null;
                     $hasToken = !empty($fonnteToken);
 
-                    $message = "*Notifikasi Service*\n{$toko->nama_toko}\n\n"
+                    if ($row->cabang_id == 1) {
+                        $kp = User::find(1);
+                    } else {
+                        $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+                    }
+                    $banks = old('banks', json_decode($kp->banks ?? '[]', true));
+
+                    $message = "*Notifikasi Service*\n{$kp->nama_toko}\n\n"
                         . "No. Service : {$row->nomor_servis}\n"
                         . "Nama user : *{$row->nama_pelanggan}*\n"
                         . "Unit : {$row->nama_barang}\n"
@@ -108,8 +115,24 @@ class SudahDiambilController extends Controller
                         . "Pembayaran : {$row->cara_pembayaran}\n\n"
                         . "Link tracking : " . env('APP_URL') . "/tracking\n"
                         . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $row->id)  . "\n"
-                        . "Link QC : " . route('kepalatoko-cetak-qc', $row->id)  . "\n\n"
-                        . "Terimakasih";
+                        . "Link QC : " . route('kepalatoko-cetak-qc', $row->id)  . "\n\n";
+
+                    $message .= 'Informasi Pembayaran :' ."\n";
+
+                    $message .= 'Bank : '. $kp->bank . "\n";
+                    $message .= 'Norek : '. $kp->rekening . "\n";
+                    $message .= 'a.n : '. $kp->pemilik_rekening . "\n";
+
+                    if (!empty($banks)) {
+
+                        foreach ($banks as $bank) {
+                            $message .= 'Bank : '. $bank['bank'] . "\n";
+                            $message .= 'Norek : '. $bank['rekening'] . "\n";
+                            $message .= 'a.n : '. $bank['pemilik'] . "\n";
+                        }
+                    }
+
+                    $message .= "Terimakasih";
 
                     $waMessage = rawurlencode($message);
 

@@ -8,34 +8,34 @@
         <div class="mb-4 font-medium text-sm text-green-600">
             {{ session('status') }}
         </div>
-    @endif   
+    @endif
     <!-- Form -->
     <form method="POST" action="{{ route('login') }}">
         @csrf
         <div class="space-y-4">
             <div>
                 <x-jet-label for="username" value="{{ __('Nama Pengguna') }}" />
-                <x-jet-input id="username" type="text" name="username" :value="old('username')" required autofocus />                
+                <x-jet-input id="username" type="text" name="username" :value="old('username')" required autofocus />
             </div>
             <div>
                 <x-jet-label for="password" value="{{ __('Kata Sandi') }}" />
-                <x-jet-input id="password" type="password" name="password" required autocomplete="current-password" />                
+                <x-jet-input id="password" type="password" name="password" required autocomplete="current-password" />
             </div>
         </div>
         <div class="flex items-center justify-between mt-6">
             @if (Route::has('password.request'))
                 <div class="mr-1">
-                    <a class="text-sm underline hover:no-underline" href="{{ route('password.request') }}">
+                    <a class="text-sm underline hover:no-underline" href="{{ route('direct.reset.request') }}">
                         {{ __('Lupa kata sandi?') }}
                     </a>
                 </div>
-            @endif            
+            @endif
             <x-jet-button class="ml-3">
                 {{ __('Masuk') }}
-            </x-jet-button>            
+            </x-jet-button>
         </div>
     </form>
-    <x-jet-validation-errors class="mt-4" />   
+    <x-jet-validation-errors class="mt-4" />
     <!-- Footer -->
     {{-- <div class="pt-5 mt-6 border-t border-slate-200">
         <div class="text-sm">

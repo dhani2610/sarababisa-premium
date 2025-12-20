@@ -160,6 +160,7 @@ use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTra
 use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as KepalaTokoServisBelumDisetujuiApproveController;
 use App\Http\Controllers\TipeOsController;
 use App\Http\Controllers\CabangController;
+use App\Http\Controllers\DirectPasswordResetController;
 use App\Http\Controllers\KepalaToko\MasterIzinController;
 use App\Http\Controllers\KepalaToko\MasterOvertimeController;
 
@@ -336,6 +337,18 @@ Route::get('master/master-absensi/export', [AttendanceController::class, 'export
     Route::get('/get-total-cabang', [KepalaTokoAkunController::class, 'getDataTotalCabang'])->name('get-total-cabang');
     Route::get('/update-total-cabang', [KepalaTokoAkunController::class, 'updateTotalCabang'])->name('update-total-cabang');
 
+// 1. Halaman Input Email (Awal)
+    Route::get('/lupa-password', [DirectPasswordResetController::class, 'showRequestForm'])->name('direct.reset.request');
+
+    // 2. Proses Cek Email (POST) -> Akan me-redirect ke halaman ganti
+    Route::post('/lupa-password/cek', [DirectPasswordResetController::class, 'checkEmail'])->name('direct.reset.check');
+
+    // 3. Halaman Input Password Baru (Halaman Berbeda / GET)
+    Route::get('/lupa-password/ganti', [DirectPasswordResetController::class, 'showChangePasswordForm'])->name('direct.reset.form');
+
+    // 4. Proses Simpan Password (POST)
+    Route::post('/lupa-password/update', [DirectPasswordResetController::class, 'updatePassword'])->name('direct.reset.update');
+    
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja'])->group(function () {
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
 
