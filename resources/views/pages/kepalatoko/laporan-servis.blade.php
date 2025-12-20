@@ -16,11 +16,11 @@
         </div>
 
         <div class="grid grid-cols-12 gap-6">
-            <x-kepalatoko.card-laporan-hari :omzethari="$omzethari" :profithari="$profithari"/>
-            <x-kepalatoko.card-laporan-bulan :omzetbulan="$omzetbulan" :profitbulan="$profitbulan"/>
-            <x-kepalatoko.card-laporan-tahun :omzettahun="$omzettahun" :profittahun="$profittahun"/>
+            <x-kepalatoko.card-laporan-hari :omzethari="$omzethari" :totalhari="$total_hari" :profithari="$profithari"/>
+            <x-kepalatoko.card-laporan-bulan :omzetbulan="$omzetbulan" :totalbulan="$total_bulan" :profitbulan="$profitbulan"/>
+            <x-kepalatoko.card-laporan-tahun :omzettahun="$omzettahun" :totaltahun="$total_tahun" :profittahun="$profittahun"/>
         </div>
-     
+
         <!-- Table -->
         <livewire:laporan-servis-data></livewire:laporan-servis-data>
 

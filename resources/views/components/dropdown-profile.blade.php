@@ -18,10 +18,14 @@
                 $kepalaToko = \App\Models\User::where('cabang_id',$cabangId)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
             }
         @endphp
+        @if (empty($kepalaToko))
+            <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_url }}" width="32" height="32" alt="{{ Auth::user()->name }}" />
+        @else
         @if ($kepalaToko->profile_photo_path != null)
             <img class="w-8 h-8 rounded-full" src="{{ Storage::url($kepalaToko->profile_photo_path ) }}" width="32" height="32" alt="{{ getCabangNameUser() ?? Auth::user()->name }}" />
         @else
             <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_url }}" width="32" height="32" alt="{{ Auth::user()->name }}" />
+        @endif
         @endif
         <div class="flex items-center truncate">
             <span class="truncate ml-2 text-sm font-medium group-hover:text-slate-800">{{ getCabangNameUser() ?? Auth::user()->name  }}</span>
