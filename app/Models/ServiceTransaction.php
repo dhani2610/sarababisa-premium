@@ -131,4 +131,9 @@ class ServiceTransaction extends Model
     {
         return $this->belongsTo(ServiceAction::class, 'service_actions_id', 'id');
     }
+
+    public function teknisi_tambahan()
+    {
+        return $this->hasMany(\App\Models\TeknisiServis::class, 'service_transactions_id');
+    }
 }

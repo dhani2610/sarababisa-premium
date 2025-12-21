@@ -403,6 +403,21 @@ class TransaksiServisController extends Controller
             // Build aksi HTML mirip persis dengan blade kamu
             $html = '<div class="space-x-1 flex">';
 
+            $urlMultiTeknisi = route('multi-teknisi', $row->id);
+
+            $html .= '
+                <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                    <a href="' . $urlMultiTeknisi . '">
+                        <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Input Multi Teknisi">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <circle cx="12" cy="7" r="4" />
+                                <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                            </svg>
+                        </button>
+                    </a>
+                </div>
+            ';
             // PIN & Pola (menyertakan wire:click dari blade asli)
             $html .= '
                 <button type="button"

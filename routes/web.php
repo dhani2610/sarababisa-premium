@@ -190,6 +190,7 @@ Route::get('/garansi', [GaransiController::class, 'index'])->name('garansi');
 Route::get('/garansi-data', [GaransiController::class, 'data'])->name('garansi-data');
 Route::get('/garansi-servis', [GaransiController::class, 'indexServis'])->name('garansi-servis');
 Route::get('/garansi-servis-data', [GaransiController::class, 'dataServis'])->name('garansi-servis-data');
+Route::get('/servis-detail/{id}', [GaransiController::class, 'dataServisTeknisi'])->name('servis-detail');
 Route::get('/get-action/{service_actions_id}', [AutoBiayaServisController::class, 'getAction']);
 Route::get('/get-sparepart/{products_id}', [AutoModalSparepartController::class, 'getSparepart']);
 Route::get('/get-product/{products_id}', [AutoHargaJualController::class, 'getProduct']);
@@ -592,6 +593,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
     Route::get('servis/ubah-status-proses/{id}', [KepalaTokoUbahStatusProsesServisController::class, 'edit'])->name('ubah-status-proses-edit');
     Route::post('servis/ubah-status-proses{id}', [KepalaTokoUbahStatusProsesServisController::class, 'update'])->name('ubah-status-proses-update');
+    Route::get('servis/multi-teknisi/{id}', [KepalaTokoUbahBisaDiambilController::class, 'multiTeknisi'])->name('multi-teknisi');
+    Route::post('servis/multi-teknisi-proses/{id}', [KepalaTokoUbahBisaDiambilController::class, 'multiTeknisiProses'])->name('multi-teknisi-proses');
     Route::get('servis/ubah-bisa-diambil/{id}', [KepalaTokoUbahBisaDiambilController::class, 'edit'])->name('ubah-bisa-diambil-edit');
     Route::post('servis/ubah-bisa-diambil{id}', [KepalaTokoUbahBisaDiambilController::class, 'update'])->name('ubah-bisa-diambil-update');
     Route::get('servis/ubah-sudah-diambil/{id}', [KepalaTokoUbahSudahDiambilController::class, 'edit'])->name('ubah-sudah-diambil-edit');
