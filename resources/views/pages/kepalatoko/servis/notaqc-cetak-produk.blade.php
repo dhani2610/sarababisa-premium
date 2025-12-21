@@ -176,11 +176,11 @@
                 <tr>
                     <td colspan="2" style="border:1px solid #000; padding: 10px;">
                         <strong>PIC QC IN:</strong> <br><br><br>
-                        <span class="uppercase">{{ $items->picMasuk->name}} </span>
+                        <span class="uppercase">{{ $items->picMasuk->name ?? '-'}} </span>
                     </td>
                     <td colspan="2" style="border:1px solid #000; padding: 10px;">
                         <strong>PIC QC OUT:</strong> <br><br><br>
-                        <span class="uppercase">{{ $items->picKeluar->name }}</span>
+                        <span class="uppercase">{{ $items->picKeluar->name ?? '-' }}</span>
                     </td>
                 </tr>
             </tbody>
