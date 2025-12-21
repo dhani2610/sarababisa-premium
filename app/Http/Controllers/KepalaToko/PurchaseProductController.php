@@ -17,6 +17,7 @@ use App\Models\Expense;
 use App\Models\Brand;
 use App\Models\SubCategory;
 use App\Models\StoreSetting;
+use App\Models\QcProduk;
 use Barryvdh\DomPDF\Facade\Pdf;
 class PurchaseProductController extends Controller
 {
@@ -225,6 +226,19 @@ class PurchaseProductController extends Controller
 
     public function store(Request $request)
     {
+
+        $qc_data = $request->qc_data ?? [];
+
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                if (!empty($name)) {
+                    $val = $request->custom_qc_masuk[$key] ?? '-';
+
+                    $qc_data[$name] = $val;
+                }
+            }
+        }
+        // return response()->json([$qc_data,$request->all()]);
         // Fungsi helper untuk membersihkan format angka
         if (!function_exists('cleanNumber')) {
             function cleanNumber($value)
@@ -338,6 +352,16 @@ class PurchaseProductController extends Controller
                     $productModel->stok += $request->quantity[$i];
                     $productModel->save();
                 }
+
+
+                $target_product_id = isset($productsNew) ? $productsNew->id : $request->products_id[$i];
+                $qc_masuk_final = json_encode($qc_data);
+
+                $qc = new QcProduk();
+                $qc->id_produk = $target_product_id;
+                $qc->qc_masuk = $qc_masuk_final;
+                $qc->pic_masuk = auth()->user()->id;
+                $qc->save();
 
                 // Simpan Pengeluaran (Expense)
                 if ($request->product_price[$i] > 0) {

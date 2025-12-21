@@ -348,7 +348,6 @@ Route::get('master/master-absensi/export', [AttendanceController::class, 'export
 
     // 4. Proses Simpan Password (POST)
     Route::post('/lupa-password/update', [DirectPasswordResetController::class, 'updatePassword'])->name('direct.reset.update');
-    
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja'])->group(function () {
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
 
@@ -527,6 +526,10 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::get('transaksi-produk/data/lunas', [App\Http\Controllers\KepalaToko\TransaksiProdukController::class, 'dataLunas'])->name('transaksi-produk.data.lunas');
     Route::get('transaksi-produk/data/due', [App\Http\Controllers\KepalaToko\TransaksiProdukController::class, 'dataDue'])->name('transaksi-produk.data.due');
     Route::resource('produk/transaksi-produk', KepalaTokoTransaksiProdukController::class);
+    Route::get('/get-qc-data/{product_id?}', [KepalaTokoTransaksiProdukController::class, 'getQcData'])->name('get-qc-data');
+    Route::post('/store-qc-data', [KepalaTokoTransaksiProdukController::class, 'storeQcData'])->name('store-qc-data');
+    Route::get('qc-produk/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakQc'])->name('qc-produk');
+
     Route::delete('/product-transactions/delete', [KepalaTokoTransaksiProdukController::class, 'deleteSelected']);
     Route::patch('/product-transactions/update', [KepalaTokoTransaksiProdukController::class, 'approveSelected']);
     Route::patch('/product-transactions/reject', [KepalaTokoTransaksiProdukController::class, 'rejectSelected']);
