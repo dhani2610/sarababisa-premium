@@ -72,6 +72,11 @@
                                         type="text" value="{{ $item->name }}" />
                                 </div>
                                 <div>
+                                    <label class="block text-sm font-medium mb-1" for="name">Email</label>
+                                    <input id="email" name="email" class="form-input w-full px-2 py-1"
+                                        type="email" value="{{ $item->email }}" />
+                                </div>
+                                <div>
                                     <label class="block text-sm font-medium mb-1" for="username">Nama Pengguna</label>
                                     <input id="username" name="username" class="form-input w-full px-2 py-1"
                                         type="text" value="{{ $item->username }}" />
@@ -96,8 +101,7 @@
                                     <textarea id="alamat" name="alamat" class="form-textarea w-full px-2 py-1" rows="4">{{ $item->alamat }}</textarea>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-1" for="shift_id">Shift <span
-                                            class="text-rose-500">*</span></label>
+                                    <label class="block text-sm font-medium mb-1" for="shift_id">Shift</label>
                                     <select id="shift_id" name="shift_id"
                                         class="form-select text-sm py-1 w-full" required>
                                         @foreach ($shift as $its)
@@ -308,17 +312,17 @@ function toggleBonusType() {
     const tipe = document.getElementById('tipe_bonus_admin').value;
     const roleAkun = document.getElementById('role').value;
     console.log(roleAkun);
-    
+
     if (roleAkun == 'Admin Toko') {
         console.log('====================================');
         console.log(tipe);
         console.log('====================================');
         const bonusTetap = document.getElementById('bonus-tetap');
         const bonusPersen = document.getElementById('bonus-persen');
-    
+
         bonusTetap.style.display = 'none';
         bonusPersen.style.display = 'none';
-    
+
         if (tipe === 'Tetap') {
             bonusTetap.style.display = 'block';
         } else if (tipe === 'Persen') {

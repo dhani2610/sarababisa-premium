@@ -150,7 +150,7 @@
                                 </label>
                             </div>
                         </th>
-                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">No.</th>
+                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">No Id.</th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Nama Model Seri</th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Nama Merek</th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Tipe OS</th>

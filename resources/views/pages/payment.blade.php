@@ -63,12 +63,12 @@
 
                         <!-- Page header -->
                         <div class="sm:flex sm:justify-between sm:items-center mb-8">
-                        
+
                             <!-- Left: Title -->
                             <div class="mb-4 sm:mb-0">
                                 <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Berlangganan ✨</h1>
                             </div>
-                        
+
                         </div>
 
                         <div class="border-t border-slate-200">
@@ -83,8 +83,42 @@
                                         </svg>
                                     </div>
                                     <h2 class="text-2xl text-slate-800 font-bold mb-2">Silahkan bayar biaya perpanjang langganan</h2>
-                                    <div class="mb-6">Mohon maaf, masa berlangganan kamu sudah berakhir pada <span class="text-rose-700 font-semibold">{{ \Carbon\Carbon::parse($user->exp_date)->format('d/m/Y') }}</span> sehingga akses kamu untuk sementara terkunci.</div>
-                                    <a href="https://api.whatsapp.com/send?phone=62811801799&text=" class="btn bg-indigo-500 hover:bg-indigo-600 text-white">
+                                    <div class="mb-6">Mohon maaf, masa berlangganan cabang {{ getCabangNameUser() }} kamu sudah berakhir pada <span class="text-rose-700 font-semibold">
+                                        @if (expiredDateCabang() == null)
+                                            {{ \Carbon\Carbon::parse($user->exp_date)->format('d/m/Y') }}
+                                        @else
+                                            {{ \Carbon\Carbon::parse(expiredDateCabang())->format('d/m/Y') }}
+                                        @endif
+                                    </span> sehingga akses kamu untuk sementara terkunci.</div>
+
+
+                                    @if (Auth::user()->role == 'Kepala Toko')
+                                        @if (count(getCabang()) > 0)
+                                            @if (Auth::user()->id == 1)
+                                            {{-- <li class="px-3 py-2 border-b border-slate-200"> --}}
+                                                <form action="{{ route('change-cabang') }}" method="POST">
+                                                    @csrf
+                                                    <label class="text-xs text-slate-500">Pilih Cabang lain jika masih memiliki cabang yang masih aktif</label>
+                                                    <select name="cabang_id"
+                                                            onchange="this.form.submit()"
+                                                            class="mt-1 w-full text-sm border-slate-300 rounded py-1 px-2">
+                                                        <option value="" selected >Pilih cabang</option>
+                                                        @foreach (getCabang() as $item)
+                                                            @if ($item->expired_date >= date('Y-m-d'))
+                                                                <option value="{{ $item->id }}"
+                                                                    {{ getCabangId() == $item->id ? 'selected' : '' }}>
+                                                                    {{ $item->nama_cabang }}
+                                                                </option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </form>
+                                            {{-- </li> --}}
+                                            @endif
+                                        @endif
+                                    @endif
+
+                                    <a href="https://api.whatsapp.com/send?phone=62811801799&text=" class="btn mt-2 bg-indigo-500 hover:bg-indigo-600 text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#fff" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                             <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
@@ -92,6 +126,17 @@
                                         </svg>
                                         <span class="ml-2">Perpanjang Langganan</span>
                                     </a>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="mt-2 inline-flex items-center bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-200 shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                            </svg>
+                                            {{ __('Keluar') }}
+                                        </button>
+                                    </form>
+
+
                                 </div>
 
                             </div>

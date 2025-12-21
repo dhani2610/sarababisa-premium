@@ -12,6 +12,10 @@
                 <div class="text-xl font-bold text-blue-500">Rp. {{ number_format($omzettahun) }}</div>
             </div>
             <div>
+                <div class="text-xs font-semibold text-slate-400 uppercase mb-1">Total</div>
+                <div class="text-xl font-bold text-blue-500">{{ number_format($totaltahun) }}</div>
+            </div>
+            <div>
                 <div class="text-xs font-semibold text-slate-400 uppercase mb-1">Profit</div>
                 <div class="text-xl font-bold text-emerald-500">Rp. {{ number_format($profittahun) }}</div>
             </div>

@@ -127,7 +127,7 @@
                                 </label>
                             </div>
                         </th>
-                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">No.</th>
+                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">No Id.</th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Nama Merek</th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Aksi</th>
                     </tr>
@@ -164,16 +164,17 @@
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
 
                     // Kolom No. Urut (Client Side Calculation) agar tetap urut meski beda page
-                    {
-                        data: null,
-                        sortable: false,
-                        orderable: false,
-                        searchable: false,
-                        render: function (data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        }
-                    },
+                    // {
+                    //     data: null,
+                    //     sortable: false,
+                    //     orderable: false,
+                    //     searchable: false,
+                    //     render: function (data, type, row, meta) {
+                    //         return meta.row + meta.settings._iDisplayStart + 1;
+                    //     }
+                    // },
 
+                    { data: 'id', name: 'id' },
                     { data: 'name', name: 'name' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                 ],

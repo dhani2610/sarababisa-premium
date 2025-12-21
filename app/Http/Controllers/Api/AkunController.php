@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\KepalaToko\UserRequest;
 use App\Models\Shift;
+use App\Models\Cabang;
 
 class AkunController extends Controller
 {
@@ -38,5 +39,52 @@ class AkunController extends Controller
         }
     }
 
+    public function getCabangWithExpiredDate(Request $request)
+    {
+        $cabang = Cabang::get();
+        return response()->json($cabang);
+    }
+
+    public function updateExpiredDateCabang(Request $request)
+{
+    try {
+        $request->validate([
+            'id' => 'required',
+            // 'expired_date' => 'required|date' // Hapus validasi required agar bisa update parsial
+        ]);
+
+        $id = $request->id;
+        $cabang = Cabang::find($id);
+
+        if (!$cabang) {
+            return response()->json(['status' => 'gagal', 'msg' => 'Cabang tidak ditemukan'], 404);
+        }
+
+        // Update Expired Date jika dikirim
+        if ($request->has('expired_date')) {
+            $cabang->expired_date = $request->expired_date;
+        }
+
+        // Update Allow Transaksi jika dikirim
+        if ($request->has('allow_transaksi')) {
+            // Pastikan nilai jadi integer (1 atau 0)
+            $cabang->allow_transaksi = (int) $request->allow_transaksi;
+        }
+
+        $cabang->save();
+
+        return response()->json([
+            'status' => 'success',
+            'msg' => 'Data cabang ' . $cabang->nama_cabang . ' berhasil diperbarui',
+            'data' => $cabang
+        ]);
+
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => 'gagal',
+            'msg' => $th->getMessage(),
+        ], 500);
+    }
+}
 
 }

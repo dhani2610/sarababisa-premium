@@ -85,7 +85,7 @@
                                 </label>
                             </div>
                         </th>
-                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">No.</th>
+                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">No Id.</th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Nama Jenis Barang</th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Aksi</th>
                     </tr>

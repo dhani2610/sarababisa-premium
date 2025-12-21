@@ -34,6 +34,14 @@ class LaporanServisController extends Controller
             ->whereDate('tgl_disetujui', today())
             ->get()
             ->sum('profittoko');
+        $total_hari = ServiceTransaction::with('serviceaction')
+            ->where('is_approve', 'Setuju')
+            ->where('cabang_id', getCabangId())
+            ->whereYear('tgl_disetujui', $currentYear)
+            ->whereMonth('tgl_disetujui', $currentMonth)
+            ->whereDate('tgl_disetujui', today())
+            ->get()
+            ->count();
         $omzetbulan = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->where('cabang_id', getCabangId())
@@ -48,6 +56,13 @@ class LaporanServisController extends Controller
             ->whereMonth('tgl_disetujui', $currentMonth)
             ->get()
             ->sum('profittoko');
+        $total_bulan = ServiceTransaction::with('serviceaction')
+            ->where('is_approve', 'Setuju')
+            ->where('cabang_id', getCabangId())
+            ->whereYear('tgl_disetujui', $currentYear)
+            ->whereMonth('tgl_disetujui', $currentMonth)
+            ->get()
+            ->count();
         $omzettahun = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->where('cabang_id', getCabangId())
@@ -60,7 +75,13 @@ class LaporanServisController extends Controller
             ->whereYear('tgl_disetujui', $currentYear)
             ->get()
             ->sum('profittoko');
-        return view('pages/kepalatoko/laporan-servis', compact('omzethari', 'profithari', 'omzetbulan', 'profitbulan', 'omzettahun', 'profittahun'));
+        $total_tahun = ServiceTransaction::with('serviceaction')
+            ->where('is_approve', 'Setuju')
+            ->where('cabang_id', getCabangId())
+            ->whereYear('tgl_disetujui', $currentYear)
+            ->get()
+            ->count();
+        return view('pages/kepalatoko/laporan-servis', compact('omzethari', 'profithari', 'omzetbulan', 'profitbulan', 'omzettahun', 'profittahun','total_hari','total_bulan','total_tahun'));
     }
     public function indexPajak()
     {
@@ -314,7 +335,7 @@ class LaporanServisController extends Controller
             ->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
             ->get();
-       
+
         // return response()->json($services);
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
         // return view('pages.kepalatoko.cetak-laporan-servis', [
@@ -338,7 +359,7 @@ class LaporanServisController extends Controller
             'total_servis' => $total_servis,
             'total_tunai' => $total_tunai,
             'total_transfer' => $total_transfer,
-            'total_kredit' => $total_kredit,    
+            'total_kredit' => $total_kredit,
             'saldo_akhir' => $saldo_akhir,
             'pengeluaran_data' => $pengeluaran_data,
             'total_dp' => $total_dp,

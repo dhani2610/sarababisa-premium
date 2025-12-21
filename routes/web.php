@@ -187,6 +187,8 @@ Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
 Route::get('/tracking-data', [TrackingController::class, 'data'])->name('tracking-data');
 Route::get('/garansi', [GaransiController::class, 'index'])->name('garansi');
 Route::get('/garansi-data', [GaransiController::class, 'data'])->name('garansi-data');
+Route::get('/garansi-servis', [GaransiController::class, 'indexServis'])->name('garansi-servis');
+Route::get('/garansi-servis-data', [GaransiController::class, 'dataServis'])->name('garansi-servis-data');
 Route::get('/get-action/{service_actions_id}', [AutoBiayaServisController::class, 'getAction']);
 Route::get('/get-sparepart/{products_id}', [AutoModalSparepartController::class, 'getSparepart']);
 Route::get('/get-product/{products_id}', [AutoHargaJualController::class, 'getProduct']);
@@ -291,6 +293,16 @@ Route::post('/set-cabang', function () {
 
     return back();
 })->name('set.cabang');
+
+Route::post('/change-cabang', function () {
+    $id = request('cabang_id');
+
+    $user = Auth::user();
+    $user->cabang_id = $id;
+    $user->save();
+
+    return redirect('hak-akses');
+})->name('change-cabang');
 
 
 // Livewire page (index)

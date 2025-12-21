@@ -99,6 +99,9 @@ class AkunController extends Controller
             ->editColumn('name', function ($row) {
                 return '<div class="font-medium">' . e($row->name) . '</div>';
             })
+            ->editColumn('email', function ($row) {
+                return $row->email;
+            })
 
             // 4. Username
             ->editColumn('username', function ($row) {
@@ -420,8 +423,18 @@ class AkunController extends Controller
         $langganan = Auth::user()->exp_date;
         $total_cabang = Auth::user()->total_cabang;
 
+
+        $checkEmail = User::where('email', $request->email)->first();
+
+        if ($checkEmail) {
+
+            toast('Email sudah terdaftar, silahkan gunakan email lain.', 'error');
+            return redirect()->route('akun');
+        }
+
         $data = [
             'name' => $request->name,
+            'email' => $request->email,
             'password' => bcrypt($request->password),
             'username' => $request->username,
             'bagian_teknisi' => $request->bagian_teknisi,
@@ -457,6 +470,16 @@ class AkunController extends Controller
         $langganan = Auth::user()->exp_date;
         $total_cabang = Auth::user()->total_cabang;
 
+
+        $checkEmail = User::where('email', $request->email)
+                          ->where('id', '!=', $id) // Abaikan ID user ini sendiri
+                          ->first();
+
+        if ($checkEmail) {
+            toast('Email sudah digunakan oleh pengguna lain.', 'error');
+            return redirect()->route('akun');
+        }
+
         $password = $item->password;
         if ($request->filled('password')) {
             $password = bcrypt($request->password);
@@ -464,6 +487,7 @@ class AkunController extends Controller
 
         $data = [
             'name' => $request->name,
+            'email' => $request->email,
             'password' => $password,
             'bagian_teknisi' => $request->bagian_teknisi,
             'username' => $request->username,

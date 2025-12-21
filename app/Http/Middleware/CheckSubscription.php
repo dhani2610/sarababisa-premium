@@ -17,10 +17,17 @@ class CheckSubscription
      */
     public function handle(Request $request, Closure $next)
     {
-        // Periksa apakah berlangganan telah kadaluarsa
-        if (Auth::user()->exp_date < now()) {
-            // Berlangganan telah kadaluarsa, arahkan pengguna ke halaman pembayaran
-            return redirect()->route('payment'); // Gantilah 'payment' dengan nama rute halaman pembayaran Anda
+        if (expiredDateCabang() == null) {
+            // Periksa apakah berlangganan telah kadaluarsa
+            if (Auth::user()->exp_date < now()) {
+                // Berlangganan telah kadaluarsa, arahkan pengguna ke halaman pembayaran
+                return redirect()->route('payment'); // Gantilah 'payment' dengan nama rute halaman pembayaran Anda
+            }
+        }else{
+            if (date('Y-m-d') > expiredDateCabang()) {
+                // Berlangganan telah kadaluarsa, arahkan pengguna ke halaman pembayaran
+                return redirect()->route('payment'); // Gantilah 'payment' dengan nama rute halaman pembayaran Anda
+            }
         }
 
         // Lanjutkan dengan permintaan jika berlangganan masih berlaku
