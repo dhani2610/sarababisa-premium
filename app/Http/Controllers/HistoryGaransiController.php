@@ -91,6 +91,12 @@ class HistoryGaransiController extends Controller
         $history = HistoryGaransi::where('id',$id)->with(['pelanggan'])->first();
         $items = ServiceTransaction::with('customer')->findOrFail($history->service_id);
         $users = User::find(1);
+
+        if ($items->cabang_id == 1) {
+            $users = User::find(1);
+        }else{
+            $users = User::where('cabang_id',$history->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
         if ($history->status == 1) {
             $terms = Term::find(1);
         }else{
