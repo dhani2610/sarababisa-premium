@@ -51,7 +51,7 @@ class RecycleBinController extends Controller
     public function cleanService()
     {
         // Mengambil semua data yang telah dihapus
-        $items = ServiceTransaction::onlyTrashed()->get();
+        $items = ServiceTransaction::where('cabang_id',getCabangId())->onlyTrashed()->get();
 
         // Melakukan penghapusan permanen untuk setiap data yang telah dihapus
         foreach ($items as $item) {
@@ -93,7 +93,7 @@ class RecycleBinController extends Controller
     public function cleanAccount()
     {
         // Mengambil semua data yang telah dihapus
-        $items = User::onlyTrashed()->get();
+        $items = User::where('cabang_id',getCabangId())->onlyTrashed()->get();
 
         // Melakukan penghapusan permanen untuk setiap data yang telah dihapus
         foreach ($items as $item) {
@@ -135,7 +135,7 @@ class RecycleBinController extends Controller
     public function cleanCustomer()
     {
         // Mengambil semua data yang telah dihapus
-        $items = Customer::onlyTrashed()->get();
+        $items = Customer::where('cabang_id',getCabangId())->onlyTrashed()->get();
 
         // Melakukan penghapusan permanen untuk setiap data yang telah dihapus
         foreach ($items as $item) {
@@ -177,7 +177,7 @@ class RecycleBinController extends Controller
     public function cleanProduct()
     {
         // Mengambil semua data yang telah dihapus
-        $items = Product::onlyTrashed()->get();
+        $items = Product::where('cabang_id',getCabangId())->onlyTrashed()->get();
 
         // Melakukan penghapusan permanen untuk setiap data yang telah dihapus
         foreach ($items as $item) {
@@ -219,7 +219,7 @@ class RecycleBinController extends Controller
     public function cleanIncident()
     {
         // Mengambil semua data yang telah dihapus
-        $items = Incident::onlyTrashed()->get();
+        $items = Incident::where('cabang_id',getCabangId())->onlyTrashed()->get();
 
         // Melakukan penghapusan permanen untuk setiap data yang telah dihapus
         foreach ($items as $item) {
@@ -261,7 +261,7 @@ class RecycleBinController extends Controller
     public function cleanDebt()
     {
         // Mengambil semua data yang telah dihapus
-        $items = Debt::onlyTrashed()->get();
+        $items = Debt::where('cabang_id',getCabangId())->onlyTrashed()->get();
 
         // Melakukan penghapusan permanen untuk setiap data yang telah dihapus
         foreach ($items as $item) {
@@ -303,7 +303,7 @@ class RecycleBinController extends Controller
     public function cleanExpense()
     {
         // Mengambil semua data yang telah dihapus
-        $items = Expense::onlyTrashed()->get();
+        $items = Expense::where('cabang_id',getCabangId())->onlyTrashed()->get();
 
         // Melakukan penghapusan permanen untuk setiap data yang telah dihapus
         foreach ($items as $item) {
@@ -349,7 +349,7 @@ class RecycleBinController extends Controller
     public function cleanOrder()
     {
         // Mengambil semua data yang telah dihapus
-        $items = Order::onlyTrashed()->get();
+        $items = Order::where('cabang_id',getCabangId())->onlyTrashed()->get();
 
         // Melakukan penghapusan permanen untuk setiap data yang telah dihapus
         foreach ($items as $item) {
