@@ -377,7 +377,7 @@ class UbahBisaDiambilController extends Controller
                             $bonus_interface = $nama_model->nominal_bonus ?? 0;
                         }
                     }
-                
+
 
                     // --- 5. PERBAIKAN: SELALU SIMPAN KE TABEL TEKNISI SERVIS (ANAK) ---
                     // Baik index 0 maupun index > 0, semua masuk sini biar data lengkap
@@ -446,7 +446,7 @@ class UbahBisaDiambilController extends Controller
             DB::commit();
             toast('Data servis multi-teknisi berhasil disimpan.', 'success');
 
-            return redirect()->back()->with('success', 'Data servis multi-teknisi berhasil disimpan.');
+            return redirect()->route('transaksi-servis.index')->with('success', 'Data servis multi-teknisi berhasil disimpan.');
 
         } catch (\Exception $e) {
             DB::rollback();
