@@ -310,7 +310,7 @@
                                 kirimFontee(
                                     '{{ $fonteeToken }}',
                                     '{{ $nomorwa }}',
-                                    '*Notifikasi Penjualan*%0A{{ $toko->nama_toko }}%0A%0A' +
+                                    '*Notifikasi Pembelian*%0A{{ $toko->nama_toko }}%0A%0A' +
                                     'No. Nota : {{ $order->invoice_no }}%0A' +
                                     'Nama pelanggan : *{{ $order->nama_pelanggan }}*%0A' +
                                     'Produk : {{ $waProductList }}%0A' +
@@ -322,7 +322,7 @@
                             @else
                                 window.open(
                                     'https://wa.me/{{ $nomorwa }}/?text=' +
-                                    '*Notifikasi%20Penjualan*%0A{{ $toko->nama_toko }}%0A%0A' +
+                                    '*Notifikasi%20Pembelian*%0A{{ $toko->nama_toko }}%0A%0A' +
                                     'No.%20Nota%20:%20{{ $order->invoice_no }}%0A' +
                                     'Nama%20pelanggan%20:%20*{{ $order->nama_pelanggan }}*%0A' +
                                     'Produk%20:%20{{ $waProductList }}%0A' +
