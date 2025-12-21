@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teknisi;
 use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use App\Models\ServiceTransaction;
+use App\Models\TeknisiServis;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
@@ -38,7 +39,30 @@ class LaporanTeknisiController extends Controller
             ->whereDate('tgl_disetujui', today())
             ->get()
             ->sum('profit');
-        $profithari = $profithari + $profithariInterface;
+
+        $bonusTeknisiServisInterface = TeknisiServis::where('users_id', Auth::user()->id)
+            ->where('tipe', 'Interface')
+            ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
+                $query->where('is_approve', 'Setuju') // Pastikan status sudah disetujui
+                ->whereDate('tgl_disetujui', today());
+            })
+            ->sum('bonus_interface');
+
+        $bonusTeknisiServisHardware = TeknisiServis::where('users_id', Auth::user()->id)
+            ->where('tipe', 'Hardware')
+            ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
+                $query->where('is_approve', 'Setuju')
+                ->whereDate('tgl_disetujui', today());
+            })
+            ->get()
+            // Jika Anda ingin menghitung bagi hasil (profit * persen / 100):
+            ->sum(function ($item) {
+                // Rumus: Profit Barang * Persen Teknisi / 100
+                return $item->profit;
+            });
+
+        $profithari = $profithari + $profithariInterface + $bonusTeknisiServisInterface + $bonusTeknisiServisHardware;
+        // dd($bonusTeknisiServisHardware,$profithari);
 
         $servisbulan = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')

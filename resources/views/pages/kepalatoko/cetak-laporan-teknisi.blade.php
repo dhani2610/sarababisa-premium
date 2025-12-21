@@ -147,11 +147,37 @@
 					<td style="width: 60px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
 					<td style="width: 70px; text-align: right;">
-						@if ($item->tipe == 'Interface')
+                        {{-- @dd($item->id,getTypeTeknisiMultiTransaksi($item->id,$item->users_id)); --}}
+
+						{{-- @if ($item->tipe == 'Interface')
 						Rp. {{ number_format($item->bonus_interface) }}
 						@else
 						Rp. {{ number_format($item->profit / 100 * $item->persen_teknisi) }}
-						@endif
+						@endif --}}
+
+                        @if (getTypeTeknisiMultiTransaksi($item->id,$item->users_id) == null)
+                        @php
+                            if ($item->tipe == 'Interface') {
+                                $bonus = $item->bonus_interface;
+                            }else{
+                                $bonus = $item->profit/100;
+                                $bonus *= $item->persen_teknisi;
+                            }
+                        @endphp
+                        Rp. {{ number_format($bonus) }}
+                        @else
+                            @if (getTypeTeknisiMultiTransaksi($item->id,$item->users_id)->tipe == 'Hardware')
+                                @php
+                                    $bonus = bonusTeknisiMultiHardwareByTransactionId($item->id,$item->users_id);
+                                @endphp
+                                Rp. {{ number_format($bonus) }}
+                            @else
+                                @php
+                                    $bonus = bonusTeknisiMultiInterfaceByTransactionId($item->id,$item->users_id);
+                                @endphp
+                                Rp. {{ number_format($bonus) }}
+                            @endif
+                        @endif
 					</td>
 				</tr>
 			@endforeach

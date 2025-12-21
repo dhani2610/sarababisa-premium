@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Auth;
 use App\Models\StoreSetting;
 use App\Models\Cabang;
+use App\Models\TeknisiServis;
+use App\Models\ServiceTransaction;
 
 if (!function_exists('getCabangId')) {
     function getCabangId()
@@ -99,6 +101,122 @@ if (!function_exists('allowTransaksiCabang')) {
         }else{
             $data = 1;
         }
+        return $data;
+    }
+}
+if (!function_exists('servisIdMultiTeknisi')) {
+    function servisIdMultiTeknisi($id = null)
+    {
+        if ($id == null) {
+            $userId = Auth::user()->id;
+        }else{
+            $userId = $id;
+        }
+
+        $idsFromDetail = TeknisiServis::where('users_id', $userId)
+            ->pluck('service_transactions_id');
+
+        $idsFromParent = ServiceTransaction::where('users_id', $userId)
+            ->pluck('id');
+
+        $mergedIds = $idsFromDetail->merge($idsFromParent)
+            ->unique()
+            ->values()
+            ->toArray();
+
+        return $mergedIds;
+    }
+}
+if (!function_exists('bonusTeknisiMultiInterface')) {
+    function bonusTeknisiMultiInterface()
+    {
+        $userId = Auth::user()->id;
+        $currentYear = now()->year;
+        $currentMonth = now()->month;
+
+        $teknisiServisInterface = TeknisiServis::where('users_id', Auth::user()->id)
+            ->where('tipe', 'Interface')
+            ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
+                $query->where('is_approve', 'Setuju') // Pastikan status sudah disetujui
+                    ->whereYear('tgl_disetujui', $currentYear)
+                    ->whereMonth('tgl_disetujui', $currentMonth);
+            })
+            ->sum('bonus_interface');
+
+        return $teknisiServisInterface;
+    }
+}
+if (!function_exists('bonusTeknisiMultiHardware')) {
+    function bonusTeknisiMultiHardware()
+    {
+        $userId = Auth::user()->id;
+        $currentYear = now()->year;
+        $currentMonth = now()->month;
+
+        $teknisiServisHardware = TeknisiServis::where('users_id', Auth::user()->id)
+            ->where('tipe', 'Hardware')
+            ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
+                $query->where('is_approve', 'Setuju') // Pastikan status sudah disetujui
+                    ->whereYear('tgl_disetujui', $currentYear)
+                    ->whereMonth('tgl_disetujui', $currentMonth);
+            })
+             ->sum(function ($item) {
+                return $item->profit * ($item->persen_teknisi / 100);
+            });
+
+        return $teknisiServisHardware;
+    }
+}
+if (!function_exists('bonusTeknisiMultiInterfaceByTransactionId')) {
+    function bonusTeknisiMultiInterfaceByTransactionId($transactionId = null,$id_user = null)
+    {
+        if ($id_user == null) {
+            $userId = Auth::user()->id;
+        }else{
+            $userId = $id_user;
+        }
+        $currentYear = now()->year;
+        $currentMonth = now()->month;
+
+        $teknisiServisInterface = TeknisiServis::where('service_transactions_id', $transactionId)->where('users_id', $userId)
+            ->where('tipe', 'Interface')
+
+            ->sum('bonus_interface');
+
+        return $teknisiServisInterface;
+    }
+}
+if (!function_exists('bonusTeknisiMultiHardwareByTransactionId')) {
+    function bonusTeknisiMultiHardwareByTransactionId($transactionId = null,$id_user = null)
+    {
+        if ($id_user == null) {
+            $userId = Auth::user()->id;
+        }else{
+            $userId = $id_user;
+        }
+        $currentYear = now()->year;
+        $currentMonth = now()->month;
+
+        $teknisiServisHardware = TeknisiServis::where('service_transactions_id', $transactionId)->where('users_id', $userId)
+            ->where('tipe', 'Hardware')
+            ->get()
+            ->sum(function ($item) {
+                return $item->profit * ($item->persen_teknisi / 100);
+            });
+
+        return $teknisiServisHardware;
+    }
+}
+if (!function_exists('getTypeTeknisiMultiTransaksi')) {
+    function getTypeTeknisiMultiTransaksi($transactionId = null,$id_user = null)
+    {
+        if ($id_user == null) {
+            $userId = Auth::user()->id;
+        }else{
+            $userId = $id_user;
+        }
+        $data = TeknisiServis::where('service_transactions_id', $transactionId)->where('users_id', $userId)->first();
+
         return $data;
     }
 }
