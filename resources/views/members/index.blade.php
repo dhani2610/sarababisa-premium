@@ -340,7 +340,7 @@
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <div class="d-flex align-items-center">
                                                 <i class="bi bi-shop text-primary me-2"></i>
-                                                <strong style="font-size: 0.9rem;">${branch.nama_cabang}</strong>
+                                                <strong style="font-size: 0.9rem;">${branch.nama_cabang} ${branch.id == 1 ? '(Pusat)' : '(Cabang)'}</strong>
                                                 ${statusBadge}
                                             </div>
                                             <span class="badge-soft small">ID: ${branch.id}</span>
