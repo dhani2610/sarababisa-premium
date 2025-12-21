@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use App\Models\ServiceAction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ServiceTransaction;
+use App\Models\TeknisiServis;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
@@ -97,7 +98,14 @@ class SudahDiambilController extends Controller
                     $fonnteToken = $toko->fonnte ?? null;
                     $hasToken = !empty($fonnteToken);
 
-                    $message = "*Notifikasi Service*\n{$toko->nama_toko}\n\n"
+                    if ($row->cabang_id == 1) {
+                        $kp = User::find(1);
+                    } else {
+                        $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+                    }
+                    $banks = old('banks', json_decode($kp->banks ?? '[]', true));
+
+                    $message = "*Notifikasi Service*\n{$kp->nama_toko}\n\n"
                         . "No. Service : {$row->nomor_servis}\n"
                         . "Nama user : *{$row->nama_pelanggan}*\n"
                         . "Unit : {$row->nama_barang}\n"
@@ -108,8 +116,24 @@ class SudahDiambilController extends Controller
                         . "Pembayaran : {$row->cara_pembayaran}\n\n"
                         . "Link tracking : " . env('APP_URL') . "/tracking\n"
                         . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $row->id)  . "\n"
-                        . "Link QC : " . route('kepalatoko-cetak-qc', $row->id)  . "\n\n"
-                        . "Terimakasih";
+                        . "Link QC : " . route('kepalatoko-cetak-qc', $row->id)  . "\n\n";
+
+                    $message .= 'Informasi Pembayaran :' ."\n";
+
+                    $message .= 'Bank : '. $kp->bank . "\n";
+                    $message .= 'Norek : '. $kp->rekening . "\n";
+                    $message .= 'a.n : '. $kp->pemilik_rekening . "\n";
+
+                    if (!empty($banks)) {
+
+                        foreach ($banks as $bank) {
+                            $message .= 'Bank : '. $bank['bank'] . "\n";
+                            $message .= 'Norek : '. $bank['rekening'] . "\n";
+                            $message .= 'a.n : '. $bank['pemilik'] . "\n";
+                        }
+                    }
+
+                    $message .= "Terimakasih";
 
                     $waMessage = rawurlencode($message);
 
@@ -117,6 +141,7 @@ class SudahDiambilController extends Controller
                     <div class="flex space-x-1">
                         <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                     ';
+
 
                     if ($hasToken) {
                         // ✅ Kirim otomatis via Fonnte
@@ -261,10 +286,19 @@ class SudahDiambilController extends Controller
                 }else{
                     $styleHide = 'display:none!important';
                 }
+                $urlMultiTeknisi = route('multi-teknisi', $row->id);
 
                 return '
                 <div class="space-x-1 flex">
-
+                    <a href="' . $urlMultiTeknisi . '">
+                        <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Input Multi Teknisi">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <circle cx="12" cy="7" r="4" />
+                                <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                            </svg>
+                        </button>
+                    </a>
                     <button type="button"
                                 class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1"
                                 data-id="' . $row->id . '"
@@ -525,7 +559,7 @@ class SudahDiambilController extends Controller
         // $users = User::find(1);
 
         if ($items->cabang_id == 1) {
-            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
@@ -1048,7 +1082,7 @@ class SudahDiambilController extends Controller
         $terms = Term::find(2);
 
         if ($items->cabang_id == 1) {
-            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
@@ -1064,15 +1098,28 @@ class SudahDiambilController extends Controller
         $invoiceNumber = $items->nomor_servis;
         $namaPelanggan = $items->customer->nama;
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $teknisiServis = TeknisiServis::where('service_transactions_id', $id)->get();
+        if(count($teknisiServis) > 0){
 
-        $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
-        // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
-            'users' => $users,
-            'items' => $items,
-            'terms' => $terms,
-            'toko' => $toko,
-            'imagePath' => $imagePath,
-        ]);
+            $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet-multi-teknisi', [
+            // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
+                'users' => $users,
+                'items' => $items,
+                'terms' => $terms,
+                'toko' => $toko,
+                'imagePath' => $imagePath,
+            ]);
+        }else{
+            $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
+            // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
+                'users' => $users,
+                'items' => $items,
+                'terms' => $terms,
+                'toko' => $toko,
+                'imagePath' => $imagePath,
+            ]);
+
+        }
 
         $filename = 'Nota Pengambilan ' . $invoiceNumber . ' ' . '(' . $namaPelanggan . ')' . '.pdf';
 

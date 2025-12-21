@@ -208,12 +208,33 @@
                                         required>
                                 </div>
 
-                                <div>
+                                {{-- <div>
                                     <label class="block text-sm font-medium mb-1" for="fungsi masuk">Pengecekan
                                         Fungsi Masuk<span class="text-rose-500">*</span></label>
                                     <input id="fungsi masuk" name="fungsi masuk" class="form-input w-full px-2 py-1"
                                         type="text" required
                                         placeholder="Contoh: Tombol, Kamera, Speaker, dll" />
+                                </div> --}}
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (Masuk) <span class="text-rose-500">*</span></label>
+                                    <small class="text-rose-500">*Jika ingin cepat silahkan isi kolom other.</small>
+                                    <div class="overflow-x-auto border rounded-sm">
+                                        <table class="w-full text-xs text-left border-collapse" id="table-qc-tab1">
+                                            <thead class="bg-slate-100 uppercase text-slate-500 font-semibold">
+                                                <tr>
+                                                    <th class="border border-slate-300 p-2 w-8 text-center">No</th>
+                                                    <th class="border border-slate-300 p-2 w-1/2">ITEM</th>
+                                                    <th class="border border-slate-300 p-2 bg-blue-50 text-center">REMARK IN</th>
+                                                    <th class="border border-slate-300 p-2 w-8 text-center"></th> </tr>
+                                            </thead>
+                                            <tbody id="checklist-tbody-tab1" class="text-slate-700">
+                                                </tbody>
+                                        </table>
+                                    </div>
+                                    <button type="button" onclick="addCustomRowTab1()" class="mt-2 text-xs flex items-center text-indigo-600 font-bold hover:text-indigo-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                                        Tambah Baris Custom
+                                    </button>
                                 </div>
 
                                 <div>
@@ -393,6 +414,7 @@
                             <th class="px-2 py-3">Pelanggan</th>
                             <th class="px-2 py-3">Penerima</th>
                             <th class="px-2 py-3">Keluhan</th>
+                            <th class="px-2 py-3">QC</th>
                             <th class="px-2 py-3">Teknisi</th>
                             <th class="px-2 py-3">Tindakan</th>
                             <th class="px-2 py-3">Sparepart</th>
@@ -424,6 +446,11 @@
                                 <td class="px-2 py-3">{{ $item->pelanggan->nama ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->penerima->name ?? '-' }}</td>
                                 <td class="px-2 py-3">{{ $item->keluhan ?? '-' }}</td>
+                                <td class="px-2 py-3">
+                                    <a href="{{  route('kepalatoko-cetak-qc-garansi',$item->id)  }}" target="_blank" class="btn bg-indigo-500 hover:bg-indigo-600 text-white " title="Lihat PDF QC">
+                                        Lihat QC
+                                    </a>
+                                </td>
                                 <td class="px-2 py-3">{{ $item->teknisi->name ?? '-' }}</td>
 
                                 {{-- Tindakan --}}
@@ -619,6 +646,111 @@
     <!-- Select2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+    <script>
+    // --- DATA ITEM STANDAR (Berlaku untuk Tab 1 & Tab 2) ---
+    const defaultChecklist = [
+        "CHECK FACE ID/FINGER", "CHECK FRONT CAM", "CHECK BACK CAM 1/2/3",
+        "CHECK CAM 30PFS,60PFS", "TOP SPEAKER", "BOTTOM SPEAKER",
+        "BODY HOUSING", "LCD (Truetone,Ts)", "NETWORK", "CALLING PHONE",
+        "BATTERY", "BACK MIC", "BOTTOM MIC", "FRONT MIC",
+        "TOP AUDIO", "BOTTOM AUDIO", "WIFI/BLUETOOTH", "FLASH LED",
+        "ALL BUTTON", "COMPAS", "VIBRANT/SILENT", "CHARGING",
+        "PANIC FULL", "OTHER"
+    ];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        renderAllChecklists();
+    });
+
+    // --- FUNGSI RENDER UTAMA ---
+    function renderAllChecklists() {
+        const tbodyTab1 = document.getElementById('checklist-tbody-tab1');
+
+        tbodyTab1.innerHTML = '';
+
+        defaultChecklist.forEach((item, index) => {
+            // === RENDER TAB 1 (Hanya IN) ===
+            const tr1 = document.createElement('tr');
+            tr1.className = "border-b border-slate-200 hover:bg-slate-50";
+            tr1.innerHTML = `
+                <td class="border border-slate-300 p-1 text-center font-bold row-num">${index + 1}</td>
+                <td class="border border-slate-300 p-1 font-medium bg-slate-50">${item}</td>
+                <td class="border border-slate-300 p-0">
+                    <input type="text" name="qc_masuk[${item}]" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent text-center" placeholder="-">
+                </td>
+                <td class="border border-slate-300 p-1 text-center">
+                    <button type="button" class="text-rose-500 hover:text-rose-700" onclick="deleteRow(this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="7" x2="20" y2="7" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+                    </button>
+                </td>
+            `;
+            tbodyTab1.appendChild(tr1);
+
+        });
+    }
+
+    function addCustomRowTab1() {
+        const tbody = document.getElementById('checklist-tbody-tab1');
+        const rowCount = tbody.rows.length + 1;
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-slate-200 hover:bg-yellow-50";
+
+        tr.innerHTML = `
+            <td class="border border-slate-300 p-1 text-center font-bold row-num">${rowCount}</td>
+            <td class="border border-slate-300 p-0">
+                <input type="text" name="custom_item_name[]" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent font-medium text-indigo-600" placeholder="Ketik Nama Item..." required>
+            </td>
+            <td class="border border-slate-300 p-0">
+                <input type="text" name="custom_qc_masuk[]" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent text-center" placeholder="-">
+            </td>
+            <td class="border border-slate-300 p-1 text-center">
+                <button type="button" class="text-rose-500 hover:text-rose-700" onclick="deleteRow(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="7" x2="20" y2="7" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function addCustomRowTab2() {
+        const tbody = document.getElementById('checklist-tbody-tab2');
+        const rowCount = tbody.rows.length + 1;
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-slate-200 hover:bg-yellow-50";
+
+        tr.innerHTML = `
+            <td class="border border-slate-300 p-1 text-center font-bold row-num">${rowCount}</td>
+            <td class="border border-slate-300 p-0">
+                <input type="text" name="custom_item_name[]" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent font-medium text-indigo-600" placeholder="Ketik Nama Item..." required>
+            </td>
+            <td class="border border-slate-300 p-0">
+                <input type="text" name="custom_qc_masuk[]" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent text-center" placeholder="-">
+            </td>
+            <td class="border border-slate-300 p-0">
+                <input type="text" name="custom_qc_keluar[]" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent text-center" placeholder="-">
+            </td>
+            <td class="border border-slate-300 p-1 text-center">
+                <button type="button" class="text-rose-500 hover:text-rose-700" onclick="deleteRow(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="7" x2="20" y2="7" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    // --- FUNGSI HAPUS BARIS ---
+    function deleteRow(btn) {
+        const row = btn.closest('tr');
+        const tbody = row.parentNode;
+        row.remove();
+
+        // Update nomor urut
+        Array.from(tbody.rows).forEach((r, index) => {
+            const numCell = r.querySelector('.row-num');
+            if(numCell) numCell.innerText = index + 1;
+        });
+    }
+</script>
     <script>
         $(document).ready(function() {
             // aktifkan select2

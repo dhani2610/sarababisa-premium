@@ -225,6 +225,12 @@ class TransaksiServisController extends Controller
             $fonteeToken = StoreSetting::where('cabang_id',getCabangId())->first()->fonnte ?? null;
             $toko = optional($row->customer)->nama ?? config('app.name');
 
+            if ($row->cabang_id == 1) {
+                $kp = User::find(1);
+            } else {
+                $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+            }
+
             $html = '<div class="flex space-x-1">';
             if ($nomorwa) {
                 $html .= '
@@ -243,17 +249,50 @@ class TransaksiServisController extends Controller
             $notaLink = route('kepalatoko-cetak-inkjet', $row->id);
             $notaQc = route('kepalatoko-cetak-qc', $row->id);
             $trackingLink = env('APP_URL') . '/tracking';
-            $message = rawurlencode("*Notifikasi Service*\n" . $tokoName . "\n\n" .
-                "No. Service : " . $row->nomor_servis . "\n" .
-                "Nama user : *" . $row->nama_pelanggan . "*\n" .
-                "Unit : " . $row->nama_barang . "\n" .
-                "Diterima : " . $row->penerima . "\n" .
-                "Tanggal : " . Carbon::parse($row->created_at)->translatedFormat('d F Y h:i') . "\n" .
-                "Kerusakan : " . $row->kerusakan . "\n\n" .
-                "Link tracking : " . $trackingLink . "\n" .
-                "Link nota : " . $notaLink . "\n" .
-                "Link QC : " . $notaQc . "\n\n" .
-                "Terimakasih");
+            // $message = rawurlencode("*Notifikasi Service*\n" . $tokoName . "\n\n" .
+            //     "No. Service : " . $row->nomor_servis . "\n" .
+            //     "Nama user : *" . $row->nama_pelanggan . "*\n" .
+            //     "Unit : " . $row->nama_barang . "\n" .
+            //     "Diterima : " . $row->penerima . "\n" .
+            //     "Tanggal : " . Carbon::parse($row->created_at)->translatedFormat('d F Y h:i') . "\n" .
+            //     "Kerusakan : " . $row->kerusakan . "\n\n" .
+            //     "Link tracking : " . $trackingLink . "\n" .
+            //     "Link nota : " . $notaLink . "\n" .
+            //     "Link QC : " . $notaQc . "\n\n" .
+            //     "Terimakasih");
+
+            $banks = old('banks', json_decode($kp->banks ?? '[]', true));
+
+            // 1. Definisikan bagian awal pesan
+            $text = "*Notifikasi Service*\n" . $tokoName . "\n\n" .
+                    "No. Service : " . $row->nomor_servis . "\n" .
+                    "Nama user : *" . $row->nama_pelanggan . "*\n" .
+                    "Unit : " . $row->nama_barang . "\n" .
+                    "Diterima : " . $row->penerima . "\n" .
+                    "Tanggal : " . Carbon::parse($row->created_at)->translatedFormat('d F Y h:i') . "\n" .
+                    "Kerusakan : " . $row->kerusakan . "\n\n" .
+                    "Link tracking : " . $trackingLink . "\n" .
+                    "Link nota : " . $notaLink . "\n" .
+                    "Link QC : " . $notaQc . "\n\n";
+
+
+            $text .= 'Informasi Pembayaran :' ."\n";
+
+            $text .= 'Bank : '. $kp->bank . "\n";
+            $text .= 'Norek : '. $kp->rekening . "\n";
+            $text .= 'a.n : '. $kp->pemilik_rekening . "\n";
+
+            if (!empty($banks)) {
+                foreach ($banks as $bank) {
+                    $text .= 'Bank : '. $bank['bank'] . "\n";
+                    $text .= 'Norek : '. $bank['rekening'] . "\n";
+                    $text .= 'a.n : '. $bank['pemilik'] . "\n";
+                }
+            }
+
+            $text .= "Terimakasih";
+
+            $message = rawurlencode($text);
 
             if ($fonteeToken && $nomorwa) {
                 // call kirimFontee JS with token & number & message
@@ -364,6 +403,21 @@ class TransaksiServisController extends Controller
             // Build aksi HTML mirip persis dengan blade kamu
             $html = '<div class="space-x-1 flex">';
 
+            $urlMultiTeknisi = route('multi-teknisi', $row->id);
+
+            $html .= '
+                <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                    <a href="' . $urlMultiTeknisi . '">
+                        <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Input Multi Teknisi">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <circle cx="12" cy="7" r="4" />
+                                <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                            </svg>
+                        </button>
+                    </a>
+                </div>
+            ';
             // PIN & Pola (menyertakan wire:click dari blade asli)
             $html .= '
                 <button type="button"
@@ -774,7 +828,7 @@ class TransaksiServisController extends Controller
         $items = ServiceTransaction::with('customer')->findOrFail($id);
         // $users = User::find(1);
         if ($items->cabang_id == 1) {
-            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
@@ -814,8 +868,8 @@ class TransaksiServisController extends Controller
 
         // 2. Buat Canvas Image (Ukuran sesuaikan dengan canvas signature pad, misal 500x300)
         // Gunakan ukuran yang cukup besar agar tidak terpotong
-        $width = 500; 
-        $height = 300; 
+        $width = 500;
+        $height = 300;
         $image = imagecreatetruecolor($width, $height);
 
         // 3. Set Background Transparan
@@ -825,7 +879,7 @@ class TransaksiServisController extends Controller
 
         // 4. Set Warna Garis (Hitam)
         $black = imagecolorallocate($image, 0, 0, 0);
-        
+
         // Set ketebalan garis
         imagesetthickness($image, 3);
 
@@ -833,15 +887,15 @@ class TransaksiServisController extends Controller
         foreach ($strokes as $stroke) {
             $points = $stroke['points'];
             $count = count($points);
-            
+
             // Perlu minimal 2 titik untuk membuat garis
             for ($i = 0; $i < $count - 1; $i++) {
                 imageline(
-                    $image, 
-                    $points[$i]['x'], 
-                    $points[$i]['y'], 
-                    $points[$i + 1]['x'], 
-                    $points[$i + 1]['y'], 
+                    $image,
+                    $points[$i]['x'],
+                    $points[$i]['y'],
+                    $points[$i + 1]['x'],
+                    $points[$i + 1]['y'],
                     $black
                 );
             }
@@ -862,7 +916,7 @@ class TransaksiServisController extends Controller
         $items = ServiceTransaction::with('customer')->findOrFail($id);
         // $users = User::find(1);
         if ($items->cabang_id == 1) {
-            $users = User::where('cabang_id',$items->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
@@ -883,7 +937,7 @@ class TransaksiServisController extends Controller
         // --- BAGIAN BARU: KONVERSI POLA ---
         // Cek apakah pola ada isinya dan berupa JSON (bukan URL gambar lama)
         $polaImage = null;
-        
+
         if (!empty($items->pola)) {
             // Cek sederhana apakah ini JSON koordinat atau sudah base64/url
             // Kalau JSON biasanya diawali kurung siku '['
@@ -895,10 +949,10 @@ class TransaksiServisController extends Controller
                 $polaImage = $items->pola;
             }
         }
-        
+
         // Jika hasil konversi null atau data kosong, pakai gambar default
         if (empty($polaImage)) {
-            $polaImage = public_path('images/pola.png'); 
+            $polaImage = public_path('images/pola.png');
         }
         // ----------------------------------
         // dd($items,$polaImage);
@@ -936,7 +990,7 @@ class TransaksiServisController extends Controller
         }
 
         if ($items->cabang_id == 1) {
-            $users = User::where('cabang_id', $items->cabang_id)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+            $users = User::find(1);
         } else {
             $users = User::where('cabang_id', $items->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
         }

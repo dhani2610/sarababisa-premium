@@ -13,11 +13,35 @@ use App\Models\ServiceAction;
 use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
 use App\Models\ModelSerie;
+use App\Models\TeknisiServis;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\DB;
 class UbahBisaDiambilController extends Controller
 {
+    public function multiTeknisi($id)
+    {
+        $item = ServiceTransaction::findOrFail($id);
+        $teknisiServis = TeknisiServis::where('service_transactions_id', $id)->get();
+        // return response()->json($teknisiServis);
+        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
+        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
+        $products = Product::where('cabang_id',getCabangId())->whereHas('subCategory', function ($query) {
+            $query->whereHas('category', function ($subQuery) {
+                $subQuery->where('category_name', 'Sparepart');
+            });
+        })->where('stok', '>=', 1)->get();
+
+        return view('pages.kepalatoko.servis.transaksi-servis-multi-teknisi', [
+            'item' => $item,
+            'users' => $users,
+            'sales' => $sales,
+            'service_actions' => $service_actions,
+            'teknisiServis' => $teknisiServis,
+            'products' => $products
+        ]);
+    }
     public function edit($id)
     {
         $item = ServiceTransaction::findOrFail($id);
@@ -239,6 +263,253 @@ class UbahBisaDiambilController extends Controller
         }
 
         return redirect()->route('transaksi-servis.index');
+    }
+
+    public function multiTeknisiProses(Request $request, $id)
+    {
+        $itemOrigin = ServiceTransaction::findOrFail($id);
+        // dd($request->all());
+        DB::beginTransaction();
+
+        try {
+            if ($request->has('teknisi') && is_array($request->teknisi)) {
+
+                // --- VARIABEL PENAMPUNG GRAND TOTAL (UNTUK TABEL INDUK) ---
+                $grandTotalBiaya = 0;
+                $grandTotalModal = 0;
+                $mainTechnicianId = null; // Penampung ID Teknisi Utama
+
+                // Variabel untuk menyimpan detail Teknisi Utama (Legacy support jika tabel induk butuh JSON detail)
+                $mainTechDetails = [
+                    'tindakan' => null,
+                    'actions_id' => null,
+                    'products_id' => null,
+                    'biaya_j' => null,
+                    'modal_j' => null
+                ];
+
+                $teknisiServisDelete = TeknisiServis::where('service_transactions_id', $itemOrigin->id)->get();
+                foreach ($teknisiServisDelete as $key => $valueDel) {
+                    $valueDel->delete();
+                }
+
+                foreach ($request->teknisi as $index => $techData) {
+                    // --- 1. PERSIAPAN DATA ---
+                    $userId = $techData['user_id'] ?? null;
+                    $tipeTeknisi = $techData['tipe'] ?? null;
+
+                    // Set Teknisi Utama (Index 0)
+                    if ($index === 0) {
+                        $mainTechnicianId = $userId;
+                    }
+
+                    // Ambil Persen
+                    $persen_teknisi = 0;
+                    if ($userId) {
+                        $userObj = User::find($userId);
+                        $persen_teknisi = $userObj->persen ?? 0;
+                    }
+
+                    // Reset variable per teknisi
+                    $list_tindakan_text = [];
+                    $arr_service_actions_id = [];
+                    $arr_products_id = [];
+                    $arr_biaya_servis = [];
+                    $arr_modal_sparepart = [];
+
+                    $subTotalBiaya = 0;
+                    $subTotalModal = 0;
+
+                    // --- 2. LOOP TINDAKAN ---
+                    if (isset($techData['tindakan']) && is_array($techData['tindakan'])) {
+                        foreach ($techData['tindakan'] as $action) {
+
+                            $act_id = $action['service_actions_id'] ?? null;
+                            $manual_act = $action['tindakan_servis'] ?? null;
+                            $prod_id = $action['products_id'] ?? null;
+                            $sales_id = $action['sales_id'] ?? 1;
+
+                            $biaya = filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+                            $modal = filter_var($action['modal_sparepart'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+
+                            // Ambil Nama Tindakan
+                            $nama_tindakan = null;
+                            if (!empty($act_id)) {
+                                $actDb = ServiceAction::find($act_id);
+                                if ($actDb) $nama_tindakan = $actDb->nama_tindakan;
+                            } elseif (!empty($manual_act)) {
+                                $nama_tindakan = $manual_act;
+                            }
+                            if ($nama_tindakan) $list_tindakan_text[] = $nama_tindakan;
+
+                            // Push Array
+                            $arr_service_actions_id[] = $act_id;
+                            $arr_products_id[] = $prod_id;
+                            $arr_biaya_servis[] = $biaya;
+                            $arr_modal_sparepart[] = $modal;
+
+                            // Kalkulasi SubTotal per Teknisi
+                            $subTotalBiaya += (int)$biaya;
+                            $subTotalModal += (int)$modal;
+
+                            // --- 3. STOK & ORDER ---
+                            if (!empty($prod_id)) {
+                                $sparepart = Product::find($prod_id);
+                                if ($sparepart) {
+                                    $sparepart->decrement('stok', 1);
+                                    $this->createSparepartOrder($itemOrigin->customers_id, $sales_id, $sparepart);
+                                }
+                            }
+                        }
+                    }
+
+                    // --- 4. HITUNG PROFIT PER TEKNISI ---
+                    $profitTransaksi = $subTotalBiaya - $subTotalModal;
+                    $nilaiBagiHasil = ($profitTransaksi) / 100;
+                    $profitToko = $profitTransaksi - ($nilaiBagiHasil * $persen_teknisi);
+
+                    // Bonus Interface
+                    $bonus_interface = 0;
+                    if ($request->kondisi_servis !== 'Dibatalkan' && $userId) {
+                        $cekTeknisi = User::find($userId);
+                        if ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface') {
+                            $nama_model = ModelSerie::find($itemOrigin->model_series_id);
+                            $bonus_interface = $nama_model->nominal_bonus ?? 0;
+                        }
+                    }
+
+
+                    // --- 5. PERBAIKAN: SELALU SIMPAN KE TABEL TEKNISI SERVIS (ANAK) ---
+                    // Baik index 0 maupun index > 0, semua masuk sini biar data lengkap
+                    TeknisiServis::create([
+                        'service_transactions_id' => $itemOrigin->id,
+                        'users_id' => $userId,
+                        'tipe' => $tipeTeknisi,
+                        'modal_sparepart' => $subTotalModal,
+                        'biaya' => $subTotalBiaya,
+                        'profit' => $profitTransaksi,
+                        'profittoko' => $profitToko,
+                        'persen_teknisi' => $persen_teknisi,
+                        'bonus_interface' => $bonus_interface,
+
+                        // Detail JSON
+                        'tindakan_servis' => count($list_tindakan_text) > 0 ? json_encode($list_tindakan_text) : null,
+                        'service_actions' => json_encode($arr_service_actions_id),
+                        'products' => json_encode($arr_products_id),
+                        'biaya_j' => json_encode($arr_biaya_servis),
+                        'modal_j' => json_encode($arr_modal_sparepart)
+                    ]);
+
+                    // --- 6. AKUMULASI GRAND TOTAL ---
+                    $grandTotalBiaya += $subTotalBiaya;
+                    $grandTotalModal += $subTotalModal;
+
+                    // Jika ini Teknisi Utama, simpan detailnya untuk update tabel Induk (Legacy)
+                    if ($index === 0) {
+                        $mainTechDetails = [
+                            'tindakan' => count($list_tindakan_text) > 0 ? json_encode($list_tindakan_text) : null,
+                            'actions_id' => json_encode($arr_service_actions_id),
+                            'products_id' => $arr_products_id[0] ?? null,
+                            'all_products' => json_encode($arr_products_id),
+                            'biaya_j' => json_encode($arr_biaya_servis),
+                            'modal_j' => json_encode($arr_modal_sparepart)
+                        ];
+                    }
+
+                } // End Foreach
+
+                // --- 7. UPDATE TABEL INDUK DENGAN GRAND TOTAL ---
+                // Profit & Omzet Induk harus akumulasi dari semua teknisi
+                $grandProfit = $grandTotalBiaya - $grandTotalModal;
+                // Note: Profit toko di induk adalah sisa setelah dikurangi bagi hasil semua teknisi
+                // Untuk simplifikasi di header, kita bisa simpan Total Profit kotor atau hitung ulang
+
+                $itemOrigin->update([
+                    'users_id' => $mainTechnicianId, // Penanggung Jawab Utama
+                    'tgl_selesai' => $request->tgl_selesai,
+                    'kondisi_servis' => $request->kondisi_servis ?? 'Selesai',
+                    'catatan' => $request->catatan,
+                    'biaya' => $grandTotalBiaya,
+                    'modal_sparepart' => $grandTotalModal,
+                    'omzet' => $grandTotalBiaya,
+                    'profit' => $grandProfit,
+                    'tindakan_servis' => $mainTechDetails['tindakan'],
+                    'service_actions' => $mainTechDetails['actions_id'],
+                    'products_id' => $mainTechDetails['products_id'],
+                    'products' => $mainTechDetails['all_products'],
+                    'biaya_j' => $mainTechDetails['biaya_j'],
+                    'modal_j' => $mainTechDetails['modal_j']
+                ]);
+
+            }
+
+            DB::commit();
+            toast('Data servis multi-teknisi berhasil disimpan.', 'success');
+
+            return redirect()->route('transaksi-servis.index')->with('success', 'Data servis multi-teknisi berhasil disimpan.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error("Error Multi Teknisi: " . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    // --- HELPER: CREATE SPAREPART ORDER ---
+    private function createSparepartOrder($customerId, $salesId, $sparepart)
+    {
+        $nama_pelanggan = Customer::find($customerId)->nama ?? 'Umum';
+
+        $order = new Order();
+        $order->customers_id = $customerId;
+        $order->users_id = $salesId;
+        $order->order_date = Carbon::today()->locale('id')->translatedFormat('d F Y');
+        $order->total_products = 1;
+        $order->sub_total = $sparepart->harga_modal;
+        $order->invoice_no = '' . mt_rand(date('Ymd00'), date('Ymd99'));
+        $order->nama_pelanggan = $nama_pelanggan;
+        $order->payment_method = "Tunai";
+        $order->pay = $sparepart->harga_modal;
+        $order->due = 0;
+        $order->save();
+
+        // Detail Order
+        $garansi = Carbon::now();
+        $expired = ($sparepart->garansi != null) ? $garansi->addDays($sparepart->garansi) : null;
+
+        $orderDetail = new OrderDetail();
+        $orderDetail->orders_id = $order->id;
+        $orderDetail->users_id = $salesId;
+        $orderDetail->products_id = $sparepart->id;
+        $orderDetail->product_name = $sparepart->product_name;
+        $orderDetail->quantity = 1;
+        $orderDetail->price = $sparepart->harga_modal;
+        $orderDetail->total = 0;
+        $orderDetail->sub_total = $sparepart->harga_modal;
+        $orderDetail->modal = $sparepart->harga_modal;
+        $orderDetail->profit = 0;
+        $orderDetail->persen_sales = 0;
+        $orderDetail->profit_toko = 0;
+        $orderDetail->garansi = $expired;
+        $orderDetail->product_discount_amount = 0;
+        $orderDetail->save();
+    }
+
+    // --- HELPER: TELEGRAM ---
+    private function sendTelegramNotification($transaksi, $adminName)
+    {
+        try {
+            $pesan = "📦 *TRANSAKSI UPDATE (MULTI)*\n\n"
+                . "🧾 *No Servis:* {$transaksi->nomor_servis}\n"
+                . "🧾 *Status:* {$transaksi->status_servis}\n"
+                . "💰 *Total Biaya Utama:* Rp " . number_format($transaksi->biaya, 0, ',', '.') . "\n"
+                . "ℹ️ *Info:* Terdapat update data multi-teknisi.\n"
+                . "🧍‍♂️ *Admin:* " . $adminName;
+
+            $this->sendMessage($pesan);
+        } catch (\Exception $e) {
+            \Log::error("Telegram Error: " . $e->getMessage());
+        }
     }
 
     public function sendMessage($message)

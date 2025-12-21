@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nota Pengambilan Servis #{{ $items->nomor_servis }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 3mm;
+            /* Atur margin atas, kanan, bawah, dan kiri */
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .pt-5 {
+            padding-top: 20px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-justify {
+            text-align: justify;
+        }
+
+        .capital {
+            text-transform: uppercase;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .w-50 {
+            width: 50%;
+        }
+
+        .w-75 {
+            width: 75%;
+        }
+
+        .w-25 {
+            width: 25%;
+        }
+
+        td,
+        th,
+        tr,
+        table {
+            border-collapse: collapse;
+            font-size: 12px;
+            line-height: 1em;
+            padding: 4px;
+        }
+
+        #data {
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <table class="w-100">
+        <tr>
+            @php
+                $phones = old('phones', json_decode($users->phones ?? '[]', true));
+            @endphp
+            @if ($users->profile_photo_path != null)
+                <td class="text-center" style="width: 30%">
+                    <img src="data:image/png;base64,{{ Storage::disk('public')->exists($users->profile_photo_path) ? base64_encode(file_get_contents($imagePath)) : '' }}"
+                        alt="" height="70">
+                </td>
+                <td style="height: 50px; vertical-align: middle; text-align: left; line-height: 1.5em;">
+                    <strong>{{ $users->nama_toko }} ({{ $users->deskripsi_toko }})</strong> <br>
+                    {{ $users->alamat_toko }} - {{ $users->nomor_hp_toko }}
+                    @foreach ($phones as $index => $phone)
+                        | {{ $phone['title'] }} : {{ $phone['nomor'] }}
+                    @endforeach
+                </td>
+            @else
+                <td style="text-align: left; line-height: 1.5em;"><strong>{{ $users->nama_toko }}
+                        ({{ $users->deskripsi_toko }})</strong> <br>
+                    {{ $users->alamat_toko }} - {{ $users->nomor_hp_toko }}
+                    @foreach ($phones as $index => $phone)
+                        | {{ $phone['title'] }} : {{ $phone['nomor'] }} 
+                    @endforeach
+                </td>
+            @endif
+        </tr>
+    </table>
+
+    <hr style="border-top: 1px dashed;">
+
+    <h4 class="text-center" style="margin-bottom: 6px; margin-top: 6px;">NOTA PENGAMBILAN SERVIS</h4>
+
+    <table class="w-100">
+        <tr>
+            <td class="text-left"><strong>No. Servis</strong> : {{ $items->nomor_servis }}</td>
+            <td class="text-right"><strong>Tanggal</strong> :
+                {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }}</td>
+            {{-- <td class="text-right"><strong>Dicetak oleh</strong> : {{ Auth::user()->name }}</td> --}}
+            <td class="text-right"><strong>Dicetak oleh</strong> : Admin</td>
+        </tr>
+    </table>
+
+    <table class="w-100">
+        <thead>
+            <tr style="border-top-style: solid; border-right-style: solid;">
+                <th id="data" colspan="2" class="text-left" style="border-left-style: solid;">Data Pelanggan
+                </th>
+                <th id="data" colspan="4" class="text-left" style="border-left-style: solid;">Data Barang</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-right-style: solid;">
+                <td id="data" scope="row" style="border-left-style: solid;">Nama</th>
+                <td id="data" class="capital">: {{ $items->customer->nama }}</td>
+                <td id="data" scope="row" style="border-left-style: solid;">Jenis Barang</th>
+                <td id="data" class="capital">: {{ $items->type->name }}</td>
+                <td id="data" scope="row">IMEI/SN</th>
+                <td id="data">: {{ $items->imei }}</td>
+            </tr>
+            <tr style="border-right-style: solid;">
+                <td id="data" scope="row" style="border-left-style: solid;">Nomor HP</th>
+                <td id="data">: {{ $items->customer->nomor_hp }}</td>
+                <td id="data" scope="row" style="border-left-style: solid;">Merek</th>
+                <td id="data" class="capital">: {{ $items->brand->name }}</td>
+                <td id="data" scope="row">Kelengkapan</th>
+                    @if ($items->kelengkapan != null)
+                <td id="data" class="capital">: {{ $items->kelengkapan }}</td>
+            @else
+                <td id="data" class="capital">: Hanya Unit</td>
+                @endif
+            </tr>
+            <tr style="border-bottom-style: solid; border-right-style: solid;">
+                <td scope="row" style="border-left-style: solid;">Alamat</th>
+                <td class="capital">: {{ $items->customer->alamat }}</td>
+                <td scope="row" style="border-left-style: solid;">Model Seri</th>
+                <td class="capital">: {{ $items->modelserie->name ?? '-' }}</td>
+                <td scope="row">Warna/Kapasitas</th>
+                <td class="capital">: {{ $items->warna }} / {{ $items->capacity->name }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="w-100" style="padding-top: 0px;">
+        <thead>
+            <tr style="border-top-style: solid; border-right-style: solid;">
+                <th id="data" colspan="2" class="text-left" style="border-left-style: solid;">Tindakan</th>
+                <th id="data" colspan="2" class="text-left" style="border-left-style: solid;">Pengecekan
+                    (Tombol, Kamera, dll)</th>
+                <th id="data" colspan="2" class="text-left" style="border-left-style: solid;">Pembayaran</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-right-style: solid;">
+                <td id="data" scope="row" style="border-left-style: solid;">Kerusakan</th>
+                <td id="data" class="capital">: {{ $items->kerusakan }}</td>
+                <td id="data" scope="row" rowspan="2" style="border-left-style: solid;">Link QC </th>
+                <td id="data" class="row" rowspan="2">: <a href="{{ route('kepalatoko-cetak-qc', $items->id) }}">{{ route('kepalatoko-cetak-qc', $items->id) }}</a> </td>
+                <td id="data" scope="row" style="border-left-style: solid;">
+                    Total Biaya Servis
+                    @php
+                        if (!empty($items->ppn)) {
+                            $subtotal = $items->biaya - $items->diskon;
+                            $ppnValue = ($subtotal * $items->ppn) / 100;
+                            $totalWithPpn = $subtotal + $ppnValue;
+                        }else{
+                            $totalWithPpn = $items->biaya - $items->diskon;
+                        }
+                    @endphp
+                    @if (!empty($items->ppn))
+                    <br>
+                    <br>
+                    PPN ({{ $items->ppn }}%)
+
+                    <br>
+                    <br>
+                    Total
+                    @endif
+                </td>
+                <td id="data">: Rp. {{ number_format($items->biaya - $items->diskon) }}
+                    @if (!empty($items->ppn))
+                    <br>
+                    <br>
+                    : Rp. {{ number_format($ppnValue) }}
+                    <br>
+                    <br>
+                    : Rp. {{ number_format($totalWithPpn) }}
+                    @endif
+                </td>
+
+            </tr>
+
+            <tr style="border-right-style: solid;">
+                <td id="data" scope="row" style="border-left-style: solid;">Kondisi Servis</th>
+                <td id="data" class="capital">: {{ $items->kondisi_servis }}</td>
+                {{-- <td id="data" scope="row" style="border-left-style: solid;">Fungsi</th>
+                <td id="data" class="row">: {{ route('kepalatoko-cetak-qc', $items->id) }}</td> --}}
+                @if ($items->kondisi_servis === 'Dibatalkan')
+                    <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
+                            <td id="data">: - </td>
+                @else
+                    @if ($items->cara_pembayaran === 'Tunai & Transfer')
+                        <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
+                        <td id="data">: Tunai Rp. {{ number_format($items->tunai) }} & Transfer Rp.
+                            {{ number_format($items->transfer) }} </td>
+                    @elseif ($items->cara_pembayaran === 'Tunai')
+                        <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
+                        <td id="data">: Tunai Rp. {{ number_format($items->tunai) }}</td>
+                    @elseif ($items->cara_pembayaran === 'Transfer')
+                        <td id="data" scope="row" style="border-left-style: solid;">Metode Pembayaran</td>
+                        <td id="data">: Transfer Rp.
+                            {{ number_format($items->transfer) }} </td>
+                    @elseif ($items->cara_pembayaran === 'Kredit')
+                        <td id="data" scope="row" style="border-left-style: solid;">Tempo</td>
+                        <td id="data">: Rp. {{ number_format($items->due) }}
+                            ({{ \Carbon\Carbon::parse($items->tempo)->locale('id')->translatedFormat('d F Y') }})</td>
+                    @endif
+                @endif
+            </tr>
+            @if (($items->uang_muka != null && $items->uang_muka != 0) && ($items->diskon != null && $items->diskon != 0))
+                <tr style="border-right-style: solid;">
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data" class="capital">
+                        
+                    </td>
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data"></td>
+                    <td id="data" scope="row" style="border-left-style: solid;">Diskon</td>
+                    <td id="data">: Rp. {{ number_format($items->diskon) }}</td>
+                </tr>
+                <tr style="border-right-style: solid;">
+                    @if (json_decode($items->biaya_j))
+                        <td id="data" scope="row" style="border-left-style: solid;">Rincian Biaya Servis</td>
+                        <td id="data">
+                           : <a href="{{ route('servis-detail', $items->id) }}">{{ route('servis-detail', $items->id) }}</a> 
+                        </td>
+                    @endif
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data"></td>
+                    <td id="data" scope="row" style="border-left-style: solid;">Uang Muka</td>
+                    <td id="data">: Rp.
+                        {{ number_format($items->uang_muka) }}</td>
+                </tr>
+                <tr style="border-bottom-style: solid; border-right-style: solid;">
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data"></td>
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data"></td>
+                    <td id="data" scope="row" style="border-left-style: solid;">Sisa Pembayaran</td>
+                    {{-- <td id="data">: Rp.
+                        {{ number_format(
+                            $items->biaya
+                            - ($items->kondisi_servis == 'Dibatalkan' ? 0 : $items->uang_muka)
+                            - $items->diskon
+                        ) }}
+                    </td> --}}
+                    {{-- <td id="data">: Rp.
+                        {{ number_format(
+                            max(0,
+                                $items->biaya
+                                - $items->diskon
+                                - ($items->kondisi_servis == 'Dibatalkan' ? 0 : $items->uang_muka)
+                            )
+                        ) }}
+                    </td> --}}
+                    @php
+                        // Hitung total dasar
+                        $totalDasar = $items->biaya - $items->diskon;
+                        if ($items->kondisi_servis != 'Dibatalkan') {
+                            $totalDasar -= $items->uang_muka;
+                        }
+
+                        // Tambahkan PPN jika ada
+                        if (!empty($items->ppn) && $items->ppn != 0) {
+                            $totalDasar += ($items->biaya * $items->ppn / 100);
+                        }
+
+                        $totalAkhir = max(0, $totalDasar);
+                    @endphp
+
+                    <td id="data">: Rp. {{ number_format($totalAkhir) }}</td>
+
+                    {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka - $items->diskon) }}
+                    </td> --}}
+                </tr>
+            @elseif (($items->uang_muka != null && $items->uang_muka != 0) && ($items->diskon == null || $items->diskon == 0))
+                <tr style="border-right-style: solid;">
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data" class="capital">
+                        
+                    </td>
+                    @if (json_decode($items->biaya_j))
+                        <td id="data" scope="row" style="border-left-style: solid;">Rincian Biaya Servis</td>
+                        <td id="data">
+                            : <a href="{{ route('servis-detail', $items->id) }}">{{ route('servis-detail', $items->id) }}</a> 
+
+                        </td>
+                    @endif
+                    <td id="data" scope="row" style="border-left-style: solid;">Uang Muka</td>
+                    <td id="data">: Rp. {{ number_format($items->uang_muka) }}</td>
+                </tr>
+                <tr style="border-bottom-style: solid; border-right-style: solid;">
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data"></td>
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data"></td>
+                    <td id="data" scope="row" style="border-left-style: solid;">Sisa Pembayaran</td>
+                    {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->uang_muka) }}</td> --}}
+                    @php
+                        $subtotal = $items->biaya - $items->uang_muka;
+
+                        if (!empty($items->ppn) && $items->ppn != 0) {
+                            $subtotal += ($subtotal * $items->ppn / 100);
+                        }
+                    @endphp
+
+                    <td id="data">: Rp. {{ number_format($subtotal) }}</td>
+
+                </tr>
+            @elseif (($items->diskon != null && $items->diskon != 0) && ($items->uang_muka == null || $items->uang_muka == 0))
+                <tr style="border-right-style: solid;">
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data" class="capital">
+                        
+                    </td>
+                    @if (json_decode($items->biaya_j))
+                        <td id="data" scope="row" style="border-left-style: solid;">Rincian Biaya Servis</td>
+                        <td id="data">
+                            : <a href="{{ route('servis-detail', $items->id) }}">{{ route('servis-detail', $items->id) }}</a> 
+
+                        </td>
+                    @endif
+                    <td id="data" scope="row" style="border-left-style: solid;">Diskon</td>
+                    <td id="data">: Rp. {{ number_format($items->diskon) }}</td>
+                </tr>
+                <tr style="border-bottom-style: solid; border-right-style: solid;">
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data"></td>
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data"></td>
+                    <td id="data" scope="row" style="border-left-style: solid;">Sisa Pembayaran</td>
+                    {{-- <td id="data">: Rp. {{ number_format($items->biaya - $items->diskon) }}</td> --}}
+                    @php
+                        $subtotal = $items->biaya - $items->diskon;
+
+                        // Kalau ada PPN, tambahkan
+                        if (!empty($items->ppn) && $items->ppn != 0) {
+                            $subtotal += ($subtotal * $items->ppn / 100);
+                        }
+                    @endphp
+
+                    <td id="data">: Rp. {{ number_format($subtotal) }}</td>
+
+                </tr>
+            @elseif (($items->diskon == null || $items->diskon == 0) && ($items->uang_muka == null || $items->uang_muka == 0))
+                <tr style="border-right-style: solid; border-bottom-style: solid;">
+                    <td id="data" scope="row" style="border-left-style: solid;"></td>
+                    <td id="data" class="capital">
+                       
+                    </td>
+                    @if (json_decode($items->biaya_j))
+                        <td id="data" scope="row" style="border-left-style: solid;">Rincian Biaya Servis</td>
+                        <td id="data" colspan="3">
+                                                      : <a href="{{ route('servis-detail', $items->id) }}">{{ route('servis-detail', $items->id) }}</a> 
+
+                        </td>
+                    @endif
+
+                </tr>
+            @endif
+        </tbody>
+    </table>
+    <table class="w-100">
+        <tbody>
+            <tr>
+                @php
+                function penyebut($nilai) {
+                    $nilai = abs($nilai);
+                    $huruf = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
+                    $temp = "";
+                    if ($nilai < 12) {
+                        $temp = " ". $huruf[$nilai];
+                    } else if ($nilai <20) {
+                        $temp = penyebut($nilai - 10). " Belas";
+                    } else if ($nilai < 100) {
+                        $temp = penyebut($nilai/10)." Puluh". penyebut($nilai % 10);
+                    } else if ($nilai < 200) {
+                        $temp = " Seratus" . penyebut($nilai - 100);
+                    } else if ($nilai < 1000) {
+                        $temp = penyebut($nilai/100) . " Ratus" . penyebut($nilai % 100);
+                    } else if ($nilai < 2000) {
+                        $temp = " Seribu" . penyebut($nilai - 1000);
+                    } else if ($nilai < 1000000) {
+                        $temp = penyebut($nilai/1000) . " Ribu" . penyebut($nilai % 1000);
+                    } else if ($nilai < 1000000000) {
+                        $temp = penyebut($nilai/1000000) . " Juta" . penyebut($nilai % 1000000);
+                    }
+                    return $temp;
+                }
+
+                function terbilang($nilai) {
+                    if($nilai<0) {
+                        $hasil = "Minus ". trim(penyebut($nilai));
+                    } else {
+                        $hasil = trim(penyebut($nilai));
+                    }
+                    return $hasil;
+                }
+                @endphp
+
+                <th class="text-right w-75">
+                    {{-- <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;text-align:right">Terbilang : {{ terbilang($totalWithPpn) }}</span> --}}
+                </th>
+                <th class="text-right w-75" colspan="3">
+                    <i>
+                        <span style="text-transform: capitalize; font-size: 10px; font-weight: normal;text-align:right">
+                            <b>
+                                Terbilang : {{ terbilang($totalWithPpn) }}
+                            </b>
+                        </span>
+                    </i>
+                </th>
+            </tr>
+            <tr>
+                @if ($items->catatan != null)
+                    <td colspan="4">
+                        <strong>Catatan</strong> : {{ $items->catatan }}
+                    </td>
+                @endif
+            </tr>
+
+            <tr>
+            <tr>
+                <th class="text-left w-75">Syarat & Ketentuan</th>
+                @if ($items->exp_garansi === null)
+                    <th colspan="3" class="w-25 text-right">
+                        {{-- (Tidak ada garansi) --}}
+                    </th>
+                @else
+                    <th colspan="3" class="w-25 text-right">
+                        {{-- (Garansi <strong>{{ $items->exp_garansi }}</strong>) --}}
+                    </th>
+                @endif
+            </tr>
+            <tr>
+                @php
+                    $banks = old('banks', json_decode($users->banks ?? '[]', true));
+                @endphp
+                <td rowspan="2" class="text-justify" style="font-style: italic; padding-right: 30px;">
+                    {!! $terms->description !!}
+                    <br><strong>No. Rekening : {{ $users->rekening }} {{ $users->bank }} An.
+                            {{ $users->pemilik_rekening }} </strong>
+                    @foreach ($banks as $index => $bank)
+                        <br><strong>No. Rekening : {{ $bank['rekening'] }}, {{ $bank['bank'] }} An.
+                            {{ $bank['pemilik'] }} </strong>
+                    @endforeach
+                </td>
+                <th class="text-center" style="vertical-align: top;">Pengambil</th>
+                <th class="text-center" style="vertical-align: top;">Penyerah</th>
+                <th class="text-center" style="vertical-align: top;">Teknisi</th>
+            </tr>
+            <tr>
+                <td class="pt-5 text-center capital">{{ $items->pengambil }}</td>
+                @if ($items->penyerah != null)
+                    <td class="pt-5 text-center capital">{{ $items->penyerah }}</td>
+                @else
+                    <td class="pt-5 text-center capital">-</td>
+                @endif
+                @if ($items->user != null)
+                    <td class="pt-5 text-center capital">{{ $items->user->name }}</td>
+                @else
+                    <td class="pt-5 text-center capital">-</td>
+                @endif
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>

@@ -14,6 +14,10 @@ use App\Models\Color;
 use App\Models\User;
 use App\Models\Customer;
 use App\Models\Expense;
+use App\Models\Brand;
+use App\Models\SubCategory;
+use App\Models\StoreSetting;
+use App\Models\QcProduk;
 use Barryvdh\DomPDF\Facade\Pdf;
 class PurchaseProductController extends Controller
 {
@@ -105,8 +109,12 @@ class PurchaseProductController extends Controller
         $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
         $colors = Color::where('cabang_id',getCabangId())->get();
         $customers = Customer::where('cabang_id',getCabangId())->get();
-
-        return view('pages/kepalatoko/pembelian/create', compact('customers','suppliers', 'products', 'categories','capacities','model_series','colors'));
+        $spareparts = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '2')->get();
+        $accessories = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '3')->get();
+        $tools = SubCategory::where('cabang_id',getCabangId())->where('categories_id', '=', '4')->get();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        return view('pages/kepalatoko/pembelian/create', compact('customers','suppliers', 'products', 'categories','capacities','model_series','colors','spareparts','accessories','tools','brands','toko'));
     }
 
     /**
@@ -218,6 +226,19 @@ class PurchaseProductController extends Controller
 
     public function store(Request $request)
     {
+
+        $qc_data = $request->qc_data ?? [];
+
+        if ($request->has('custom_item_name')) {
+            foreach ($request->custom_item_name as $key => $name) {
+                if (!empty($name)) {
+                    $val = $request->custom_qc_masuk[$key] ?? '-';
+
+                    $qc_data[$name] = $val;
+                }
+            }
+        }
+        // return response()->json([$qc_data,$request->all()]);
         // Fungsi helper untuk membersihkan format angka
         if (!function_exists('cleanNumber')) {
             function cleanNumber($value)
@@ -234,11 +255,11 @@ class PurchaseProductController extends Controller
             return redirect()->back()->with($notification);
         } else {
             $count_product = count($request->products_id);
-            
+
             for ($i = 0; $i < $count_product; $i++) {
 
                 $tipe = $request->tipe_select[$i];
-                
+
                 // Ambil data produk di awal loop agar efisien
                 $productModel = Product::find($request->products_id[$i]);
 
@@ -269,7 +290,7 @@ class PurchaseProductController extends Controller
 
                 // LOGIKA UPDATE STOK ATAU BUAT PRODUK BARU
                 if (!empty($request->nomor_seri[$i])) {
-                    
+
                     // Cek apakah nomor seri sama dengan produk yang dipilih
                     if ($productModel->nomor_seri == $request->nomor_seri[$i]) {
                         // Jika sama, tambahkan stok ke produk tersebut
@@ -323,7 +344,7 @@ class PurchaseProductController extends Controller
                         $productsNew->stok = $request->quantity[$i];
                         $productsNew->keterangan = $request->keterangan[$i];
                         $productsNew->cabang_id = getCabangId();
-                        
+
                         $productsNew->save();
                     }
                 } else {
@@ -332,12 +353,23 @@ class PurchaseProductController extends Controller
                     $productModel->save();
                 }
 
+
+                $target_product_id = isset($productsNew) ? $productsNew->id : $request->products_id[$i];
+                $qc_masuk_final = json_encode($qc_data);
+
+                $qc = new QcProduk();
+                $qc->id_produk = $target_product_id;
+                $qc->qc_masuk = $qc_masuk_final;
+                $qc->pic_masuk = auth()->user()->id;
+                $qc->save();
+
                 // Simpan Pengeluaran (Expense)
                 if ($request->product_price[$i] > 0) {
                     Expense::create([
                         'name' => 'Pembelian produk ' . $purchase->product_name,
                         'price' => cleanNumber($purchase->total_price),
-                        'users_id' => auth()->user()->id
+                        'users_id' => auth()->user()->id,
+                        'cabang_id' => getCabangId()
                     ]);
                 }
             }

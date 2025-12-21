@@ -53,8 +53,8 @@ class TeknisiLaporanServisData extends Component
             'model_series' => $model_series,
             'toko' => $toko,
             'services' => $this->search === null ?
-                ServiceTransaction::latest()->where('is_approve', 'Setuju')->where('users_id', Auth::user()->id)->paginate($this->paginate) :
-                ServiceTransaction::latest()->where('is_approve', 'Setuju')->where('users_id', Auth::user()->id)->where('created_at', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                ServiceTransaction::latest()->where('is_approve', 'Setuju')->whereIn('id', servisIdMultiTeknisi())->paginate($this->paginate) :
+                ServiceTransaction::latest()->where('is_approve', 'Setuju')->whereIn('id', servisIdMultiTeknisi())->where('created_at', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

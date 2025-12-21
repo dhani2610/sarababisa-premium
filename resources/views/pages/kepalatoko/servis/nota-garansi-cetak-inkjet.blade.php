@@ -185,8 +185,8 @@
             <td id="data" scope="row" style="border-left-style: solid;{{ $style  }}">Keluhan</td>
             <td id="data" style="{{$style }}">: {{ $history->keluhan }}</td>
 
-            <td id="data" scope="row" style="border-left-style: solid;{{ $style }}">Fungsi (Masuk)</td>
-            <td id="data" style="{{$style }}">: {{ $history->fungsi_masuk }}</td>
+            <td id="data" scope="row" style="border-left-style: solid;{{ $style }}">Fungsi (QC)</td>
+            <td id="data" style="{{$style }}">: <a href="{{  route('kepalatoko-cetak-qc-garansi',$history->id)  }}">{{  route('kepalatoko-cetak-qc-garansi',$history->id)  }}</a></td>
 
             <td id="data" class="capital" style="border-left-style: solid;border-right: 2px solid black;border-bottom: 2px solid black" colspan="2">
                 @if ($history->status == 1)
@@ -204,13 +204,10 @@
             <td id="data" style="{{$style }}">: {{ $history->keluhan }}</td>
 
             <td id="data" scope="row" style="border-left-style: solid;{{$style }}">
-                Fungsi (Masuk) <br> <br>
-                Fungsi (Keluar)
+                Fungsi (QC)
             </td>
             <td id="data" style="{{$style }}">
-                : {{ $history->fungsi_masuk }}
-                <br><br>
-                : {{ $history->fungsi_keluar }}
+                : <a href="{{  route('kepalatoko-cetak-qc-garansi',$history->id)  }}">{{  route('kepalatoko-cetak-qc-garansi',$history->id)  }}</a>
             </td>
 
             <td id="data" class="capital" style="border-left-style: solid;border-right: 2px solid black;border-bottom: 2px solid black" colspan="2">

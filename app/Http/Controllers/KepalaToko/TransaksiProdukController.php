@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Customer;
 use App\Models\OrderDetail;
 use App\Models\StoreSetting;
+use App\Models\QcProduk;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\Controller;
@@ -822,6 +823,200 @@ class TransaksiProdukController extends Controller
         return view('pages.kepalatoko.produk.transaksi-detail', compact('order', 'orderItem', 'total', 'subtotal', 'totalTax', 'toko', 'produkDetails'));
     }
 
+    // Tambahkan method ini untuk AJAX get data
+    public function getQcData($product_id = null)
+    {
+        // 1. Cari Data QC berdasarkan Produk
+        $qcData = QcProduk::where('id_produk', $product_id)->first();
+
+        $mergedData = [];
+
+        if ($qcData) {
+            // PERHATIKAN: Menangani format JSON aneh ["[{...}]"] atau standard [{...}]
+            // Kita decoding 2 kali jika perlu, atau parsing array index 0
+
+            $rawMasuk = json_decode($qcData->qc_masuk, true);
+            $rawKeluar = json_decode($qcData->qc_keluar, true);
+
+            // Fix jika formatnya string di dalam array ["[...]"]
+            if (is_array($rawMasuk) && count($rawMasuk) == 1 && is_string($rawMasuk[0])) {
+                $rawMasuk = json_decode($rawMasuk[0], true);
+            }
+            if (is_array($rawKeluar) && count($rawKeluar) == 1 && is_string($rawKeluar[0])) {
+                $rawKeluar = json_decode($rawKeluar[0], true);
+            }
+
+            // Mapping Data Masuk ke Array Key-Value biar mudah digabung
+            $mapMasuk = [];
+            if($rawMasuk) {
+                foreach ($rawMasuk as $row) {
+                    $mapMasuk[$row['item']] = [
+                        'value' => $row['value'],
+                        'is_custom' => $row['is_custom'] ?? false
+                    ];
+                }
+            }
+
+            // Mapping Data Keluar
+            $mapKeluar = [];
+            if($rawKeluar) {
+                foreach ($rawKeluar as $row) {
+                    $mapKeluar[$row['item']] = [
+                        'value' => $row['value'],
+                        'is_custom' => $row['is_custom'] ?? false
+                    ];
+                }
+            }
+
+            // GABUNGKAN (Merge) Item Masuk & Keluar
+            // Ambil semua nama item unik dari kedua sisi
+            $allItems = array_unique(array_merge(array_keys($mapMasuk), array_keys($mapKeluar)));
+
+            foreach ($allItems as $item) {
+                $mergedData[] = [
+                    'item'      => $item,
+                    'val_masuk' => $mapMasuk[$item]['value'] ?? '', // Value otomatis Masuk
+                    'val_keluar'=> $mapKeluar[$item]['value'] ?? '', // Value otomatis Keluar
+                    'is_custom' => ($mapMasuk[$item]['is_custom'] ?? false) || ($mapKeluar[$item]['is_custom'] ?? false)
+                ];
+            }
+
+        } else {
+            // JIKA DATA BELUM ADA (Baru) -> Load Template Default dari DB atau Array
+            // Contoh ambil dari tabel master: $templates = \App\Models\QcTemplate::pluck('nama_item')->toArray();
+            $templates = [
+                "CHECK FACE ID/FINGER", "CHECK FRONT CAM", "CHECK BACK CAM 1/2/3",
+                "CHECK CAM 30PFS,60PFS", "TOP SPEAKER", "BOTTOM SPEAKER",
+                "BODY HOUSING", "LCD (Truetone,Ts)", "NETWORK", "CALLING PHONE",
+                "BATTERY", "WIFI/BLUETOOTH", "ALL BUTTON", "CHARGING", "OTHER"
+            ];
+
+            foreach ($templates as $item) {
+                $mergedData[] = [
+                    'item'      => $item,
+                    'val_masuk' => '',
+                    'val_keluar'=> '',
+                    'is_custom' => false
+                ];
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $mergedData // Ini data bersih yang dikirim ke JS
+        ]);
+    }
+
+    // Update pada method STORE untuk menyimpan ke tabel qc_produks
+   public function storeQcData(Request $request)
+    {
+        try {
+            // Validasi input
+            $request->validate([
+                'product_id' => 'required',
+                'qc_masuk'   => 'required|array',
+                'qc_keluar'  => 'required|array',
+            ]);
+
+            // Cari data QC berdasarkan id_produk, jika ada update, jika tidak create
+            // Pastikan model QcProduk sudah di-import
+            QcProduk::updateOrCreate(
+                ['id_produk' => $request->product_id], // Kondisi pencarian
+                [
+                    // Data yang akan disimpan/diupdate
+                    'qc_masuk'   => json_encode($request->qc_masuk),
+                    'qc_keluar'  => json_encode($request->qc_keluar),
+                    'pic_masuk'  => auth()->user()->id, // PIC otomatis user yang login
+                    'pic_keluar' => auth()->user()->id,
+                    'updated_at' => now(),
+                ]
+            );
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data QC berhasil disimpan.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function cetakQc($id)
+    {
+        $items = QcProduk::with(['picMasuk','picKeluar'])->where('id_produk', $id)->first();
+
+        if (!$items) {
+            toast('Data QC tidak ditemukan.', 'error');
+            return redirect()->back();
+        }
+
+        $prod = Product::findOrFail($items->id_produk);
+        // dd($items);
+        // 1. Decode JSON
+        // Handle jika formatnya double encoded string "["[{...}]]" atau standard "[{...}]"
+        $rawMasuk = json_decode($items->qc_masuk, true);
+        $rawKeluar = json_decode($items->qc_keluar, true);
+
+        // Normalisasi Data Masuk (ambil array pertama jika terbungkus array lagi)
+        if (is_array($rawMasuk) && isset($rawMasuk[0]) && is_string($rawMasuk[0])) {
+            $qcMasuk = json_decode($rawMasuk[0], true);
+        } else {
+            $qcMasuk = $rawMasuk ?? [];
+        }
+
+        // Normalisasi Data Keluar
+        if (is_array($rawKeluar) && isset($rawKeluar[0]) && is_string($rawKeluar[0])) {
+            $qcKeluar = json_decode($rawKeluar[0], true);
+        } else {
+            $qcKeluar = $rawKeluar ?? [];
+        }
+
+        // 2. Tentukan Jumlah Baris berdasarkan array terpanjang
+        $countMasuk = count($qcMasuk);
+        $countKeluar = count($qcKeluar);
+        $maxCount = max($countMasuk, $countKeluar);
+
+        // Buat array index [0, 1, 2, ...] sejumlah baris data
+        $qcIndexes = range(0, $maxCount - 1);
+
+        // 3. Ambil User Kepala Toko
+        if ($prod->cabang_id == 1) {
+            $users = User::find(1);
+        } else {
+            $users = User::where('cabang_id', $items->cabang_id)
+                ->where('id', '!=', 1)
+                ->where('role', 'Kepala Toko')
+                ->orderBy('id', 'asc')
+                ->first();
+        }
+
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu...', 'error');
+            return redirect()->back();
+        }
+
+        $logo = $users->profile_photo_path;
+        // return response()->json([$qcMasuk,$qcKeluar]);
+        $imagePath = public_path('storage/' . $logo);
+
+        $pdf = PDF::loadView('pages.kepalatoko.servis.notaqc-cetak-produk', [
+            'users'     => $users,
+            'items'     => $items,
+            'prod'     => $prod,
+            'imagePath' => $imagePath,
+            'qcMasuk'   => $qcMasuk,   // Array of Objects
+            'qcKeluar'  => $qcKeluar,  // Array of Objects
+            'qcIndexes' => $qcIndexes  // Array of Integers [0, 1, 2...]
+        ]);
+
+        $filename = 'QC Produk - ' . $items->nomor_servis . '.pdf';
+
+        return $pdf->setOption('isRemoteEnabled', true)->stream($filename);
+    }
     public function OrderDueAjax($id)
     {
         $orders = Order::findOrFail($id);
@@ -866,7 +1061,7 @@ class TransaksiProdukController extends Controller
         $totalWithoutTax = $order->sub_total - $totalTax;
         // $users = User::find(1);
         if ($order->cabang_id == 1) {
-            $users = User::where('cabang_id',$order->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$order->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
@@ -908,7 +1103,7 @@ class TransaksiProdukController extends Controller
         // $users = User::find(1);
 
         if ($order->cabang_id == 1) {
-            $users = User::where('cabang_id',$order->cabang_id)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+            $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$order->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }

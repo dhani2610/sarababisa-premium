@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\StoreSetting;
 use App\Models\TeknisiTarget;
 use App\Models\ServiceTransaction;
+use App\Models\TeknisiServis;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,7 +32,51 @@ class DashboardController extends Controller
             ->whereMonth('tgl_disetujui', $currentMonth)
             ->get()
             ->count();
+        $servis = ServiceTransaction::where('users_id', Auth::user()->id)
+            ->where('is_approve', 'Setuju')
+            ->whereYear('tgl_disetujui', $currentYear)
+            ->whereMonth('tgl_disetujui', $currentMonth)
+            ->get();
 
+        $bonusServisInterface = ServiceTransaction::with('serviceaction')
+            ->where('tipe', 'Interface')
+            ->where('is_approve', 'Setuju')
+            ->where('users_id', Auth::user()->id)
+            ->whereYear('tgl_disetujui', $currentYear)
+            ->whereMonth('tgl_disetujui', $currentMonth)
+            ->get()
+            ->sum('bonus_interface');
+
+        // 1. Hitung Bonus Interface (Multi Teknisi)
+        $teknisiServisInterface = TeknisiServis::where('users_id', Auth::user()->id)
+            ->where('tipe', 'Interface')
+            ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
+                $query->where('is_approve', 'Setuju') // Pastikan status sudah disetujui
+                    ->whereYear('tgl_disetujui', $currentYear)
+                    ->whereMonth('tgl_disetujui', $currentMonth);
+            })
+            ->sum('bonus_interface');
+
+        $teknisiServisHardware = TeknisiServis::where('users_id', Auth::user()->id)
+            ->where('tipe', 'Hardware')
+            ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
+                $query->where('is_approve', 'Setuju')
+                    ->whereYear('tgl_disetujui', $currentYear)
+                    ->whereMonth('tgl_disetujui', $currentMonth);
+            })
+            ->get()
+            // Jika Anda ingin menghitung bagi hasil (profit * persen / 100):
+            ->sum(function ($item) {
+                // Rumus: Profit Barang * Persen Teknisi / 100
+                return $item->profit * ($item->persen_teknisi / 100);
+            });
+
+        // Debugging
+        // dd(
+        //     $teknisiServisInterface,
+        //     $teknisiServisHardware,
+        //     Auth::user()->id
+        // );
         $bonusServisInterface = ServiceTransaction::with('serviceaction')
             ->where('tipe', 'Interface')
             ->where('is_approve', 'Setuju')
@@ -50,8 +95,8 @@ class DashboardController extends Controller
             ->sum('profit');
         $bonusservis = ($profitservis / 100) * Auth::user()->persen;
 
-        $totalbonusHardware = $bonusservis;
-        $totalbonusInterface = $bonusServisInterface;
+        $totalbonusHardware = $bonusservis + $teknisiServisHardware;
+        $totalbonusInterface = $bonusServisInterface + $teknisiServisInterface;
         $totalbonus = $bonusservis + $bonusServisInterface;
 
         // Ambil data transaksi servis yang memiliki status "Belum cek"

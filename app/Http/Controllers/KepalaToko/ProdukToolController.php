@@ -84,6 +84,7 @@ class ProdukToolController extends Controller
         ]);
 
         // return redirect()->route('tool.index');
+        toast('Data berhasil disimpan.', 'success');
         return redirect()->back();
 
     }

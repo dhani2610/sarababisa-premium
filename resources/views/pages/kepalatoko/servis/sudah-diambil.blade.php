@@ -218,6 +218,8 @@
 
                 // fungsi kirimFontee (dipanggil dari kolom hubungi bila ada token)
                 function kirimFontee(token, phone, message) {
+                    console.log(token, phone, message);
+
                     fetch('https://api.fonnte.com/send', {
                         method: 'POST',
                         headers: {

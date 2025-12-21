@@ -223,9 +223,6 @@
                                         <div class="font-semibold text-left">Total</div>
                                     </th>
                                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                        <div class="font-semibold text-left">QC</div>
-                                    </th>
-                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                         <div class="font-semibold text-left">Aksi</div>
                                     </th>
                                 </tr>
@@ -260,56 +257,6 @@
                 </button>
             </div>
         </form>
-
-        <div id="qcModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                    Pengecekan Masuk: <span id="qc_product_name" class="font-bold text-indigo-600">Nama Produk</span>
-                                </h3>
-
-                                <div class="mt-4 max-h-[60vh] overflow-y-auto">
-                                    <div class="overflow-x-auto border rounded-sm">
-                                        <table class="w-full text-xs text-left border-collapse">
-                                            <thead class="bg-slate-100 uppercase text-slate-500 font-semibold sticky top-0">
-                                                <tr>
-                                                    <th class="border border-slate-300 p-2 w-8 text-center">No</th>
-                                                    <th class="border border-slate-300 p-2 w-1/2">ITEM</th>
-                                                    <th class="border border-slate-300 p-2 bg-blue-50 text-center">REMARK IN</th>
-                                                    <th class="border border-slate-300 p-2 w-8 text-center"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="qc_modal_tbody" class="text-slate-700">
-                                                </tbody>
-                                        </table>
-                                    </div>
-
-                                    <button type="button" onclick="addCustomRowModal()" class="mt-2 text-xs flex items-center text-indigo-600 font-bold hover:text-indigo-800">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                                        Tambah Baris Custom
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="button" id="btnSaveQC" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                            Simpan & Tutup
-                        </button>
-                        <button type="button" onclick="closeQcModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                            Batal
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
     </div>
 
@@ -387,20 +334,6 @@
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                     <input type="text" class="form-input total_price" name="total_price[]" value="0" readonly>
-                </td>
-
-                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                    <input type="hidden" name="qc_data[]" class="qc-data-json" value="">
-
-                    <button type="button" class="btn-sm bg-blue-100 text-blue-600 hover:bg-blue-200 rounded border border-blue-200 flex items-center gap-1 open-qc-modal">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="18" height="18" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"></path>
-                        <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"></path>
-                        <path d="M9 14l2 2l4 -4"></path>
-                        </svg>
-                        <span>Cek</span>
-                    </button>
                 </td>
 
                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -623,171 +556,6 @@
                         }
                     })
                 });
-            });
-        </script>
-        <script>
-            // --- KONFIGURASI QC ---
-            const defaultChecklist = [
-                "CHECK FACE ID/FINGER", "CHECK FRONT CAM", "CHECK BACK CAM 1/2/3",
-                "CHECK CAM 30PFS,60PFS", "TOP SPEAKER", "BOTTOM SPEAKER",
-                "BODY HOUSING", "LCD (Truetone,Ts)", "NETWORK", "CALLING PHONE",
-                "BATTERY", "BACK MIC", "BOTTOM MIC", "FRONT MIC",
-                "TOP AUDIO", "BOTTOM AUDIO", "WIFI/BLUETOOTH", "FLASH LED",
-                "ALL BUTTON", "COMPAS", "VIBRANT/SILENT", "CHARGING",
-                "PANIC FULL", "OTHER"
-            ];
-
-            let currentActiveRow = null; // Menyimpan referensi baris TR yang sedang diedit QC-nya
-
-            // --- FUNGSI MEMBUKA MODAL ---
-            $(document).on('click', '.open-qc-modal', function() {
-                // 1. Simpan baris yang sedang aktif
-                currentActiveRow = $(this).closest('tr');
-
-                // 2. Ambil Nama Produk untuk Judul Modal
-                // Karena di template handlebar nama produk ada di div text, kita ambil textnya
-                let productName = currentActiveRow.find('td:first .font-medium').text().trim();
-                // Fallback jika ambil text gagal (tergantung struktur persisnya), coba ambil dari select/option logika sebelumnya
-                if(!productName) productName = "Produk";
-                $('#qc_product_name').text(productName);
-
-                // 3. Ambil Data Lama (jika ada) dari hidden input
-                let existingDataJson = currentActiveRow.find('.qc-data-json').val();
-                let existingData = [];
-
-                if (existingDataJson) {
-                    try {
-                        existingData = JSON.parse(existingDataJson);
-                    } catch (e) {
-                        console.error("Error parsing JSON QC", e);
-                        existingData = [];
-                    }
-                }
-
-                // 4. Render Tabel di Modal
-                renderQcTable(existingData);
-
-                // 5. Tampilkan Modal
-                $('#qcModal').removeClass('hidden');
-            });
-
-            // --- FUNGSI RENDER TABEL MODAL ---
-            function renderQcTable(savedData) {
-                const tbody = document.getElementById('qc_modal_tbody');
-                tbody.innerHTML = '';
-
-                // Jika belum ada data tersimpan, gunakan default checklist
-                if (!savedData || savedData.length === 0) {
-                    defaultChecklist.forEach((item, index) => {
-                        appendRowToModal(tbody, index + 1, item, '', false); // false = bukan custom
-                    });
-                } else {
-                    // Jika sudah ada data, render berdasarkan data yang disimpan
-                    savedData.forEach((data, index) => {
-                        appendRowToModal(tbody, index + 1, data.item, data.value, data.is_custom);
-                    });
-                }
-            }
-
-            // Helper untuk append row
-            function appendRowToModal(tbody, num, itemName, value, isCustom) {
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-200 hover:bg-slate-50 qc-row-item";
-
-                // Input Item Name (Readonly jika standard, Editable jika custom)
-                let nameInput = '';
-                if(isCustom) {
-                    nameInput = `<input type="text" class="qc-item-name w-full p-1 border-0 focus:ring-0 bg-transparent font-medium text-indigo-600" value="${itemName}" placeholder="Nama Item...">`;
-                } else {
-                    nameInput = `<span class="qc-item-name-text pl-1">${itemName}</span><input type="hidden" class="qc-item-name" value="${itemName}">`;
-                }
-
-                // Hidden input penanda custom
-                let customMarker = `<input type="hidden" class="qc-is-custom" value="${isCustom ? 1 : 0}">`;
-
-                tr.innerHTML = `
-                    <td class="border border-slate-300 p-1 text-center font-bold row-num">${num}</td>
-                    <td class="border border-slate-300 p-1 font-medium bg-slate-50">
-                        ${nameInput} ${customMarker}
-                    </td>
-                    <td class="border border-slate-300 p-0">
-                        <input type="text" class="qc-item-value w-full h-full p-1 border-0 focus:ring-0 bg-transparent text-center" value="${value}" placeholder="-">
-                    </td>
-                    <td class="border border-slate-300 p-1 text-center">
-                        <button type="button" class="text-rose-500 hover:text-rose-700" onclick="deleteModalRow(this)">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="7" x2="20" y2="7" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            }
-
-            // --- FUNGSI TAMBAH ROW CUSTOM DI MODAL ---
-            function addCustomRowModal() {
-                const tbody = document.getElementById('qc_modal_tbody');
-                const rowCount = tbody.rows.length + 1;
-                appendRowToModal(tbody, rowCount, '', '', true); // true = custom
-            }
-
-            // --- FUNGSI HAPUS ROW CUSTOM ---
-            function deleteModalRow(btn) {
-                const row = btn.closest('tr');
-                const tbody = row.parentNode;
-                row.remove();
-                // Re-numbering
-                Array.from(tbody.rows).forEach((r, index) => {
-                    const numCell = r.querySelector('.row-num');
-                    if(numCell) numCell.innerText = index + 1;
-                });
-            }
-
-            // --- FUNGSI TUTUP MODAL ---
-            function closeQcModal() {
-                $('#qcModal').addClass('hidden');
-                currentActiveRow = null;
-            }
-
-            // --- FUNGSI SIMPAN DATA DARI MODAL KE HIDDEN INPUT ---
-            $('#btnSaveQC').on('click', function() {
-                if (!currentActiveRow) return;
-
-                let dataToSave = [];
-
-                // Loop semua baris di modal
-                $('#qc_modal_tbody tr').each(function() {
-                    let itemName = $(this).find('.qc-item-name').val();
-                    let itemVal = $(this).find('.qc-item-value').val();
-                    let isCustom = $(this).find('.qc-is-custom').val() == 1;
-
-                    // Simpan hanya jika nama item ada (untuk custom row yg kosong tidak disimpan)
-                    if (itemName && itemName.trim() !== '') {
-                        dataToSave.push({
-                            item: itemName,
-                            value: itemVal,
-                            is_custom: isCustom
-                        });
-                    }
-                });
-
-                // Convert ke JSON String
-                let jsonString = JSON.stringify(dataToSave);
-
-                // Masukkan ke Hidden Input di Tabel Utama
-                currentActiveRow.find('.qc-data-json').val(jsonString);
-
-                // Ubah warna tombol biar user tau sudah diisi (Opsional)
-                currentActiveRow.find('.open-qc-modal').removeClass('bg-blue-100 text-blue-600').addClass('bg-green-100 text-green-700 border-green-200');
-                currentActiveRow.find('.open-qc-modal span').text('Sudah Dicek');
-
-                closeQcModal();
-                $.notify("Data QC disimpan sementara", { className: 'success', position: 'top right' });
-            });
-
-            // Close modal on click outside (optional)
-            $(window).click(function(e) {
-                if (e.target.id === 'qcModal') {
-                    // closeQcModal(); // Uncomment jika ingin klik luar menutup modal
-                }
             });
         </script>
     @endpush

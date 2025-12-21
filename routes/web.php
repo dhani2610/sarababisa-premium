@@ -160,6 +160,7 @@ use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTra
 use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as KepalaTokoServisBelumDisetujuiApproveController;
 use App\Http\Controllers\TipeOsController;
 use App\Http\Controllers\CabangController;
+use App\Http\Controllers\DirectPasswordResetController;
 use App\Http\Controllers\KepalaToko\MasterIzinController;
 use App\Http\Controllers\KepalaToko\MasterOvertimeController;
 
@@ -189,6 +190,7 @@ Route::get('/garansi', [GaransiController::class, 'index'])->name('garansi');
 Route::get('/garansi-data', [GaransiController::class, 'data'])->name('garansi-data');
 Route::get('/garansi-servis', [GaransiController::class, 'indexServis'])->name('garansi-servis');
 Route::get('/garansi-servis-data', [GaransiController::class, 'dataServis'])->name('garansi-servis-data');
+Route::get('/servis-detail/{id}', [GaransiController::class, 'dataServisTeknisi'])->name('servis-detail');
 Route::get('/get-action/{service_actions_id}', [AutoBiayaServisController::class, 'getAction']);
 Route::get('/get-sparepart/{products_id}', [AutoModalSparepartController::class, 'getSparepart']);
 Route::get('/get-product/{products_id}', [AutoHargaJualController::class, 'getProduct']);
@@ -198,6 +200,21 @@ Route::controller(DefaultController::class)->group(function () {
     Route::get('/get-modelserie', 'GetModelSerie')->name('get-modelserie');
     Route::get('/get-product', 'GetProduct')->name('get-product');
 });
+
+Route::get('/test-mail', function () {
+    $data = [
+        'name' => 'Test User',
+        'url' => 'https://example.com/verify-link'
+    ];
+
+    Mail::send('mail.password', $data, function ($message) {
+        $message->to('andakaramdhanisantoso@gmail.com')
+                ->subject('Test Email with View');
+    });
+
+    return 'HTML mail sent using Blade view!';
+});
+
 
 // Keranjang Sampah
 Route::get('/keranjang-servis', [RecycleBinController::class, 'service'])->name('keranjang-servis');
@@ -321,6 +338,17 @@ Route::get('master/master-absensi/export', [AttendanceController::class, 'export
     Route::get('/get-total-cabang', [KepalaTokoAkunController::class, 'getDataTotalCabang'])->name('get-total-cabang');
     Route::get('/update-total-cabang', [KepalaTokoAkunController::class, 'updateTotalCabang'])->name('update-total-cabang');
 
+// 1. Halaman Input Email (Awal)
+    Route::get('/lupa-password', [DirectPasswordResetController::class, 'showRequestForm'])->name('direct.reset.request');
+
+    // 2. Proses Cek Email (POST) -> Akan me-redirect ke halaman ganti
+    Route::post('/lupa-password/cek', [DirectPasswordResetController::class, 'checkEmail'])->name('direct.reset.check');
+
+    // 3. Halaman Input Password Baru (Halaman Berbeda / GET)
+    Route::get('/lupa-password/ganti', [DirectPasswordResetController::class, 'showChangePasswordForm'])->name('direct.reset.form');
+
+    // 4. Proses Simpan Password (POST)
+    Route::post('/lupa-password/update', [DirectPasswordResetController::class, 'updatePassword'])->name('direct.reset.update');
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja'])->group(function () {
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
 
@@ -499,6 +527,10 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::get('transaksi-produk/data/lunas', [App\Http\Controllers\KepalaToko\TransaksiProdukController::class, 'dataLunas'])->name('transaksi-produk.data.lunas');
     Route::get('transaksi-produk/data/due', [App\Http\Controllers\KepalaToko\TransaksiProdukController::class, 'dataDue'])->name('transaksi-produk.data.due');
     Route::resource('produk/transaksi-produk', KepalaTokoTransaksiProdukController::class);
+    Route::get('/get-qc-data/{product_id?}', [KepalaTokoTransaksiProdukController::class, 'getQcData'])->name('get-qc-data');
+    Route::post('/store-qc-data', [KepalaTokoTransaksiProdukController::class, 'storeQcData'])->name('store-qc-data');
+    Route::get('qc-produk/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakQc'])->name('qc-produk');
+
     Route::delete('/product-transactions/delete', [KepalaTokoTransaksiProdukController::class, 'deleteSelected']);
     Route::patch('/product-transactions/update', [KepalaTokoTransaksiProdukController::class, 'approveSelected']);
     Route::patch('/product-transactions/reject', [KepalaTokoTransaksiProdukController::class, 'rejectSelected']);
@@ -561,6 +593,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
     Route::get('servis/ubah-status-proses/{id}', [KepalaTokoUbahStatusProsesServisController::class, 'edit'])->name('ubah-status-proses-edit');
     Route::post('servis/ubah-status-proses{id}', [KepalaTokoUbahStatusProsesServisController::class, 'update'])->name('ubah-status-proses-update');
+    Route::get('servis/multi-teknisi/{id}', [KepalaTokoUbahBisaDiambilController::class, 'multiTeknisi'])->name('multi-teknisi');
+    Route::post('servis/multi-teknisi-proses/{id}', [KepalaTokoUbahBisaDiambilController::class, 'multiTeknisiProses'])->name('multi-teknisi-proses');
     Route::get('servis/ubah-bisa-diambil/{id}', [KepalaTokoUbahBisaDiambilController::class, 'edit'])->name('ubah-bisa-diambil-edit');
     Route::post('servis/ubah-bisa-diambil{id}', [KepalaTokoUbahBisaDiambilController::class, 'update'])->name('ubah-bisa-diambil-update');
     Route::get('servis/ubah-sudah-diambil/{id}', [KepalaTokoUbahSudahDiambilController::class, 'edit'])->name('ubah-sudah-diambil-edit');
@@ -593,6 +627,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
 // Route::get('izin', [MasterIzinController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
 Route::get('nota-qc/{id}', [KepalaTokoTransaksiServisController::class, 'cetakQc'])->name('kepalatoko-cetak-qc');
+Route::get('nota-qc-garansi/{id}', [HistoryGaransiController::class, 'cetakQcGaransi'])->name('kepalatoko-cetak-qc-garansi');
 Route::get('nota-terima-inkjet/{id}', [KepalaTokoTransaksiServisController::class, 'cetakinkjet'])->name('kepalatoko-cetak-inkjet');
 Route::get('nota-pengambilan-inkjet/{id}', [KepalaTokoSudahDiambilController::class, 'cetakinkjet'])->name('kepalatoko-pengambilan-cetak-inkjet');
 Route::get('transaksi-produk-inkjet/{id}', [KepalaTokoTransaksiProdukController::class, 'cetakinkjet'])->name('lunas-cetak-inkjet');

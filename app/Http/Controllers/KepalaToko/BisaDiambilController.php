@@ -97,20 +97,40 @@ class BisaDiambilController extends Controller
                 $nomorwa = preg_replace('/^08/', '628', $nomor);
 
                 // Ambil data toko & token
-                $toko = User::find(1);
+                if ($row->cabang_id == 1) {
+                    $kp = User::find(1);
+                } else {
+                    $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+                }
+                $banks = old('banks', json_decode($kp->banks ?? '[]', true));
+
                 $fonteeToken = StoreSetting::where('cabang_id',getCabangId())->first()->fonnte ?? null;
                 $notaQc = route('kepalatoko-cetak-qc', $row->id);
 
-                // --- SUSUN PESAN (Gunakan \n untuk enter, jangan %0A manual dulu) ---
-                $rawPesan = "*Notifikasi | {$toko->nama_toko}*\n" .
+                $rawPesan = "*Notifikasi | {$kp->nama_toko}*\n" .
                             "Barang Servis: *{$row->nama_barang}*\n" .
                             "No. Servis: *{$row->nomor_servis}*\n" .
                             "Kondisi: *{$row->kondisi_servis}*\n" .
                             "Tanggal: " . Carbon::parse($row->tgl_selesai)->translatedFormat('d F Y') . "\n" .
                             "Status: *{$row->status_servis}*\n" .
                             "Biaya: Rp. " . number_format($row->biaya) . "\n\n" .
-                            "Link QC: {$notaQc}\n\n" .
-                            "Terima Kasih.";
+                            "Link QC: {$notaQc}\n\n" ;
+
+                $rawPesan .= 'Informasi Pembayaran :' ."\n";
+
+                $rawPesan .= 'Bank : '. $kp->bank . "\n";
+                $rawPesan .= 'Norek : '. $kp->rekening . "\n";
+                $rawPesan .= 'a.n : '. $kp->pemilik_rekening . "\n";
+
+                if (!empty($banks)) {
+                    foreach ($banks as $bank) {
+                        $rawPesan .= 'Bank : '. $bank['bank'] . "\n";
+                        $rawPesan .= 'Norek : '. $bank['rekening'] . "\n";
+                        $rawPesan .= 'a.n : '. $bank['pemilik'] . "\n";
+                    }
+                }
+
+                $rawPesan .= "Terimakasih";
 
                 // $pesan = rawurlencode("*Notifikasi | {$toko->nama_toko}*%0ABarang Servis *{$row->nama_barang}*%0A"
                 //     ."No. Servis *{$row->nomor_servis}*%0AKondisi: *{$row->kondisi_servis}*%0A"
@@ -198,8 +218,19 @@ class BisaDiambilController extends Controller
                 }else{
                     $styleHide = 'display:none!important';
                 }
+                $urlMultiTeknisi = route('multi-teknisi', $row->id);
+
                 return '
                     <div class="space-x-1 flex">
+                            <a href="' . $urlMultiTeknisi . '">
+                                <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Input Multi Teknisi">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <circle cx="12" cy="7" r="4" />
+                                        <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                                    </svg>
+                                </button>
+                            </a>
                           <button type="button"
                                 class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1"
                                 data-id="' . $row->id . '"
