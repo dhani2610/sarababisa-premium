@@ -67,7 +67,7 @@
                                         <input class="form-input w-full px-2 py-1 bg-white" type="number" name="total_modal_sparepart" id="total_modal_sparepart" readonly required />
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya Servis (Ke Customer) <span class="text-rose-500">*</span></label>
+                                        <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya Servis (Ke Pelanggan) <span class="text-rose-500">*</span></label>
                                         <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="number" name="biaya" id="biaya" readonly required />
                                     </div>
                                 </div>
@@ -192,7 +192,7 @@
                         </div>
                         <div class="grid grid-cols-2 gap-2 mt-2">
                             <div><label class="block text-sm font-medium mb-1">Modal Part <span class="text-rose-500">*</span></label><input class="form-input w-full px-2 py-1 modal_sparepart" type="number" name="teknisi[${groupIndex}][tindakan][${actionIndex}][modal_sparepart]" value="0" required /></div>
-                            <div><label class="block text-sm font-medium mb-1">Biaya Jasa <span class="text-rose-500">*</span></label><input class="form-input w-full px-2 py-1 biaya_servis" type="number" name="teknisi[${groupIndex}][tindakan][${actionIndex}][biaya_servis]" value="0" required /></div>
+                            <div><label class="block text-sm font-medium mb-1">Biaya Servis <span class="text-rose-500">*</span></label><input class="form-input w-full px-2 py-1 biaya_servis" type="number" name="teknisi[${groupIndex}][tindakan][${actionIndex}][biaya_servis]" value="0" required /></div>
                         </div>
                     </div>
                 </div>`;
@@ -239,7 +239,7 @@
                     // Set Nilai Duit Awal (PENTING: Pastikan ini jalan)
                     // Gunakan .val() dan pastikan angka (0 jika null/kosong)
                     $newItem.find('.biaya_servis').val(actionData.biaya || 0);
-                    
+
                     // Untuk modal, jika 0, nanti akan ditimpa oleh harga modal sparepart jika ada
                     $newItem.find('.modal_sparepart').val(actionData.modal || 0);
 
@@ -248,15 +248,15 @@
                     // Logic Sparepart
                     if (actionData.prod_id && actionData.prod_id != "null" && actionData.prod_id != "") {
                         setTimeout(() => { $newItem.find('.radio-sparepart-yes')[0].click(); }, 50);
-                        
-                        setTimeout(() => { 
+
+                        setTimeout(() => {
                             // Set value sparepart
-                            $selSparepart.val(actionData.prod_id).trigger('change.select2'); 
-                            
+                            $selSparepart.val(actionData.prod_id).trigger('change.select2');
+
                             // PENTING: Ambil harga modal dari data-attribute option yang terpilih
                             // Ini logic fallback jika actionData.modal ternyata 0 atau tidak tersimpan benar
                             const hargaModalOtomatis = $selSparepart.find(':selected').data('harga_modal') || 0;
-                            
+
                             // Jika data modal dari DB ada (>0), pakai itu. Jika 0, ambil dari master barang.
                             if(actionData.modal > 0) {
                                 $newItem.find('.modal_sparepart').val(actionData.modal);
@@ -265,7 +265,7 @@
                             }
 
                             // Trigger hitung ulang total
-                            recalculateAll(); 
+                            recalculateAll();
                         }, 100);
                     } else {
                         // Jika tidak ada sparepart, hitung ulang untuk biaya servis saja
@@ -301,7 +301,7 @@
                     }
                 });
                 // Delay sedikit untuk rekap total akhir setelah semua timeout selesai
-                setTimeout(recalculateAll, 1000); 
+                setTimeout(recalculateAll, 1000);
             } else {
                 addTechnicianGroup();
             }
