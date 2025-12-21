@@ -19,12 +19,12 @@ class SampahServisData extends Component
 
     public function render()
     {
-        $sampahServis = ServiceTransaction::onlyTrashed()->get();
-        $services_count = $sampahServis->whereNotNull('deleted_at')->count();
+        $sampahServis = ServiceTransaction::where('cabang_id',getCabangId())->onlyTrashed()->get();
+        $services_count = $sampahServis->where('cabang_id',getCabangId())->whereNotNull('deleted_at')->count();
 
         return view('livewire.sampah-servis-data', [
             'services_count' => $services_count,
-            'services' => ServiceTransaction::onlyTrashed()->latest()->when($this->search, function ($q) {
+            'services' => ServiceTransaction::where('cabang_id',getCabangId())->onlyTrashed()->latest()->when($this->search, function ($q) {
                 $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->onlyTrashed()->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->onlyTrashed()->orWhere('nama_barang', 'like', '%' . $this->search . '%')->onlyTrashed();
             })->paginate($this->paginate),
         ]);

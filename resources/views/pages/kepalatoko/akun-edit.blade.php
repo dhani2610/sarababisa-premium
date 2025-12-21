@@ -103,7 +103,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="shift_id">Shift</label>
                                     <select id="shift_id" name="shift_id"
-                                        class="form-select text-sm py-1 w-full" required>
+                                        class="form-select text-sm py-1 w-full">
                                         @foreach ($shift as $its)
                                             <option value="{{ $its->id }}" {{ $item->shift_id == $its->id ? 'selected' : '' }}>{{ $its->nama_shift }}</option>
                                         @endforeach

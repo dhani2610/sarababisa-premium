@@ -15,12 +15,12 @@ class SampahKasbonData extends Component
 
     public function render()
     {
-        $items = Debt::onlyTrashed()->get();
-        $items_count = $items->whereNotNull('deleted_at')->count();
+        $items = Debt::where('cabang_id',getCabangId())->onlyTrashed()->get();
+        $items_count = $items->where('cabang_id',getCabangId())->whereNotNull('deleted_at')->count();
 
         return view('livewire.sampah-kasbon-data', [
             'items_count' => $items_count,
-            'items' => Debt::onlyTrashed()->latest()->paginate($this->paginate)
+            'items' => Debt::where('cabang_id',getCabangId())->onlyTrashed()->latest()->paginate($this->paginate)
         ]);
     }
 }
