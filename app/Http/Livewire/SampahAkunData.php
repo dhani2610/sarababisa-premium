@@ -14,12 +14,12 @@ class SampahAkunData extends Component
 
     public function render()
     {
-        $sampahAkun = User::onlyTrashed()->get();
-        $users_count = $sampahAkun->whereNotNull('deleted_at')->count();
+        $sampahAkun = User::where('cabang_id',getCabangId())->onlyTrashed()->get();
+        $users_count = $sampahAkun->where('cabang_id',getCabangId())->whereNotNull('deleted_at')->count();
 
         return view('livewire.sampah-akun-data', [
             'users_count' => $users_count,
-            'users' => User::onlyTrashed()->latest()->paginate($this->paginate)
+            'users' => User::where('cabang_id',getCabangId())->onlyTrashed()->latest()->paginate($this->paginate)
         ]);
     }
 }

@@ -16,12 +16,12 @@ class SampahInsidenData extends Component
 
     public function render()
     {
-        $items = Incident::onlyTrashed()->get();
-        $items_count = $items->whereNotNull('deleted_at')->count();
+        $items = Incident::where('cabang_id',getCabangId())->onlyTrashed()->get();
+        $items_count = $items->where('cabang_id',getCabangId())->whereNotNull('deleted_at')->count();
 
         return view('livewire.sampah-insiden-data', [
             'items_count' => $items_count,
-            'items' => Incident::onlyTrashed()->latest()->paginate($this->paginate)
+            'items' => Incident::where('cabang_id',getCabangId())->onlyTrashed()->latest()->paginate($this->paginate)
         ]);
     }
 }

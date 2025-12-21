@@ -21,12 +21,12 @@ class SampahPelangganData extends Component
 
     public function render()
     {
-        $items = Customer::onlyTrashed()->get();
-        $items_count = $items->whereNotNull('deleted_at')->count();
+        $items = Customer::where('cabang_id',getCabangId())->onlyTrashed()->get();
+        $items_count = $items->where('cabang_id',getCabangId())->whereNotNull('deleted_at')->count();
 
         return view('livewire.sampah-pelanggan-data', [
             'items_count' => $items_count,
-            'items' => Customer::onlyTrashed()->latest()->when($this->search, function ($q) {
+            'items' => Customer::where('cabang_id',getCabangId())->onlyTrashed()->latest()->when($this->search, function ($q) {
                 $q->where('nama', 'like', '%' . $this->search . '%')->onlyTrashed()->orWhere('nomor_hp', 'like', '%' . $this->search . '%')->onlyTrashed();
             })->paginate($this->paginate),
         ]);

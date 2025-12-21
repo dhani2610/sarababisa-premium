@@ -14,12 +14,12 @@ class SampahPengeluaranData extends Component
 
     public function render()
     {
-        $items = Expense::onlyTrashed()->get();
-        $items_count = $items->whereNotNull('deleted_at')->count();
+        $items = Expense::where('cabang_id',getCabangId())->onlyTrashed()->get();
+        $items_count = $items->where('cabang_id',getCabangId())->whereNotNull('deleted_at')->count();
 
         return view('livewire.sampah-pengeluaran-data', [
             'items_count' => $items_count,
-            'items' => Expense::onlyTrashed()->latest()->paginate($this->paginate)
+            'items' => Expense::where('cabang_id',getCabangId())->onlyTrashed()->latest()->paginate($this->paginate)
         ]);
     }
 }
