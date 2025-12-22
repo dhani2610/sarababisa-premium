@@ -100,10 +100,10 @@
                                     <label class="block text-sm font-medium mb-1">Kerusakan</label>
                                     <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->kerusakan }}" disabled />
                                 </div>
-                                <div>
+                                {{-- <div>
                                     <label class="block text-sm font-medium mb-1">Pengecekan Fungsi Masuk</label>
                                     <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->qc_masuk }}" disabled />
-                                </div>
+                                </div> --}}
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Teknisi</label>
                                     <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text"
@@ -114,10 +114,10 @@
                                     @endif
                                     disabled />
                                 </div>
-                                <div>
+                                {{-- <div>
                                     <label class="block text-sm font-medium mb-1">Tindakan Servis</label>
                                     <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->tindakan_servis }}" disabled />
-                                </div>
+                                </div> --}}
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Biaya Servis</label>
                                     <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="Rp. {{ number_format($item->biaya) }}" disabled />

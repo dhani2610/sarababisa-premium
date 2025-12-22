@@ -362,7 +362,11 @@ class ServisBelumDisetujuiController extends Controller
         $qcMasuk = $item->qc_masuk ? json_decode($item->qc_masuk, true) : [];
         $qcKeluar = $item->qc_keluar ? json_decode($item->qc_keluar, true) : [];
         // dd($qcMasuk,$items->qc_masuk);
-        $qcItems = array_keys($qcMasuk);
+        if ($qcMasuk != null) {
+            $qcItems = array_keys($qcMasuk);
+        }else{
+            $qcItems = [];
+        }
 
         if (empty($qcItems) && !empty($qcKeluar)) {
             $qcItems = array_keys($qcKeluar);

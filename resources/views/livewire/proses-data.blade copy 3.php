@@ -12,42 +12,6 @@
     .filepond--panel-root { background-color: #f1f5f9; border: 1px solid #cbd5e1; }
     .filepond--drop-label { color: #64748b; }
 </style>
-<style>
-    .select2-container .select2-selection--single {
-        height: 38px;
-        border-color: #e2e8f0;
-        display: flex;
-        align-items: center;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 36px;
-    }
-    .technician-group {
-        border: 2px solid #e2e8f0;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        background-color: #f8fafc;
-    }
-    .action-item {
-        background-color: #ffffff;
-        border: 1px solid #cbd5e1;
-        border-radius: 0.375rem;
-        padding: 0.75rem;
-        margin-bottom: 0.75rem;
-        position: relative;
-    }
-    .position-button-x{
-        position: absolute;
-        right: -3%;
-        top: -16px;
-        font-size: 23px!important;
-        background: red!important;
-        color: white!important;
-        padding: 0px 8px 0px 8px!important;
-        border-radius: 50%!important;
-    }
-</style>
 <div>
 
     <!-- Page header -->
@@ -528,7 +492,7 @@
 
 
                                         <div x-data="{ showDetails: true }">
-                                            {{-- <label class="block text-sm font-medium mb-1" for="kondisi_servis">Kondisi
+                                            <label class="block text-sm font-medium mb-1" for="kondisi_servis">Kondisi
                                                 Servis <span class="text-rose-500">*</span></label>
                                             <div class="flex flex-wrap items-center -m-3">
                                                 <div class="m-3">
@@ -551,62 +515,206 @@
                                                     </label>
                                                     <!-- End -->
                                                 </div>
-                                            </div> --}}
-                                            <div class="space-y-3" x-data="{ showDetails: true }">
-
-                                            <label class="block text-sm font-medium mb-1" for="kondisi_servis">Kondisi Servis <span class="text-rose-500">*</span></label>
-                                            <div class="flex flex-wrap items-center -m-3">
-                                                <div class="m-3">
-                                                    <!-- Start -->
-                                                    <label class="flex items-center">
-                                                        <input type="radio" name="kondisi_servis" value="Sudah jadi" class="form-radio" checked x-on:click="showDetails = true"/>
-                                                        <span class="text-sm ml-2">Sudah jadi</span>
-                                                    </label>
-                                                    <!-- End -->
-                                                </div>
-                                                <div class="m-3">
-                                                    <!-- Start -->
-                                                    <label class="flex items-center">
-                                                        <input type="radio" name="kondisi_servis" value="Menunggu konfirmasi" class="form-radio" x-on:click="showDetails = true"/>
-                                                        <span class="text-sm ml-2">Menunggu konfirmasi</span>
-                                                    </label>
-                                                    <!-- End -->
-                                                </div>
-                                                <div class="m-3">
-                                                    <!-- Start -->
-                                                    <label class="flex items-center">
-                                                        <input type="radio" name="kondisi_servis" value="Dibatalkan" class="form-radio" x-on:click="showDetails = false"/>
-                                                        <span class="text-sm ml-2">Dibatalkan</span>
-                                                    </label>
-                                                    <!-- End -->
-                                                </div>
                                             </div>
-                                            <div x-show="showDetails">
-                                                <div id="main-container" >
-                                                    {{-- Group Teknisi akan ditambahkan di sini via JS --}}
-                                                </div>
-
-                                                <div class="mb-4">
-                                                    <button type="button" class="btn-sm bg-indigo-600 hover:bg-indigo-700 text-white w-full flex justify-center items-center" id="tambah-teknisi-baru">
-                                                        <svg class="w-4 h-4 fill-current opacity-50 shrink-0 mr-2" viewBox="0 0 16 16">
-                                                            <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-                                                        </svg>
-                                                        Tambah Teknisi Baru
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <div class="bg-slate-100 p-3 rounded">
-                                                <div class="mb-2">
-                                                    <label class="block text-sm font-medium mb-1" for="total_modal_sparepart">Total Modal Sparepart <span class="text-rose-500">*</span></label>
-                                                    <input class="form-input w-full px-2 py-1 bg-white" type="number" name="total_modal_sparepart" id="total_modal_sparepart" required />
+                                            <div x-show="showDetails" class="mt-3 space-y-3">
+                                                <div>
+                                                    <label class="block text-sm font-medium mb-1"
+                                                        for="users_id">Teknisi <span
+                                                            class="text-rose-500">*</span></label>
+                                                    <select id="users_id" name="users_id"
+                                                        class="form-select text-sm py-1 w-full">
+                                                        <option selected value="">Pilih Teknisi</option>
+                                                        @foreach ($users as $user)
+                                                            <option value="{{ $user->id }}">{{ $user->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                                 <div>
-                                                    <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya Servis (Ke Pelanggan) <span class="text-rose-500">*</span></label>
-                                                    <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="number" name="biaya" id="biaya" required />
+                                                    <label class="block text-sm font-medium mb-1" for="tipe">Tipe Teknisi<span
+                                                            class="text-rose-500">*</span></label>
+                                                    <select id="tipe" name="tipe"
+                                                        class="form-select text-sm py-1 w-full">
+                                                        <option selected value="">Pilih Tipe</option>
+                                                        <option value="Interface">Interface (bonus pertipe)</option>
+                                                        <option value="Hardware">Hardware & interface (bonus persen)</option>
+                                                    </select>
                                                 </div>
-                                            </div>
+                                                <div x-data="{ showInputManual: false }">
+                                                    <div class="flex justify-between items-center mb-1">
+                                                        <label class="block text-sm font-medium">
+                                                            Tindakan Servis
+                                                            <span class="text-rose-500">*</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" class="form-checkbox"
+                                                                x-on:click="showInputManual = true" />
+                                                            <span class="text-sm ml-2">Isi Manual</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pilih-tindakan">
+                                                        <select id="selectjs5" name="service_actions_id[]"
+                                                            class="form-select text-sm py-1 w-full"
+                                                            style="width: 100%;">
+                                                            <option selected value="">Pilih Tindakan</option>
+                                                            @foreach ($service_actions as $action)
+                                                                <option value="{{ $action->id }}">
+                                                                    {{ $action->nama_tindakan }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div x-show="showInputManual" class="mt-2">
+                                                        <input class="form-input w-full px-2 py-1" type="text"
+                                                            name="tindakan_servis[]" />
+                                                    </div>
+                                                    <input type="hidden" name="prev_modal" value="0">
+                                                    <input type="hidden" name="prev_biaya" value="0">
+                                                </div>
+                                                <div x-data="{ showDetails: false,modalSparepart: 0  }"  x-init="
+                                                    // hook ke event select2
+                                                    $('#selectjs6').on('select2:select', function (e) {
+                                                        let data = e.params.data.element.dataset.harga_modal;
+                                                        modalSparepart = data || 0;
+                                                    });
+                                                ">
+                                                    <label class="block text-sm font-medium mb-1"
+                                                        for="modal_sparepart">Apakah menggunakan stok sparepart
+                                                        toko?</label>
+                                                    <div class="flex flex-wrap items-center -m-3">
+                                                        <div class="m-3">
+                                                            <!-- Start -->
+                                                            <label class="flex items-center">
+                                                                <input type="radio" name="radio-buttons"
+                                                                    class="form-radio" checked
+                                                                    x-on:click="showDetails = false" />
+                                                                <span class="text-sm ml-2">Tidak</span>
+                                                            </label>
+                                                            <!-- End -->
+                                                        </div>
+                                                        <div class="m-3">
+                                                            <!-- Start -->
+                                                            <label class="flex items-center">
+                                                                <input type="radio" name="radio-buttons"
+                                                                    class="form-radio"
+                                                                    x-on:click="showDetails = true" />
+                                                                <span class="text-sm ml-2">Ya</span>
+                                                            </label>
+                                                            <!-- End -->
+                                                        </div>
+                                                    </div>
+                                                    <div x-show="showDetails" class="mt-3">
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="products_id">Sparepart Toko yg Digunakan</label>
+                                                        <select id="selectjs6" name="products_id[]"
+                                                            class="form-select text-sm py-1 w-full"
+                                                            style="width: 100%;"
+                                                            x-on:change="
+                                                                let selected = $el.options[$el.selectedIndex];
+                                                                modalSparepart = selected.dataset.hargaModal || 0;
+                                                            ">
+                                                            <option selected value="">Pilih Sparepart</option>
+                                                            @foreach (App\Models\Product::where('cabang_id',getCabangId())->where('stok', '>', 0)->get() as $item)
+                                                                <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">
+                                                                    {{ $item->product_name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
 
+                                                    <div x-show="showDetails" class="mt-3">
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="sales_id">Sales Sparepart</label>
+                                                        <select id="sales_id" name="sales_id[]"
+                                                            class="form-select text-sm py-1 w-full">
+                                                            <option selected value="1">Tidak ada Sales</option>
+                                                            @foreach ($sales as $user)
+                                                                <option value="{{ $user->id }}">
+                                                                    {{ $user->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="garansi">Garansi</label>
+                                                        <select name="garansi[]"
+                                                            class="form-select text-sm py-1 w-full">
+                                                            <option value="">Tidak Ada</option>
+                                                            <option value="1">1 Hari</option>
+                                                            <option value="2">2 Hari</option>
+                                                            <option value="3">3 Hari</option>
+                                                            <option value="4">4 Hari</option>
+                                                            <option value="5">5 Hari</option>
+                                                            <option value="6">6 Hari</option>
+                                                            <option value="7">1 Minggu</option>
+                                                            <option value="14">2 Minggu</option>
+                                                            <option value="21">3 Minggu</option>
+                                                            <option value="30">1 Bulan</option>
+                                                            <option value="60">2 Bulan</option>
+                                                            <option value="90">3 Bulan</option>
+                                                            <option value="120">4 Bulan</option>
+                                                            <option value="150">5 Bulan</option>
+                                                            <option value="180">6 Bulan</option>
+                                                            <option value="210">7 Bulan</option>
+                                                            <option value="240">8 Bulan</option>
+                                                            <option value="270">9 Bulan</option>
+                                                            <option value="300">10 Bulan</option>
+                                                            <option value="330">11 Bulan</option>
+                                                            <option value="365">1 Tahun</option>
+                                                            <option value="730">2 Tahun</option>
+                                                            <option value="1095">3 Tahun</option>
+                                                            <option value="1460">4 Tahun</option>
+                                                            <option value="1825">5 Tahun</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mt-3">
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="modal_sparepart">Modal Sparepart <span
+                                                                class="text-rose-500">*</span></label>
+                                                        <input class="form-input w-full px-2 py-1 modal_sparepart"
+                                                            type="number" name="modal_sparepart[]" x-model="modalSparepart" :required="showDetails" />
+                                                    </div>
+
+                                                    <div class="mt-3">
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="biaya_servis">Biaya
+                                                            Servis <span class="text-rose-500">*</span></label>
+                                                        <input class="form-input w-full px-2 py-1 biaya_servis"
+                                                            type="number" name="biaya_servis[]" :required="showDetails" />
+                                                    </div>
+                                                    <div id="servis-lain"></div>
+                                                    {{-- Tombol tambah servis --}}
+                                                    <div>
+                                                        <button type="button"
+                                                            class="rounded-lg px-4 py-1 bg-blue-600 text-white"
+                                                            id="tambah-servis">+ tambah
+                                                            tindakan servis</button>
+                                                    </div>
+                                                    {{-- <div>
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="qc_keluar">Pengecekan Fungsi Keluar <span
+                                                                class="text-rose-500">*</span></label>
+                                                        <input id="qc_keluar" name="qc_keluar"
+                                                            class="form-input w-full px-2 py-1" type="text"
+                                                            placeholder="Contoh: Tombol, Kamera, Speaker, dll"
+                                                            :required="showDetails" />
+                                                    </div> --}}
+                                                    <div>
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="total_modal_sparepart">Total
+                                                            Modal
+                                                            Sparepart <span class="text-rose-500">*</span></label>
+                                                        <input class="form-input w-full px-2 py-1" type="number"
+                                                            name="total_modal_sparepart" id="total_modal_sparepart" />
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="biaya">Total Biaya
+                                                            Servis
+                                                            <span class="text-rose-500">*</span></label>
+                                                        <input class="form-input w-full px-2 py-1" type="number"
+                                                            name="biaya" id="biaya" />
+                                                    </div>
                                                     <div>
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="diskon">Diskon</label>
@@ -709,13 +817,13 @@
                                                 </div>
 
                                             </div>
-                                            {{-- <div id="total_modal_batal_wrapper" class="mt-4 space-y-3" style="display: none;">
+                                            <div id="total_modal_batal_wrapper" class="mt-4 space-y-3" style="display: none;">
                                                 <label class="block text-sm font-medium mb-1" for="total_modal_batal">
                                                     Total Modal
                                                     <span class="text-rose-500">*</span>
                                                 </label>
                                                 <input class="form-input w-full px-2 py-1" type="number" name="total_modal_sparepart" id="total_modal_batal" />
-                                            </div> --}}
+                                            </div>
                                             <div>
                                                 <label class="block text-sm font-medium mb-1"
                                                     for="catatan">Catatan <small>(Kosongkan jika tidak
@@ -1784,227 +1892,4 @@ $(document).ready(function () {
             }
         });
     }
-</script>
- {{-- <script src="https://code.jquery.com/jquery-3.7.0.js" crossorigin="anonymous"></script> --}}
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-<script>
-    $(document).ready(function () {
-
-        // --- 1. TERIMA DATA DARI CONTROLLER ---
-        const existingData = @json($teknisiServis ?? []);
-        let groupCounter = 0;
-
-        // --- TEMPLATES ---
-        const teknisiOptions = `
-            <option selected value="">Pilih Teknisi</option>
-            @foreach ($users as $user) <option value="{{ $user->id }}">{{ $user->name }}</option> @endforeach
-        `;
-        const actionOptions = `
-            <option selected value="">Pilih Tindakan</option>
-            @foreach ($service_actions as $action) <option value="{{ $action->id }}">{{ $action->nama_tindakan }}</option> @endforeach
-        `;
-        const sparepartOptions = `
-            <option selected value="">Pilih Sparepart</option>
-            @foreach (App\Models\Product::where('cabang_id',getCabangId())->get() as $item)
-                <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ addslashes($item->product_name) }}</option>
-            @endforeach
-        `;
-        const salesOptions = `
-            <option selected value="1">Tidak ada Sales</option>
-            @foreach ($sales as $user) <option value="{{ $user->id }}">{{ $user->name }}</option> @endforeach
-        `;
-
-        // --- HTML GENERATOR ---
-        function generateActionHtml(groupIndex, actionIndex) {
-            const uniqueRadioId = 'radio_' + actionIndex;
-            return `
-            <div class="action-item" x-data="{ useSparepart: false, showInputManual: false }">
-                <button type="button" class="position-button-x remove-action absolute top-2 right-2 text-rose-500 hover:text-rose-700 font-bold" title="Hapus">&times;</button>
-                <div class="mb-2 pr-6">
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-sm font-medium">Tindakan Servis <span class="text-rose-500">*</span></label>
-                        <label class="flex items-center"><input type="checkbox" class="form-checkbox checkbox-manual" x-on:click="showInputManual = !showInputManual"/><span class="text-sm ml-2">Isi Manual</span></label>
-                    </div>
-                    <div x-show="!showInputManual" class="wrapper-select-action">
-                        <select name="teknisi[${groupIndex}][tindakan][${actionIndex}][service_actions_id]" class="form-select text-sm py-1 w-full selectAction">${actionOptions}</select>
-                    </div>
-                    <div x-show="showInputManual" class="mt-2 wrapper-input-manual" style="display:none;">
-                        <input class="form-input w-full px-2 py-1 input-manual-text" type="text" name="teknisi[${groupIndex}][tindakan][${actionIndex}][tindakan_servis]" placeholder="Ketik manual..."/>
-                    </div>
-                </div>
-                <div class="konfirmasi-stok border-t border-slate-200 pt-2 mt-2">
-                    <label class="block text-sm font-medium mb-1">Pakai Sparepart Toko?</label>
-                    <div class="flex flex-wrap items-center -m-3 mb-2">
-                        <div class="m-3"><label class="flex items-center"><input type="radio" name="${uniqueRadioId}" value="tidak" class="form-radio radio-sparepart-no" checked x-on:click="useSparepart = false"/><span class="text-sm ml-2">Tidak</span></label></div>
-                        <div class="m-3"><label class="flex items-center"><input type="radio" name="${uniqueRadioId}" value="ya" class="form-radio radio-sparepart-yes" x-on:click="useSparepart = true"/><span class="text-sm ml-2">Ya</span></label></div>
-                    </div>
-                    <div x-show="useSparepart" style="display: none;" class="wrapper-sparepart-area">
-                        <div class="mb-2"><label class="block text-sm font-medium mb-1">Sparepart</label><select name="teknisi[${groupIndex}][tindakan][${actionIndex}][products_id]" class="form-select text-sm py-1 w-full selectSparepart" style="width: 100%;">${sparepartOptions}</select></div>
-                        <div class="mb-2"><label class="block text-sm font-medium mb-1">Sales Sparepart</label><select name="teknisi[${groupIndex}][tindakan][${actionIndex}][sales_id]" class="form-select text-sm py-1 w-full selectSales">${salesOptions}</select></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mt-2">
-                        <div><label class="block text-sm font-medium mb-1">Modal Part <span class="text-rose-500">*</span></label><input class="form-input w-full px-2 py-1 modal_sparepart" type="number" name="teknisi[${groupIndex}][tindakan][${actionIndex}][modal_sparepart]" value="0" required /></div>
-                        <div><label class="block text-sm font-medium mb-1">Biaya Servis <span class="text-rose-500">*</span></label><input class="form-input w-full px-2 py-1 biaya_servis" type="number" name="teknisi[${groupIndex}][tindakan][${actionIndex}][biaya_servis]" value="0" required /></div>
-                    </div>
-                </div>
-            </div>`;
-        }
-
-        function addTechnicianGroup(techData = null) {
-            const currentGroupIndex = groupCounter++;
-            const groupHtml = `
-            <div class="technician-group relative" data-group-index="${currentGroupIndex}">
-                <button style="position: absolute;right: 2%;" type="button" class="remove-group absolute top-2 right-2 text-white bg-rose-500 hover:bg-rose-600 rounded px-2 py-1 text-xs z-10">Hapus Teknisi</button>
-                <div class="bg-indigo-50 -m-4 mb-4 p-4 border-b border-indigo-100 rounded-t">
-                    <h3 class="font-bold text-indigo-800 mb-2">Data Teknisi</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div><label class="block text-sm font-medium mb-1">Nama Teknisi <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][user_id]" class="form-select text-sm py-1 w-full selectUser" >${teknisiOptions}</select></div>
-                        <div><label class="block text-sm font-medium mb-1">Tipe Bagi Hasil <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][tipe]" class="form-select text-sm py-1 w-full selectType" ><option selected value="">Pilih Tipe</option><option value="Interface">Interface (bonus pertipe)</option><option value="Hardware">Hardware & interface (bonus persen)</option></select></div>
-                    </div>
-                </div>
-                <div class="actions-list-container space-y-3"></div>
-                <div class="mt-3 text-center border-t border-dashed border-slate-300 pt-3"><button type="button" class="add-action-btn btn-sm bg-emerald-500 hover:bg-emerald-600 text-white">+ Tambah Tindakan Lain (Untuk Teknisi Ini)</button></div>
-            </div>`;
-            const $newGroup = $(groupHtml);
-            $('#main-container').append($newGroup);
-            if (techData) {
-                $newGroup.find('.selectUser').val(techData.users_id);
-                $newGroup.find('.selectType').val(techData.tipe);
-            } else {
-                addActionToGroup($newGroup, currentGroupIndex);
-            }
-            return { $element: $newGroup, index: currentGroupIndex };
-        }
-
-        function addActionToGroup($groupElement, groupIndex, actionData = null) {
-            if (groupIndex === undefined) groupIndex = $groupElement.attr('data-group-index');
-            const actionIndex = Date.now() + Math.floor(Math.random() * 10000);
-            const html = generateActionHtml(groupIndex, actionIndex);
-            const $newItem = $(html);
-            $groupElement.find('.actions-list-container').append($newItem);
-
-            const $selAction = $newItem.find('.selectAction').select2();
-            const $selSparepart = $newItem.find('.selectSparepart').select2();
-            const $selSales = $newItem.find('.selectSales').select2();
-
-            if (actionData) {
-                // Set Nilai Duit Awal (PENTING: Pastikan ini jalan)
-                // Gunakan .val() dan pastikan angka (0 jika null/kosong)
-                $newItem.find('.biaya_servis').val(actionData.biaya || 0);
-
-                // Untuk modal, jika 0, nanti akan ditimpa oleh harga modal sparepart jika ada
-                $newItem.find('.modal_sparepart').val(actionData.modal || 0);
-
-                if (actionData.act_id && actionData.act_id !== "null") $selAction.val(actionData.act_id).trigger('change.select2');
-
-                // Logic Sparepart
-                if (actionData.prod_id && actionData.prod_id != "null" && actionData.prod_id != "") {
-                    setTimeout(() => { $newItem.find('.radio-sparepart-yes')[0].click(); }, 50);
-
-                    setTimeout(() => {
-                        // Set value sparepart
-                        $selSparepart.val(actionData.prod_id).trigger('change.select2');
-
-                        // PENTING: Ambil harga modal dari data-attribute option yang terpilih
-                        // Ini logic fallback jika actionData.modal ternyata 0 atau tidak tersimpan benar
-                        const hargaModalOtomatis = $selSparepart.find(':selected').data('harga_modal') || 0;
-
-                        // Jika data modal dari DB ada (>0), pakai itu. Jika 0, ambil dari master barang.
-                        if(actionData.modal > 0) {
-                            $newItem.find('.modal_sparepart').val(actionData.modal);
-                        } else {
-                            $newItem.find('.modal_sparepart').val(hargaModalOtomatis);
-                        }
-
-                        // Trigger hitung ulang total
-                        recalculateAll();
-                    }, 100);
-                } else {
-                    // Jika tidak ada sparepart, hitung ulang untuk biaya servis saja
-                    recalculateAll();
-                }
-            }
-        }
-
-        // LOAD DATA
-        if (existingData && existingData.length > 0) {
-            existingData.forEach(function(tech) {
-                const groupObj = addTechnicianGroup(tech);
-                let actionsArr = [], productsArr = [], biayaArr = [], modalArr = [];
-                try {
-                    actionsArr = JSON.parse(tech.service_actions) || [];
-                    productsArr = JSON.parse(tech.products) || [];
-                    biayaArr = JSON.parse(tech.biaya_j) || [];
-                    modalArr = JSON.parse(tech.modal_j) || [];
-                } catch (e) { console.error(e); }
-
-                if (actionsArr.length > 0) {
-                    actionsArr.forEach(function(actId, i) {
-                        const detailData = {
-                            act_id: actId,
-                            prod_id: productsArr[i] ?? null,
-                            biaya: biayaArr[i] ?? 0,
-                            modal: modalArr[i] ?? 0
-                        };
-                        addActionToGroup(groupObj.$element, groupObj.index, detailData);
-                    });
-                } else {
-                    addActionToGroup(groupObj.$element, groupObj.index);
-                }
-            });
-            // Delay sedikit untuk rekap total akhir setelah semua timeout selesai
-            setTimeout(recalculateAll, 1000);
-        } else {
-            addTechnicianGroup();
-        }
-
-        // EVENT HANDLERS
-        $('#tambah-teknisi-baru').on('click', function() { addTechnicianGroup(); });
-        $(document).on('click', '.add-action-btn', function() { addActionToGroup($(this).closest('.technician-group')); });
-        $(document).on('click', '.remove-action', function() {
-            if ($(this).closest('.actions-list-container').children().length > 1) {
-                if(confirm('Hapus?')) { $(this).closest('.action-item').remove(); recalculateAll(); }
-            } else alert('Minimal 1 tindakan.');
-        });
-        $(document).on('click', '.remove-group', function() {
-            if(confirm('Hapus Teknisi?')) { $(this).closest('.technician-group').remove(); recalculateAll(); }
-        });
-
-        $(document).on('select2:select', '.selectAction', function(e) {
-            const $select = $(this);
-            const $container = $select.closest('.action-item');
-            const actionId = $select.val();
-            if(actionId) {
-                $.ajax({
-                    url: '/get-action/' + actionId,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(data) {
-                        $container.find('.biaya_servis').val(data.biaya);
-                        recalculateAll();
-                    }
-                });
-            }
-        });
-
-        $(document).on('change', '.selectSparepart', function() {
-            const $select = $(this);
-            const $container = $select.closest('.action-item');
-            const hargaModal = $select.find(':selected').data('harga_modal') || 0;
-            $container.find('.modal_sparepart').val(hargaModal);
-            recalculateAll();
-        });
-
-        $(document).on('input', '.biaya_servis, .modal_sparepart', function() { recalculateAll(); });
-
-        function recalculateAll() {
-            let totalBiaya = 0;
-            let totalModal = 0;
-            $('.biaya_servis').each(function() { totalBiaya += parseFloat($(this).val()) || 0; });
-            $('.modal_sparepart').each(function() { totalModal += parseFloat($(this).val()) || 0; });
-            $('#biaya').val(totalBiaya);
-            $('#total_modal_sparepart').val(totalModal);
-        }
-    });
 </script>

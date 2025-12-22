@@ -21,6 +21,7 @@ use App\Models\TeknisiServis;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\DB;
 
 class SudahDiambilController extends Controller
 {
@@ -229,11 +230,59 @@ class SudahDiambilController extends Controller
             })
 
             // ✅ Tindakan Servis
-            ->addColumn('tindakan_servis', fn($row) => implode(', ', json_decode($row->tindakan_servis) ?? []))
+            // ->addColumn('tindakan_servis', fn($row) => implode(', ', json_decode($row->tindakan_servis) ?? []))
 
-            // ✅ Teknisi
-            ->addColumn('teknisi', fn($row) => $row->user?->name ?? '<span class="text-red-600">Akun dihapus</span>')
+            // // ✅ Teknisi
+            // ->addColumn('teknisi', fn($row) => $row->user?->name ?? '<span class="text-red-600">Akun dihapus</span>')
 
+            ->addColumn('tindakan_servis', function ($row) {
+                $teknisiServis = TeknisiServis::where('service_transactions_id', $row->id)->get();
+                
+                if ($teknisiServis->isEmpty()) {
+                    return '<div class="font-medium">'.implode(', ', json_decode($row->tindakan_servis) ?? []).'</div>';
+                } else {
+                    $tindakanArr = [];
+                    foreach ($teknisiServis as $ts) {
+                        $decodedItem = json_decode($ts->tindakan_servis);
+
+                        if (is_array($decodedItem)) {
+                            $tindakanArr = array_merge($tindakanArr, $decodedItem);
+                        } 
+                        elseif (!empty($ts->tindakan_servis)) { 
+                            $tindakanArr[] = $ts->tindakan_servis;
+                        }
+                    }
+                    
+                    $tindakanArr = array_unique($tindakanArr);
+
+                    return '<div class="font-medium">'.implode(', ', $tindakanArr).'</div>';
+                }
+            })
+            // ->addColumn('tindakan', fn($r) => '<div class="font-medium">'.implode(', ', json_decode($r->tindakan_servis) ?? []).'</div>')
+            ->addColumn('teknisi', function ($row) {
+
+                $teknisiServis = TeknisiServis::where('service_transactions_id', $row->id)->get();
+                
+                if ($teknisiServis->isEmpty()) {
+                    // return '<div class="font-medium">'.e($row->user->name).'</div>';
+                    return $row->user
+                        ? '<div class="font-medium">'.e($row->user->name).'</div>'
+                        : '<div class="font-medium text-red-600">-</div>';
+                } else {
+                    $tindakanArr = [];
+                    foreach ($teknisiServis as $ts) {
+                        $tindakanArr[] = $ts->teknisi->name ?? '-';
+                    }
+                    
+                    $tindakanArr = array_unique($tindakanArr);
+
+                    return '<div class="font-medium">'.implode(', ', $tindakanArr).'</div>';
+                }
+
+                // return $r->user
+                //     ? '<div class="font-medium">'.e($r->user->name).'</div>'
+                //     : '<div class="font-medium text-red-600">-</div>';
+            })
             // ✅ Modal, Biaya, Diskon
             ->addColumn('modal_sparepart', fn($row) => 'Rp. '.number_format($row->modal_sparepart))
             ->addColumn('biaya', fn($row) => 'Rp. '.number_format($row->biaya))
@@ -465,7 +514,7 @@ class SudahDiambilController extends Controller
             })
 
 
-            ->rawColumns(['fungsi','checkbox', 'nomor_servis', 'hubungi', 'kondisi_servis', 'status', 'aksi', 'exp_garansi'])
+            ->rawColumns(['fungsi','checkbox', 'nomor_servis', 'hubungi', 'kondisi_servis', 'status', 'aksi', 'exp_garansi','tindakan_servis','teknisi'])
             ->make(true);
     }
 
@@ -632,6 +681,9 @@ class SudahDiambilController extends Controller
             $qcItems = [];
         }
 
+        $teknisiServis = TeknisiServis::where('service_transactions_id', $id)->get();
+
+
         return view('pages.kepalatoko.servis.sudah-diambil-edit', [
             'item' => $item,
             'types' => $types,
@@ -648,6 +700,7 @@ class SudahDiambilController extends Controller
             'qcItems' => $qcItems,
             'qcMasuk' => $qcMasuk,
             'qcKeluar' => $qcKeluar,
+            'teknisiServis' => $teknisiServis,
         ]);
     }
 
@@ -658,11 +711,11 @@ class SudahDiambilController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+   
     // public function update(Request $request, $id)
     // {
+    //     // dd($request->all());
     //     $item = ServiceTransaction::findOrFail($id);
-
-    //     $nama_pelanggan = Customer::find($request->customers_id);
 
     //     $nama_tipe = Type::find($request->types_id);
     //     $nama_merek = Brand::find($request->brands_id);
@@ -675,7 +728,6 @@ class SudahDiambilController extends Controller
     //         $persen_teknisi = null;
     //     }
 
-    //     // --- BLOK LOGIKA YANG DIPERBAIKI ---
     //     $tindakan_servis = []; // 1. Inisialisasi sebagai array kosong
 
     //     // Pastikan request memiliki inputnya untuk menghindari error
@@ -692,8 +744,8 @@ class SudahDiambilController extends Controller
     //                 }
     //             }
     //             // 4. Jika tidak, cek apakah diisi manual
-    //             elseif (!empty($request->tindakan_servis[$key])) {
-    //                 $tindakan = $request->tindakan_servis[$key];
+    //             elseif (!empty($request->tindakan_servis_manual[$key])) {
+    //                 $tindakan = $request->tindakan_servis_manual[$key];
     //             }
 
     //             // 5. Tambahkan ke array jika ada tindakan yang valid
@@ -702,21 +754,10 @@ class SudahDiambilController extends Controller
     //             }
     //         }
     //     }
-    //     // --- AKHIR BLOK LOGIKA YANG DIPERBAIKI ---
 
-    //     $garansi = Carbon::now();
-    //     if ($request->garansi != null) {
-    //         $expired = $garansi->addDays(
-    //             $request->garansi
-    //         );
-    //     } else {
-    //         $expired = null;
-    //     }
-
-    //     $modalSparepart = array_sum($request->modal_sparepart);
-    //     $biaya = $request->biaya ?? 0;
-    //     $profittransaksi = $biaya - $modalSparepart - $request->diskon;
-    //     $bagihasil = ($biaya - $modalSparepart - $request->diskon) / 100;
+    //     $profittransaksi = $request->biaya - $request->modal_sparepart - $request->diskon;
+    //     $bagihasil = ($request->biaya - $request->modal_sparepart - $request->diskon) / 100;
+    //     $nama_pelanggan = Customer::find($request->customers_id);
 
 
     //     $ppn = 0;
@@ -724,25 +765,21 @@ class SudahDiambilController extends Controller
     //     if (!empty($cekppn) && $cekppn->is_tax == 1) {
     //         $ppn = $cekppn->ppn;
     //     }
-
-    //     // Hitung dasar (pakai diskon kalau ada)
-    //     if (!empty($request->diskon) && $request->diskon > 0) {
+    //      if (!empty($request->diskon) && $request->diskon > 0) {
     //         $baseBiaya = $request->biaya - $request->diskon;
     //     } else {
     //         $baseBiaya = $request->biaya;
     //     }
 
-    //     // Hitung total dengan PPN
     //     $biayaFinal = $baseBiaya;
-    //     if ($ppn > 0) {
-    //         $biayaFinal += ($baseBiaya * $ppn / 100);
-    //     }
-
     //     // Default
     //     $tunai = 0;
     //     $transfer = 0;
     //     $due = 0;
     //     $pay = 0;
+    //     if ($ppn > 0) {
+    //         $biayaFinal += ($baseBiaya * $item->ppn / 100);
+    //     }
 
     //     if ($request->cara_pembayaran === 'Tunai & Transfer') {
     //         $due = 0;
@@ -793,286 +830,406 @@ class SudahDiambilController extends Controller
     //         $tempo = null;
     //     }
 
-    //     $expired = [];
-    //     if (count($request->garansi) > 0) {
-    //         foreach ($request->garansi as $val) {
-    //             array_push($expired, Carbon::now()->addDays(
-    //                 $val
-    //             ));
-    //         }
-    //     } else {
-    //         $expired = null;
+    //     $garansiList = $request->garansi ?? [];
+    //     foreach ($garansiList as $val) {
+    //         $expired[] = Carbon::now()->addDays($val);
     //     }
 
-    //     if ($request->kondisi_servis == 'Dibatalkan') {
-    //         $finalModal = $request->total_modal_sparepart;
-    //     }else{
-    //         $finalModal = $modalSparepart;
-    //     }
-    //     // dd($profittransaksi,$request->all());
-    //     $ppn = 0;
-    //     $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
-    //     if (!empty($cekppn)) {
-    //         if ($cekppn->is_tax == 1) {
-    //             $ppn = $cekppn->ppn;
+    //     $cekTeknisi = User::find($request->users_id);
+    //     if ($cekTeknisi->bagian_teknisi == 'Teknisi Interface') {
+    //         if ($request->tipe == 'Interface') {
+    //             if (!empty($nama_model)) {
+    //                 $bonus_interface = $nama_model->nominal_bonus;
+    //             }else{
+    //             $bonus_interface = 0;
+    //             }
     //         }else{
-    //             $ppn = 0;
+    //             $bonus_interface = 0;
+    //         }
+    //     }else{
+    //         $bonus_interface = 0;
+    //     }
+
+    //     $qc_masuk_data = $request->qc_masuk ?? [];
+    //     $qc_keluar_data = $request->qc_keluar ?? [];
+
+    //     if ($request->has('custom_item_name')) {
+    //         foreach ($request->custom_item_name as $key => $name) {
+    //             if (!empty($name)) {
+    //                 $val_in = $request->custom_qc_masuk[$key] ?? '-';
+    //                 $val_out = $request->custom_qc_keluar[$key] ?? '-';
+
+    //                 $qc_masuk_data[$name] = $val_in;
+    //                 $qc_keluar_data[$name] = $val_out;
+    //             }
     //         }
     //     }
+
+    //     $qc_masuk_final = json_encode($qc_masuk_data);
+    //     $qc_keluar_final = json_encode($qc_keluar_data);
     //     // Transaction create
     //     $item->update([
     //         'created_at' => $request->created_at,
+    //         'tgl_disetujui' => $request->tgl_disetujui,
+    //         'users_id' => $request->users_id,
+    //         'penerima' => $request->penerima,
     //         'customers_id' => $request->customers_id,
     //         'nama_pelanggan' => $nama_pelanggan->nama,
     //         'types_id' => $request->types_id,
     //         'brands_id' => $request->brands_id,
     //         'model_series_id' => $request->model_series_id,
+    //         'bonus_interface' => $bonus_interface,
+    //         'tipe' => $request->tipe,
     //         'nama_barang' => $nama_barang,
     //         'kerusakan' => $request->kerusakan,
-    //         'imei' => $request->imei,
-    //         'warna' => $request->warna,
-    //         'capacities_id' => $request->capacities_id,
-    //         'kelengkapan' => $request->kelengkapan,
-    //         'qc_masuk' => $request->qc_masuk,
-    //         'penerima' => $request->penerima,
-    //         'users_id' => $request->users_id,
+    //         'qc_masuk' => $qc_masuk_data,
+    //         'qc_keluar' => $qc_keluar_data,
     //         'kondisi_servis' => $request->kondisi_servis,
-    //         'products_id' => $request->products_id[0],
-    //         'tindakan_servis' => count($tindakan_servis) > 0 ? json_encode($tindakan_servis) : null,
-    //         'modal_sparepart' => $finalModal,
+    //         'service_actions_id' => $request->service_actions_id,
+    //         'products_id' => $request->products_id,
+    //         'tindakan_servis' => $tindakan_servis,
+    //         'modal_sparepart' => $request->modal_sparepart,
+    //         'service_actions' => json_encode($request->service_actions_id),
+    //         'products' => json_encode($request->products_id),
+    //         'biaya_j' => $request->biaya_j,
+    //         'modal_j' => $request->modal_j,
     //         'biaya' => $request->biaya,
-    //         'catatan' => $request->catatan,
-    //         'persen_teknisi' => $persen_teknisi,
-    //         'omzet' => $request->biaya,
-    //         'profit' => $profittransaksi,
-    //         'profittoko' => $profittransaksi - ($bagihasil * $persen_teknisi),
-    //         'qc_keluar' => $request->qc_keluar,
-    //         'cara_pembayaran' => $request->cara_pembayaran,
+    //         'uang_muka' => $request->uang_muka,
     //         'diskon' => $request->diskon,
-    //         'garansi' => $request->garansi[0],
-    //         'exp_garansi' => $expired[0],
-    //         'exp_garansi_j' => json_encode($expired),
+    //         'cara_pembayaran' => $request->cara_pembayaran,
+    //         'garansi'       => !empty($request->garansi) && isset($request->garansi[0]) ? $request->garansi[0] : null,
+    //         'exp_garansi'   => !empty($expired) && isset($expired[0]) ? $expired[0] : null,
+    //         'exp_garansi_j' => json_encode($expired ?? []),
     //         'tgl_ambil' => $request->tgl_ambil,
-    //         'pengambil' => $nama_pelanggan->nama,
-    //         'penyerah' => Auth::user()->name,
+    //         'pengambil' => $request->pengambil,
+    //         'persen_teknisi' => $persen_teknisi,
+    //         'omzet' => $request->biaya - $request->diskon,
+    //         'profit' => $profittransaksi,
     //         'pay' => $pay,
     //         'due' => $due,
     //         'tempo' => $tempo,
     //         'tunai' => $tunai,
     //         'transfer' => $transfer,
     //         'ppn' => $ppn ?? 0,
-    //         'service_actions' => json_encode($request->service_actions_id),
-    //         'products' => json_encode($request->products_id),
-    //         'biaya_j' => json_encode($request->biaya_servis),
-    //         'modal_j' => json_encode($request->modal_sparepart)
+    //         'profittoko' => $profittransaksi - ($bagihasil *= $persen_teknisi),
     //     ]);
 
     //     return redirect()->route('transaksi-servis-sudah-diambil.index');
     // }
-
     public function update(Request $request, $id)
     {
         // dd($request->all());
-        $item = ServiceTransaction::findOrFail($id);
+       $itemOrigin = ServiceTransaction::findOrFail($id);
+        DB::beginTransaction();
 
-        $nama_tipe = Type::find($request->types_id);
-        $nama_merek = Brand::find($request->brands_id);
-        $nama_model = ModelSerie::find($request->model_series_id);
-        $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
+        try {
+            if ($request->has('teknisi') && is_array($request->teknisi)) {
 
-        if ($request->users_id != null) {
-            $persen_teknisi = User::find($request->users_id)->persen;
-        } else {
-            $persen_teknisi = null;
-        }
+                // --- VARIABEL PENAMPUNG GRAND TOTAL (UNTUK TABEL INDUK) ---
+                $grandTotalBiaya = 0;
+                $grandTotalModal = 0;
+                $mainTechnicianId = null; // Penampung ID Teknisi Utama
 
-        $tindakan_servis = []; // 1. Inisialisasi sebagai array kosong
+                // Variabel untuk menyimpan detail Teknisi Utama (Legacy support jika tabel induk butuh JSON detail)
+                $mainTechDetails = [
+                    'tindakan' => null,
+                    'actions_id' => null,
+                    'products_id' => null,
+                    'biaya_j' => null,
+                    'modal_j' => null
+                ];
 
-        // Pastikan request memiliki inputnya untuk menghindari error
-        if ($request->has('service_actions_id')) {
-            // 2. Lakukan loop pada semua tindakan yang dikirim
-            foreach ($request->service_actions_id as $key => $servis_id) {
-                $tindakan = null; // Reset untuk setiap iterasi
+                $teknisiServisDelete = TeknisiServis::where('service_transactions_id', $itemOrigin->id)->get();
+                foreach ($teknisiServisDelete as $key => $valueDel) {
+                    $valueDel->delete();
+                }
 
-                // 3. Cek apakah tindakan dipilih dari dropdown
-                if (!empty($servis_id)) {
-                    $action = ServiceAction::find($servis_id);
-                    if ($action) {
-                        $tindakan = $action->nama_tindakan;
+                foreach ($request->teknisi as $index => $techData) {
+                    // --- 1. PERSIAPAN DATA ---
+                    $userId = $techData['user_id'] ?? null;
+                    $tipeTeknisi = $techData['tipe'] ?? null;
+
+                    // Set Teknisi Utama (Index 0)
+                    if ($index === 0) {
+                        $mainTechnicianId = $userId;
+                    }
+
+                    // Ambil Persen
+                    $persen_teknisi = 0;
+                    if ($userId) {
+                        $userObj = User::find($userId);
+                        $persen_teknisi = $userObj->persen ?? 0;
+                    }
+
+                    // Reset variable per teknisi
+                    $list_tindakan_text = [];
+                    $arr_service_actions_id = [];
+                    $arr_products_id = [];
+                    $arr_biaya_servis = [];
+                    $arr_modal_sparepart = [];
+
+                    $subTotalBiaya = 0;
+                    $subTotalModal = 0;
+
+                    if ($request->kondisi_servis !== 'Dibatalkan' && $userId) {
+                        // --- 2. LOOP TINDAKAN ---
+                        if (isset($techData['tindakan']) && is_array($techData['tindakan'])) {
+                            foreach ($techData['tindakan'] as $action) {
+
+                                $act_id = $action['service_actions_id'] ?? null;
+                                $manual_act = $action['tindakan_servis'] ?? null;
+                                $prod_id = $action['products_id'] ?? null;
+                                $sales_id = $action['sales_id'] ?? 1;
+
+                                $biaya = filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+                                $modal = filter_var($action['modal_sparepart'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+
+                                // Ambil Nama Tindakan
+                                $nama_tindakan = null;
+                                if (!empty($act_id)) {
+                                    $actDb = ServiceAction::find($act_id);
+                                    if ($actDb) $nama_tindakan = $actDb->nama_tindakan;
+                                } elseif (!empty($manual_act)) {
+                                    $nama_tindakan = $manual_act;
+                                }
+                                if ($nama_tindakan) $list_tindakan_text[] = $nama_tindakan;
+
+                                // Push Array
+                                $arr_service_actions_id[] = $act_id;
+                                $arr_products_id[] = $prod_id;
+                                $arr_biaya_servis[] = $biaya;
+                                $arr_modal_sparepart[] = $modal;
+
+                                // Kalkulasi SubTotal per Teknisi
+                                $subTotalBiaya += (int)$biaya;
+                                $subTotalModal += (int)$modal;
+
+                                // --- 3. STOK & ORDER ---
+                                if (!empty($prod_id)) {
+                                    $sparepart = Product::find($prod_id);
+                                    if ($sparepart) {
+                                        $sparepart->decrement('stok', 1);
+                                        // $this->createSparepartOrder($itemOrigin->customers_id, $sales_id, $sparepart);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // --- 4. HITUNG PROFIT PER TEKNISI ---
+                    $profitTransaksi = $subTotalBiaya - $subTotalModal;
+                    $nilaiBagiHasil = ($profitTransaksi) / 100;
+                    $profitToko = $profitTransaksi - ($nilaiBagiHasil * $persen_teknisi);
+
+                    // Bonus Interface
+                    $bonus_interface = 0;
+                    if ($request->kondisi_servis !== 'Dibatalkan' && $userId) {
+                        $cekTeknisi = User::find($userId);
+                        if ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface') {
+                            $nama_model = ModelSerie::find($itemOrigin->model_series_id);
+                            $bonus_interface = $nama_model->nominal_bonus ?? 0;
+                        }
+                    }
+                 
+                    if ($request->kondisi_servis !== 'Dibatalkan' && $userId) {
+                        TeknisiServis::create([
+                            'service_transactions_id' => $itemOrigin->id,
+                            'users_id' => $userId,
+                            'tipe' => $tipeTeknisi,
+                            'modal_sparepart' => $subTotalModal,
+                            'biaya' => $subTotalBiaya,
+                            'profit' => $profitTransaksi,
+                            'profittoko' => $profitToko,
+                            'persen_teknisi' => $persen_teknisi,
+                            'bonus_interface' => $bonus_interface,
+                           
+                            // Detail JSON
+                            'tindakan_servis' => count($list_tindakan_text) > 0 ? json_encode($list_tindakan_text) : null,
+                            'service_actions' => json_encode($arr_service_actions_id),
+                            'products' => json_encode($arr_products_id),
+                            'biaya_j' => json_encode($arr_biaya_servis),
+                            'modal_j' => json_encode($arr_modal_sparepart)
+                        ]);
+                    }
+
+
+                    // --- 6. AKUMULASI GRAND TOTAL ---
+                    $grandTotalBiaya += $subTotalBiaya;
+                    $grandTotalModal += $subTotalModal;
+
+                    // Jika ini Teknisi Utama, simpan detailnya untuk update tabel Induk (Legacy)
+                    if ($index === 0) {
+                        $mainTechDetails = [
+                            'tindakan' => count($list_tindakan_text) > 0 ? json_encode($list_tindakan_text) : null,
+                            'actions_id' => json_encode($arr_service_actions_id),
+                            'products_id' => $arr_products_id[0] ?? null,
+                            'all_products' => json_encode($arr_products_id),
+                            'biaya_j' => json_encode($arr_biaya_servis),
+                            'modal_j' => json_encode($arr_modal_sparepart)
+                        ];
+                    }
+
+                } // End Foreach
+
+                $nama_tipe = Type::find($request->types_id);
+                $nama_merek = Brand::find($request->brands_id);
+                $nama_model = ModelSerie::find($request->model_series_id);
+                $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
+                $nama_pelanggan = Customer::find($request->customers_id);
+
+                
+                $ppn = 0;
+                $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
+                if (!empty($cekppn) && $cekppn->is_tax == 1) {
+                    $ppn = $cekppn->ppn;
+                }
+                    if (!empty($request->diskon) && $request->diskon > 0) {
+                    $baseBiaya = $request->biaya - $request->diskon;
+                } else {
+                    $baseBiaya = $request->biaya;
+                }
+
+                $biayaFinal = $baseBiaya;
+                // Default
+                $tunai = 0;
+                $transfer = 0;
+                $due = 0;
+                $pay = 0;
+                if ($ppn > 0) {
+                    $biayaFinal += ($baseBiaya * $item->ppn / 100);
+                }
+
+                if ($request->cara_pembayaran === 'Tunai & Transfer') {
+                    $due = 0;
+                    if ($request->tunai != 0) {
+                        $transfer = $request->transfer;
+                        $pay = $request->biaya;
+                        $tunai = $request->tunai;
+                    } else {
+                        $tunai = $request->tunai;
+                        $pay = $request->biaya;
+                        $transfer = $request->transfer;
                     }
                 }
-                // 4. Jika tidak, cek apakah diisi manual
-                elseif (!empty($request->tindakan_servis_manual[$key])) {
-                    $tindakan = $request->tindakan_servis_manual[$key];
+
+                // Cara pembayaran
+                if ($request->cara_pembayaran === 'Tunai') {
+                    $tunai = $biayaFinal;
+                    $transfer = 0;
+                    $due = 0;
+                    $pay = $biayaFinal;
                 }
 
-                // 5. Tambahkan ke array jika ada tindakan yang valid
-                if ($tindakan !== null) {
-                    array_push($tindakan_servis, $tindakan);
+                if ($request->cara_pembayaran === 'Transfer') {
+                    $transfer = $biayaFinal;
+                    $tunai = 0;
+                    $due = 0;
+                    $pay = $biayaFinal;
                 }
-            }
-        }
 
-        $profittransaksi = $request->biaya - $request->modal_sparepart - $request->diskon;
-        $bagihasil = ($request->biaya - $request->modal_sparepart - $request->diskon) / 100;
-        $nama_pelanggan = Customer::find($request->customers_id);
-
-
-        $ppn = 0;
-        $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
-        if (!empty($cekppn) && $cekppn->is_tax == 1) {
-            $ppn = $cekppn->ppn;
-        }
-         if (!empty($request->diskon) && $request->diskon > 0) {
-            $baseBiaya = $request->biaya - $request->diskon;
-        } else {
-            $baseBiaya = $request->biaya;
-        }
-
-        $biayaFinal = $baseBiaya;
-        // Default
-        $tunai = 0;
-        $transfer = 0;
-        $due = 0;
-        $pay = 0;
-        if ($ppn > 0) {
-            $biayaFinal += ($baseBiaya * $item->ppn / 100);
-        }
-
-        if ($request->cara_pembayaran === 'Tunai & Transfer') {
-            $due = 0;
-            if ($request->tunai != 0) {
-                $transfer = $request->transfer;
-                $pay = $request->biaya;
-                $tunai = $request->tunai;
-            } else {
-                $tunai = $request->tunai;
-                $pay = $request->biaya;
-                $transfer = $request->transfer;
-            }
-        }
-
-        // Cara pembayaran
-        if ($request->cara_pembayaran === 'Tunai') {
-            $tunai = $biayaFinal;
-            $transfer = 0;
-            $due = 0;
-            $pay = $biayaFinal;
-        }
-
-        if ($request->cara_pembayaran === 'Transfer') {
-            $transfer = $biayaFinal;
-            $tunai = 0;
-            $due = 0;
-            $pay = $biayaFinal;
-        }
-
-        if ($request->cara_pembayaran === 'Kredit') {
-            $pay = $request->pay;
-            $due = $request->biaya - $request->pay;
-            if ($request->tunai) {
-                $tunai = $request->pay;
-                $transfer = 0;
-            } elseif ($request->transfer) {
-                $transfer = $request->pay;
-                $tunai = 0;
-            }
-        }
-
-        $waktu = Carbon::today();
-        if ($request->tempo != null) {
-            $tempo = $waktu->addDays(
-                $request->tempo
-            );
-        } else {
-            $tempo = null;
-        }
-
-        $garansiList = $request->garansi ?? [];
-        foreach ($garansiList as $val) {
-            $expired[] = Carbon::now()->addDays($val);
-        }
-
-        $cekTeknisi = User::find($request->users_id);
-        if ($cekTeknisi->bagian_teknisi == 'Teknisi Interface') {
-            if ($request->tipe == 'Interface') {
-                if (!empty($nama_model)) {
-                    $bonus_interface = $nama_model->nominal_bonus;
-                }else{
-                $bonus_interface = 0;
+                if ($request->cara_pembayaran === 'Kredit') {
+                    $pay = $request->pay;
+                    $due = $request->biaya - $request->pay;
+                    if ($request->tunai) {
+                        $tunai = $request->pay;
+                        $transfer = 0;
+                    } elseif ($request->transfer) {
+                        $transfer = $request->pay;
+                        $tunai = 0;
+                    }
                 }
-            }else{
-                $bonus_interface = 0;
-            }
-        }else{
-            $bonus_interface = 0;
-        }
 
-        $qc_masuk_data = $request->qc_masuk ?? [];
-        $qc_keluar_data = $request->qc_keluar ?? [];
-
-        if ($request->has('custom_item_name')) {
-            foreach ($request->custom_item_name as $key => $name) {
-                if (!empty($name)) {
-                    $val_in = $request->custom_qc_masuk[$key] ?? '-';
-                    $val_out = $request->custom_qc_keluar[$key] ?? '-';
-
-                    $qc_masuk_data[$name] = $val_in;
-                    $qc_keluar_data[$name] = $val_out;
+                $waktu = Carbon::today();
+                if ($request->tempo != null) {
+                    $tempo = $waktu->addDays(
+                        $request->tempo
+                    );
+                } else {
+                    $tempo = null;
                 }
+
+                $garansiList = $request->garansi ?? [];
+                foreach ($garansiList as $val) {
+                    $expired[] = Carbon::now()->addDays($val);
+                }
+
+
+                $qc_masuk_data = $request->qc_masuk ?? [];
+                $qc_keluar_data = $request->qc_keluar ?? [];
+
+                if ($request->has('custom_item_name')) {
+                    foreach ($request->custom_item_name as $key => $name) {
+                        if (!empty($name)) {
+                            $val_in = $request->custom_qc_masuk[$key] ?? '-';
+                            $val_out = $request->custom_qc_keluar[$key] ?? '-';
+
+                            $qc_masuk_data[$name] = $val_in;
+                            $qc_keluar_data[$name] = $val_out;
+                        }
+                    }
+                }
+
+                $qc_masuk_final = json_encode($qc_masuk_data);
+                $qc_keluar_final = json_encode($qc_keluar_data);
+
+                $grandProfit = $grandTotalBiaya - $grandTotalModal;
+
+                $itemOrigin->update([
+                    'created_at' => $request->created_at,
+                    'tgl_disetujui' => $request->tgl_disetujui,
+                    'kondisi_servis' => $request->kondisi_servis,
+                    'tgl_selesai' => $request->tgl_selesai,
+                    'penerima' => $request->penerima,
+                    'customers_id' => $request->customers_id,
+                    'nama_pelanggan' => $nama_pelanggan->nama,
+                    'types_id' => $request->types_id,
+                    'brands_id' => $request->brands_id,
+                    'model_series_id' => $request->model_series_id,
+                    'kerusakan' => $request->kerusakan,
+                    'qc_masuk' => $qc_masuk_data,
+                    'qc_keluar' => $qc_keluar_data,
+                    'uang_muka' => $request->uang_muka,
+                    'diskon' => $request->diskon,
+                    'cara_pembayaran' => $request->cara_pembayaran,
+                    'garansi'       => !empty($request->garansi) && isset($request->garansi[0]) ? $request->garansi[0] : null,
+                    'exp_garansi'   => !empty($expired) && isset($expired[0]) ? $expired[0] : null,
+                    'exp_garansi_j' => json_encode($expired ?? []),
+                    'tgl_ambil' => $request->tgl_ambil,
+                    'pengambil' => $request->pengambil,
+                    'pay' => $pay,
+                    'due' => $due,
+                    'tempo' => $tempo,
+                    'tunai' => $tunai,
+                    'transfer' => $transfer,
+                    'ppn' => $ppn ?? 0,
+                    'users_id' => $mainTechnicianId, // Penanggung Jawab Utama
+                    'catatan' => $request->catatan,
+                    'biaya' => $grandTotalBiaya,
+                    'modal_sparepart' => $grandTotalModal,
+                    'omzet' => $grandTotalBiaya,
+                    'profit' => $grandProfit,
+                    'tindakan_servis' => $mainTechDetails['tindakan'],
+                    'service_actions' => $mainTechDetails['actions_id'],
+                    'products_id' => $mainTechDetails['products_id'],
+                    'products' => $mainTechDetails['all_products'],
+                    'biaya_j' => $mainTechDetails['biaya_j'],
+                    'modal_j' => $mainTechDetails['modal_j']
+                ]);
+
             }
+
+            DB::commit();
+            toast('Data servis berhasil disimpan.', 'success');
+
+            return redirect()->route('transaksi-servis-sudah-diambil.index')->with('success', 'Data servis berhasil disimpan.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            dd($e->getMessage());
+            \Log::error("Error Multi Teknisi: " . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
 
-        $qc_masuk_final = json_encode($qc_masuk_data);
-        $qc_keluar_final = json_encode($qc_keluar_data);
-        // Transaction create
-        $item->update([
-            'created_at' => $request->created_at,
-            'tgl_disetujui' => $request->tgl_disetujui,
-            'users_id' => $request->users_id,
-            'penerima' => $request->penerima,
-            'customers_id' => $request->customers_id,
-            'nama_pelanggan' => $nama_pelanggan->nama,
-            'types_id' => $request->types_id,
-            'brands_id' => $request->brands_id,
-            'model_series_id' => $request->model_series_id,
-            'bonus_interface' => $bonus_interface,
-            'tipe' => $request->tipe,
-            'nama_barang' => $nama_barang,
-            'kerusakan' => $request->kerusakan,
-            'qc_masuk' => $qc_masuk_data,
-            'qc_keluar' => $qc_keluar_data,
-            'kondisi_servis' => $request->kondisi_servis,
-            'service_actions_id' => $request->service_actions_id,
-            'products_id' => $request->products_id,
-            'tindakan_servis' => $tindakan_servis,
-            'modal_sparepart' => $request->modal_sparepart,
-            'service_actions' => json_encode($request->service_actions_id),
-            'products' => json_encode($request->products_id),
-            'biaya_j' => $request->biaya_j,
-            'modal_j' => $request->modal_j,
-            'biaya' => $request->biaya,
-            'uang_muka' => $request->uang_muka,
-            'diskon' => $request->diskon,
-            'cara_pembayaran' => $request->cara_pembayaran,
-            'garansi'       => !empty($request->garansi) && isset($request->garansi[0]) ? $request->garansi[0] : null,
-            'exp_garansi'   => !empty($expired) && isset($expired[0]) ? $expired[0] : null,
-            'exp_garansi_j' => json_encode($expired ?? []),
-            'tgl_ambil' => $request->tgl_ambil,
-            'pengambil' => $request->pengambil,
-            'persen_teknisi' => $persen_teknisi,
-            'omzet' => $request->biaya - $request->diskon,
-            'profit' => $profittransaksi,
-            'pay' => $pay,
-            'due' => $due,
-            'tempo' => $tempo,
-            'tunai' => $tunai,
-            'transfer' => $transfer,
-            'ppn' => $ppn ?? 0,
-            'profittoko' => $profittransaksi - ($bagihasil *= $persen_teknisi),
-        ]);
-
-        return redirect()->route('transaksi-servis-sudah-diambil.index');
     }
 
     public function cetakinkjet($id)

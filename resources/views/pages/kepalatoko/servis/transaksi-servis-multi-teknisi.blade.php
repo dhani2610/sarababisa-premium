@@ -45,30 +45,87 @@
                         <input type="hidden" name="status_servis" value="Bisa Diambil"/>
                         <input type="hidden" name="tgl_selesai" value="<?php echo date('Y/m/d') ?>"/>
 
-                        <div class="px-5 py-4">
+
+                         <div class="px-5 py-4">
                             <div class="space-y-3">
-
-                                <div id="main-container">
-                                    {{-- Group Teknisi akan ditambahkan di sini via JS --}}
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="customers_id">Pelanggan</label>
+                                    <input id="customers_id" name="customers_id" class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->customer->nama }}" disabled />
                                 </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Nama Barang</label>
+                                    <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->type->name }} {{ $item->brand->name }} {{ $item->modelserie->name ?? '-' }}" disabled />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Warna & Kapasitas Barang</label>
+                                    <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->warna }} - {{ $item->capacity->name }}" disabled />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Kerusakan</label>
+                                    <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->kerusakan }}" disabled />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Pengecekan Fungsi</label>
 
-                                <div class="mb-4">
-                                    <button type="button" class="btn-sm bg-indigo-600 hover:bg-indigo-700 text-white w-full flex justify-center items-center" id="tambah-teknisi-baru">
-                                        <svg class="w-4 h-4 fill-current opacity-50 shrink-0 mr-2" viewBox="0 0 16 16">
-                                            <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-                                        </svg>
-                                        Tambah Teknisi Baru
-                                    </button>
+                                    <a href="{{ route('kepalatoko-cetak-qc', $item->id) }}" target="_blank" class="btn bg-indigo-500 hover:bg-indigo-600 text-white " title="Lihat PDF QC">
+                                        Lihat QC
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-5 py-4">
+                            <div class="space-y-3" x-data="{ showDetails: true }">
+
+                                <label class="block text-sm font-medium mb-1" for="kondisi_servis">Kondisi Servis <span class="text-rose-500">*</span></label>
+                                <div class="flex flex-wrap items-center -m-3">
+                                    <div class="m-3">
+                                        <!-- Start -->
+                                        <label class="flex items-center">
+                                            <input type="radio" name="kondisi_servis" value="Sudah jadi" class="form-radio" checked x-on:click="showDetails = true"/>
+                                            <span class="text-sm ml-2">Sudah jadi</span>
+                                        </label>
+                                        <!-- End -->
+                                    </div>
+                                    <div class="m-3">
+                                        <!-- Start -->
+                                        <label class="flex items-center">
+                                            <input type="radio" name="kondisi_servis" value="Menunggu konfirmasi" class="form-radio" x-on:click="showDetails = true"/>
+                                            <span class="text-sm ml-2">Menunggu konfirmasi</span>
+                                        </label>
+                                        <!-- End -->
+                                    </div>
+                                    <div class="m-3">
+                                        <!-- Start -->
+                                        <label class="flex items-center">
+                                            <input type="radio" name="kondisi_servis" value="Dibatalkan" class="form-radio" x-on:click="showDetails = false"/>
+                                            <span class="text-sm ml-2">Dibatalkan</span>
+                                        </label>
+                                        <!-- End -->
+                                    </div>
+                                </div>
+                                <div x-show="showDetails">
+                                    <div id="main-container" >
+                                        {{-- Group Teknisi akan ditambahkan di sini via JS --}}
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <button type="button" class="btn-sm bg-indigo-600 hover:bg-indigo-700 text-white w-full flex justify-center items-center" id="tambah-teknisi-baru">
+                                            <svg class="w-4 h-4 fill-current opacity-50 shrink-0 mr-2" viewBox="0 0 16 16">
+                                                <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
+                                            </svg>
+                                            Tambah Teknisi Baru
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div class="bg-slate-100 p-3 rounded">
                                     <div class="mb-2">
                                         <label class="block text-sm font-medium mb-1" for="total_modal_sparepart">Total Modal Sparepart <span class="text-rose-500">*</span></label>
-                                        <input class="form-input w-full px-2 py-1 bg-white" type="number" name="total_modal_sparepart" id="total_modal_sparepart" readonly required />
+                                        <input class="form-input w-full px-2 py-1 bg-white" type="number" name="total_modal_sparepart" id="total_modal_sparepart" required value="0" />
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya Servis (Ke Pelanggan) <span class="text-rose-500">*</span></label>
-                                        <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="number" name="biaya" id="biaya" readonly required />
+                                        <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="number" name="biaya" id="biaya" required  value="0"/>
                                     </div>
                                 </div>
 
@@ -206,8 +263,8 @@
                     <div class="bg-indigo-50 -m-4 mb-4 p-4 border-b border-indigo-100 rounded-t">
                         <h3 class="font-bold text-indigo-800 mb-2">Data Teknisi</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div><label class="block text-sm font-medium mb-1">Nama Teknisi <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][user_id]" class="form-select text-sm py-1 w-full selectUser" required>${teknisiOptions}</select></div>
-                            <div><label class="block text-sm font-medium mb-1">Tipe Bagi Hasil <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][tipe]" class="form-select text-sm py-1 w-full selectType" required><option selected value="">Pilih Tipe</option><option value="Interface">Interface (bonus pertipe)</option><option value="Hardware">Hardware & interface (bonus persen)</option></select></div>
+                            <div><label class="block text-sm font-medium mb-1">Nama Teknisi <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][user_id]" class="form-select text-sm py-1 w-full selectUser" >${teknisiOptions}</select></div>
+                            <div><label class="block text-sm font-medium mb-1">Tipe Bagi Hasil <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][tipe]" class="form-select text-sm py-1 w-full selectType" ><option selected value="">Pilih Tipe</option><option value="Interface">Interface (bonus pertipe)</option><option value="Hardware">Hardware & interface (bonus persen)</option></select></div>
                         </div>
                     </div>
                     <div class="actions-list-container space-y-3"></div>

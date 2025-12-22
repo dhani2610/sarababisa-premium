@@ -101,7 +101,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Pengecekan Fungsi</label>
-                                    
+
                                     <a href="{{ route('kepalatoko-cetak-qc', $item->id) }}" target="_blank" class="btn bg-indigo-500 hover:bg-indigo-600 text-white " title="Lihat PDF QC">
                                         Lihat QC
                                     </a>

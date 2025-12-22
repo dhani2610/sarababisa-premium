@@ -18,6 +18,7 @@ use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use App\Models\StoreSetting;
+use App\Models\TeknisiServis;
 use Illuminate\Support\Facades\Auth;
 
 class BisaDiambilController extends Controller
@@ -194,11 +195,53 @@ class BisaDiambilController extends Controller
                 };
                 return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 '.$color.'">'.e($row->kondisi_servis).'</div>';
             })
-            ->addColumn('tindakan', fn($r) => '<div class="font-medium">'.implode(', ', json_decode($r->tindakan_servis) ?? []).'</div>')
-            ->addColumn('teknisi', function ($r) {
-                return $r->user
-                    ? '<div class="font-medium">'.e($r->user->name).'</div>'
-                    : '<div class="font-medium text-red-600">-</div>';
+            ->addColumn('tindakan', function ($row) {
+                $teknisiServis = TeknisiServis::where('service_transactions_id', $row->id)->get();
+                
+                if ($teknisiServis->isEmpty()) {
+                    return '<div class="font-medium">'.implode(', ', json_decode($row->tindakan_servis) ?? []).'</div>';
+                } else {
+                    $tindakanArr = [];
+                    foreach ($teknisiServis as $ts) {
+                        $decodedItem = json_decode($ts->tindakan_servis);
+
+                        if (is_array($decodedItem)) {
+                            $tindakanArr = array_merge($tindakanArr, $decodedItem);
+                        } 
+                        elseif (!empty($ts->tindakan_servis)) { 
+                            $tindakanArr[] = $ts->tindakan_servis;
+                        }
+                    }
+                    
+                    $tindakanArr = array_unique($tindakanArr);
+
+                    return '<div class="font-medium">'.implode(', ', $tindakanArr).'</div>';
+                }
+            })
+            // ->addColumn('tindakan', fn($r) => '<div class="font-medium">'.implode(', ', json_decode($r->tindakan_servis) ?? []).'</div>')
+            ->addColumn('teknisi', function ($row) {
+
+                $teknisiServis = TeknisiServis::where('service_transactions_id', $row->id)->get();
+                
+                if ($teknisiServis->isEmpty()) {
+                    // return '<div class="font-medium">'.e($row->user->name).'</div>';
+                    return $row->user
+                        ? '<div class="font-medium">'.e($row->user->name).'</div>'
+                        : '<div class="font-medium text-red-600">-</div>';
+                } else {
+                    $tindakanArr = [];
+                    foreach ($teknisiServis as $ts) {
+                        $tindakanArr[] = $ts->teknisi->name ?? '-';
+                    }
+                    
+                    $tindakanArr = array_unique($tindakanArr);
+
+                    return '<div class="font-medium">'.implode(', ', $tindakanArr).'</div>';
+                }
+
+                // return $r->user
+                //     ? '<div class="font-medium">'.e($r->user->name).'</div>'
+                //     : '<div class="font-medium text-red-600">-</div>';
             })
             ->addColumn('modal_sparepart', function ($r) {
                 if (auth()->user()->role === 'Investor') return '';
