@@ -424,12 +424,14 @@ class AkunController extends Controller
         $total_cabang = Auth::user()->total_cabang;
 
 
-        $checkEmail = User::where('email', $request->email)->first();
-
-        if ($checkEmail) {
-
-            toast('Email sudah terdaftar, silahkan gunakan email lain.', 'error');
-            return redirect()->route('akun');
+        if ($request->email != null) {
+            $checkEmail = User::where('email', $request->email)->first();
+    
+            if ($checkEmail) {
+    
+                toast('Email sudah terdaftar, silahkan gunakan email lain.', 'error');
+                return redirect()->route('akun');
+            }
         }
 
         $data = [
