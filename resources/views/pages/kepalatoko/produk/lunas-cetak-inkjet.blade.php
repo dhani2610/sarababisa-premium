@@ -189,6 +189,7 @@
       <tr class="font">
         <th>No.</th>
         <th>Nama Produk</th>
+        <th>QC</th>
         <th>Keterangan</th>
         <th>Garansi</th>
         <th>Harga</th>
@@ -216,6 +217,9 @@
         @else
           {{ $item->product->product_name }}
         @endif
+        </td>
+        <td align="center" >
+            <a href="{{ route('qc-produk',$item->product->id) }}" target="_blank" rel="noopener noreferrer">{{ route('qc-produk',$item->product->id) }}</a>
         </td>
         <td align="center" style="text-transform: uppercase;">
           @if ($item->product->keterangan != null)
@@ -292,6 +296,8 @@
             $banks = old('banks', json_decode($users->banks ?? '[]', true));
         @endphp
       <td class="text-justify" style="font-style: italic; padding-right: 30px;">
+        Garansi : <a href="{{ env('APP_URL') }}/garansi" target="_blank" rel="noopener noreferrer">{{ env('APP_URL') }}/garansi</a>
+        <br>
         {!! $terms->description !!}
         @foreach ($banks as $index => $bank)
             <br><strong>No. Rekening : {{ $bank['rekening'] }}, {{ $bank['bank'] }} An.
