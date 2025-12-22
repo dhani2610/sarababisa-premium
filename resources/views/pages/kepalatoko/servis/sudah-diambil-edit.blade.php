@@ -198,69 +198,69 @@
 
                                 <div>
                                 
-                                 <div class="px-5 py-4">
-                            <div class="space-y-3" x-data="{ showDetails: true }">
+                                <div class="px-5 py-4">
+                                    <div class="space-y-3" x-data="{ showDetails: true }">
 
-                                <label class="block text-sm font-medium mb-1" for="kondisi_servis">Kondisi Servis <span class="text-rose-500">*</span></label>
-                                <div class="flex flex-wrap items-center -m-3">
-                                    <div class="m-3">
-                                        <!-- Start -->
-                                        <label class="flex items-center">
-                                            <input type="radio" name="kondisi_servis" value="Sudah jadi" class="form-radio" checked x-on:click="showDetails = true"/>
-                                            <span class="text-sm ml-2">Sudah jadi</span>
-                                        </label>
-                                        <!-- End -->
-                                    </div>
-                                    <div class="m-3">
-                                        <!-- Start -->
-                                        <label class="flex items-center">
-                                            <input type="radio" name="kondisi_servis" value="Menunggu konfirmasi" class="form-radio" x-on:click="showDetails = true"/>
-                                            <span class="text-sm ml-2">Menunggu konfirmasi</span>
-                                        </label>
-                                        <!-- End -->
-                                    </div>
-                                    <div class="m-3">
-                                        <!-- Start -->
-                                        <label class="flex items-center">
-                                            <input type="radio" name="kondisi_servis" value="Dibatalkan" class="form-radio" x-on:click="showDetails = false"/>
-                                            <span class="text-sm ml-2">Dibatalkan</span>
-                                        </label>
-                                        <!-- End -->
+                                        <label class="block text-sm font-medium mb-1" for="kondisi_servis">Kondisi Servis <span class="text-rose-500">*</span></label>
+                                        <div class="flex flex-wrap items-center -m-3">
+                                            <div class="m-3">
+                                                <!-- Start -->
+                                                <label class="flex items-center">
+                                                    <input type="radio" name="kondisi_servis" value="Sudah jadi" class="form-radio" checked x-on:click="showDetails = true"/>
+                                                    <span class="text-sm ml-2">Sudah jadi</span>
+                                                </label>
+                                                <!-- End -->
+                                            </div>
+                                            <div class="m-3">
+                                                <!-- Start -->
+                                                <label class="flex items-center">
+                                                    <input type="radio" name="kondisi_servis" value="Menunggu konfirmasi" class="form-radio" x-on:click="showDetails = true"/>
+                                                    <span class="text-sm ml-2">Menunggu konfirmasi</span>
+                                                </label>
+                                                <!-- End -->
+                                            </div>
+                                            <div class="m-3">
+                                                <!-- Start -->
+                                                <label class="flex items-center">
+                                                    <input type="radio" name="kondisi_servis" value="Dibatalkan" class="form-radio" x-on:click="showDetails = false"/>
+                                                    <span class="text-sm ml-2">Dibatalkan</span>
+                                                </label>
+                                                <!-- End -->
+                                            </div>
+                                        </div>
+                                        <div x-show="showDetails">
+                                            <div id="main-container" >
+                                                {{-- Group Teknisi akan ditambahkan di sini via JS --}}
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <button type="button" class="btn-sm bg-indigo-600 hover:bg-indigo-700 text-white w-full flex justify-center items-center" id="tambah-teknisi-baru">
+                                                    <svg class="w-4 h-4 fill-current opacity-50 shrink-0 mr-2" viewBox="0 0 16 16">
+                                                        <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
+                                                    </svg>
+                                                    Tambah Teknisi Baru
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="bg-slate-100 p-3 rounded">
+                                            <div class="mb-2">
+                                                <label class="block text-sm font-medium mb-1" for="total_modal_sparepart">Total Modal Sparepart <span class="text-rose-500">*</span></label>
+                                                <input class="form-input w-full px-2 py-1 bg-white" type="number" name="total_modal_sparepart" id="total_modal_sparepart" required value="0" />
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya Servis (Ke Pelanggan) <span class="text-rose-500">*</span></label>
+                                                <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="number" name="biaya" id="biaya" required  value="0"/>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1" for="catatan">Catatan <small>(Kosongkan jika tidak perlu)</small></label>
+                                            <textarea id="catatan" name="catatan" class="form-textarea w-full px-2 py-1" rows="2" placeholder="Tulis catatan untuk pelanggan..."></textarea>
+                                        </div>
+
                                     </div>
                                 </div>
-                                <div x-show="showDetails">
-                                    <div id="main-container" >
-                                        {{-- Group Teknisi akan ditambahkan di sini via JS --}}
-                                    </div>
-
-                                    <div class="mb-4">
-                                        <button type="button" class="btn-sm bg-indigo-600 hover:bg-indigo-700 text-white w-full flex justify-center items-center" id="tambah-teknisi-baru">
-                                            <svg class="w-4 h-4 fill-current opacity-50 shrink-0 mr-2" viewBox="0 0 16 16">
-                                                <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-                                            </svg>
-                                            Tambah Teknisi Baru
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="bg-slate-100 p-3 rounded">
-                                    <div class="mb-2">
-                                        <label class="block text-sm font-medium mb-1" for="total_modal_sparepart">Total Modal Sparepart <span class="text-rose-500">*</span></label>
-                                        <input class="form-input w-full px-2 py-1 bg-white" type="number" name="total_modal_sparepart" id="total_modal_sparepart" required value="0" />
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya Servis (Ke Pelanggan) <span class="text-rose-500">*</span></label>
-                                        <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="number" name="biaya" id="biaya" required  value="0"/>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-1" for="catatan">Catatan <small>(Kosongkan jika tidak perlu)</small></label>
-                                    <textarea id="catatan" name="catatan" class="form-textarea w-full px-2 py-1" rows="2" placeholder="Tulis catatan untuk pelanggan..."></textarea>
-                                </div>
-
-                            </div>
-                        </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="uang_muka">Uang Muka </label>
                                     <input id="uang_muka" name="uang_muka" class="form-input w-full px-2 py-1" type="number" value="{{ $item->uang_muka }}"/>
