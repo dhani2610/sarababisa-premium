@@ -304,7 +304,7 @@ class TransaksiServisLangsungController extends Controller
                     'brands_id' => $request->brands_id,
                     'model_series_id' => $request->model_series_id,
                     'bonus_interface' => $bonus_interface,
-                    'tipe' => $mainTechDetails['bagian_teknisi'],
+                    'tipe' => $tipeTeknisi,
                     'nama_barang' => $nama_barang,
                     'kerusakan' => $request->kerusakan,
                     'imei' => $request->imei,
@@ -316,7 +316,6 @@ class TransaksiServisLangsungController extends Controller
                     'penerima' => $request->penerima,
                     'users_id' => $mainTechnicianId, // Penanggung Jawab Utama
                     'kondisi_servis' => $request->kondisi_servis,
-                    'bagian_teknisi' => $mainTechDetails['bagian_teknisi'],
                     // 'service_actions_id' => $request->service_actions_id,
                     'tindakan_servis' => $mainTechDetails['tindakan'],
                     'modal_sparepart' => $grandTotalModal,
