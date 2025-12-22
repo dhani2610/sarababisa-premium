@@ -34,7 +34,7 @@ class ProdukController extends Controller
     }
     public function indexTop()
     {
-        return view('pages/admintoko/produk/top');
+        return view('pages/kepalatoko/produk/top');
     }
 
     public function getData(Request $request)
