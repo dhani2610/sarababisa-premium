@@ -13,7 +13,6 @@
     <style>
         @page {
             margin: 3mm 4mm 10mm 3mm;
-            /* Atur margin atas, kanan, bawah, dan kiri */
         }
 
         .text-center {
@@ -43,6 +42,7 @@
             text-align: left;
         }
 
+            /* Cari bagian ini di <style> */
         #detail td,
         #detail th,
         #detail tr,
@@ -55,6 +55,9 @@
             text-align: center;
             border: solid;
             word-wrap: break-word;
+
+            /* UBAH DARI 'top' MENJADI 'middle' */
+            vertical-align: middle;
         }
 
         #analisis td,
@@ -165,303 +168,199 @@
         </thead>
         <tbody>
             @php
-                $i = 1;
+                $no = 1;
             @endphp
             @foreach ($services as $item)
                 @php
-                    $teknisiServis = $item->teknisi_tambahan;
+                    // --- PREPARE DATA STRUCTURE (GROUPING) ---
+                    // Kita buat array yang terstruktur: Transaksi -> Teknisi -> Actions
 
-                    // $tindakan_servis = json_decode($item->tindakan_servis);
+                    $grouped_data = [];
+                    $total_rows_transaksi = 0; // Untuk Rowspan Utama
 
-                    $tindakan_servis = [];
-                    $biaya_j = [];
-                    $modal_j = [];
-                    $teknisi_display_arr = [];
+                    // Ambil relasi teknisi (sesuaikan dengan nama relasi di model Anda, contoh: teknisi_tambahan)
+                    $teknisiCollection = $item->teknisi_tambahan;
 
-                    if ($teknisiServis->isNotEmpty()) {
-                        foreach ($teknisiServis as $teknisi) {
-                            $list = json_decode($teknisi->tindakan_servis);
-
-                            if (is_array($list)) {
-                                $tindakan_servis = array_merge($tindakan_servis, $list);
+                    if ($teknisiCollection && $teknisiCollection->isNotEmpty()) {
+                        // KASUS 1: Ada data di tabel teknisi_servis
+                        foreach ($teknisiCollection as $tek) {
+                            $actions = json_decode($tek->tindakan_servis);
+                            if (!is_array($actions) || empty($actions)) {
+                                $actions = ['-']; // Fallback jika array kosong
                             }
 
-                            $biaya_multi = json_decode(str_replace(['“','”'], '"', $teknisi->biaya_j), true);
+                            // Decode Biaya & Modal per teknisi
+                            $biayas = json_decode(str_replace(['“','”'], '"', $tek->biaya_j), true);
+                            $modals = json_decode(str_replace(['“','”'], '"', $tek->modal_j), true);
 
-                            if (is_array($biaya_multi)) {
-                                $biaya_j = array_merge($biaya_j, $biaya_multi);
-                            }
-                            $modal_multi = json_decode(str_replace(['“','”'], '"', $teknisi->modal_j), true);
+                            $grouped_data[] = [
+                                'nama_teknisi' => $tek->teknisi->name ?? '-',
+                                'actions'      => $actions,
+                                'biayas'       => is_array($biayas) ? $biayas : [],
+                                'modals'       => is_array($modals) ? $modals : [],
+                            ];
 
-                            if (is_array($modal_multi)) {
-                                $modal_j = array_merge($modal_j, $modal_multi);
-                            }
-
-                            $teknisi_display_arr[] = $teknisi->teknisi->name ?? '-';
-
+                            $total_rows_transaksi += count($actions);
                         }
-
-                        $teknisi_display = implode(', ', $teknisi_display_arr);
                     } else {
-                        $list = json_decode($item->tindakan_servis);
+                        // KASUS 2: Tidak ada teknisi spesifik (Data Legacy/Lama/Single)
+                        // Ambil dari table service_transactions langsung
+                        $actions = json_decode($item->tindakan_servis);
+                        if (!is_array($actions)) {
+                             // Jika tindakan bukan array, cek kondisi servis
+                             $act_str = ($item->kondisi_servis != 'Sudah jadi') ? $item->kondisi_servis : ($item->tindakan_servis ?? '-');
+                             $actions = [$act_str];
+                        }
+                        if (empty($actions)) $actions = ['-'];
 
-                        if (is_array($list)) {
-                            $tindakan_servis = $list;
+                        $biayas = json_decode(str_replace(['“','”'], '"', $item->biaya_j), true);
+                        if(!is_array($biayas)) $biayas = [$item->biaya]; // fallback single value
+
+                        $modals = json_decode(str_replace(['“','”'], '"', $item->modal_j), true);
+                        if(!is_array($modals)) $modals = [$item->modal_sparepart]; // fallback single value
+
+                        // Tentukan nama teknisi fallback
+                        $nama_tek = '-';
+                        if ($item->user) {
+                            $nama_tek = $item->user->name;
+                        } elseif ($item->user()->withTrashed()->first()) {
+                            $nama_tek = $item->user()->withTrashed()->first()->name;
                         }
 
-                        $biaya_j = json_decode(str_replace(['“','”'], '"', $item->biaya_j), true);
-                        $modal_j = json_decode(str_replace(['“','”'], '"', $item->modal_j), true);
-
-                        if ($item->user){
-                            $teknisi_display = $item->user->name;
-                        }elseif ($item->user()->withTrashed()->first()){
-                            $teknisi_display = $item->user()->withTrashed()->first()->name;
-                        } else{
-                            $teknisi_display = '-';
-                        }
+                        $grouped_data[] = [
+                            'nama_teknisi' => $nama_tek,
+                            'actions'      => $actions,
+                            'biayas'       => $biayas,
+                            'modals'       => $modals,
+                        ];
+                        $total_rows_transaksi += count($actions);
                     }
-                    // dd($teknisi_display);
-
-
-                    // $biaya_j = json_decode($item->biaya_j);
-                    // $biaya_j = json_decode(str_replace(['“','”'], '"', $item->biaya_j), true);
-                    // $modal_j = json_decode(str_replace(['“','”'], '"', $item->modal_j), true);
-                    // $modal_j = json_decode($item->modal_j);
                 @endphp
-                @if ($tindakan_servis)
-                    <tr>
-                        <td style="width: 10px;" rowspan="{{ count($tindakan_servis) }}">{{ $i++ }}</td>
-                        <td class="text-center" style="width: 60px;" rowspan="{{ count($tindakan_servis) }}">
-                            {{ $item->nomor_servis }}</td>
-                        <td style="text-align: left; width: 70px;" class="capital"
-                            rowspan="{{ count($tindakan_servis) }}">{{ $item->nama_pelanggan }}</td>
-                        {{-- @if ($item->user)
-                            <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
-                                {{ $item->user->name }}
-                            </td>
-                        @elseif ($item->user()->withTrashed()->first())
-                            <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
-                                {{ $item->user()->withTrashed()->first()->name }}
-                            </td>
-                        @else
-                            <td style="text-align: center; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
-                                -
-                            </td>
-                        @endif --}}
-                        <td style="text-align: center; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
-                                {{  $teknisi_display  }}
-                        </td>
-                        <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
-                            @if ($item->modelserie)
-                                {{ $item->modelserie->name ?? '-' }}
-                            @else
-                                -
-                            @endif
-                        </td>
-                        <td class="" style="text-align: left; width: 80px;">
-                            @if ($item->kondisi_servis != 'Sudah jadi')
-                                {{ $item->kondisi_servis }}
-                            @else
-                                {{ $tindakan_servis[0] }}
-                            @endif
-                        </td>
 
-                        @php
-                            $biayaj_convert = is_array($biaya_j) ? ($biaya_j[0] ?? 0) : $biaya_j;
-                            $modal_convert = is_array($modal_j) ? ($modal_j[0] ?? 0) : $modal_j;
-                        @endphp
-                        <td style="width: 60px; text-align: right;">
-                            Rp. {{ number_format($modal_convert) }}
-                        </td>
-                        {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($modal_j[0]) }}
-                        </td> --}}
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($biayaj_convert) }}</td>
-                        {{-- <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td> --}}
-                        <td style="width: 50px; text-align: right;" rowspan="{{ count($tindakan_servis) }}">Rp. {{ number_format($item->diskon) }}</td>
-                        <td style="width: 60px; text-align: right;">Rp.
-                            {{ number_format($biayaj_convert - $modal_convert - $item->diskon) }}</td>
+                {{-- START LOOPING TAMPILAN --}}
+                @php
+                    $isFirstRowTransaction = true;
+                @endphp
 
-                        <td class="" rowspan="{{ count($tindakan_servis) }}"
-                            style="text-align: left; width: 80px;">
-                            @php
-                                $metode = [];
-                                if ($item->tunai > 0) {
-                                    $metode[] =
-                                        '<div>
-                        <strong>Tunai:</strong><br>
-                        Rp.' .
-                                        number_format($item->tunai, 0, ',', '.') .
-                                        '
-                     </div>';
-                                }
-                                if ($item->transfer > 0) {
-                                    $metode[] =
-                                        '<div>
-                        <strong>Transfer:</strong><br>
-                        Rp.' .
-                                        number_format($item->transfer, 0, ',', '.') .
-                                        '
-                     </div>';
-                                }
-                            @endphp
-                            @if ($item->kondisi_servis == 'Dibatalkan')
-                                @php
-                                    if ($item->uang_muka > 0 && $item->modal_sparepart > 0) {
-                                        $label = 'Modal - DP:';
-                                        $nilai = $item->uang_muka - $item->modal_sparepart;
-                                    } elseif ($item->uang_muka > 0 && $item->biaya > 0) {
-                                        $label = 'Modal - DP:';
-                                        $nilai = $item->uang_muka - $item->biaya;
-                                    } elseif ($item->uang_muka > 0) {
-                                        $label = 'Uang Muka:';
-                                        $nilai = $item->uang_muka;
-                                    } elseif ($item->modal_sparepart > 0) {
-                                        $label = 'Modal:';
-                                        $nilai = $item->modal_sparepart;
-                                    } else {
-                                        $label = '';
-                                        $nilai = 0;
-                                    }
-                                @endphp
+                @foreach ($grouped_data as $group)
+                    @php
+                        $tek_rowspan = count($group['actions']);
+                        $isFirstRowTeknisi = true;
+                    @endphp
 
-                                <div>
-                                    <strong>{{ $label }}</strong><br>
-                                    Rp.-{{ number_format($nilai, 0, ',', '.') }}
-                                </div>
-                            @else
-                            {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
-                            @endif
-
-                        </td>
-                    </tr>
-                    @for ($k = 1; $k < count($tindakan_servis); $k++)
+                    @foreach ($group['actions'] as $index => $action)
                         <tr>
+                            {{-- KOLOM UTAMA (Hanya muncul di baris pertama transaksi) --}}
+                            @if ($isFirstRowTransaction)
+                                <td style="width: 10px;" rowspan="{{ $total_rows_transaksi }}">{{ $no++ }}</td>
+                                <td class="text-center" style="width: 60px;" rowspan="{{ $total_rows_transaksi }}">
+                                    {{ $item->nomor_servis }}
+                                </td>
+                                <td style="text-align: left; width: 70px;" class="capital" rowspan="{{ $total_rows_transaksi }}">
+                                    {{ $item->nama_pelanggan }}
+                                </td>
+                            @endif
+
+                            {{-- KOLOM TEKNISI (Hanya muncul di baris pertama tiap teknisi) --}}
+                            @if ($isFirstRowTeknisi)
+                                <td style="text-align: center; width: 70px;" rowspan="{{ $tek_rowspan }}">
+                                    {{ $group['nama_teknisi'] }}
+                                </td>
+                            @endif
+
+                            {{-- KOLOM MODEL SERI (Hanya muncul di baris pertama transaksi - sesuai design asli user) --}}
+                            {{-- Tapi karena layout teknisi memecah baris, model seri sebaiknya ikut rowspan UTAMA agar rapi --}}
+                            @if ($isFirstRowTransaction)
+                                <td style="text-align: left; width: 70px;" rowspan="{{ $total_rows_transaksi }}">
+                                    {{ $item->modelserie->name ?? '-' }}
+                                </td>
+                            @endif
+
+                            {{-- KOLOM TINDAKAN (Selalu muncul per baris) --}}
                             <td class="" style="text-align: left; width: 80px;">
-                                @if ($item->kondisi_servis != 'Sudah jadi')
+                                @if ($item->kondisi_servis != 'Sudah jadi' && $isFirstRowTransaction && count($grouped_data) == 1 && count($group['actions']) == 1)
+                                    {{-- Handle jika status bukan sudah jadi --}}
                                     {{ $item->kondisi_servis }}
                                 @else
-                                    {{ $tindakan_servis[$k] }}
+                                    {{ $action }}
                                 @endif
                             </td>
-                            {{-- <td class="" style="text-align: left; width: 80px;">
-                                @php
-                                    $metode = [];
-                                    if ($item->tunai > 0) {
-                                        $metode[] = 'Tunai: Rp ' . number_format($item->tunai, 0, ',', '.');
-                                    }
-                                    if ($item->transfer > 0) {
-                                        $metode[] = 'Transfer: Rp ' . number_format($item->transfer, 0, ',', '.');
-                                    }
-                                @endphp
-                                {!! implode('<br><hr style="margin: 2px 0;">', $metode) !!}
-                            </td> --}}
-                            <td style="width: 60px; text-align: right;">Rp.
-                                {{ number_format($modal_j[$k]) }}
-                            </td>
-                            <td style="width: 60px; text-align: right;">Rp. {{ number_format($biaya_j[$k]) }}</td>
-                            {{-- <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td> --}}
-                            {{-- <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->profit) }}</td> --}}
-                            <td style="width: 60px; text-align: right;">Rp.
-                                {{ number_format($biaya_j[$k] - $modal_j[$k]) }}</td>
-                        </tr>
-                    @endfor
-                @else
-                    <tr>
-                        <td style="width: 10px;">{{ $i++ }}</td>
-                        <td class="text-center" style="width: 60px;">{{ $item->nomor_servis }}</td>
-                        <td style="text-align: left; width: 70px;" class="capital">{{ $item->nama_pelanggan }}</td>
-                        @if ($item->user)
-                            <td style="text-align: left; width: 70px;">
-                                {{ $item->user->name }}
-                            </td>
-                        @elseif ($item->user()->withTrashed()->first())
-                            <td style="text-align: left; width: 70px;">
-                                {{ $item->user()->withTrashed()->first()->name }}
-                            </td>
-                        @else
-                            <td style="text-align: center; width: 70px;">
-                                -
-                            </td>
-                        @endif
-                        <td style="text-align: left; width: 70px;">
-                            @if ($item->modelserie)
-                                {{ $item->modelserie->name ?? '-' }}
-                            @else
-                                -
-                            @endif
-                        </td>
-                        <td class="" style="text-align: left; width: 80px;">
-                            @if ($item->kondisi_servis != 'Sudah jadi')
-                                {{ $item->kondisi_servis }}
-                            @else
-                                {{-- {{ json_decode($tindakan_servis) ? implode(', ', json_decode($tindakan_servis)) : $tindakan_servis }} --}}
-                                @foreach ($tindakan_servis as $t)
-                                    {{ $t }},
-                                @endforeach
-                            @endif
-                        </td>
 
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}
-                        </td>
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td>
-                        <td style="width: 50px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
-                        <td style="width: 60px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
-
-                        <td class="" style="text-align: left; width: 80px;">
+                            {{-- PREPARE VALUE HARGA --}}
                             @php
-                                $metode = [];
-                                if ($item->tunai > 0) {
-                                    $metode[] =
-                                        '<div>
-                        <strong>Tunai:</strong><br>
-                        Rp.' .
-                                        number_format($item->tunai, 0, ',', '.') .
-                                        '
-                     </div>';
-                                }
-                                if ($item->transfer > 0) {
-                                    $metode[] =
-                                        '<div>
-                        <strong>Transfer:</strong><br>
-                        Rp.' .
-                                        number_format($item->transfer, 0, ',', '.') .
-                                        '
-                     </div>';
-                                }
+                                $val_modal = $group['modals'][$index] ?? 0;
+                                $val_biaya = $group['biayas'][$index] ?? 0;
                             @endphp
-                            @if ($item->kondisi_servis == 'Dibatalkan')
-                                @php
-                                    if ($item->uang_muka > 0 && $item->modal_sparepart > 0) {
-                                        $label = 'Modal - DP:';
-                                        $nilai = $item->uang_muka - $item->modal_sparepart;
-                                    } elseif ($item->uang_muka > 0 && $item->biaya > 0) {
-                                        $label = 'Modal - DP:';
-                                        $nilai = $item->uang_muka - $item->biaya;
-                                    } elseif ($item->uang_muka > 0) {
-                                        $label = 'Uang Muka:';
-                                        $nilai = $item->uang_muka;
-                                    } elseif ($item->modal_sparepart > 0) {
-                                        $label = 'Modal:';
-                                        $nilai = $item->modal_sparepart;
-                                    } else {
-                                        $label = '';
-                                        $nilai = 0;
-                                    }
-                                @endphp
 
-                                <div>
-                                    <strong>{{ $label }}</strong><br>
-                                    Rp.-{{ number_format($nilai, 0, ',', '.') }}
-                                </div>
+                            {{-- KOLOM MODAL & BIAYA (Selalu muncul per baris) --}}
+                            <td style="width: 60px; text-align: right;">
+                                Rp. {{ number_format($val_modal) }}
+                            </td>
+                            <td style="width: 60px; text-align: right;">
+                                Rp. {{ number_format($val_biaya) }}
+                            </td>
 
-
-                            @else
-                            {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
+                            {{-- KOLOM DISKON (Rowspan Utama - Diskon biasanya per transaksi) --}}
+                            @if ($isFirstRowTransaction)
+                                <td style="width: 50px; text-align: right;" rowspan="{{ $total_rows_transaksi }}">
+                                    Rp. {{ number_format($item->diskon) }}
+                                </td>
                             @endif
 
-                        </td>
-                    </tr>
-                @endif
+                            {{-- KOLOM PROFIT (Per Baris) --}}
+                            {{-- Note: Rumus asli user dikurangi diskon per item. Hati-hati jika diskon global --}}
+                            <td style="width: 60px; text-align: right;">
+                                Rp. {{ number_format($val_biaya - $val_modal - ($isFirstRowTransaction ? $item->diskon : 0)) }}
+                                {{-- Logic Profit diatas: Diskon hanya mengurangi baris pertama agar tidak double counting pengurangan profit, atau sesuaikan dengan logika bisnis Anda --}}
+                            </td>
+
+                            {{-- KOLOM PEMBAYARAN (Rowspan Utama) --}}
+                            @if ($isFirstRowTransaction)
+                                <td class="" rowspan="{{ $total_rows_transaksi }}" style="text-align: left; width: 80px;">
+                                    @php
+                                        $metode = [];
+                                        if ($item->tunai > 0) {
+                                            $metode[] = '<div><strong>Tunai:</strong><br>Rp.' . number_format($item->tunai, 0, ',', '.') . '</div>';
+                                        }
+                                        if ($item->transfer > 0) {
+                                            $metode[] = '<div><strong>Transfer:</strong><br>Rp.' . number_format($item->transfer, 0, ',', '.') . '</div>';
+                                        }
+                                    @endphp
+
+                                    @if ($item->kondisi_servis == 'Dibatalkan')
+                                        @php
+                                            $label = ''; $nilai = 0;
+                                            if ($item->uang_muka > 0 && $item->modal_sparepart > 0) {
+                                                $label = 'Modal - DP:';
+                                                $nilai = $item->uang_muka - $item->modal_sparepart;
+                                            } elseif ($item->uang_muka > 0 && $item->biaya > 0) {
+                                                $label = 'Modal - DP:';
+                                                $nilai = $item->uang_muka - $item->biaya;
+                                            } elseif ($item->uang_muka > 0) {
+                                                $label = 'Uang Muka:';
+                                                $nilai = $item->uang_muka;
+                                            } elseif ($item->modal_sparepart > 0) {
+                                                $label = 'Modal:';
+                                                $nilai = $item->modal_sparepart;
+                                            }
+                                        @endphp
+                                        <div>
+                                            <strong>{{ $label }}</strong><br>
+                                            Rp.-{{ number_format($nilai, 0, ',', '.') }}
+                                        </div>
+                                    @else
+                                        {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
+                                    @endif
+                                </td>
+                            @endif
+                        </tr>
+
+                        @php
+                            $isFirstRowTransaction = false; // Baris selanjutnya bukan baris pertama transaksi
+                            $isFirstRowTeknisi = false;     // Baris selanjutnya bukan baris pertama teknisi ini
+                        @endphp
+                    @endforeach
+                @endforeach
             @endforeach
         </tbody>
     </table>
@@ -481,20 +380,16 @@
                 <th>Kerusakan</th>
                 <th>Estimasi Biaya</th>
                 <th>Uang Muka</th>
-                {{-- <th>Pembayaran</th> --}}
             </tr>
         </thead>
         <tbody>
-            @php
-                $i = 1;
-            @endphp
             @foreach ($servicesDP as $item)
                 <tr>
                     <td style="width: 10px;">{{ $loop->iteration }}</td>
                     <td>{{ $item->nomor_servis }}</td>
                     <td>{{ $item->nama_pelanggan }}</td>
                     <td>{{ $item->penerima }}</td>
-                    <td>{{ $item->modelserie->name ?? '-' ?? '-' }}</td>
+                    <td>{{ $item->modelserie->name ?? '-' }}</td>
                     <td>{{ $item->kerusakan }}</td>
                     <td>Rp. {{ number_format($item->estimasi_biaya) }}</td>
                     <td>Rp. {{ number_format($item->uang_muka) }}</td>
@@ -520,9 +415,6 @@
             </tr>
         </thead>
         <tbody>
-            @php
-                $i = 1;
-            @endphp
             @foreach ($pengeluaran_data as $item)
                 <tr>
                     <td style="width: 10px;">{{ $loop->iteration }}</td>
@@ -547,10 +439,10 @@
                     <td>Rp. {{ number_format($item->price) }}</td>
                 </tr>
             @endforeach
-             <tr>
-				<th colspan="5">Total Biaya</th>
-				<td style="text-align: right;">Rp. {{ number_format($total_pengeluaran) }}</td>
-			</tr>
+            <tr>
+                <th colspan="5">Total Biaya</th>
+                <td style="text-align: right;">Rp. {{ number_format($total_pengeluaran) }}</td>
+            </tr>
         </tbody>
     </table>
     <hr>
@@ -569,44 +461,27 @@
             </tr>
         </thead>
         <tbody>
-                <!-- Row -->
-            @php
-                $i = 1
-            @endphp
             @foreach($insiden as $itemsiden)
                 <tr>
+                    <td class="">{{ $loop->iteration }}</td>
+                    <td class="">{{ \Carbon\Carbon::parse($itemsiden->created_at)->translatedFormat('d F Y') }}</td>
                     <td class="">
-                        {{ $i++ }}
-                    </td>
-                    <td class="">
-                        {{ \Carbon\Carbon::parse($itemsiden->created_at)->translatedFormat('d F Y') }}
-                    </td>
-                    <td class="">
-                        @if ($itemsiden->worker)
-                            @if ($itemsiden->worker->exists())
-                                {{ $itemsiden->worker->name }}
-                            @else
-                                Data karyawan telah dihapus
-                            @endif
+                        @if ($itemsiden->worker && $itemsiden->worker->exists())
+                            {{ $itemsiden->worker->name }}
                         @else
                             Data karyawan telah dihapus
                         @endif
                     </td>
-                    <td class="">
-                        {{ $itemsiden->name }}
-                    </td>
-                    <td class="">
-                        {{ number_format($itemsiden->price) }}
-                    </td>
+                    <td class="">{{ $itemsiden->name }}</td>
+                    <td class="">{{ number_format($itemsiden->price) }}</td>
                 </tr>
             @endforeach
-             <tr>
-				<th colspan="4">Total Biaya</th>
-				<td style="text-align: right;">Rp. {{ number_format($total_insiden) }}</td>
-			</tr>
+            <tr>
+                <th colspan="4">Total Biaya</th>
+                <td style="text-align: right;">Rp. {{ number_format($total_insiden) }}</td>
+            </tr>
         </tbody>
     </table>
 
 </body>
-
 </html>
