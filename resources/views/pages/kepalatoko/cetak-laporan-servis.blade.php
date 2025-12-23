@@ -169,7 +169,7 @@
             @endphp
             @foreach ($services as $item)
                 @php
-                    $teknisiServis = \App\Models\TeknisiServis::where('service_transactions_id', $item->id)->get();
+                    $teknisiServis = $item->teknisi_tambahan;
 
                     // $tindakan_servis = json_decode($item->tindakan_servis);
 

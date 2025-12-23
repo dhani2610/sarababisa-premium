@@ -161,7 +161,7 @@ class LaporanServisController extends Controller
         $end_date = $request->end_date;
 
         // Mengambil data servis
-        $services = ServiceTransaction::with('brand', 'modelserie', 'user')->where('status_servis', 'Sudah Diambil')
+        $services = ServiceTransaction::with('brand', 'modelserie', 'user','teknisi_tambahan')->where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
             ->where('cabang_id',getCabangId())
