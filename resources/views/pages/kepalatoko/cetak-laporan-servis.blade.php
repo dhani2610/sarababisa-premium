@@ -394,7 +394,10 @@
                             @if ($item->kondisi_servis != 'Sudah jadi')
                                 {{ $item->kondisi_servis }}
                             @else
-                                {{ json_decode($tindakan_servis) ? implode(', ', json_decode($tindakan_servis)) : $tindakan_servis }}
+                                {{-- {{ json_decode($tindakan_servis) ? implode(', ', json_decode($tindakan_servis)) : $tindakan_servis }} --}}
+                                @foreach ($tindakan_servis as $t)
+                                    {{ $t }},
+                                @endforeach
                             @endif
                         </td>
 
