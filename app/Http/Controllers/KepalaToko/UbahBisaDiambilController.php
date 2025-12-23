@@ -311,6 +311,7 @@ class UbahBisaDiambilController extends Controller
 
                     // Reset variable per teknisi
                     $list_tindakan_text = [];
+                    $list_garansi = [];
                     $arr_service_actions_id = [];
                     $arr_products_id = [];
                     $arr_biaya_servis = [];
@@ -323,6 +324,19 @@ class UbahBisaDiambilController extends Controller
                         // --- 2. LOOP TINDAKAN ---
                         if (isset($techData['tindakan']) && is_array($techData['tindakan'])) {
                             foreach ($techData['tindakan'] as $action) {
+
+                                $garansi_data = $action['garansi'] ?? 0;
+
+                                $garansi = Carbon::now();
+                                if ($garansi_data != null) {
+                                    $garansi_servis = $garansi->addDays(
+                                        $garansi_data
+                                    );
+                                } else {
+                                    $garansi_servis = null;
+                                }
+
+                                $list_garansi[] = $garansi_servis;
 
                                 $act_id = $action['service_actions_id'] ?? null;
                                 $manual_act = $action['tindakan_servis'] ?? null;
@@ -397,7 +411,8 @@ class UbahBisaDiambilController extends Controller
                             'service_actions' => json_encode($arr_service_actions_id),
                             'products' => json_encode($arr_products_id),
                             'biaya_j' => json_encode($arr_biaya_servis),
-                            'modal_j' => json_encode($arr_modal_sparepart)
+                            'modal_j' => json_encode($arr_modal_sparepart),
+                            'garansi' => !empty($list_garansi) ? json_encode($list_garansi) : null,
                         ]);
                     }
 
@@ -414,7 +429,12 @@ class UbahBisaDiambilController extends Controller
                             'products_id' => $arr_products_id[0] ?? null,
                             'all_products' => json_encode($arr_products_id),
                             'biaya_j' => json_encode($arr_biaya_servis),
-                            'modal_j' => json_encode($arr_modal_sparepart)
+                            'modal_j' => json_encode($arr_modal_sparepart),
+                            'garansi' => !empty($garansi_data) ? $garansi_data[0] ?? null : null,
+                            'exp_garansi' => !empty($list_garansi) ? $list_garansi[0] ?? null : null,
+                            'exp_garansi_j' => !empty($list_garansi) ? json_encode($list_garansi) : null,
+                            'bagian_teknisi' => $cekTeknisi->bagian_teknisi,
+                            'tipe_teknisi' => $tipeTeknisi,
                         ];
                     }
 
@@ -437,12 +457,18 @@ class UbahBisaDiambilController extends Controller
                     'products_id' => $mainTechDetails['products_id'],
                     'products' => $mainTechDetails['all_products'],
                     'biaya_j' => $mainTechDetails['biaya_j'],
-                    'modal_j' => $mainTechDetails['modal_j']
+                    'modal_j' => $mainTechDetails['modal_j'],
+                    'tipe' => $mainTechDetails['tipe_teknisi'],
+                    'garansi' => $mainTechDetails['garansi'],
+                    'exp_garansi' => $mainTechDetails['exp_garansi'],
+                    'exp_garansi_j' => json_encode($mainTechDetails['exp_garansi_j']),
                 ]);
 
             }
 
             DB::commit();
+
+            // dd($itemOrigin);
             toast('Data servis berhasil disimpan.', 'success');
 
             return redirect()->route('transaksi-servis.index')->with('success', 'Data servis berhasil disimpan.');

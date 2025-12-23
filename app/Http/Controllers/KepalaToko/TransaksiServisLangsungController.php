@@ -45,6 +45,7 @@ class TransaksiServisLangsungController extends Controller
         DB::beginTransaction();
 
         try {
+
             if ($request->has('teknisi') && is_array($request->teknisi)) {
 
                 $grandTotalBiaya = 0;
@@ -79,6 +80,7 @@ class TransaksiServisLangsungController extends Controller
 
                     // Reset variable per teknisi
                     $list_tindakan_text = [];
+                    $list_garansi = [];
                     $arr_service_actions_id = [];
                     $arr_products_id = [];
                     $arr_biaya_servis = [];
@@ -92,15 +94,28 @@ class TransaksiServisLangsungController extends Controller
                         if (isset($techData['tindakan']) && is_array($techData['tindakan'])) {
                             foreach ($techData['tindakan'] as $action) {
 
+
+                                $garansi_data = $action['garansi'] ?? 0;
+
+                                $garansi = Carbon::now();
+                                if ($garansi_data != null) {
+                                    $garansi_servis = $garansi->addDays(
+                                        $garansi_data
+                                    );
+                                } else {
+                                    $garansi_servis = null;
+                                }
+
+                                $list_garansi[] = $garansi_servis;
+
                                 $act_id = $action['service_actions_id'] ?? null;
                                 $manual_act = $action['tindakan_servis'] ?? null;
                                 $prod_id = $action['products_id'] ?? null;
                                 $sales_id = $action['sales_id'] ?? 1;
-
                                 $biaya = filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
                                 $modal = filter_var($action['modal_sparepart'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
 
-                                // Ambil Nama Tindakan
+
                                 $nama_tindakan = null;
                                 if (!empty($act_id)) {
                                     $actDb = ServiceAction::find($act_id);
@@ -122,7 +137,6 @@ class TransaksiServisLangsungController extends Controller
                             }
                         }
                     }
-
                     // --- 4. HITUNG PROFIT PER TEKNISI ---
                     $profitTransaksi = $subTotalBiaya - $subTotalModal;
                     $nilaiBagiHasil = ($profitTransaksi) / 100;
@@ -138,10 +152,15 @@ class TransaksiServisLangsungController extends Controller
                         }
                     }
 
+                    // dd($request->all(),$request->kondisi_servis,$userId);
+
+
                     // --- 6. AKUMULASI GRAND TOTAL ---
                     $grandTotalBiaya += $subTotalBiaya;
                     $grandTotalModal += $subTotalModal;
 
+
+                    // Ambil Nama Tindakan
                     // Jika ini Teknisi Utama, simpan detailnya untuk update tabel Induk (Legacy)
                     if ($index === 0) {
                         $mainTechDetails = [
@@ -151,21 +170,28 @@ class TransaksiServisLangsungController extends Controller
                             'all_products' => json_encode($arr_products_id),
                             'biaya_j' => json_encode($arr_biaya_servis),
                             'modal_j' => json_encode($arr_modal_sparepart),
-                            'bagian_teknisi' => $cekTeknisi->bagian_teknisi
+                            'garansi' => !empty($garansi_data) ? $garansi_data[0] ?? null : null,
+                            'exp_garansi' => !empty($list_garansi) ? $list_garansi[0] ?? null : null,
+                            'exp_garansi_j' => !empty($list_garansi) ? json_encode($list_garansi) : null,
+                            'bagian_teknisi' => $cekTeknisi->bagian_teknisi,
+                            'tipe_teknisi' => $tipeTeknisi,
                         ];
                     }
 
                 } // End Foreach
 
+                // dd($request->all(),$mainTechDetails);
+
+
                 $grandProfit = $grandTotalBiaya - $grandTotalModal;
-                $garansi = Carbon::now();
-                if ($request->garansi != null) {
-                    $expired = $garansi->addDays(
-                        $request->garansi
-                    );
-                } else {
-                    $expired = null;
-                }
+                // $garansi = Carbon::now();
+                // if ($request->garansi != null) {
+                //     $expired = $garansi->addDays(
+                //         $request->garansi
+                //     );
+                // } else {
+                //     $expired = null;
+                // }
 
                 $modalSparepart = $request->total_modal_sparepart;
                 $biaya = $request->biaya ?? 0;
@@ -247,20 +273,8 @@ class TransaksiServisLangsungController extends Controller
                     $tempo = null;
                 }
 
-                $expired = [];
-                if ($request->garansi != null) {
-                    if (count($request->garansi) > 0) {
-                        foreach ($request->garansi as $val) {
-                            array_push($expired, Carbon::now()->addDays(
-                                $val
-                            ));
-                        }
-                    } else {
-                        $expired = null;
-                    }
-                }else{
-                    $expired = null;
-                }
+
+                // dd($request->all(),$expired);
 
                 if ($request->kondisi_servis == 'Dibatalkan') {
                     $finalModal = $request->total_modal_sparepart;
@@ -304,7 +318,7 @@ class TransaksiServisLangsungController extends Controller
                     'brands_id' => $request->brands_id,
                     'model_series_id' => $request->model_series_id,
                     'bonus_interface' => $bonus_interface,
-                    'tipe' => $tipeTeknisi,
+                    'tipe' => $mainTechDetails['tipe_teknisi'],
                     'nama_barang' => $nama_barang,
                     'kerusakan' => $request->kerusakan,
                     'imei' => $request->imei,
@@ -329,9 +343,10 @@ class TransaksiServisLangsungController extends Controller
                     'qc_keluar' => $qc_keluar_final,
                     'cara_pembayaran' => $request->cara_pembayaran,
                     'diskon' => $request->diskon,
-                    'garansi' => !empty($request->garansi) ? $request->garansi[0] : null,
-                    'exp_garansi' => !empty($expired) ? $expired[0] : null,
-                    'exp_garansi_j' => json_encode($expired),
+                    // 'garansi' => !empty($request->garansi) ? $request->garansi[0] : null,
+                    'garansi' => $mainTechDetails['garansi'],
+                    'exp_garansi' => $mainTechDetails['exp_garansi'],
+                    'exp_garansi_j' => json_encode($mainTechDetails['exp_garansi_j']),
                     'is_admin_toko' => Auth::user()->role == 'Admin Toko' ? 'Admin' : null,
                     'is_approve' => Auth::user()->role == 'Kepala Toko' ? 'Setuju' : null,
                     'tgl_disetujui' => $request->tgl_disetujui,
@@ -394,6 +409,7 @@ class TransaksiServisLangsungController extends Controller
 
                         // Reset variable per teknisi
                         $list_tindakan_text = [];
+                        $list_garansi = [];
                         $arr_service_actions_id = [];
                         $arr_products_id = [];
                         $arr_biaya_servis = [];
@@ -406,6 +422,19 @@ class TransaksiServisLangsungController extends Controller
                             // --- 2. LOOP TINDAKAN ---
                             if (isset($techData['tindakan']) && is_array($techData['tindakan'])) {
                                 foreach ($techData['tindakan'] as $action) {
+
+                                    $garansi_data = $action['garansi'] ?? 0;
+
+                                    $garansi = Carbon::now();
+                                    if ($garansi_data != null) {
+                                        $garansi_servis = $garansi->addDays(
+                                            $garansi_data
+                                        );
+                                    } else {
+                                        $garansi_servis = null;
+                                    }
+
+                                    $list_garansi[] = $garansi_servis;
 
                                     $act_id = $action['service_actions_id'] ?? null;
                                     $manual_act = $action['tindakan_servis'] ?? null;
@@ -473,13 +502,15 @@ class TransaksiServisLangsungController extends Controller
                                 'profittoko' => $profitToko,
                                 'persen_teknisi' => $persen_teknisi,
                                 'bonus_interface' => $bonus_interface,
+                                'garansi' => $expired[$index] ?? null,
 
                                 // Detail JSON
                                 'tindakan_servis' => count($list_tindakan_text) > 0 ? json_encode($list_tindakan_text) : null,
                                 'service_actions' => json_encode($arr_service_actions_id),
                                 'products' => json_encode($arr_products_id),
                                 'biaya_j' => json_encode($arr_biaya_servis),
-                                'modal_j' => json_encode($arr_modal_sparepart)
+                                'modal_j' => json_encode($arr_modal_sparepart),
+                                'garansi' => !empty($list_garansi) ? json_encode($list_garansi) : null,
                             ]);
                         }
 
@@ -489,7 +520,7 @@ class TransaksiServisLangsungController extends Controller
 
 
                 }
-             
+
 
 
             }
@@ -599,7 +630,7 @@ class TransaksiServisLangsungController extends Controller
         } else {
             $persen_teknisi = null;
         }
-        
+
 
         // --- BLOK LOGIKA YANG DIPERBAIKI ---
         $tindakan_servis = []; // 1. Inisialisasi sebagai array kosong

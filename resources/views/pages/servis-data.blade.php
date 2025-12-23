@@ -127,19 +127,19 @@
                                         <li class="flex justify-between border-b border-slate-100 pb-1"><span>Pengecekan Fungsi (QC):</span> <span class="text-slate-800"><a target="_blank" href="{{ route('kepalatoko-cetak-qc', $item->id) }}">{{ route('kepalatoko-cetak-qc', $item->id) }}</a></span></li>
                                     </ul>
 
-                                  
+
                                 </div>
 
                                 <div>
                                     <h4 class="font-semibold text-slate-800 mt-5 mb-3">Tindakan Servis & Rincian Biaya</h4>
-
+                                    {{-- @dd($teknisiServis); --}}
                                     @if(isset($teknisiServis) && count($teknisiServis) > 0)
-                                        
+
                                         {{-- === TAMPILAN MULTI TEKNISI === --}}
                                         <div class="space-y-4">
                                             @foreach($teknisiServis as $ts)
                                                 <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 text-sm shadow-sm">
-                                                    
+
                                                     {{-- Header: Nama Teknisi --}}
                                                     <div class="flex items-center gap-2 mb-3 border-b border-indigo-200 pb-2">
                                                         <div class="bg-indigo-100 p-1 rounded-full">
@@ -152,22 +152,41 @@
 
                                                     {{-- Prepare Data --}}
                                                     @php
-                                                        $actions = json_decode($ts->tindakan_servis) ?? [];
-                                                        $costs   = json_decode($ts->biaya_j) ?? [];
-                                                        
-                                                        $prods   = json_decode($ts->products) ?? [];
-                                                        $modals  = json_decode($ts->modal_j) ?? []; // Ambil data harga modal
+                                                        $actions    = json_decode($ts->tindakan_servis) ?? [];
+                                                        $costs      = json_decode($ts->biaya_j) ?? [];
+                                                        $warranties = json_decode($ts->garansi) ?? [];
+
+                                                        $prods      = json_decode($ts->products) ?? [];
                                                     @endphp
 
                                                     {{-- 1. List Tindakan (Jasa) --}}
                                                     @if(count($actions) > 0)
                                                         <div class="mb-3">
                                                             <span class="text-xs font-bold text-slate-400 uppercase mb-1 block">Tindakan Servis</span>
-                                                            <div class="space-y-1">
+                                                            <div class="space-y-2"> {{-- Ubah space-y-1 jadi space-y-2 biar agak lega --}}
                                                                 @foreach($actions as $key => $act)
-                                                                    <div class="flex justify-between items-start border-b border-indigo-100 last:border-0 pb-1 last:pb-0">
-                                                                        <span class="text-slate-700 font-medium pl-1">• {{ $act }}</span>
-                                                                        <span class="text-slate-900 font-semibold whitespace-nowrap">Rp {{ number_format($costs[$key] ?? 0) }}</span>
+                                                                    <div class="border-b border-indigo-100 last:border-0 pb-2 last:pb-0">
+
+                                                                        {{-- Baris Nama & Harga --}}
+                                                                        <div class="flex justify-between items-start">
+                                                                            <span class="text-slate-700 font-medium pl-1">• {{ $act }}</span>
+                                                                            <span class="text-slate-900 font-semibold whitespace-nowrap">Rp {{ number_format($costs[$key] ?? 0) }}</span>
+                                                                        </div>
+
+                                                                        @php
+                                                                            $garansiDate = $warranties[$key] ?? null;
+                                                                        @endphp
+
+                                                                        <div class="pl-4 mt-0.5 text-xs">
+                                                                            @if($garansiDate)
+                                                                                <span class="text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 inline-block">
+                                                                                    Garansi s/d {{ \Carbon\Carbon::parse($garansiDate)->translatedFormat('d M Y') }}
+                                                                                </span>
+                                                                            @else
+                                                                                <span class="text-slate-400 italic">Tidak ada garansi</span>
+                                                                            @endif
+                                                                        </div>
+
                                                                     </div>
                                                                 @endforeach
                                                             </div>
@@ -175,29 +194,25 @@
                                                     @endif
 
                                                     {{-- 2. List Sparepart & Harga --}}
-                                                    @if(count($prods) > 0)
+                                                    {{-- @if(count($prods) > 0)
                                                         <div class="mt-3 pt-2 border-t border-indigo-200">
                                                             <span class="text-xs font-bold text-slate-400 uppercase mb-1 block">Sparepart Digunakan</span>
                                                             <div class="flex flex-col gap-1">
                                                                 @foreach($prods as $key => $pid)
                                                                     @php
-                                                                        // Ambil nama produk
                                                                         $productName = \App\Models\Product::find($pid)->product_name ?? 'Item #'.$pid;
-                                                                        // Ambil harga modal berdasarkan index key yang sama
-                                                                        $productPrice = $modals[$key] ?? 0;
                                                                     @endphp
+                                                                    @if (!empty($productName))
                                                                     <div class="flex justify-between items-center bg-white px-2 py-1.5 rounded border border-indigo-100">
-                                                                        <span class="text-indigo-600 text-xs font-medium truncate pr-2 w-3/4">
+                                                                        <span class="text-indigo-600 text-xs font-medium truncate pr-2 w-full">
                                                                             {{ $productName }}
                                                                         </span>
-                                                                        <span class="text-slate-700 text-xs font-bold whitespace-nowrap">
-                                                                            Rp {{ number_format($productPrice) }}
-                                                                        </span>
                                                                     </div>
+                                                                    @endif
                                                                 @endforeach
                                                             </div>
                                                         </div>
-                                                    @endif
+                                                    @endif --}}
                                                 </div>
                                             @endforeach
                                         </div>

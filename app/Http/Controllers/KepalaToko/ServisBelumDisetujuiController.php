@@ -406,7 +406,7 @@ class ServisBelumDisetujuiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-   
+
     public function updateOld(Request $request, $id)
     {
         $item = ServiceTransaction::findOrFail($id);
@@ -617,6 +617,7 @@ class ServisBelumDisetujuiController extends Controller
 
                     // Reset variable per teknisi
                     $list_tindakan_text = [];
+                    $list_garansi = [];
                     $arr_service_actions_id = [];
                     $arr_products_id = [];
                     $arr_biaya_servis = [];
@@ -629,6 +630,19 @@ class ServisBelumDisetujuiController extends Controller
                         // --- 2. LOOP TINDAKAN ---
                         if (isset($techData['tindakan']) && is_array($techData['tindakan'])) {
                             foreach ($techData['tindakan'] as $action) {
+
+                                $garansi_data = $action['garansi'] ?? 0;
+
+                                $garansi = Carbon::now();
+                                if ($garansi_data != null) {
+                                    $garansi_servis = $garansi->addDays(
+                                        $garansi_data
+                                    );
+                                } else {
+                                    $garansi_servis = null;
+                                }
+
+                                $list_garansi[] = $garansi_servis;
 
                                 $act_id = $action['service_actions_id'] ?? null;
                                 $manual_act = $action['tindakan_servis'] ?? null;
@@ -684,7 +698,7 @@ class ServisBelumDisetujuiController extends Controller
                             $bonus_interface = $nama_model->nominal_bonus ?? 0;
                         }
                     }
-                 
+
                     if ($request->kondisi_servis !== 'Dibatalkan' && $userId) {
                         TeknisiServis::create([
                             'service_transactions_id' => $itemOrigin->id,
@@ -696,13 +710,14 @@ class ServisBelumDisetujuiController extends Controller
                             'profittoko' => $profitToko,
                             'persen_teknisi' => $persen_teknisi,
                             'bonus_interface' => $bonus_interface,
-                           
+
                             // Detail JSON
                             'tindakan_servis' => count($list_tindakan_text) > 0 ? json_encode($list_tindakan_text) : null,
                             'service_actions' => json_encode($arr_service_actions_id),
                             'products' => json_encode($arr_products_id),
                             'biaya_j' => json_encode($arr_biaya_servis),
-                            'modal_j' => json_encode($arr_modal_sparepart)
+                            'modal_j' => json_encode($arr_modal_sparepart),
+                            'garansi' => !empty($list_garansi) ? json_encode($list_garansi) : null,
                         ]);
                     }
 
@@ -719,7 +734,12 @@ class ServisBelumDisetujuiController extends Controller
                             'products_id' => $arr_products_id[0] ?? null,
                             'all_products' => json_encode($arr_products_id),
                             'biaya_j' => json_encode($arr_biaya_servis),
-                            'modal_j' => json_encode($arr_modal_sparepart)
+                            'modal_j' => json_encode($arr_modal_sparepart),
+                            'garansi' => !empty($garansi_data) ? $garansi_data[0] ?? null : null,
+                            'exp_garansi' => !empty($list_garansi) ? $list_garansi[0] ?? null : null,
+                            'exp_garansi_j' => !empty($list_garansi) ? json_encode($list_garansi) : null,
+                            'bagian_teknisi' => $cekTeknisi->bagian_teknisi,
+                            'tipe_teknisi' => $tipeTeknisi,
                         ];
                     }
 
@@ -731,7 +751,7 @@ class ServisBelumDisetujuiController extends Controller
                 $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
                 $nama_pelanggan = Customer::find($request->customers_id);
 
-                
+
                 $ppn = 0;
                 $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
                 if (!empty($cekppn) && $cekppn->is_tax == 1) {
@@ -834,6 +854,8 @@ class ServisBelumDisetujuiController extends Controller
                     'kondisi_servis' => $request->kondisi_servis,
                     'tgl_selesai' => $request->tgl_selesai,
                     'penerima' => $request->penerima,
+                    'qc_masuk' => $qc_masuk_final,
+                    'qc_keluar' => $qc_keluar_final,
                     'customers_id' => $request->customers_id,
                     'nama_pelanggan' => $nama_pelanggan->nama,
                     'types_id' => $request->types_id,
@@ -845,9 +867,10 @@ class ServisBelumDisetujuiController extends Controller
                     'uang_muka' => $request->uang_muka,
                     'diskon' => $request->diskon,
                     'cara_pembayaran' => $request->cara_pembayaran,
-                    'garansi'       => !empty($request->garansi) && isset($request->garansi[0]) ? $request->garansi[0] : null,
-                    'exp_garansi'   => !empty($expired) && isset($expired[0]) ? $expired[0] : null,
-                    'exp_garansi_j' => json_encode($expired ?? []),
+                    'tipe' => $mainTechDetails['tipe_teknisi'],
+                    'garansi' => $mainTechDetails['garansi'],
+                    'exp_garansi' => $mainTechDetails['exp_garansi'],
+                    'exp_garansi_j' => json_encode($mainTechDetails['exp_garansi_j']),
                     'tgl_ambil' => $request->tgl_ambil,
                     'pengambil' => $request->pengambil,
                     'pay' => $pay,

@@ -26,6 +26,7 @@ class TeknisiServis extends Model
         'products',
         'biaya_j',
         'modal_j',
+        'garansi',
     ];
 
     // Relasi balik ke Transaksi Utama

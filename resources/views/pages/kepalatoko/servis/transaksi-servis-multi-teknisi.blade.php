@@ -237,6 +237,39 @@
                             <input class="form-input w-full px-2 py-1 input-manual-text" type="text" name="teknisi[${groupIndex}][tindakan][${actionIndex}][tindakan_servis]" placeholder="Ketik manual..."/>
                         </div>
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1"
+                            for="garansi">Garansi</label>
+                        <select name="teknisi[${groupIndex}][tindakan][${actionIndex}][garansi]"
+                            class="form-select text-sm py-1 w-full">
+                            <option value="">Tidak Ada</option>
+                            <option value="1">1 Hari</option>
+                            <option value="2">2 Hari</option>
+                            <option value="3">3 Hari</option>
+                            <option value="4">4 Hari</option>
+                            <option value="5">5 Hari</option>
+                            <option value="6">6 Hari</option>
+                            <option value="7">1 Minggu</option>
+                            <option value="14">2 Minggu</option>
+                            <option value="21">3 Minggu</option>
+                            <option value="30">1 Bulan</option>
+                            <option value="60">2 Bulan</option>
+                            <option value="90">3 Bulan</option>
+                            <option value="120">4 Bulan</option>
+                            <option value="150">5 Bulan</option>
+                            <option value="180">6 Bulan</option>
+                            <option value="210">7 Bulan</option>
+                            <option value="240">8 Bulan</option>
+                            <option value="270">9 Bulan</option>
+                            <option value="300">10 Bulan</option>
+                            <option value="330">11 Bulan</option>
+                            <option value="365">1 Tahun</option>
+                            <option value="730">2 Tahun</option>
+                            <option value="1095">3 Tahun</option>
+                            <option value="1460">4 Tahun</option>
+                            <option value="1825">5 Tahun</option>
+                        </select>
+                    </div>
                     <div class="konfirmasi-stok border-t border-slate-200 pt-2 mt-2">
                         <label class="block text-sm font-medium mb-1">Pakai Sparepart Toko?</label>
                         <div class="flex flex-wrap items-center -m-3 mb-2">
