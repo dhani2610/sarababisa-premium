@@ -169,20 +169,73 @@
             @endphp
             @foreach ($services as $item)
                 @php
-                    $tindakan_servis = json_decode($item->tindakan_servis);
+                    $teknisiServis = \App\Models\TeknisiServis::where('service_transactions_id', $item->id)->get();
+
+                    // $tindakan_servis = json_decode($item->tindakan_servis);
+
+                    $tindakan_servis = [];
+                    $biaya_j = [];
+                    $modal_j = [];
+                    $teknisi_display_arr = [];
+
+                    if ($teknisiServis->isNotEmpty()) {
+                        foreach ($teknisiServis as $teknisi) {
+                            $list = json_decode($teknisi->tindakan_servis);
+
+                            if (is_array($list)) {
+                                $tindakan_servis = array_merge($tindakan_servis, $list);
+                            }
+
+                            $biaya_multi = json_decode(str_replace(['“','”'], '"', $teknisi->biaya_j), true);
+
+                            if (is_array($biaya_multi)) {
+                                $biaya_j = array_merge($biaya_j, $biaya_multi);
+                            }
+                            $modal_multi = json_decode(str_replace(['“','”'], '"', $teknisi->modal_j), true);
+
+                            if (is_array($modal_multi)) {
+                                $modal_j = array_merge($modal_j, $modal_multi);
+                            }
+
+                            $teknisi_display_arr[] = $teknisi->teknisi->name ?? '-';
+
+                        }
+
+                        $teknisi_display = implode(', ', $teknisi_display_arr);
+                    } else {
+                        $list = json_decode($item->tindakan_servis);
+
+                        if (is_array($list)) {
+                            $tindakan_servis = $list;
+                        }
+
+                        $biaya_j = json_decode(str_replace(['“','”'], '"', $item->biaya_j), true);
+                        $modal_j = json_decode(str_replace(['“','”'], '"', $item->modal_j), true);
+
+                        if ($item->user){
+                            $teknisi_display = $item->user->name;
+                        }elseif ($item->user()->withTrashed()->first()){
+                            $teknisi_display = $item->user()->withTrashed()->first()->name;
+                        } else{
+                            $teknisi_display = '-';
+                        }
+                    }
+                    // dd($teknisi_display);
+
+
                     // $biaya_j = json_decode($item->biaya_j);
-                    $biaya_j = json_decode(str_replace(['“','”'], '"', $item->biaya_j), true);
-                    $modal_j = json_decode(str_replace(['“','”'], '"', $item->modal_j), true);
+                    // $biaya_j = json_decode(str_replace(['“','”'], '"', $item->biaya_j), true);
+                    // $modal_j = json_decode(str_replace(['“','”'], '"', $item->modal_j), true);
                     // $modal_j = json_decode($item->modal_j);
                 @endphp
-                @if (json_decode($item->tindakan_servis))
+                @if ($tindakan_servis)
                     <tr>
                         <td style="width: 10px;" rowspan="{{ count($tindakan_servis) }}">{{ $i++ }}</td>
                         <td class="text-center" style="width: 60px;" rowspan="{{ count($tindakan_servis) }}">
                             {{ $item->nomor_servis }}</td>
                         <td style="text-align: left; width: 70px;" class="capital"
                             rowspan="{{ count($tindakan_servis) }}">{{ $item->nama_pelanggan }}</td>
-                        @if ($item->user)
+                        {{-- @if ($item->user)
                             <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
                                 {{ $item->user->name }}
                             </td>
@@ -194,7 +247,10 @@
                             <td style="text-align: center; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
                                 -
                             </td>
-                        @endif
+                        @endif --}}
+                        <td style="text-align: center; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
+                                {{  $teknisi_display  }}
+                        </td>
                         <td style="text-align: left; width: 70px;" rowspan="{{ count($tindakan_servis) }}">
                             @if ($item->modelserie)
                                 {{ $item->modelserie->name ?? '-' }}
@@ -338,7 +394,7 @@
                             @if ($item->kondisi_servis != 'Sudah jadi')
                                 {{ $item->kondisi_servis }}
                             @else
-                                {{ json_decode($item->tindakan_servis) ? implode(', ', json_decode($item->tindakan_servis)) : $item->tindakan_servis }}
+                                {{ json_decode($tindakan_servis) ? implode(', ', json_decode($tindakan_servis)) : $tindakan_servis }}
                             @endif
                         </td>
 
