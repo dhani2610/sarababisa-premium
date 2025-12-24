@@ -350,7 +350,7 @@ Route::get('master/master-absensi/export', [AttendanceController::class, 'export
     // 4. Proses Simpan Password (POST)
     Route::post('/lupa-password/update', [DirectPasswordResetController::class, 'updatePassword'])->name('direct.reset.update');
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja'])->group(function () {
-    Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk-kepala-toko');
+    Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTopNew'])->name('top-produk-kepala-toko');
 
     Route::get('/dashboard', [KepalaTokoDashboardController::class, 'index'])->name('kepalatoko-dashboard');
     Route::get('/dashboard-cabang', [KepalaTokoDashboardCabangController::class, 'index'])->name('kepalatoko-dashboard-cabang');

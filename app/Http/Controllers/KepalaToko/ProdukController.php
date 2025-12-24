@@ -33,7 +33,7 @@ class ProdukController extends Controller
         return view('pages/kepalatoko/produk/index',compact('toko'));
     }
 
-    public function indexTop()
+    public function indexTopNew()
     {
         return view('pages/kepalatoko/produk/top');
     }
