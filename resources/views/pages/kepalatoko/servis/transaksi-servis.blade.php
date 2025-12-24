@@ -331,7 +331,7 @@
                 });
             });
         </script>
-        <script>
+        {{-- <script>
             $(document).on('change', '.pilih-tindakan select', function() {
                 var serviceActionId = $(this).val();
                 const myEl = $(this)
@@ -648,6 +648,6 @@
                     }
                 });
             });
-        </script>
+        </script> --}}
     @endpush
 </x-toko-layout>
