@@ -23,6 +23,27 @@ class UbahBisaDiambilController extends Controller
     {
         $item = ServiceTransaction::findOrFail($id);
         $teknisiServis = TeknisiServis::where('service_transactions_id', $id)->get();
+        if ($teknisiServis->isEmpty()) {
+            $dummyTeknisi = new TeknisiServis();
+
+            $dummyTeknisi->service_transactions_id = $item->id;
+            $dummyTeknisi->users_id = $item->users_id; // Teknisi utama
+            $dummyTeknisi->tipe = $item->tipe; // Hardware/Software
+            $dummyTeknisi->modal_sparepart = $item->modal_sparepart;
+            $dummyTeknisi->biaya = $item->biaya;
+            $dummyTeknisi->profit = $item->profit;
+            $dummyTeknisi->profittoko = $item->profittoko;
+            $dummyTeknisi->bonus_interface = $item->bonus_interface;
+            $dummyTeknisi->persen_teknisi = $item->persen_teknisi;
+            $dummyTeknisi->tindakan_servis = $item->tindakan_servis;
+            $dummyTeknisi->garansi = $item->exp_garansi_j; // Sesuaikan nama kolom
+            $dummyTeknisi->service_actions = $item->service_actions;
+            $dummyTeknisi->products = $item->products;
+            $dummyTeknisi->biaya_j = $item->biaya_j;
+            $dummyTeknisi->modal_j = $item->modal_j;
+
+            $teknisiServis->push($dummyTeknisi);
+        }
         // return response()->json($teknisiServis);
         $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
         $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
