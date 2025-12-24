@@ -388,7 +388,7 @@
     <table>
         <tr>
             <th class="text-right w-75"></th>
-            <th class="text-right w-75" colspan="2">
+            <th class="text-right w-75" colspan="4">
                 <i><span style="font-size: 10px; font-weight: normal;"><b>Terbilang : {{ terbilang($totalWithPpn) }}</b></span></i>
             </th>
         </tr>
