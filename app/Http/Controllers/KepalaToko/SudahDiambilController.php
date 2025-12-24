@@ -1270,27 +1270,29 @@ class SudahDiambilController extends Controller
         $namaPelanggan = $items->customer->nama;
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         $teknisiServis = TeknisiServis::where('service_transactions_id', $id)->get();
-        if(count($teknisiServis) > 0){
+        // if(count($teknisiServis) > 0){
 
-            $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet-multi-teknisi', [
+        //     $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet-multi-teknisi', [
+        //     // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
+        //         'users' => $users,
+        //         'items' => $items,
+        //         'terms' => $terms,
+        //         'toko' => $toko,
+        //         'imagePath' => $imagePath,
+        //     ]);
+        // }else{
+            // $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
+            $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet-new', [
             // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
                 'users' => $users,
                 'items' => $items,
                 'terms' => $terms,
                 'toko' => $toko,
                 'imagePath' => $imagePath,
-            ]);
-        }else{
-            $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
-            // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
-                'users' => $users,
-                'items' => $items,
-                'terms' => $terms,
-                'toko' => $toko,
-                'imagePath' => $imagePath,
+                'teknisiServis' => $teknisiServis,
             ]);
 
-        }
+        // }
 
         $filename = 'Nota Pengambilan ' . $invoiceNumber . ' ' . '(' . $namaPelanggan . ')' . '.pdf';
 

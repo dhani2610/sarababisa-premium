@@ -96,7 +96,7 @@
                         ({{ $users->deskripsi_toko }})</strong> <br>
                     {{ $users->alamat_toko }} - {{ $users->nomor_hp_toko }}
                     @foreach ($phones as $index => $phone)
-                        | {{ $phone['title'] }} : {{ $phone['nomor'] }} 
+                        | {{ $phone['title'] }} : {{ $phone['nomor'] }}
                     @endforeach
                 </td>
             @endif
