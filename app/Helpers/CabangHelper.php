@@ -23,9 +23,9 @@ if (!function_exists('getCabang')) {
     {
         if (Auth::check()) {
             if (Auth::user()->id == 1) {
-                $data = Cabang::orderBy('nama_cabang','asc')->get();
+                $data = Cabang::orderBy('id','asc')->get();
             }else{
-                $data = Cabang::orderBy('nama_cabang','asc')->where('id',Auth::user()->cabang_id)->get();
+                $data = Cabang::orderBy('id','asc')->where('id',Auth::user()->cabang_id)->get();
             }
         }
 

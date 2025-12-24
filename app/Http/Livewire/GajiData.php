@@ -31,16 +31,16 @@ class GajiData extends Component
 
     public function render()
     {
-        $workers = Worker::all();
-        $users = User::whereNot('role', 'Kepala Toko')->get();
-        $salaries_count = Salary::all()->count();
+        $workers = Worker::where('cabang_id',getCabangId())->get();
+        $users = User::where('cabang_id',getCabangId())->whereNotIn('role', ['Kepala Toko','Investor'])->get();
+        $salaries_count = Salary::where('cabang_id',getCabangId())->get()->count();
         return view('livewire.gaji-data', [
             'workers' => $workers,
             'users' => $users,
             'salaries_count' => $salaries_count,
             'worker_users' => $this->search === null ?
-                Salary::latest()->paginate($this->paginate) :
-                Salary::latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Salary::where('cabang_id',getCabangId())->latest()->paginate($this->paginate) :
+                Salary::where('cabang_id',getCabangId())->latest()->where('name', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }
