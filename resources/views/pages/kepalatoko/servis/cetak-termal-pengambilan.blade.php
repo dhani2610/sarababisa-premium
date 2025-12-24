@@ -138,65 +138,107 @@
                         @else
                             {{ $items->tindakan_servis }}
                         @endif --}}
-                        @if (json_decode($items->tindakan_servis))
-                            @php
-                                $tindakans = json_decode($items->tindakan_servis, true);
-                                $garansi = json_decode($items->exp_garansi_j, true);
-                            @endphp
+                        @php
+                            // Variabel Penampung Akhir
+                            $finalTindakan = [];
+                            $finalGaransi = [];
+                            $finalBiaya = [];
 
-                            <ul style="padding-left: 4px; margin-left: 0;">
-                                @foreach ($tindakans as $key => $item)
-                                    @php
+                            // Cek apakah ada data TeknisiServis
+                            $useTeknisi = (isset($teknisiServis) && count($teknisiServis) > 0);
+
+                            if ($useTeknisi) {
+                                // LOOPING DARI TEKNISISERVIS
+                                foreach ($teknisiServis as $tek) {
+                                    // 1. Tindakan
+                                    $t = json_decode($tek->tindakan_servis, true);
+                                    if (is_string($t)) $t = json_decode($t, true);
+                                    if (is_array($t)) $finalTindakan = array_merge($finalTindakan, $t);
+
+                                    // 2. Garansi
+                                    $g = json_decode($tek->garansi, true);
+                                    if (is_string($g)) $g = json_decode($g, true);
+                                    if (is_array($g)) $finalGaransi = array_merge($finalGaransi, $g);
+
+                                    // 3. Biaya
+                                    $b = json_decode($tek->biaya_j, true);
+                                    if (is_string($b)) $b = json_decode($b, true);
+                                    if (is_array($b)) $finalBiaya = array_merge($finalBiaya, $b);
+                                }
+                            } else {
+                                // FALLBACK KE ITEMS (JIKA TEKNISI KOSONG)
+                                $t = json_decode($items->tindakan_servis, true);
+                                if (is_string($t)) $t = json_decode($t, true);
+                                $finalTindakan = is_array($t) ? $t : [];
+
+                                $g = json_decode($items->exp_garansi_j, true);
+                                if (is_string($g)) $g = json_decode($g, true);
+                                $finalGaransi = is_array($g) ? $g : [];
+
+                                $b = json_decode($items->biaya_j, true);
+                                if (is_string($b)) $b = json_decode($b, true);
+                                $finalBiaya = is_array($b) ? $b : [];
+                            }
+
+                            // --- HELPER FUNCTION UNTUK RENDER HTML ---
+
+                            // 1. Render Tindakan
+                            $tindakanList = function() use ($finalTindakan, $finalGaransi, $items, $useTeknisi) {
+                                if (!empty($finalTindakan)) {
+                                    foreach ($finalTindakan as $key => $tindakan) {
+                                        $garansiDate = $finalGaransi[$key] ?? null;
+
                                         $garansiText = 'Garansi tidak ada';
-                                        if (isset($garansi[$key]) && !empty($garansi[$key])) {
+                                        if ($garansiDate) {
                                             try {
-                                                $tanggal = \Carbon\Carbon::create($garansi[$key]);
-                                                $garansiText = 'Garansi ' . $tanggal->format('d-m-Y');
+                                                $garansiText = 'Garansi ' . \Carbon\Carbon::parse($garansiDate)->translatedFormat('d F Y');
                                             } catch (\Exception $e) {
-                                                // Tanggal tidak valid, biarkan "Garansi tidak ada"
+                                                $garansiText = 'Garansi -';
                                             }
                                         }
-                                    @endphp
-                                    <li style="margin-top: 5px;">
-                                        {{ $item }} <br />
-                                        (<b>{{ $garansiText }}</b>)<br />
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            {{ $items->tindakan_servis }}
-                        @endif
+                                        echo '<ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
+                                                <li style="margin-bottom: 6px">'. $tindakan .' (<strong>'. $garansiText .'</strong>)</li>
+                                            </ul>';
+                                    }
+                                } else {
+                                    if (!$useTeknisi) echo ': ' . $items->tindakan_servis;
+                                }
+                            };
+
+                            // 2. Render Rincian Biaya (DENGAN LINK DETAIL DIBAWAHNYA)
+                            $rincianBiaya = function() use ($finalBiaya, $finalTindakan, $items) {
+                                if (!empty($finalBiaya)) {
+
+                                    // Loop rincian biaya
+                                    foreach ($finalBiaya as $key => $biaya) {
+                                        $tindakanName = $finalTindakan[$key] ?? '-';
+                                        echo '<ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
+                                                <li style="margin-bottom: 6px">'. $tindakanName .' = Rp. '. number_format((float)$biaya) .'</li>
+                                            </ul>';
+                                    }
+
+                                    // Tambahan Link Detail Rincian
+                                    $linkUrl = route('servis-detail', $items->id);
+                                    echo '<span style="margin-left: 10px; font-size: 10px;">Link Detail: <a href="' . $linkUrl . '">' . $linkUrl . '</a></span>';
+
+                                }
+                            };
+                            // dd($tindakanList);
+                        @endphp
+                        {{ $tindakanList() }}
+                       
                     </td>
                 </tr>
-                @if (json_decode($items->biaya_j))
+                {{-- @if (json_decode($items->biaya_j)) --}}
                     <tr>
                         <td class="title">Rincian Biaya Servis</td>
                         <td class="value">
-                            @foreach (json_decode($items->biaya_j) as $key => $biaya)
-                                <ul style="margin: 0; padding: 0; margin-left: 10px; margin-top: 3px;">
-                                    <li style="margin-bottom: 6px">
-                                        {{-- @if (isset($items->tindakan_servis[$key]))
-                                        {{ json_decode($items->tindakan_servis)[$key] . ' = Rp. ' . number_format($biaya) }}
-                                        @else
-                                        -
-                                        @endif --}}
-                                        @php
-                                            $tindakan = json_decode($items->tindakan_servis, true);
-                                        @endphp
 
-                                        @if(isset($tindakan[$key]))
-                                            {{ $tindakan[$key] . ' = Rp. ' . number_format($biaya) }}
-                                        @else
-                                            -
-                                        @endif
-
-                                    </li>
-                                </ul>
-                            @endforeach
+                            {{ $rincianBiaya() }}
                         </td>
                     </tr>
 
-                @endif
+                {{-- @endif --}}
                 <tr>
                     <td class="title">Biaya Servis</td>
                     <td class="value">: Rp. {{ number_format($items->biaya) }}</td>

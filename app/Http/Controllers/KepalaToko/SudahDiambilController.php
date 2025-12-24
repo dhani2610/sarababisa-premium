@@ -616,6 +616,7 @@ class SudahDiambilController extends Controller
         $invoiceNumber = $items->nomor_servis;
         $namaPelanggan = $items->customer->nama;
         $toko = StoreSetting::where('cabang_id', getCabangId())->first();
+        $teknisiServis = TeknisiServis::where('service_transactions_id', $id)->get();
 
         $pdf = PDF::loadView('pages.kepalatoko.servis.cetak-termal-pengambilan', [
         // return View('pages.kepalatoko.servis.cetak-termal-pengambilan', [
@@ -623,6 +624,7 @@ class SudahDiambilController extends Controller
             'users' => $users,
             'items' => $items,
             'imagePath' => $imagePath,
+            'teknisiServis' => $teknisiServis,
         ]);
 
         $filename = 'Nota Pengambilan ' . $invoiceNumber . ' ' . '(' . $namaPelanggan . ')' . '.pdf';
