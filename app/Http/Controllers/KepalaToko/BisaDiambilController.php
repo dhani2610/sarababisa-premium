@@ -558,8 +558,8 @@ class BisaDiambilController extends Controller
         })->where('stok', '>=', 1)->get();
         $capacities = Capacity::where('cabang_id',getCabangId())->get();
         $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
-        $workers = Worker::where('cabang_id',getCabangId())->where('jabatan', 'like', '%' . 'teknisi')->get();
-
+        $workers = Worker::where('cabang_id',getCabangId())->whereIn('id', $users->pluck('workers_id'))->get();
+        // dd($workers);
 
          // 1. Decode JSON ke Array
         $qcMasuk = $item->qc_masuk ? json_decode($item->qc_masuk, true) : [];
