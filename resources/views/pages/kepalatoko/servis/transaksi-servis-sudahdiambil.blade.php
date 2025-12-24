@@ -110,7 +110,7 @@
                                     <input
                                         class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                                         type="text"
-                                        value="{{ json_decode($item->tindakan_servis) ? implode(',', json_decode($item->tindakan_servis)) : $item->tindakan_servis }}"
+                                        value="{{ !empty($viewTindakan) ? implode(', ', $viewTindakan) : '-' }}"
                                         disabled />
                                 </div>
                                 <div>
@@ -325,8 +325,8 @@
 </x-toko-layout>
 <script>
     // Struktur: [ArrayStandar, ObjectMasuk, ObjectKeluar]
-    const fullData = @json([$qcItems, $qcMasuk, $qcKeluar]); 
-    
+    const fullData = @json([$qcItems, $qcMasuk, $qcKeluar]);
+
     // Pecah data ke variabel biar mudah dibaca
     const standardItems = fullData[0];       // List Nama Item
     const dataMasuk     = fullData[1] || {}; // Data Value Masuk
@@ -340,9 +340,9 @@
     function renderAllChecklists() {
         const tbodyTab2 = document.getElementById('checklist-tbody-tab2');
         tbodyTab2.innerHTML = '';
-        
+
         standardItems.forEach((item, index) => {
-            let valMasuk = dataMasuk[item] || ''; 
+            let valMasuk = dataMasuk[item] || '';
             let valKeluar = dataKeluar[item] || '';
 
             if(valMasuk === null) valMasuk = '';
@@ -350,7 +350,7 @@
 
             const tr = document.createElement('tr');
             tr.className = "border-b border-slate-200 hover:bg-slate-50";
-            
+
             tr.innerHTML = `
                 <td class="border border-slate-300 p-1 text-center font-bold row-num">${index + 1}</td>
                 <td class="border border-slate-300 p-1 font-medium bg-slate-50">${item}</td>
@@ -370,12 +370,12 @@
         });
 
         const allKeys = new Set([...Object.keys(dataMasuk), ...Object.keys(dataKeluar)]);
-        
+
         allKeys.forEach(key => {
             if (!standardItems.includes(key)) {
                 let valMasuk = dataMasuk[key] || '';
                 let valKeluar = dataKeluar[key] || '';
-                
+
                 addCustomRowTab2(key, valMasuk, valKeluar);
             }
         });

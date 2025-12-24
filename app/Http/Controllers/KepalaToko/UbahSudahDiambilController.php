@@ -12,6 +12,7 @@ use App\Models\Customer;
 use App\Models\ModelSerie;
 use Illuminate\Http\Request;
 use App\Models\ServiceAction;
+use App\Models\TeknisiServis;
 use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -116,13 +117,15 @@ class UbahSudahDiambilController extends Controller
             $qcItems = [];
         }
         // return response()->json([$qcItems,$qcMasuk,$qcKeluar]);
-
+        $teknisiServis = TeknisiServis::where('service_transactions_id', $id)->get();
+        // dd($teknisiServis);
         return view('pages.kepalatoko.servis.transaksi-servis-sudahdiambil', [
             'item' => $item,
             'service_actions' => $service_actions,
             'qcItems' => $qcItems,
             'qcMasuk' => $qcMasuk,
             'qcKeluar' => $qcKeluar,
+            'teknisiServis' => $teknisiServis,
         ]);
     }
 
@@ -245,7 +248,7 @@ class UbahSudahDiambilController extends Controller
             }
         }
 
-        
+
         $qc_masuk_data = $request->qc_masuk ?? [];
         $qc_keluar_data = $request->qc_keluar ?? [];
 

@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use App\Models\StoreSetting;
 use App\Models\TeknisiServis;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BisaDiambilController extends Controller
 {
@@ -197,7 +198,7 @@ class BisaDiambilController extends Controller
             })
             ->addColumn('tindakan', function ($row) {
                 $teknisiServis = TeknisiServis::where('service_transactions_id', $row->id)->get();
-                
+
                 if ($teknisiServis->isEmpty()) {
                     return '<div class="font-medium">'.implode(', ', json_decode($row->tindakan_servis) ?? []).'</div>';
                 } else {
@@ -207,12 +208,12 @@ class BisaDiambilController extends Controller
 
                         if (is_array($decodedItem)) {
                             $tindakanArr = array_merge($tindakanArr, $decodedItem);
-                        } 
-                        elseif (!empty($ts->tindakan_servis)) { 
+                        }
+                        elseif (!empty($ts->tindakan_servis)) {
                             $tindakanArr[] = $ts->tindakan_servis;
                         }
                     }
-                    
+
                     $tindakanArr = array_unique($tindakanArr);
 
                     return '<div class="font-medium">'.implode(', ', $tindakanArr).'</div>';
@@ -222,7 +223,7 @@ class BisaDiambilController extends Controller
             ->addColumn('teknisi', function ($row) {
 
                 $teknisiServis = TeknisiServis::where('service_transactions_id', $row->id)->get();
-                
+
                 if ($teknisiServis->isEmpty()) {
                     // return '<div class="font-medium">'.e($row->user->name).'</div>';
                     return $row->user
@@ -233,7 +234,7 @@ class BisaDiambilController extends Controller
                     foreach ($teknisiServis as $ts) {
                         $tindakanArr[] = $ts->teknisi->name ?? '-';
                     }
-                    
+
                     $tindakanArr = array_unique($tindakanArr);
 
                     return '<div class="font-medium">'.implode(', ', $tindakanArr).'</div>';
@@ -265,7 +266,7 @@ class BisaDiambilController extends Controller
 
                 return '
                     <div class="space-x-1 flex">
-                           
+
                           <button type="button"
                                 class="text-indigo-500 hover:text-indigo-600 rounded-full btn-upload-foto ml-1"
                                 data-id="' . $row->id . '"
@@ -545,19 +546,19 @@ class BisaDiambilController extends Controller
     public function edit($id)
     {
         $item = ServiceTransaction::with('user', 'serviceaction', 'product')->findOrFail($id);
-        $customers = Customer::all();
-        $types = Type::all();
-        $brands = Brand::all();
-        $model_series = ModelSerie::all();
-        $service_actions = ServiceAction::all();
-        $products = Product::whereHas('subCategory', function ($query) {
+        $customers = Customer::where('cabang_id',getCabangId())->get();
+        $types = Type::where('cabang_id',getCabangId())->get();
+        $brands = Brand::where('cabang_id',getCabangId())->get();
+        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
+        $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
+        $products = Product::where('cabang_id',getCabangId())->whereHas('subCategory', function ($query) {
             $query->whereHas('category', function ($subQuery) {
                 $subQuery->where('category_name', 'Sparepart');
             });
         })->where('stok', '>=', 1)->get();
-        $capacities = Capacity::all();
-        $users = User::where('role', 'Teknisi')->get();
-        $workers = Worker::where('jabatan', 'like', '%' . 'teknisi')->get();
+        $capacities = Capacity::where('cabang_id',getCabangId())->get();
+        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
+        $workers = Worker::where('cabang_id',getCabangId())->where('jabatan', 'like', '%' . 'teknisi')->get();
 
 
          // 1. Decode JSON ke Array
@@ -578,6 +579,10 @@ class BisaDiambilController extends Controller
         if (empty($qcItems)) {
             $qcItems = [];
         }
+
+        $teknisiServis = TeknisiServis::where('service_transactions_id', $id)->get();
+        $sales = User::where('role', 'Sales')->where('cabang_id',getCabangId())->get();
+
         return view('pages.kepalatoko.servis.bisa-diambil-edit', [
             'item' => $item,
             'types' => $types,
@@ -592,6 +597,8 @@ class BisaDiambilController extends Controller
             'qcItems' => $qcItems,
             'qcMasuk' => $qcMasuk,
             'qcKeluar' => $qcKeluar,
+            'sales' => $sales,
+            'teknisiServis' => $teknisiServis,
         ]);
     }
 
@@ -602,7 +609,7 @@ class BisaDiambilController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function updateOld(Request $request, $id)
     {
         $item = ServiceTransaction::findOrFail($id);
 
@@ -675,6 +682,336 @@ class BisaDiambilController extends Controller
         ]);
 
         return redirect()->route('transaksi-servis-bisa-diambil.index');
+    }
+     public function update(Request $request, $id)
+    {
+        // dd($request->all());
+       $itemOrigin = ServiceTransaction::findOrFail($id);
+        DB::beginTransaction();
+
+        try {
+            if ($request->has('teknisi') && is_array($request->teknisi)) {
+
+                // --- VARIABEL PENAMPUNG GRAND TOTAL (UNTUK TABEL INDUK) ---
+                $grandTotalBiaya = 0;
+                $grandTotalModal = 0;
+                $mainTechnicianId = null; // Penampung ID Teknisi Utama
+
+                // Variabel untuk menyimpan detail Teknisi Utama (Legacy support jika tabel induk butuh JSON detail)
+                $mainTechDetails = [
+                    'tindakan' => null,
+                    'actions_id' => null,
+                    'products_id' => null,
+                    'biaya_j' => null,
+                    'modal_j' => null
+                ];
+
+                $teknisiServisDelete = TeknisiServis::where('service_transactions_id', $itemOrigin->id)->get();
+                foreach ($teknisiServisDelete as $key => $valueDel) {
+                    $valueDel->delete();
+                }
+
+                foreach ($request->teknisi as $index => $techData) {
+                    // --- 1. PERSIAPAN DATA ---
+                    $userId = $techData['user_id'] ?? null;
+                    $tipeTeknisi = $techData['tipe'] ?? null;
+
+                    // Set Teknisi Utama (Index 0)
+                    if ($index === 0) {
+                        $mainTechnicianId = $userId;
+                    }
+
+                    // Ambil Persen
+                    $persen_teknisi = 0;
+                    if ($userId) {
+                        $userObj = User::find($userId);
+                        $persen_teknisi = $userObj->persen ?? 0;
+                    }
+
+                    // Reset variable per teknisi
+                    $list_tindakan_text = [];
+                    $list_garansi = [];
+                    $arr_service_actions_id = [];
+                    $arr_products_id = [];
+                    $arr_biaya_servis = [];
+                    $arr_modal_sparepart = [];
+
+                    $subTotalBiaya = 0;
+                    $subTotalModal = 0;
+
+                    if ($request->kondisi_servis !== 'Dibatalkan' && $userId) {
+                        // --- 2. LOOP TINDAKAN ---
+                        if (isset($techData['tindakan']) && is_array($techData['tindakan'])) {
+                            foreach ($techData['tindakan'] as $action) {
+
+                                $garansi_data = $action['garansi'] ?? 0;
+
+                                $garansi = Carbon::now();
+                                if ($garansi_data != null) {
+                                    $garansi_servis = $garansi->addDays(
+                                        $garansi_data
+                                    );
+                                } else {
+                                    $garansi_servis = null;
+                                }
+
+                                $list_garansi[] = $garansi_servis;
+
+
+                                $act_id = $action['service_actions_id'] ?? null;
+                                $manual_act = $action['tindakan_servis'] ?? null;
+                                $prod_id = $action['products_id'] ?? null;
+                                $sales_id = $action['sales_id'] ?? 1;
+
+                                $biaya = filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+                                $modal = filter_var($action['modal_sparepart'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+
+                                // Ambil Nama Tindakan
+                                $nama_tindakan = null;
+                                if (!empty($act_id)) {
+                                    $actDb = ServiceAction::find($act_id);
+                                    if ($actDb) $nama_tindakan = $actDb->nama_tindakan;
+                                } elseif (!empty($manual_act)) {
+                                    $nama_tindakan = $manual_act;
+                                }
+                                if ($nama_tindakan) $list_tindakan_text[] = $nama_tindakan;
+
+                                // Push Array
+                                $arr_service_actions_id[] = $act_id;
+                                $arr_products_id[] = $prod_id;
+                                $arr_biaya_servis[] = $biaya;
+                                $arr_modal_sparepart[] = $modal;
+
+                                // Kalkulasi SubTotal per Teknisi
+                                $subTotalBiaya += (int)$biaya;
+                                $subTotalModal += (int)$modal;
+
+                                // --- 3. STOK & ORDER ---
+                                if (!empty($prod_id)) {
+                                    $sparepart = Product::find($prod_id);
+                                    if ($sparepart) {
+                                        $sparepart->decrement('stok', 1);
+                                        // $this->createSparepartOrder($itemOrigin->customers_id, $sales_id, $sparepart);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // --- 4. HITUNG PROFIT PER TEKNISI ---
+                    $profitTransaksi = $subTotalBiaya - $subTotalModal;
+                    $nilaiBagiHasil = ($profitTransaksi) / 100;
+                    $profitToko = $profitTransaksi - ($nilaiBagiHasil * $persen_teknisi);
+
+                    // Bonus Interface
+                    $bonus_interface = 0;
+                    if ($request->kondisi_servis !== 'Dibatalkan' && $userId) {
+                        $cekTeknisi = User::find($userId);
+                        if ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface') {
+                            $nama_model = ModelSerie::find($itemOrigin->model_series_id);
+                            $bonus_interface = $nama_model->nominal_bonus ?? 0;
+                        }
+                    }
+
+                    if ($request->kondisi_servis !== 'Dibatalkan' && $userId) {
+                        TeknisiServis::create([
+                            'service_transactions_id' => $itemOrigin->id,
+                            'users_id' => $userId,
+                            'tipe' => $tipeTeknisi,
+                            'modal_sparepart' => $subTotalModal,
+                            'biaya' => $subTotalBiaya,
+                            'profit' => $profitTransaksi,
+                            'profittoko' => $profitToko,
+                            'persen_teknisi' => $persen_teknisi,
+                            'bonus_interface' => $bonus_interface,
+
+                            // Detail JSON
+                            'tindakan_servis' => count($list_tindakan_text) > 0 ? json_encode($list_tindakan_text) : null,
+                            'service_actions' => json_encode($arr_service_actions_id),
+                            'products' => json_encode($arr_products_id),
+                            'biaya_j' => json_encode($arr_biaya_servis),
+                            'modal_j' => json_encode($arr_modal_sparepart),
+                            'garansi' => !empty($list_garansi) ? json_encode($list_garansi) : null,
+                        ]);
+                    }
+
+
+                    // --- 6. AKUMULASI GRAND TOTAL ---
+                    $grandTotalBiaya += $subTotalBiaya;
+                    $grandTotalModal += $subTotalModal;
+
+                    // Jika ini Teknisi Utama, simpan detailnya untuk update tabel Induk (Legacy)
+                    if ($index === 0) {
+                        $mainTechDetails = [
+                            'tindakan' => count($list_tindakan_text) > 0 ? json_encode($list_tindakan_text) : null,
+                            'actions_id' => json_encode($arr_service_actions_id),
+                            'products_id' => $arr_products_id[0] ?? null,
+                            'all_products' => json_encode($arr_products_id),
+                            'biaya_j' => json_encode($arr_biaya_servis),
+                            'modal_j' => json_encode($arr_modal_sparepart),
+                            'garansi' => !empty($garansi_data) ? $garansi_data[0] ?? null : null,
+                            'exp_garansi' => !empty($list_garansi) ? $list_garansi[0] ?? null : null,
+                            'exp_garansi_j' => !empty($list_garansi) ? json_encode($list_garansi) : null,
+                            'bagian_teknisi' => $cekTeknisi->bagian_teknisi,
+                            'tipe_teknisi' => $tipeTeknisi,
+                        ];
+                    }
+
+                } // End Foreach
+
+                $nama_tipe = Type::find($request->types_id);
+                $nama_merek = Brand::find($request->brands_id);
+                $nama_model = ModelSerie::find($request->model_series_id);
+                $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
+                $nama_pelanggan = Customer::find($request->customers_id);
+
+
+                $ppn = 0;
+                $cekppn = StoreSetting::where('cabang_id',getCabangId())->first();
+                if (!empty($cekppn) && $cekppn->is_tax == 1) {
+                    $ppn = $cekppn->ppn;
+                }
+                    if (!empty($request->diskon) && $request->diskon > 0) {
+                    $baseBiaya = $request->biaya - $request->diskon;
+                } else {
+                    $baseBiaya = $request->biaya;
+                }
+
+                $biayaFinal = $baseBiaya;
+                // Default
+                $tunai = 0;
+                $transfer = 0;
+                $due = 0;
+                $pay = 0;
+                if ($ppn > 0) {
+                    $biayaFinal += ($baseBiaya * $item->ppn / 100);
+                }
+
+                if ($request->cara_pembayaran === 'Tunai & Transfer') {
+                    $due = 0;
+                    if ($request->tunai != 0) {
+                        $transfer = $request->transfer;
+                        $pay = $request->biaya;
+                        $tunai = $request->tunai;
+                    } else {
+                        $tunai = $request->tunai;
+                        $pay = $request->biaya;
+                        $transfer = $request->transfer;
+                    }
+                }
+
+                // Cara pembayaran
+                if ($request->cara_pembayaran === 'Tunai') {
+                    $tunai = $biayaFinal;
+                    $transfer = 0;
+                    $due = 0;
+                    $pay = $biayaFinal;
+                }
+
+                if ($request->cara_pembayaran === 'Transfer') {
+                    $transfer = $biayaFinal;
+                    $tunai = 0;
+                    $due = 0;
+                    $pay = $biayaFinal;
+                }
+
+                if ($request->cara_pembayaran === 'Kredit') {
+                    $pay = $request->pay;
+                    $due = $request->biaya - $request->pay;
+                    if ($request->tunai) {
+                        $tunai = $request->pay;
+                        $transfer = 0;
+                    } elseif ($request->transfer) {
+                        $transfer = $request->pay;
+                        $tunai = 0;
+                    }
+                }
+
+                $waktu = Carbon::today();
+                if ($request->tempo != null) {
+                    $tempo = $waktu->addDays(
+                        $request->tempo
+                    );
+                } else {
+                    $tempo = null;
+                }
+
+                $garansiList = $request->garansi ?? [];
+                foreach ($garansiList as $val) {
+                    $expired[] = Carbon::now()->addDays($val);
+                }
+
+
+                $qc_masuk_data = $request->qc_masuk ?? [];
+                $qc_keluar_data = $request->qc_keluar ?? [];
+
+                if ($request->has('custom_item_name')) {
+                    foreach ($request->custom_item_name as $key => $name) {
+                        if (!empty($name)) {
+                            $val_in = $request->custom_qc_masuk[$key] ?? '-';
+                            $val_out = $request->custom_qc_keluar[$key] ?? '-';
+
+                            $qc_masuk_data[$name] = $val_in;
+                            $qc_keluar_data[$name] = $val_out;
+                        }
+                    }
+                }
+
+                $qc_masuk_final = json_encode($qc_masuk_data);
+                $qc_keluar_final = json_encode($qc_keluar_data);
+
+                $grandProfit = $grandTotalBiaya - $grandTotalModal;
+
+
+                $itemOrigin->update([
+                    'created_at' => $request->created_at,
+                    'users_id' => $mainTechnicianId, // Penanggung Jawab Utama
+                    'penerima' => $request->penerima,
+                    'customers_id' => $request->customers_id,
+                    'nama_pelanggan' => $nama_pelanggan->nama,
+                    'types_id' => $request->types_id,
+                    'brands_id' => $request->brands_id,
+                    'model_series_id' => $request->model_series_id,
+                    'nama_barang' => $nama_barang,
+                    'kerusakan' => $request->kerusakan,
+                    'qc_masuk' => $qc_masuk_data,
+                    'qc_keluar' => $qc_keluar_final,
+                    'kondisi_servis' => $request->kondisi_servis,
+                    // 'service_actions_id' => $request->service_actions_id,
+                    'modal_sparepart' => $request->modal_sparepart,
+                    'persen_admin' => $request->persen_admin,
+                    'persen_teknisi' => $persen_teknisi,
+                    // 'profittoko' => $profittransaksi - ($bagihasil *= $persen_teknisi),
+                    'tipe' => $mainTechDetails['tipe_teknisi'],
+                    'garansi' => $mainTechDetails['garansi'],
+                    'exp_garansi' => $mainTechDetails['exp_garansi'],
+                    'exp_garansi_j' => json_encode($mainTechDetails['exp_garansi_j']),
+                    'tindakan_servis' => $mainTechDetails['tindakan'],
+                    'service_actions' => $mainTechDetails['actions_id'],
+                    'products_id' => $mainTechDetails['products_id'],
+                    'products' => $mainTechDetails['all_products'],
+                    'biaya_j' => $mainTechDetails['biaya_j'],
+                    'modal_j' => $mainTechDetails['modal_j'],
+                    'biaya' => $grandTotalBiaya,
+                    'modal_sparepart' => $grandTotalModal,
+                    'omzet' => $grandTotalBiaya,
+                    'profit' => $grandProfit,
+                ]);
+
+            }
+
+            DB::commit();
+            toast('Data servis berhasil disimpan.', 'success');
+
+            return redirect()->route('transaksi-servis-bisa-diambil.index')->with('success', 'Data servis berhasil disimpan.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            // dd($e->getMessage());
+            \Log::error("Error Multi Teknisi: " . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+
     }
 
     public function back(Request $request, $id)

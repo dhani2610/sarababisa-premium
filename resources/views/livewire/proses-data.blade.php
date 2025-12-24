@@ -582,8 +582,9 @@
                                                     <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="number" name="biaya" id="biaya" required />
                                                 </div>
                                             </div>
-                                            
 
+
+                                                    <div>
                                                     <div>
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="diskon">Diskon</label>
