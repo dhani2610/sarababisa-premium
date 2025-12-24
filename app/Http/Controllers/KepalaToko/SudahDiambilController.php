@@ -1283,7 +1283,7 @@ class SudahDiambilController extends Controller
         // }else{
             // $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
             $pdf = PDF::loadView('pages.kepalatoko.servis.notapengambilan-cetak-inkjet-new', [
-            // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet', [
+            // return View('pages.kepalatoko.servis.notapengambilan-cetak-inkjet-new', [
                 'users' => $users,
                 'items' => $items,
                 'terms' => $terms,
