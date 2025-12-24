@@ -159,10 +159,48 @@ class UbahSudahDiambilController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // dd($request->all());
         $item = ServiceTransaction::findOrFail($id);
         $profittransaksi = $request->biaya - $request->modal_sparepart - $request->diskon;
         $bagihasil = ($request->biaya - $request->modal_sparepart - $request->diskon) / 100;
+
+        $finalExpiredDates = []; // Penampung semua tanggal expired untuk update ke service_transactions (gabungan)
+
+        if ($request->has('garansi_teknisi')) {
+            $garansiInput = $request->garansi_teknisi; // Array: [tek_id => [days, days], 'main' => [days]]
+
+            foreach ($garansiInput as $tekId => $daysArray) {
+                // Calculate Dates
+                $datesArray = [];
+                foreach ($daysArray as $days) {
+                    $expDate = ($days && $days > 0) ? Carbon::now()->addDays($days)->format('Y-m-d H:i:s') : null;
+                    $datesArray[] = $expDate;
+                    $finalExpiredDates[] = $expDate; // Kumpulkan untuk main transaction
+                }
+
+                if ($tekId !== 'main' && is_numeric($tekId)) {
+                    // UPDATE KE TABLE TEKNISI_SERVIS
+                    // Cari record teknisi servis berdasarkan ID
+                    $tekServis = TeknisiServis::find($tekId);
+                    if ($tekServis) {
+                        $tekServis->update([
+                            'garansi' => json_encode($datesArray)
+                        ]);
+                    }
+                } else {
+                    // Handle case 'main' (jika data dari dummy / tidak ada di tabel teknisi_servis)
+                    // Ini nanti akan tersimpan otomatis saat update $item di bawah via exp_garansi_j
+                }
+            }
+        } else {
+            // Fallback jika tidak ada input (jarang terjadi jika form benar)
+            // Ambil existing
+            $g = json_decode($item->exp_garansi_j, true);
+            if (is_string($g)) $g = json_decode($g, true);
+            $finalExpiredDates = is_array($g) ? $g : [];
+        }
+
+        // dd($finalExpiredDates,$garansiInput);
+
 
         // $garansi = Carbon::now();
         $garansiList = $request->garansi ?? [];
@@ -294,10 +332,12 @@ class UbahSudahDiambilController extends Controller
             'qc_keluar' => $qc_keluar_final,
             'cara_pembayaran' => $request->cara_pembayaran,
             'diskon' => $request->diskon,
-            'garansi'       => !empty($request->garansi) && isset($request->garansi[0]) ? $request->garansi[0] : null,
-            'exp_garansi'   => !empty($expired) && isset($expired[0]) ? $expired[0] : null,
-            'exp_garansi_j' => json_encode($expired ?? []),
-
+            // 'garansi'       => !empty($request->garansi) && isset($request->garansi[0]) ? $request->garansi[0] : null,
+            // 'exp_garansi'   => !empty($expired) && isset($expired[0]) ? $expired[0] : null,
+            // 'exp_garansi_j' => json_encode($expired ?? []),
+            'garansi'           => $request->has('garansi_teknisi') ? (collect($request->garansi_teknisi)->flatten()->first() ?? null) : null,
+            'exp_garansi'       => !empty($finalExpiredDates) ? max($finalExpiredDates) : null,
+            'exp_garansi_j'     => json_encode($finalExpiredDates),
             'status_servis' => $request->status_servis,
             'is_approve' => Auth::user()->role == 'Kepala Toko' ? 'Setuju' : null,
             'tgl_disetujui' => $request->tgl_disetujui,
