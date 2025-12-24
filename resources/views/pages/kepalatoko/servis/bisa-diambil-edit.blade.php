@@ -83,10 +83,11 @@
                                     <input id="created_at" name="created_at" class="form-input w-full px-2 py-1" type="date" value="{{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') }}"/>
                                 </div>
                                 <div>
+                                    {{-- @dd($usersAdmin); --}}
                                     <label class="block text-sm font-medium mb-1" for="penerima">Penerima </label>
                                     <select id="penerima" name="penerima" class="form-select text-sm py-1 w-full">
                                         <option selected value="{{ $item->penerima }}">{{ $item->penerima }}</option>
-                                        @foreach ($workers as $worker)
+                                        @foreach ($usersPenerima as $worker)
                                             <option value="{{ $worker->name }}">{{ $worker->name }}</option>
                                         @endforeach
                                     </select>
