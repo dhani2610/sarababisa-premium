@@ -152,6 +152,8 @@ class GajiController extends Controller
             }
         }
 
+        // return response()->json([$bonus]);
+
         Salary::create([
             'name' => $request->name,
             'users_id' => $request->users_id,
