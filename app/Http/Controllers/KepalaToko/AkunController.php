@@ -170,7 +170,7 @@ class AkunController extends Controller
 
                 $deleteBtn = '';
                 // Tombol delete hanya muncul jika bukan diri sendiri
-                if ($row->id != Auth::id()) {
+                if ($row->id != Auth::id() && $row->role != 'Kepala Toko') {
                     $deleteBtn = '
                         <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Yakin ingin menghapus akun ini?\');">
                             ' . $csrf . $method . '

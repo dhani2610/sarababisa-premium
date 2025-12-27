@@ -68,27 +68,34 @@
                             </div>
                         </div>
                         <!-- Modal content -->
-                        <form action="{{ route('cetak-laporan-servis') }}" method="get"  target="_blank">
-                            @csrf
-                            <div class="px-5 py-4">
-                                <div class="space-y-3">
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1">Mulai tanggal <span class="text-rose-500">*</span></label>
-                                        <input id="start_date" name="start_date" class="form-input w-full py-2" type="date" required />
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1">Sampai tanggal <span class="text-rose-500">*</span></label>
-                                        <input id="end_date" name="end_date" class="form-input w-full py-2" type="date" required />
+                            <form action="{{ route('cetak-laporan-servis') }}" method="get"  target="_blank">
+                                @csrf
+                                <div class="px-5 py-4">
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Tipe <span class="text-rose-500">*</span></label>
+                                            <select name="tipe" class="form-select text-sm py-1 w-full" id="tipe">
+                                                <option value="Sudah Disetujui">Sudah Disetujui</option>
+                                                <option value="Sudah Diambil">Sudah Diambil</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Mulai tanggal <span class="text-rose-500">*</span></label>
+                                            <input id="start_date" name="start_date" class="form-input w-full py-2" type="date" required />
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Sampai tanggal <span class="text-rose-500">*</span></label>
+                                            <input id="end_date" name="end_date" class="form-input w-full py-2" type="date" required />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- Modal footer -->
-                            <div class="px-5 py-4 border-t border-slate-200">
-                                <div class="flex flex-wrap justify-end space-x-2">
-                                    <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Cetak</button>
+                                <!-- Modal footer -->
+                                <div class="px-5 py-4 border-t border-slate-200">
+                                    <div class="flex flex-wrap justify-end space-x-2">
+                                        <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Cetak</button>
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
                     </div>
                 </div>
             </div>
@@ -143,7 +150,7 @@
                 <!-- Table body -->
                 <tbody class="text-sm divide-y divide-slate-200">
                     <!-- Row -->
-                    @foreach($services as $item)                  
+                    @foreach($services as $item)
                         <tr>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ \Carbon\Carbon::parse($item->tgl_disetujui)->translatedFormat('d F Y') }}</div>
@@ -198,5 +205,5 @@
     <div class="mt-8">
         {{ $services->links() }}
     </div>
-    
+
 </div>

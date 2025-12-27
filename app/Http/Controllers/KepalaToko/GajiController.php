@@ -158,7 +158,8 @@ class GajiController extends Controller
             'name' => $request->name,
             'users_id' => $request->users_id,
             'workers_id' => $request->workers_id,
-            'bonus' => $bonus
+            'bonus' => $bonus,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('bonus.index');
