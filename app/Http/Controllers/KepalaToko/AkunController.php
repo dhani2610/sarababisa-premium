@@ -70,65 +70,45 @@ class AkunController extends Controller
     {
         $cabangId = getCabangId();
 
-        // Query Dasar (Eager load shift dan type untuk performa)
         $query = User::whereNull('deleted_at')
             ->where('cabang_id', $cabangId)
             ->with(['shift', 'type'])
             ->latest();
 
-        // Sembunyikan Super Admin (ID 1) jika bukan di cabang pusat
         if ($cabangId != 1) {
             $query->where('id', '!=', 1);
         }
 
         return DataTables::of($query)
             ->addIndexColumn()
-
-            // 1. Checkbox
             ->addColumn('checkbox', function ($row) {
-                if ($row->id == Auth::id() || $row->id == 1) return ''; // Jangan hapus diri sendiri/admin
+                if ($row->id == Auth::id() || $row->id == 1) return '';
                 return '<input type="checkbox" class="table-item form-checkbox" value="' . $row->id . '" />';
             })
-
-            // 2. Cabang (Menggunakan helper getCabangName)
             ->addColumn('cabang_name', function ($row) {
                 return getCabangName($row->cabang_id);
             })
-
-            // 3. Nama
             ->editColumn('name', function ($row) {
                 return '<div class="font-medium">' . e($row->name) . '</div>';
             })
             ->editColumn('email', function ($row) {
                 return $row->email;
             })
-
-            // 4. Username
             ->editColumn('username', function ($row) {
                 return '<div class="font-medium">' . e($row->username) . '</div>';
             })
-
-            // 5. Bagian Teknisi
             ->addColumn('bagian_teknisi', function ($row) {
                 return '<div class="font-medium">' . ($row->bagian_teknisi ?? '-') . '</div>';
             })
-
-            // 6. NIK
             ->addColumn('nik', function ($row) {
                 return '<div class="font-medium">' . e($row->nik) . '</div>';
             })
-
-            // 7. Alamat
             ->addColumn('alamat', function ($row) {
                 return '<div class="font-medium">' . e($row->alamat) . '</div>';
             })
-
-            // 8. HP
             ->addColumn('nomor_hp', function ($row) {
                 return '<div class="font-medium">' . e($row->nomor_hp) . '</div>';
             })
-
-            // 9. Hak Akses (Role + Tipe Barang jika ada)
             ->addColumn('hak_akses', function ($row) {
                 $text = e($row->role);
                 if ($row->types_id != null && $row->type) {
@@ -136,40 +116,60 @@ class AkunController extends Controller
                 }
                 return '<div class="font-medium text-slate-800">' . $text . '</div>';
             })
-
-            // 10. Persen
             ->addColumn('persen', function ($row) {
                 return '<div class="font-medium text-slate-800">' . e($row->persen) . '</div>';
             })
-
-            // 11. PDF Investor
             ->addColumn('pdf_investor', function ($row) {
                 if ($row->role == 'Investor' && $row->pdf_investor) {
                     $url = asset('storage/' . $row->pdf_investor);
-                    return '<p class="text-sm mt-1">📎
-                                <a href="' . $url . '" target="_blank" class="text-indigo-500 underline">Lihat PDF</a>
-                            </p>';
+                    return '<a href="' . $url . '" target="_blank" class="text-indigo-500 underline text-sm">Lihat PDF</a>';
                 }
-                return '';
+                return '-';
             })
-
-            // 12. Shift
             ->addColumn('shift_name', function ($row) {
                 return '<div class="font-medium">' . ($row->shift ? e($row->shift->nama_shift) : '-') . '</div>';
             })
 
-            // 13. Aksi
+            // --- TAMBAHAN KOLOM DATA BARU ---
+            ->addColumn('foto_ktp', function ($row) {
+                if ($row->foto_ktp) {
+                    $url = asset('storage/' . $row->foto_ktp);
+                    return '<a href="' . $url . '" target="_blank" class="text-sky-500 hover:text-sky-600 font-medium">Lihat</a>';
+                }
+                return '<span class="text-slate-400">-</span>';
+            })
+            ->addColumn('foto_kk', function ($row) {
+                if ($row->foto_kk) {
+                    $url = asset('storage/' . $row->foto_kk);
+                    return '<a href="' . $url . '" target="_blank" class="text-sky-500 hover:text-sky-600 font-medium">Lihat</a>';
+                }
+                return '<span class="text-slate-400">-</span>';
+            })
+            ->addColumn('foto_ijasah', function ($row) {
+                if ($row->foto_ijasah) {
+                    $url = asset('storage/' . $row->foto_ijasah);
+                    return '<a href="' . $url . '" target="_blank" class="text-sky-500 hover:text-sky-600 font-medium">Lihat</a>';
+                }
+                return '<span class="text-slate-400">-</span>';
+            })
+            ->addColumn('dokumen_lain', function ($row) {
+                if ($row->dokumen_lain) {
+                    $url = asset('storage/' . $row->dokumen_lain);
+                    return '<a href="' . $url . '" target="_blank" class="text-sky-500 hover:text-sky-600 font-medium">Lihat</a>';
+                }
+                return '<span class="text-slate-400">-</span>';
+            })
+            // --------------------------------
+
             ->addColumn('aksi', function ($row) {
-                // Cegah edit/hapus Super Admin jika bukan Super Admin
                 if ($row->id == 1 && Auth::id() != 1) return '';
 
-                $editUrl = route('akun-edit', $row->id); // Sesuaikan nama route edit Anda
-                $deleteUrl = route('akun-destroy', $row->id); // Sesuaikan nama route destroy Anda
+                $editUrl = route('akun-edit', $row->id);
+                $deleteUrl = route('akun-destroy', $row->id);
                 $csrf = csrf_field();
                 $method = method_field('DELETE');
 
                 $deleteBtn = '';
-                // Tombol delete hanya muncul jika bukan diri sendiri
                 if ($row->id != Auth::id() && $row->role != 'Kepala Toko') {
                     $deleteBtn = '
                         <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Yakin ingin menghapus akun ini?\');">
@@ -199,7 +199,8 @@ class AkunController extends Controller
                     </div>
                 ';
             })
-            ->rawColumns(['checkbox', 'name', 'username', 'bagian_teknisi', 'nik', 'alamat', 'nomor_hp', 'hak_akses', 'persen', 'pdf_investor', 'shift_name', 'aksi'])
+            // Tambahkan nama kolom baru ke rawColumns agar HTML link terbaca
+            ->rawColumns(['checkbox', 'name', 'username', 'bagian_teknisi', 'nik', 'alamat', 'nomor_hp', 'hak_akses', 'persen', 'pdf_investor', 'shift_name', 'foto_ktp', 'foto_kk', 'foto_ijasah', 'dokumen_lain', 'aksi'])
             ->make(true);
     }
 
@@ -455,6 +456,15 @@ class AkunController extends Controller
             'cabang_id' => getCabangId(),
         ];
 
+        $dokumenFiles = ['foto_ktp', 'foto_kk', 'foto_ijasah', 'dokumen_lain'];
+
+        foreach ($dokumenFiles as $fileKey) {
+            if ($request->hasFile($fileKey)) {
+                $path = $request->file($fileKey)->store('dokumen_user', 'public');
+                $data[$fileKey] = $path;
+            }
+        }
+
         if ($request->role === 'Investor' && $request->hasFile('pdf_investor')) {
             $pdfPath = $request->file('pdf_investor')->store('pdf_investors', 'public');
             $data['pdf_investor'] = $pdfPath;
@@ -506,6 +516,15 @@ class AkunController extends Controller
             'exp_date' => $langganan,
             'total_cabang' => $total_cabang,
         ];
+
+        $dokumenFiles = ['foto_ktp', 'foto_kk', 'foto_ijasah', 'dokumen_lain'];
+
+        foreach ($dokumenFiles as $fileKey) {
+            if ($request->hasFile($fileKey)) {
+                $path = $request->file($fileKey)->store('dokumen_user', 'public');
+                $data[$fileKey] = $path;
+            }
+        }
 
         if ($request->role === 'Investor' && $request->hasFile('pdf_investor')) {
             $pdfPath = $request->file('pdf_investor')->store('pdf_investors', 'public');

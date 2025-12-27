@@ -227,6 +227,44 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="mt-6 border-t border-slate-200 pt-4">
+                                        <span class="font-semibold text-slate-800 mb-4">Detail Akun (Dokumen)</h3>
+                                        <p style="color: red" class="text-xs text-slate-500 mt-1">Format: JPG, PNG, atau PDF</p>
+                                        <hr>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1" for="foto_ktp">
+                                                    KTP
+                                                </label>
+                                                <input id="foto_ktp" name="foto_ktp" class="form-input w-full px-2 py-1 text-sm"
+                                                    type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1" for="foto_kk">
+                                                    KK
+                                                </label>
+                                                <input id="foto_kk" name="foto_kk" class="form-input w-full px-2 py-1 text-sm"
+                                                    type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1" for="foto_ijasah">
+                                                    Ijasah
+                                                </label>
+                                                <input id="foto_ijasah" name="foto_ijasah" class="form-input w-full px-2 py-1 text-sm"
+                                                    type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1" for="dokumen_lain">
+                                                    Dokumen Lain
+                                                </label>
+                                                <input id="dokumen_lain" name="dokumen_lain" class="form-input w-full px-2 py-1 text-sm"
+                                                    type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="px-5 py-4 border-t border-slate-200">
                                     <div class="flex flex-wrap justify-end space-x-2">
@@ -358,6 +396,18 @@
                                 <div class="font-semibold text-left">Shift</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">KTP</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">KK</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Ijasah</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Dok. Lain</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Aksi</div>
                             </th>
                         </tr>
@@ -487,6 +537,10 @@
                         { data: 'persen', name: 'persen' },
                         { data: 'pdf_investor', name: 'pdf_investor', orderable: false, searchable: false },
                         { data: 'shift_name', name: 'shift.nama_shift' },
+                        { data: 'foto_ktp', name: 'foto_ktp', orderable: false, searchable: false },
+                        { data: 'foto_kk', name: 'foto_kk', orderable: false, searchable: false },
+                        { data: 'foto_ijasah', name: 'foto_ijasah', orderable: false, searchable: false },
+                        { data: 'dokumen_lain', name: 'dokumen_lain', orderable: false, searchable: false },
                         { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                     ],
                     order: [[1, 'asc']], // Default urut berdasarkan Nama (index ke-3)
