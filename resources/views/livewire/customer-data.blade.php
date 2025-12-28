@@ -256,106 +256,59 @@
             <!-- End Export Excel-->
 
             <!-- Start Import Excel -->
+            <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+
             <div x-data="{ modalOpen: false }" class="hidden lg:block">
                 <button class="btn bg-white border-emerald-200 hover:border-emerald-300 text-emerald-700"
-                    @click.prevent="modalOpen = true" aria-controls="tambah-modal">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-import"
-                        width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="#047857"
-                        fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                        <path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3" />
-                    </svg>
-                    <span class="hidden xs:block ml-2">Impor Data</span>
+                    @click.prevent="modalOpen = true" aria-controls="import-modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3"/></svg>
+                    Impor Data JS
                 </button>
-                <!-- Modal backdrop -->
-                <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen"
-                    x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="opacity-100" x-transition:leave="transition ease-out duration-100"
-                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" aria-hidden="true"
-                    x-cloak></div>
-                <!-- Modal dialog -->
-                <div id="basic-modal"
-                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                    role="dialog" aria-modal="true" x-show="modalOpen"
-                    x-transition:enter="transition ease-in-out duration-200"
-                    x-transition:enter-start="opacity-0 translate-y-4"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    x-transition:leave="transition ease-in-out duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0"
-                    x-transition:leave-end="opacity-0 translate-y-4" x-cloak>
-                    <div class="bg-white rounded shadow-lg overflow-auto max-w-xl w-full max-h-full"
-                        @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
-                        <form action="{{ route('impor-pelanggan') }}" method="post" enctype="multipart/form-data">
-                            @csrf
-                            <!-- Modal header -->
-                            <div class="px-5 py-3 border-b border-slate-200">
-                                <div class="flex justify-between items-center">
-                                    <div class="font-semibold text-slate-800">Impor Data Pelanggan</div>
-                                    <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false">
-                                        <div class="sr-only">Close</div>
-                                        <svg class="w-4 h-4 fill-current">
-                                            <path
-                                                d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <!-- Modal content -->
-                            <div class="px-5 pt-4 pb-1">
-                                <div class="text-sm">
-                                    <div class="space-y-2">
-                                        <p>Silahkan download terlebih dahulu formatnya, kemudian isi datanya dan upload.
-                                        </p>
-                                        <input type="file" name="file" id="file"
-                                            class="btn-sm bg-slate-100 w-full" required>
+
+                <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-out duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" aria-hidden="true" x-cloak></div>
+
+                <div id="import-modal" class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="modalOpen" x-transition:enter="transition ease-in-out duration-200" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in-out duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-4" x-cloak>
+                    <div class="bg-white rounded shadow-lg overflow-auto max-w-xl w-full max-h-full" @click.outside="if(!processing) modalOpen = false">
+
+                        <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center">
+                            <div class="font-semibold text-slate-800">Impor Data (Client Side Processing)</div>
+                            <button class="text-slate-400 hover:text-slate-500" @click="if(!processing) modalOpen = false" :class="{'opacity-50 cursor-not-allowed': processing}">
+                                <svg class="w-4 h-4 fill-current"><path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" /></svg>
+                            </button>
+                        </div>
+
+                        <div class="px-5 pt-4 pb-1">
+                            <div class="text-sm space-y-3">
+                                <p>Pilih file Excel. Sistem akan membaca dan mengupload data secara bertahap (per 200 baris) agar tidak timeout.</p>
+
+                                <input type="file" id="file_js_import" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+
+                                <div id="import-log" class="hidden p-2 bg-gray-50 rounded text-xs text-gray-600 font-mono h-24 overflow-y-auto border"></div>
+
+                                <div id="js-progress-wrapper" class="hidden mt-4">
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-xs font-medium text-indigo-700" id="status-text">Mempersiapkan...</span>
+                                        <span class="text-xs font-medium text-indigo-700" id="js-progress-percent">0%</span>
                                     </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4">
+                                        <div id="js-progress-bar" class="bg-indigo-600 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                    </div>
+                                    <p class="text-xs text-red-500 mt-1 italic font-bold">⚠️ JANGAN TUTUP HALAMAN INI SAMPAI SELESAI 100%</p>
                                 </div>
                             </div>
-                            <!-- Modal footer -->
-                            <div class="px-5 py-4">
-                                <div class="flex flex-wrap justify-end space-x-2">
-                                    <a href="{{ asset('storage/assets/format_pelanggan.xlsx') }}"
-                                        class="btn-sm bg-orange-500 hover:bg-orange-600 text-white">
-                                        <span class="mr-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                class="icon icon-tabler icon-tabler-file-download" width="20"
-                                                height="20" viewBox="0 0 24 24" stroke-width="1.5"
-                                                stroke="#ffffff" fill="none" stroke-linecap="round"
-                                                stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                                <path
-                                                    d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                                <line x1="12" y1="11" x2="12" y2="17" />
-                                                <polyline points="9 14 12 17 15 14" />
-                                            </svg>
-                                        </span>
-                                        Download Format
-                                    </a>
-                                    <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
-                                        <span class="mr-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                class="icon icon-tabler icon-tabler-file-upload" width="20"
-                                                height="20" viewBox="0 0 24 24" stroke-width="1.5"
-                                                stroke="#ffffff" fill="none" stroke-linecap="round"
-                                                stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                                <path
-                                                    d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                                <line x1="12" y1="11" x2="12" y2="17" />
-                                                <polyline points="9 14 12 11 15 14" />
-                                            </svg>
-                                        </span>
-                                        Upload File
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                        </div>
+
+                        <div class="px-5 py-4 flex justify-end space-x-2">
+                            <a href="{{ asset('storage/assets/format_pelanggan.xlsx') }}" class="btn-sm bg-orange-500 text-white" :class="{'hidden': processing}">Download Format</a>
+
+                            <button type="button" id="btn-js-process" class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
+                                Mulai Proses Import
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+
             <!-- End Import Excel-->
         </div>
     </div>
@@ -785,4 +738,130 @@
             }
         });
     </script>
+
+<script>
+    // Variable global untuk state
+    let processing = false;
+    let allData = [];
+    let totalRows = 0;
+    let processedRows = 0;
+    const CHUNK_SIZE = 200; // Kirim 200 data per request (aman untuk shared hosting)
+
+    $(document).ready(function() {
+
+        // 1. Tombol Klik Proses
+        $('#btn-js-process').on('click', function() {
+            const fileInput = document.getElementById('file_js_import');
+
+            if (fileInput.files.length === 0) {
+                alert("Pilih file Excel dulu!");
+                return;
+            }
+
+            // Kunci UI
+            processing = true;
+            $(this).prop('disabled', true).addClass('opacity-50').text('Sedang Membaca File...');
+            $('#js-progress-wrapper').removeClass('hidden');
+            $('#import-log').removeClass('hidden').html('<div>Mulai membaca file...</div>');
+
+            // 2. Baca Excel di Browser
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+
+                // Ambil sheet pertama
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert ke JSON
+                // raw: false agar tanggal/angka dibaca sesuai format string
+                allData = XLSX.utils.sheet_to_json(worksheet, {raw: false});
+
+                totalRows = allData.length;
+                processedRows = 0;
+
+                addLog(`Total data ditemukan: ${totalRows} baris.`);
+
+                if (totalRows === 0) {
+                    alert("File Excel kosong atau format header salah!");
+                    resetUI();
+                    return;
+                }
+
+                // 3. Mulai Pengiriman Bertahap
+                sendChunk(0);
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
+
+        // Fungsi Rekursif Mengirim Data
+        function sendChunk(startIndex) {
+            if (startIndex >= totalRows) {
+                // SELESAI
+                updateProgress(100);
+                $('#status-text').text('Selesai!');
+                addLog('✅ Semua data berhasil diimport!');
+                alert('Import Selesai! Halaman akan dimuat ulang.');
+                window.location.reload();
+                return;
+            }
+
+            // Ambil potongan data (slice)
+            const chunk = allData.slice(startIndex, startIndex + CHUNK_SIZE);
+            const currentChunkNumber = Math.ceil((startIndex + 1) / CHUNK_SIZE);
+            const totalChunks = Math.ceil(totalRows / CHUNK_SIZE);
+
+            $('#status-text').text(`Mengupload bagian ${currentChunkNumber} dari ${totalChunks}...`);
+
+            // Kirim via AJAX
+            $.ajax({
+                url: "{{ route('pelanggan.import-chunk') }}",
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    rows: chunk
+                },
+                success: function(response) {
+                    processedRows += chunk.length;
+
+                    // Update Persentase
+                    let percent = Math.round((processedRows / totalRows) * 100);
+                    updateProgress(percent);
+
+                    // Log kecil
+                    // addLog(`Chunk ${currentChunkNumber} OK. Inserted: ${response.inserted}, Updated: ${response.updated}`);
+
+                    // Lanjut ke potongan berikutnya
+                    sendChunk(startIndex + CHUNK_SIZE);
+                },
+                error: function(xhr) {
+                    console.error(xhr);
+                    addLog(`❌ Error pada baris ${startIndex} - ${startIndex + CHUNK_SIZE}. Menghentiikan proses.`);
+                    alert("Terjadi kesalahan koneksi atau server error. Cek Log.");
+                    resetUI();
+                }
+            });
+        }
+
+        function updateProgress(percent) {
+            $('#js-progress-bar').css('width', percent + '%');
+            $('#js-progress-percent').text(percent + '%');
+        }
+
+        function addLog(message) {
+            const logDiv = $('#import-log');
+            logDiv.append(`<div>${message}</div>`);
+            logDiv.scrollTop(logDiv[0].scrollHeight); // Auto scroll ke bawah
+        }
+
+        function resetUI() {
+            processing = false;
+            $('#btn-js-process').prop('disabled', false).removeClass('opacity-50').text('Mulai Proses Import');
+        }
+    });
+</script>
 </div>

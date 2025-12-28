@@ -58,7 +58,7 @@ class PelangganController extends Controller
                                 <path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z" />
                             </svg>
                         </a>
-                        
+
                         <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Apakah anda yakin ingin menghapus data ini?\');">
                             ' . $csrf . $method . '
                             <button type="submit" class="text-rose-500 hover:text-rose-600 rounded-full">
@@ -128,6 +128,96 @@ class PelangganController extends Controller
         $data->move('PelangganData', $namafile);
         Excel::import(new PelangganImport, \public_path('/PelangganData/' . $namafile));
         return redirect()->route('pelanggan.index')->with('success', 'All good!');
+    }
+
+
+    public function importChunk(Request $request)
+    {
+        try {
+            $rows = $request->input('rows');
+            $cabangId = getCabangId(); // Pastikan helper ini jalan
+
+            // Ambil semua nomor HP dari chunk ini
+            $chunkHps = collect($rows)->pluck('Nomor HP')->filter()->toArray();
+
+            // Ambil data yang sudah ada di DB (Global check)
+            $existingCustomers = Customer::whereIn('nomor_hp', $chunkHps)
+                ->get(['id', 'nomor_hp', 'cabang_id']);
+
+            $insertData = [];
+            $updatedCount = 0;
+
+            foreach ($rows as $row) {
+                // Validasi data kosong
+                if (empty($row['Nama Pelanggan']) && empty($row['Nomor HP'])) {
+                    continue;
+                }
+
+                // Pastikan HP jadi string & Trim spasi
+                $hpAsli = trim((string) $row['Nomor HP']);
+
+                // Cek existing
+                $existing = $existingCustomers->where('nomor_hp', $hpAsli)->first();
+
+                // 1. LOGIKA UPDATE (Jika Cabang Sama)
+                if ($existing && $existing->cabang_id == $cabangId) {
+                    Customer::where('id', $existing->id)->update([
+                        'nama'     => $row['Nama Pelanggan'],
+                        'kategori' => $row['Kategori Pelanggan'] ?? 'Umum',
+                        'alamat'   => $row['Alamat'] ?? '-',
+                    ]);
+                    $updatedCount++;
+                    continue;
+                }
+
+                // 2. LOGIKA CREATE
+                $finalHp = $hpAsli;
+
+                // Jika HP sudah dipakai cabang lain, kita rename
+                if ($existing) {
+                    $counter = 1; // Mulai dari 1
+                    // Cek terus sampai nemu yang belum ada
+                    while (Customer::where('nomor_hp', $finalHp)->exists()) {
+                        // PERBAIKAN DISINI: Gunakan str_repeat agar titiknya nambah terus
+                        // Loop 1: 0812.
+                        // Loop 2: 0812..
+                        // Loop 3: 0812...
+                        $finalHp = $hpAsli . str_repeat('.', $counter);
+                        $counter++;
+                    }
+                }
+
+                $insertData[] = [
+                    'nama'       => $row['Nama Pelanggan'],
+                    'nomor_hp'   => $finalHp,
+                    'kategori'   => $row['Kategori Pelanggan'] ?? 'Umum',
+                    'alamat'     => $row['Alamat'] ?? '-',
+                    'cabang_id'  => $cabangId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            // Insert Batch
+            if (!empty($insertData)) {
+                Customer::insert($insertData);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'inserted' => count($insertData),
+                'updated' => $updatedCount
+            ]);
+
+        } catch (\Throwable $th) {
+            // Log error biar tau di baris mana
+            \Log::error('Import Error: ' . $th->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'msg' => $th->getMessage(),
+            ], 500);
+        }
     }
 
     public function export()

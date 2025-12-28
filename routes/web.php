@@ -381,6 +381,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::resource('servis/tindakan-servis', KepalaTokoTindakanServisController::class);
 
     Route::get('pelanggan/data', [KepalaTokoPelangganController::class, 'getData'])->name('pelanggan.data');
+    Route::post('pelanggan/import-chunk', [KepalaTokoPelangganController::class, 'importChunk'])->name('pelanggan.import-chunk');
     Route::resource('pelanggan', KepalaTokoPelangganController::class);
     Route::post('pelanggan-broadcast', [KepalaTokoPelangganController::class,'broadcast'])->name('pelanggan.broadcast');
 
