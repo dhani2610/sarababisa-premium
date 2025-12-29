@@ -34,6 +34,12 @@ class TransaksiServisLangsungController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
+
+        $request->merge([
+            'total_modal_sparepart' => str_replace('.', '', $request->total_modal_sparepart),
+            'tunai' => str_replace('.', '', $request->tunai),
+            'transfer' => str_replace('.', '', $request->transfer),
+        ]);
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99')).rand(10,90);
         $nama_pelanggan = Customer::find($request->customers_id);
 
