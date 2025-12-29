@@ -76,7 +76,7 @@ class BonusBulanSebelumnyaController extends Controller
                 ->whereDate('tgl_ambil', '>=', $start_date)
                 ->whereDate('tgl_ambil', '<=', $end_date)
                 ->sum('profit');
-            
+
             $bonus_hardware_main = ($total_profit_hardware_main / 100) * $user->persen;
 
 
@@ -84,7 +84,7 @@ class BonusBulanSebelumnyaController extends Controller
                 ->where('tipe', 'Interface')
                 ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
                     $query->where('is_approve', 'Setuju')
-                        ->where('status_servis', 'Sudah Diambil') 
+                        ->where('status_servis', 'Sudah Diambil')
                         ->whereDate('tgl_ambil', '>=', $start_date)
                         ->whereDate('tgl_ambil', '<=', $end_date);
                 })

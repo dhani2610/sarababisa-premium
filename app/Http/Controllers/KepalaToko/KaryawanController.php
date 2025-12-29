@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\Budget;
 use App\Models\Salary;
 use App\Models\Refund;
+use App\Models\ServiceTransaction;
+use App\Models\TeknisiServis;
 use App\Models\Izin;
 use App\Models\Worker;
 use Illuminate\Http\Request;
@@ -94,6 +96,10 @@ class KaryawanController extends Controller
         $periode = $request->input('periode');
         $date = Carbon::createFromFormat('Y-m', $periode);
 
+        $start_date = $date->copy()->startOfMonth()->format('Y-m-d');
+        $end_date   = $date->copy()->endOfMonth()->format('Y-m-d');
+        // dd($start_date, $end_date);
+
         $namaBulanFile = Carbon::now()->translatedFormat('F Y');
 
         $items = Worker::findOrFail($id);
@@ -101,8 +107,16 @@ class KaryawanController extends Controller
             ->whereYear('created_at', $date->year)
             ->whereMonth('created_at', $date->month)
             ->get();
-        $bonus = Salary::where('workers_id', $id)->whereYear('created_at', $date->year)->whereMonth('created_at', $date->month)
+        $bonusOld = Salary::where('workers_id', $id)->whereYear('created_at', $date->year)->whereMonth('created_at', $date->month)
             ->sum('bonus');
+
+        $user = User::where('workers_id', $id)->first();
+        $bonus = 0;
+        if($user) {
+            $bonus = $this->calculateBonus($user->id, $start_date, $end_date);
+        }
+
+        // dd($bonus,$bonusOld);
         $users = User::find(1);
         $debts = Debt::where('workers_id', $id)
             ->where('is_approve', 'Setuju')
@@ -165,6 +179,72 @@ class KaryawanController extends Controller
         return $pdf->setPaper('a4', 'portrait')->setOption(['dpi' => 150, 'defaultFont' => 'sans-serif', 'isRemoteEnabled', true])->stream($filename);
     }
 
+    // Tambahkan parameter $customDate (opsional)
+    public function calculateBonus($id, $start_date, $end_date)
+    {
+        $user = User::find($id);
+        $bonus = 0;
+
+
+
+        if ($user->role === 'Teknisi') {
+            $total_bonus_interface_main = ServiceTransaction::where('users_id', $user->id)
+                ->where('status_servis', 'Sudah Diambil')
+                ->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
+                ->where('tipe', 'Interface')
+                ->whereDate('tgl_ambil', '>=', $start_date)
+                ->whereDate('tgl_ambil', '<=', $end_date)
+                ->sum('bonus_interface');
+
+            $total_profit_hardware_main = ServiceTransaction::where('users_id', $user->id)
+                ->where('status_servis', 'Sudah Diambil')
+                ->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
+                ->where('tipe', 'Hardware')
+                ->whereDate('tgl_ambil', '>=', $start_date)
+                ->whereDate('tgl_ambil', '<=', $end_date)
+                ->sum('profit');
+
+            $bonus_hardware_main = ($total_profit_hardware_main / 100) * $user->persen;
+
+            $total_bonus_interface_detail = TeknisiServis::where('users_id', $user->id)
+                ->where('tipe', 'Interface')
+                ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
+                    $query->where('is_approve', 'Setuju')
+                        ->where('status_servis', 'Sudah Diambil')
+                        ->whereDate('tgl_ambil', '>=', $start_date)
+                        ->whereDate('tgl_ambil', '<=', $end_date);
+                })
+                ->sum('bonus_interface');
+
+            $total_bonus_hardware_detail = TeknisiServis::where('users_id', $user->id)
+                ->where('tipe', 'Hardware')
+                ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
+                    $query->where('is_approve', 'Setuju')
+                        ->where('status_servis', 'Sudah Diambil')
+                        ->whereDate('tgl_ambil', '>=', $start_date)
+                        ->whereDate('tgl_ambil', '<=', $end_date);
+                })
+                ->get()
+                ->sum(function ($item) {
+                    return $item->profit * ($item->persen_teknisi / 100);
+                });
+
+            $bonus = $total_bonus_interface_main + $bonus_hardware_main + $total_bonus_interface_detail + $total_bonus_hardware_detail;
+
+        } elseif ($user->role === 'Sales') {
+            $bonus = $user->prevsale->sum('profit') / 100;
+            $bonus *= $user->persen;
+
+        } else {
+            $bonusadminservis = $user->prevadminservice->sum('profit') / 100;
+            $bonusadminsale = $user->prevadminsale->sum('profit') / 100;
+            $bonus = ($bonusadminservis + $bonusadminsale) * $user->persen;
+        }
+
+        return $bonus;
+    }
     /**
      * Show the form for editing the specified resource.
      *

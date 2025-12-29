@@ -482,15 +482,16 @@ class AkunController extends Controller
         $langganan = Auth::user()->exp_date;
         $total_cabang = Auth::user()->total_cabang;
 
-
-        $checkEmail = User::where('email', $request->email)
-                          ->where('id', '!=', $id) // Abaikan ID user ini sendiri
-                          ->first();
-
-        if ($checkEmail) {
-            toast('Email sudah digunakan oleh pengguna lain.', 'error');
-            return redirect()->route('akun');
+        if ($request->email != null) {
+            $checkEmail = User::where('email', $request->email)
+                              ->where('id', '!=', $id) // Abaikan ID user ini sendiri
+                              ->first();
+            if ($checkEmail) {
+                toast('Email sudah digunakan oleh pengguna lain.', 'error');
+                return redirect()->route('akun');
+            }
         }
+
 
         $password = $item->password;
         if ($request->filled('password')) {

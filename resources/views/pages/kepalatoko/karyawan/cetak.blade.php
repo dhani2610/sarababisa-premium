@@ -122,12 +122,18 @@
 			<td>Tunjangan BPJS</td>
 			<td class="text-right">Rp. {{ number_format($items->bpjs) }}</td>
 			</tr>
-			@foreach ($salaries as $item)
+			{{-- @foreach ($salaries as $item) --}}
+			<tr>
+			<td>Bonus</td>
+			<td class="text-right">Rp. {{ number_format($bonus) }}</td>
+			</tr>
+			{{-- @endforeach --}}
+			{{-- @foreach ($salaries as $item)
 			<tr>
 			<td>{{ $item->name }}</td>
 			<td class="text-right">Rp. {{ number_format($item->bonus) }}</td>
 			</tr>
-			@endforeach
+			@endforeach --}}
 			<tr>
 				<td>Lembur</td>
 				<td class="text-right">Rp. {{ number_format($overtime) }}</td>
@@ -139,8 +145,16 @@
 		<thead>
 			<tr>
 			<th scope="col">Total Penghasilan Bruto</th>
-			<th scope="col" class="text-right text-primary">Rp. {{ number_format($shift->nominal_gaji ?? 0 + $items->absen + $items->bpjs + $bonus + $overtime) }}</th>
-			</tr>
+            {{-- @dd($shift->nominal_gaji, (int)$items->absen, (int)$items->bpjs, $bonus, $overtime,$shift->nominal_gaji ?? 0 + $items->absen + $items->bpjs + $bonus + $overtime) --}}
+			<th scope="col" class="text-right text-primary">
+                Rp. {{ number_format(
+                    ($shift->nominal_gaji ?? 0) +
+                    (int)$items->absen +
+                    (int)$items->bpjs +
+                    $bonus +
+                    $overtime
+                ) }}
+            </th>
 		</thead>
 	</table>
 
@@ -207,7 +221,7 @@
 		<thead>
 			<tr>
 			<th scope="col">TOTAL DITERIMA KARYAWAN</th>
-			<th scope="col" class="text-right text-success">Rp. {{ number_format($shift->nominal_gaji ?? 0 + $items->absen + $items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal') - $izin + $overtime - $potongan_telat) }}</th>
+			<th scope="col" class="text-right text-success">Rp. {{ number_format(($shift->nominal_gaji ?? 0) + (int)$items->absen + (int)$items->bpjs + $bonus - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal') - $izin + $overtime - $potongan_telat) }}</th>
 			</tr>
 		</thead>
 	</table>
