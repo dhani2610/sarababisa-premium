@@ -575,11 +575,11 @@
                                             <div class="bg-slate-100 p-3 rounded">
                                                 <div class="mb-2">
                                                     <label class="block text-sm font-medium mb-1" for="total_modal_sparepart">Total Modal Sparepart <span class="text-rose-500">*</span></label>
-                                                    <input class="form-input w-full px-2 py-1 bg-white" type="number" name="total_modal_sparepart" id="total_modal_sparepart" required />
+                                                    <input class="form-input w-full px-2 py-1 bg-white" type="text" name="total_modal_sparepart" id="total_modal_sparepart" required />
                                                 </div>
                                                 <div>
                                                     <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya Servis (Ke Pelanggan) <span class="text-rose-500">*</span></label>
-                                                    <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="number" name="biaya" id="biaya" required />
+                                                    <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="text" name="biaya" id="biaya" required />
                                                 </div>
                                             </div>
 
