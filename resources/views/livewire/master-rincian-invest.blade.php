@@ -113,48 +113,62 @@
 
     <!-- Table -->
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5">
-        <div class="row">
-            <!-- Filter Tabs -->
-            <div class="flex gap-2 mt-4 border-b border-slate-200">
-                <button wire:click="setFilter(0)"
-                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150
-        {{ $filterTipe == 0 ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
-                    Semua
-                </button>
+        <div class="w-full">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mt-4 border-b border-slate-200 pb-2">
 
-                <button wire:click="setFilter(1)"
-                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150
-        {{ $filterTipe == 1 ? 'border-green-500 text-green-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
-                    Masuk (Rp{{ number_format($totals['masuk'], 0, ',', '.') }})
-                </button>
+        <div class="flex overflow-x-auto gap-2 w-full lg:w-auto pb-2 lg:pb-0 no-scrollbar">
 
-                <button wire:click="setFilter(2)"
-                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150
-        {{ $filterTipe == 2 ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
-                    Pembagian (Rp{{ number_format($totals['pembagian'], 0, ',', '.') }})
-                </button>
+            <button wire:click="setFilter(0)"
+                class="whitespace-nowrap px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150 flex-shrink-0
+                {{ $filterTipe == 0 ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
+                Semua
+            </button>
 
-                <button wire:click="setFilter(3)"
-                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150
-        {{ $filterTipe == 3 ? 'border-gray-500 text-gray-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
-                    Lain-lain (Rp{{ number_format($totals['lain'], 0, ',', '.') }})
-                </button>
+            <button wire:click="setFilter(1)"
+                class="whitespace-nowrap px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150 flex-shrink-0
+                {{ $filterTipe == 1 ? 'border-green-500 text-green-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
+                Masuk (Rp{{ number_format($totals['masuk'], 0, ',', '.') }})
+            </button>
 
-                @if (Auth::user()->role != 'Investor')
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium">Filter Investor:</label>
-                        <select wire:model="filterInvestor" class="form-select text-sm">
-                            <option value="0">Semua Investor</option>
-                            @foreach ($investors as $investor)
-                                <option value="{{ $investor->id }}">{{ $investor->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                @endif
+            <button wire:click="setFilter(2)"
+                class="whitespace-nowrap px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150 flex-shrink-0
+                {{ $filterTipe == 2 ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
+                Pembagian (Rp{{ number_format($totals['pembagian'], 0, ',', '.') }})
+            </button>
 
-            </div>
+            <button wire:click="setFilter(3)"
+                class="whitespace-nowrap px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150 flex-shrink-0
+                {{ $filterTipe == 3 ? 'border-gray-500 text-gray-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
+                Lain-lain (Rp{{ number_format($totals['lain'], 0, ',', '.') }})
+            </button>
 
         </div>
+
+        @if (Auth::user()->role != 'Investor')
+            <div class="w-full lg:w-auto flex items-center gap-2">
+                <label class="text-sm font-medium whitespace-nowrap hidden sm:block">Filter Investor:</label>
+                <select wire:model="filterInvestor" class="form-select text-sm w-full lg:w-auto">
+                    <option value="0">Semua Investor</option>
+                    @foreach ($investors as $investor)
+                        <option value="{{ $investor->id }}">{{ $investor->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
+
+    </div>
+</div>
+
+{{-- CSS Tambahan Opsional: Untuk menyembunyikan scrollbar tapi tetap bisa di-scroll --}}
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+</style>
         <div class="overflow-x-auto" x-data="handleSelect">
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 <h2 class="font-semibold text-slate-800">Semua Data <span
