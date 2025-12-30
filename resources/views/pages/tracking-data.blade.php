@@ -55,13 +55,13 @@
                         $ppnValue = 0;
                         $totalAkhir = $subtotal;
                     }
-                    
+
                     // Helper URL untuk fetch foto (Pastikan route ini benar di web.php)
                     $urlGetFoto = url('/servis/transaksi-servis/' . $item->id . '/get-foto');
                 @endphp
 
-                <div x-data="{ 
-                        open: false, 
+                <div x-data="{
+                        open: false,
                         loaded: false,
                         loading: false,
                         fotoMasuk: [],
@@ -87,7 +87,7 @@
                                     this.loading = false;
                                 });
                         }
-                    }" 
+                    }"
                     class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-slate-200 overflow-hidden">
 
                     <div class="p-5">
@@ -138,7 +138,7 @@
 
                     <div x-show="open" x-collapse style="display: none;">
                         <div class="p-5 border-t border-slate-200">
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <h4 class="font-semibold text-slate-800 mb-3 flex items-center gap-2">
@@ -169,7 +169,8 @@
                                                     </div>
                                                     @php $garansiDate = $listGaransi[$key] ?? null; @endphp
                                                     <div class="text-xs mt-1 {{ $garansiDate ? 'text-blue-600' : 'text-slate-400' }}">
-                                                        {{ $garansiDate ? 'Garansi s/d ' . \Carbon\Carbon::make($garansiDate)->translatedFormat('d M Y') : 'Tidak ada garansi' }}
+                                                        {{ $garansiDate ? 'Garansi s/d ' . optional(\Carbon\Carbon::parse($garansiDate))->translatedFormat('d M Y') : 'Tidak ada garansi' }}
+                                                        {{-- {{ $garansiDate ? 'Garansi s/d ' . \Carbon\Carbon::make($garansiDate)->translatedFormat('d M Y') : 'Tidak ada garansi' }} --}}
                                                     </div>
                                                 </div>
                                             @endforeach
@@ -243,7 +244,7 @@
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-show="!loading && (fotoMasuk.length > 0 || fotoSelesai.length > 0)">
-                                    
+
                                     <div x-show="fotoMasuk.length > 0">
                                         <div class="text-xs font-bold text-slate-500 uppercase mb-3 border-l-4 border-amber-400 pl-2">Foto QC Masuk</div>
                                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
