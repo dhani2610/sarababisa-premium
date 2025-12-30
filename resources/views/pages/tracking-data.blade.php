@@ -167,10 +167,23 @@
                                                         <div class="font-medium text-slate-700">{{ $tindakan }}</div>
                                                         <div class="font-semibold text-slate-900 ml-2 whitespace-nowrap">Rp. {{ number_format($listBiaya[$key] ?? 0) }}</div>
                                                     </div>
-                                                    @php $garansiDate = $listGaransi[$key] ?? null; @endphp
+                                                   @php
+                                                        $rawDate = $listGaransi[$key] ?? null;
+
+                                                        // Cek jika data masih berupa JSON String (array string)
+                                                        // Contoh kasus: "[\"2026-01-13\"]"
+                                                        if (is_string($rawDate) && (str_starts_with($rawDate, '[') || str_starts_with($rawDate, '"'))) {
+                                                            $decoded = json_decode($rawDate, true);
+                                                            // Ambil elemen pertama jika hasil decode adalah array, atau ambil nilainya langsung
+                                                            $garansiDate = is_array($decoded) ? ($decoded[0] ?? null) : $decoded;
+                                                        } else {
+                                                            // Jika sudah string tanggal biasa atau null
+                                                            $garansiDate = $rawDate;
+                                                        }
+                                                    @endphp
+
                                                     <div class="text-xs mt-1 {{ $garansiDate ? 'text-blue-600' : 'text-slate-400' }}">
                                                         {{ $garansiDate ? 'Garansi s/d ' . optional(\Carbon\Carbon::parse($garansiDate))->translatedFormat('d M Y') : 'Tidak ada garansi' }}
-                                                        {{-- {{ $garansiDate ? 'Garansi s/d ' . \Carbon\Carbon::make($garansiDate)->translatedFormat('d M Y') : 'Tidak ada garansi' }} --}}
                                                     </div>
                                                 </div>
                                             @endforeach
