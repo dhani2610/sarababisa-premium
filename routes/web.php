@@ -271,6 +271,8 @@ Route::get('produk/item/{id}/download-barcode', [ProdukController::class, 'downl
 Route::delete('master/master-gallery/delete-selected', [GalleryController::class, 'deleteSelected'])
         ->name('master-gallery.deleteSelected');
 
+Route::get('gaji/karyawan/data', [KepalaTokoKaryawanController::class, 'getData'])->name('karyawan.data');
+Route::post('gaji/karyawan/delete-batch', [KepalaTokoKaryawanController::class, 'deleteBatch'])->name('karyawan.delete-batch');
 Route::resource('gaji/karyawan', KepalaTokoKaryawanController::class);
 Route::get('slip-gaji/{id}', [KepalaTokoKaryawanController::class, 'cetak'])->name('cetak-slip-gaji');
 Route::get('/history-garansi/cetak', [HistoryGaransiController::class, 'cetak'])
@@ -481,7 +483,14 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::resource('target-teknisi', KepalaTokoTargetTeknisiController::class);
     Route::delete('/budgets/delete', [KepalaTokoAnggaranController::class, 'deleteSelected']);
     Route::post('/target/bulan-sebelumnya', [KepalaTokoTargetBulanSebelumnyaController::class, 'store'])->name('target-bulan-sebelumnya');
+
+    Route::get('manajemen/insiden/data', [KepalaTokoInsidenController::class, 'getData'])->name('insiden.data');
+Route::post('manajemen/insiden/delete-batch', [KepalaTokoInsidenController::class, 'deleteBatch'])->name('insiden.delete-batch');
     Route::resource('manajemen/insiden', KepalaTokoInsidenController::class);
+    Route::get('manajemen/kasbon/data', [KepalaTokoKasbonController::class, 'getData'])->name('kasbon.data');
+Route::post('manajemen/kasbon/delete-batch', [KepalaTokoKasbonController::class, 'deleteBatch'])->name('kasbon.delete-batch');
+Route::post('manajemen/kasbon/approve-batch', [KepalaTokoKasbonController::class, 'approveBatch'])->name('kasbon.approve-batch');
+Route::post('manajemen/kasbon/reject-batch', [KepalaTokoKasbonController::class, 'rejectBatch'])->name('kasbon.reject-batch');
     Route::resource('manajemen/kasbon', KepalaTokoKasbonController::class);
     Route::patch('/debts/update', [KepalaTokoKasbonController::class, 'approveSelected']);
     Route::patch('/debts/reject', [KepalaTokoKasbonController::class, 'rejectSelected']);
@@ -489,6 +498,12 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::resource('gaji/bonus', KepalaTokoGajiController::class);
     Route::delete('/bonus/delete', [KepalaTokoGajiController::class, 'deleteSelected']);
     Route::post('/gaji/bonus/bulan-sebelumnya', [KepalaTokoBonusBulanSebelumnyaController::class, 'store'])->name('bonus-bulan-sebelumnya');
+
+
+    Route::get('manajemen/pengeluaran/data', [KepalaTokoExpenseController::class, 'getData'])->name('pengeluaran.data');
+Route::post('manajemen/pengeluaran/delete-batch', [KepalaTokoExpenseController::class, 'deleteBatch'])->name('pengeluaran.delete-batch');
+Route::post('manajemen/pengeluaran/approve-batch', [KepalaTokoExpenseController::class, 'approveBatch'])->name('pengeluaran.approve-batch');
+Route::post('manajemen/pengeluaran/reject-batch', [KepalaTokoExpenseController::class, 'rejectBatch'])->name('pengeluaran.reject-batch');
     Route::resource('manajemen/pengeluaran', KepalaTokoExpenseController::class);
     Route::patch('/expenses/update', [KepalaTokoExpenseController::class, 'approveSelected']);
     Route::patch('/expenses/reject', [KepalaTokoExpenseController::class, 'rejectSelected']);

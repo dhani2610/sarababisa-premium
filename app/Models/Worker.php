@@ -24,7 +24,7 @@ class Worker extends Model
     // many to many
     public function user()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     // one to many
