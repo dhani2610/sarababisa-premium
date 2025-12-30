@@ -347,7 +347,7 @@
                                                 for="estimasi_biaya">Estimasi Biaya Servis</label>
                                             <div class="relative">
                                                 <input id="estimasi_biaya" name="estimasi_biaya"
-                                                    class="form-input w-full pl-10 px-2 py-1" type="number"
+                                                    class="form-input w-full pl-10 px-2 py-1 input-currency" type="text"
                                                     placeholder="Kosongkan jika tidak ada" />
                                                 <div
                                                     class="absolute inset-0 right-auto flex items-center pointer-events-none">
@@ -360,7 +360,7 @@
                                                 Muka</label>
                                             <div class="relative">
                                                 <input id="uang_muka" name="uang_muka"
-                                                    class="form-input w-full pl-10 px-2 py-1" type="number"
+                                                    class="form-input w-full pl-10 px-2 py-1 input-currency" type="text"
                                                     placeholder="Kosongkan jika tidak ada" />
                                                 <div
                                                     class="absolute inset-0 right-auto flex items-center pointer-events-none">
@@ -2092,5 +2092,27 @@ $(document).ready(function () {
             // Trigger input agar kalkulasi diskon/tunai di bawah ikut update
             $('#biaya').trigger('input');
         }
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Seleksi semua input dengan class "input-currency"
+        const currencyInputs = document.querySelectorAll('.input-currency');
+
+        currencyInputs.forEach(function(input) {
+            // Format saat user mengetik
+            input.addEventListener('input', function(e) {
+                e.target.value = formatRupiah(e.target.value);
+            });
+        });
+
+        // Optional: Bersihkan titik saat submit form agar data bersih masuk database
+        const forms = document.querySelectorAll('form');
+        forms.forEach(function(form) {
+            form.addEventListener('submit', function() {
+                currencyInputs.forEach(function(input) {
+                    // Hapus titik sebelum submit
+                    input.value = input.value.replace(/\./g, '');
+                });
+            });
+        });
     });
 </script>

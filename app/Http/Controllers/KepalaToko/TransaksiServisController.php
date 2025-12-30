@@ -663,7 +663,7 @@ class TransaksiServisController extends Controller
      */
     public function store(Request $request)
     {
-
+        // dd($request->all());
         $qc_data = $request->qc_masuk ?? [];
 
         // Gabungkan dengan baris Custom (jika ada input manual)
