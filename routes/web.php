@@ -495,7 +495,10 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::delete('/inventories/delete', [KepalaTokoInventarisController::class, 'deleteSelected']);
 
     Route::resource('produk/kategori', KepalaTokoKategoriController::class);
+    Route::get('produk/sub-kategori/data', [KepalaTokoSubKategoriController::class, 'getData'])->name('sub-kategori.data');
+    Route::post('produk/sub-kategori/delete-batch', [KepalaTokoSubKategoriController::class, 'deleteBatch'])->name('sub-kategori.delete-batch');
     Route::resource('produk/sub-kategori', KepalaTokoSubKategoriController::class);
+
     Route::resource('produk/supplier', KepalaTokoSupplierController::class);
 
     Route::get('produk/item/data', [ProdukController::class, 'getData'])->name('produk-item.data');

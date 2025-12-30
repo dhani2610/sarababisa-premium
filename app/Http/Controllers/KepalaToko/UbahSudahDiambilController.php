@@ -159,6 +159,11 @@ class UbahSudahDiambilController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // dd($request->all());
+        $request->merge([
+            'tunai' => str_replace('.', '', $request->tunai),
+            'transfer' => str_replace('.', '', $request->transfer),
+        ]);
         $item = ServiceTransaction::findOrFail($id);
         $profittransaksi = $request->biaya - $request->modal_sparepart - $request->diskon;
         $bagihasil = ($request->biaya - $request->modal_sparepart - $request->diskon) / 100;

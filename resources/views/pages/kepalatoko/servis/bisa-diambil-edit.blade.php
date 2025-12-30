@@ -450,288 +450,306 @@
   <script src="https://code.jquery.com/jquery-3.7.0.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-        <script>
-            $(document).ready(function () {
 
-                // --- 1. TERIMA DATA DARI CONTROLLER ---
-                const existingData = @json($teknisiServis ?? []);
-                // Master data tindakan untuk pengecekan validitas ID
-                const masterActions = @json($service_actions);
-                let groupCounter = 0;
+<script>
+    // --- 1. HELPER FUNCTIONS FORMAT RUPIAH ---
+    function formatRupiah(angka) {
+        if (!angka) return '';
+        var number_string = angka.toString().replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-                // --- TEMPLATES (PHP BLADE RENDERED) ---
-                const teknisiOptions = `
-                    <option selected value="">Pilih Teknisi</option>
-                    @foreach ($users as $user) <option value="{{ $user->id }}">{{ $user->name }}</option> @endforeach
-                `;
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
 
-                // Option dropdown tindakan
-                const actionOptions = `
-                    <option selected value="">Pilih Tindakan</option>
-                    @foreach ($service_actions as $action) <option value="{{ $action->id }}">{{ $action->nama_tindakan }}</option> @endforeach
-                `;
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return rupiah;
+    }
 
-                const sparepartOptions = `
-                    <option selected value="">Pilih Sparepart</option>
-                    @foreach (App\Models\Product::where('cabang_id',getCabangId())->get() as $item)
-                        <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ addslashes($item->product_name) }}</option>
-                    @endforeach
-                `;
+    function parseRupiah(str) {
+        if (!str) return 0;
+        // Hapus semua titik, lalu ubah ke integer
+        return parseInt(str.toString().replace(/\./g, '')) || 0;
+    }
 
-                const salesOptions = `
-                    <option selected value="1">Tidak ada Sales</option>
-                    @foreach ($sales as $user) <option value="{{ $user->id }}">{{ $user->name }}</option> @endforeach
-                `;
+    // --- 2. LOGIC UTAMA ---
+    $(document).ready(function() {
 
-                // --- HTML GENERATOR ---
-                // Parameter tambahan: isManual (boolean), manualValue (string text tindakan)
-                function generateActionHtml(groupIndex, actionIndex, isManual = false, manualValue = '') {
-                    const uniqueRadioId = 'radio_' + actionIndex;
+        // A. EVENT LISTENER FORMATTING INPUT
+        $(document).on('input', '.input-currency', function() {
+            $(this).val(formatRupiah($(this).val()));
+        });
 
-                    // Logic display element berdasarkan isManual
-                    const displaySelect = isManual ? 'none' : 'block';
-                    const displayInput = isManual ? 'block' : 'none';
-                    const checkedState = isManual ? 'true' : 'false'; // string 'true' untuk x-data alpine
+        // B. CLEAN DATA SEBELUM SUBMIT
+        $('form').on('submit', function() {
+            // Hapus titik di semua input currency sebelum dikirim ke backend
+            $(this).find('.input-currency').each(function() {
+                var cleanVal = $(this).val().replace(/\./g, '');
+                $(this).val(cleanVal);
+            });
+            // Bersihkan juga field total (readonly)
+            $('#biaya').val($('#biaya').val().replace(/\./g, ''));
+            $('#total_modal_sparepart').val($('#total_modal_spaInirepart').val().replace(/\./g, ''));
+            $('#tunai').val($('#tunai').val().replace(/\./g, ''));
+            $('#transfer').val($('#transfer').val().replace(/\./g, ''));
+        });
 
-                    return `
-                    <div class="action-item" x-data="{ useSparepart: false, showInputManual: ${checkedState} }">
-                        <button type="button" class="position-button-x remove-action absolute top-2 right-2 text-rose-500 hover:text-rose-700 font-bold" title="Hapus">&times;</button>
-                        <div class="mb-2 pr-6">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="block text-sm font-medium">Tindakan Servis <span class="text-rose-500">*</span></label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="form-checkbox checkbox-manual" x-model="showInputManual"/>
-                                    <span class="text-sm ml-2">Isi Manual</span>
-                                </label>
-                            </div>
+        // C. LOGIC DINAMIS TEKNISI
+        const existingData = @json($teknisiServis ?? []);
+        let groupCounter = 0;
 
-                            <div x-show="!showInputManual" class="wrapper-select-action" style="display:${displaySelect}">
-                                <select name="teknisi[${groupIndex}][tindakan][${actionIndex}][service_actions_id]" class="form-select text-sm py-1 w-full selectAction">
-                                    ${actionOptions}
-                                </select>
-                            </div>
+        // TEMPLATES
+        const teknisiOptions = `
+            <option selected value="">Pilih Teknisi</option>
+            @foreach ($users as $user) <option value="{{ $user->id }}">{{ $user->name }}</option> @endforeach
+        `;
+        const actionOptions = `
+            <option selected value="">Pilih Tindakan</option>
+            @foreach ($service_actions as $action) <option value="{{ $action->id }}">{{ $action->nama_tindakan }}</option> @endforeach
+        `;
+        const sparepartOptions = `
+            <option selected value="">Pilih Sparepart</option>
+            @foreach (App\Models\Product::where('cabang_id',getCabangId())->get() as $item)
+                <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ addslashes($item->product_name) }}</option>
+            @endforeach
+        `;
+        const salesOptions = `
+            <option selected value="1">Tidak ada Sales</option>
+            @foreach ($sales as $user) <option value="{{ $user->id }}">{{ $user->name }}</option> @endforeach
+        `;
 
-                            <div x-show="showInputManual" class="mt-2 wrapper-input-manual" style="display:${displayInput}">
-                                <input class="form-input w-full px-2 py-1 input-manual-text" type="text"
-                                    name="teknisi[${groupIndex}][tindakan][${actionIndex}][tindakan_servis]"
-                                    placeholder="Ketik manual..."
-                                    value="${manualValue}"/>
-                            </div>
-                        </div>
-
+        function generateActionHtml(groupIndex, actionIndex) {
+            const uniqueRadioId = 'radio_' + actionIndex;
+            // PERUBAHAN: Input modal & biaya jadi type="text" + class="input-currency"
+            return `
+            <div class="action-item" x-data="{ useSparepart: false, showInputManual: false }">
+                <button type="button" class="position-button-x remove-action absolute top-2 right-2 text-rose-500 hover:text-rose-700 font-bold" title="Hapus">&times;</button>
+                <div class="mb-2 pr-6">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-sm font-medium">Tindakan Servis <span class="text-rose-500">*</span></label>
+                        <label class="flex items-center"><input type="checkbox" class="form-checkbox checkbox-manual" x-on:click="showInputManual = !showInputManual"/><span class="text-sm ml-2">Isi Manual</span></label>
+                    </div>
+                    <div x-show="!showInputManual" class="wrapper-select-action">
+                        <select name="teknisi[${groupIndex}][tindakan][${actionIndex}][service_actions_id]" class="form-select text-sm py-1 w-full selectAction">${actionOptions}</select>
+                    </div>
+                    <div x-show="showInputManual" class="mt-2 wrapper-input-manual" style="display:none;">
+                        <input class="form-input w-full px-2 py-1 input-manual-text" type="text" name="teknisi[${groupIndex}][tindakan][${actionIndex}][tindakan_servis]" placeholder="Ketik manual..."/>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="garansi">Garansi</label>
+                    <select name="teknisi[${groupIndex}][tindakan][${actionIndex}][garansi]" class="form-select text-sm py-1 w-full">
+                        <option value="">Tidak Ada</option>
+                        <option value="1">1 Hari</option>
+                        <option value="2">2 Hari</option>
+                        <option value="3">3 Hari</option>
+                        <option value="4">4 Hari</option>
+                        <option value="5">5 Hari</option>
+                        <option value="6">6 Hari</option>
+                        <option value="7">1 Minggu</option>
+                        <option value="14">2 Minggu</option>
+                        <option value="21">3 Minggu</option>
+                        <option value="30">1 Bulan</option>
+                        <option value="60">2 Bulan</option>
+                        <option value="90">3 Bulan</option>
+                        <option value="120">4 Bulan</option>
+                        <option value="150">5 Bulan</option>
+                        <option value="180">6 Bulan</option>
+                        <option value="210">7 Bulan</option>
+                        <option value="240">8 Bulan</option>
+                        <option value="270">9 Bulan</option>
+                        <option value="300">10 Bulan</option>
+                        <option value="330">11 Bulan</option>
+                        <option value="365">1 Tahun</option>
+                        <option value="730">2 Tahun</option>
+                        <option value="1095">3 Tahun</option>
+                        <option value="1460">4 Tahun</option>
+                        <option value="1825">5 Tahun</option>
+                        </select>
+                </div>
+                <div class="konfirmasi-stok border-t border-slate-200 pt-2 mt-2">
+                    <label class="block text-sm font-medium mb-1">Pakai Sparepart Toko?</label>
+                    <div class="flex flex-wrap items-center -m-3 mb-2">
+                        <div class="m-3"><label class="flex items-center"><input type="radio" name="${uniqueRadioId}" value="tidak" class="form-radio radio-sparepart-no" checked x-on:click="useSparepart = false"/><span class="text-sm ml-2">Tidak</span></label></div>
+                        <div class="m-3"><label class="flex items-center"><input type="radio" name="${uniqueRadioId}" value="ya" class="form-radio radio-sparepart-yes" x-on:click="useSparepart = true"/><span class="text-sm ml-2">Ya</span></label></div>
+                    </div>
+                    <div x-show="useSparepart" style="display: none;" class="wrapper-sparepart-area">
+                        <div class="mb-2"><label class="block text-sm font-medium mb-1">Sparepart</label><select name="teknisi[${groupIndex}][tindakan][${actionIndex}][products_id]" class="form-select text-sm py-1 w-full selectSparepart" style="width: 100%;">${sparepartOptions}</select></div>
+                        <div class="mb-2"><label class="block text-sm font-medium mb-1">Sales Sparepart</label><select name="teknisi[${groupIndex}][tindakan][${actionIndex}][sales_id]" class="form-select text-sm py-1 w-full selectSales">${salesOptions}</select></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
                         <div>
-                            <label class="block text-sm font-medium mb-1" for="garansi">Garansi</label>
-                            <select name="teknisi[${groupIndex}][tindakan][${actionIndex}][garansi]" class="form-select text-sm py-1 w-full">
-                                <option value="">Tidak Ada</option>
-                                <option value="1">1 Hari</option>
-                                <option value="2">2 Hari</option>
-                                <option value="3">3 Hari</option>
-                                <option value="4">4 Hari</option>
-                                <option value="5">5 Hari</option>
-                                <option value="6">6 Hari</option>
-                                <option value="7">1 Minggu</option>
-                                <option value="14">2 Minggu</option>
-                                <option value="21">3 Minggu</option>
-                                <option value="30">1 Bulan</option>
-                                <option value="60">2 Bulan</option>
-                                <option value="90">3 Bulan</option>
-                                <option value="120">4 Bulan</option>
-                                <option value="150">5 Bulan</option>
-                                <option value="180">6 Bulan</option>
-                                <option value="210">7 Bulan</option>
-                                <option value="240">8 Bulan</option>
-                                <option value="270">9 Bulan</option>
-                                <option value="300">10 Bulan</option>
-                                <option value="330">11 Bulan</option>
-                                <option value="365">1 Tahun</option>
-                                <option value="730">2 Tahun</option>
-                                <option value="1095">3 Tahun</option>
-                                <option value="1460">4 Tahun</option>
-                                <option value="1825">5 Tahun</option>
-                            </select>
+                            <label class="block text-sm font-medium mb-1">Modal Part <span class="text-rose-500">*</span></label>
+                            <input class="form-input w-full px-2 py-1 modal_sparepart input-currency" type="text" name="teknisi[${groupIndex}][tindakan][${actionIndex}][modal_sparepart]" value="0" required />
                         </div>
-
-                        <div class="konfirmasi-stok border-t border-slate-200 pt-2 mt-2">
-                            <label class="block text-sm font-medium mb-1">Pakai Sparepart Toko?</label>
-                            <div class="flex flex-wrap items-center -m-3 mb-2">
-                                <div class="m-3"><label class="flex items-center"><input type="radio" name="${uniqueRadioId}" value="tidak" class="form-radio radio-sparepart-no" checked x-on:click="useSparepart = false"/><span class="text-sm ml-2">Tidak</span></label></div>
-                                <div class="m-3"><label class="flex items-center"><input type="radio" name="${uniqueRadioId}" value="ya" class="form-radio radio-sparepart-yes" x-on:click="useSparepart = true"/><span class="text-sm ml-2">Ya</span></label></div>
-                            </div>
-                            <div x-show="useSparepart" style="display: none;" class="wrapper-sparepart-area">
-                                <div class="mb-2"><label class="block text-sm font-medium mb-1">Sparepart</label><select name="teknisi[${groupIndex}][tindakan][${actionIndex}][products_id]" class="form-select text-sm py-1 w-full selectSparepart" style="width: 100%;">${sparepartOptions}</select></div>
-                                <div class="mb-2"><label class="block text-sm font-medium mb-1">Sales Sparepart</label><select name="teknisi[${groupIndex}][tindakan][${actionIndex}][sales_id]" class="form-select text-sm py-1 w-full selectSales">${salesOptions}</select></div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 mt-2">
-                                <div><label class="block text-sm font-medium mb-1">Modal Part <span class="text-rose-500">*</span></label><input class="form-input w-full px-2 py-1 modal_sparepart" type="number" name="teknisi[${groupIndex}][tindakan][${actionIndex}][modal_sparepart]" value="0" required /></div>
-                                <div><label class="block text-sm font-medium mb-1">Biaya Servis <span class="text-rose-500">*</span></label><input class="form-input w-full px-2 py-1 biaya_servis" type="number" name="teknisi[${groupIndex}][tindakan][${actionIndex}][biaya_servis]" value="0" required /></div>
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Biaya Servis <span class="text-rose-500">*</span></label>
+                            <input class="form-input w-full px-2 py-1 biaya_servis input-currency" type="text" name="teknisi[${groupIndex}][tindakan][${actionIndex}][biaya_servis]" value="0" required />
                         </div>
-                    </div>`;
-                }
+                    </div>
+                </div>
+            </div>`;
+        }
 
-                function addTechnicianGroup(techData = null) {
-                    const currentGroupIndex = groupCounter++;
-                    const groupHtml = `
-                    <div class="technician-group relative" data-group-index="${currentGroupIndex}">
-                        <button style="position: absolute;right: 2%;" type="button" class="remove-group absolute top-2 right-2 text-white bg-rose-500 hover:bg-rose-600 rounded px-2 py-1 text-xs z-10">Hapus Teknisi</button>
-                        <div class="bg-indigo-50 -m-4 mb-4 p-4 border-b border-indigo-100 rounded-t">
-                            <h3 class="font-bold text-indigo-800 mb-2">Data Teknisi</h3>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div><label class="block text-sm font-medium mb-1">Nama Teknisi <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][user_id]" class="form-select text-sm py-1 w-full selectUser" >${teknisiOptions}</select></div>
-                                <div><label class="block text-sm font-medium mb-1">Tipe Bagi Hasil <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][tipe]" class="form-select text-sm py-1 w-full selectType" ><option selected value="">Pilih Tipe</option><option value="Interface">Interface (bonus pertipe)</option><option value="Hardware">Hardware & interface (bonus persen)</option></select></div>
-                            </div>
-                        </div>
-                        <div class="actions-list-container space-y-3"></div>
-                        <div class="mt-3 text-center border-t border-dashed border-slate-300 pt-3"><button type="button" class="add-action-btn btn-sm bg-emerald-500 hover:bg-emerald-600 text-white">+ Tambah Tindakan Lain (Untuk Teknisi Ini)</button></div>
-                    </div>`;
-                    const $newGroup = $(groupHtml);
-                    $('#main-container').append($newGroup);
-                    if (techData) {
-                        $newGroup.find('.selectUser').val(techData.users_id);
-                        $newGroup.find('.selectType').val(techData.tipe);
-                    } else {
-                        addActionToGroup($newGroup, currentGroupIndex);
-                    }
-                    return { $element: $newGroup, index: currentGroupIndex };
-                }
+        function addTechnicianGroup(techData = null) {
+            const currentGroupIndex = groupCounter++;
+            const groupHtml = `
+            <div class="technician-group relative" data-group-index="${currentGroupIndex}">
+                <button style="position: absolute;right: 2%;" type="button" class="remove-group absolute top-2 right-2 text-white bg-rose-500 hover:bg-rose-600 rounded px-2 py-1 text-xs z-10">Hapus Teknisi</button>
+                <div class="bg-indigo-50 -m-4 mb-4 p-4 border-b border-indigo-100 rounded-t">
+                    <h3 class="font-bold text-indigo-800 mb-2">Data Teknisi</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div><label class="block text-sm font-medium mb-1">Nama Teknisi <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][user_id]" class="form-select text-sm py-1 w-full selectUser" >${teknisiOptions}</select></div>
+                        <div><label class="block text-sm font-medium mb-1">Tipe Bagi Hasil <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][tipe]" class="form-select text-sm py-1 w-full selectType" ><option selected value="">Pilih Tipe</option><option value="Interface">Interface (bonus pertipe)</option><option value="Hardware">Hardware & interface (bonus persen)</option></select></div>
+                    </div>
+                </div>
+                <div class="actions-list-container space-y-3"></div>
+                <div class="mt-3 text-center border-t border-dashed border-slate-300 pt-3"><button type="button" class="add-action-btn btn-sm bg-emerald-500 hover:bg-emerald-600 text-white">+ Tambah Tindakan Lain (Untuk Teknisi Ini)</button></div>
+            </div>`;
 
-                function addActionToGroup($groupElement, groupIndex, actionData = null) {
-                    if (groupIndex === undefined) groupIndex = $groupElement.attr('data-group-index');
-                    const actionIndex = Date.now() + Math.floor(Math.random() * 10000);
+            const $newGroup = $(groupHtml);
+            $('#main-container').append($newGroup);
 
-                    // --- LOGIC DETEKSI MANUAL ---
-                    let isManual = false;
-                    let manualText = '';
+            if (techData) {
+                $newGroup.find('.selectUser').val(techData.users_id);
+                $newGroup.find('.selectType').val(techData.tipe);
+            } else {
+                addActionToGroup($newGroup, currentGroupIndex);
+            }
+            return { $element: $newGroup, index: currentGroupIndex };
+        }
 
-                    if (actionData) {
-                        // Logic: Jika act_id tidak ada di masterActions atau null => Manual
-                        const existsInMaster = masterActions.some(act => act.id == actionData.act_id);
+        function addActionToGroup($groupElement, groupIndex, actionData = null) {
+            if (groupIndex === undefined) groupIndex = $groupElement.attr('data-group-index');
+            const actionIndex = Date.now() + Math.floor(Math.random() * 10000);
+            const html = generateActionHtml(groupIndex, actionIndex);
+            const $newItem = $(html);
+            $groupElement.find('.actions-list-container').append($newItem);
 
-                        if (!actionData.act_id || actionData.act_id === 'null' || !existsInMaster) {
-                            isManual = true;
-                            // Ambil text dari parameter manual_text yang dikirim
-                            manualText = actionData.manual_text || '';
-                        }
-                    }
+            const $selAction = $newItem.find('.selectAction').select2();
+            const $selSparepart = $newItem.find('.selectSparepart').select2();
+            const $selSales = $newItem.find('.selectSales').select2();
 
-                    const html = generateActionHtml(groupIndex, actionIndex, isManual, manualText);
-                    const $newItem = $(html);
-                    $groupElement.find('.actions-list-container').append($newItem);
+            if (actionData) {
+                // FORMAT VALUE SAAT LOAD
+                $newItem.find('.biaya_servis').val(formatRupiah(actionData.biaya || 0));
+                $newItem.find('.modal_sparepart').val(formatRupiah(actionData.modal || 0));
 
-                    const $selAction = $newItem.find('.selectAction').select2();
-                    const $selSparepart = $newItem.find('.selectSparepart').select2();
-                    const $selSales = $newItem.find('.selectSales').select2();
+                if (actionData.act_id && actionData.act_id !== "null") $selAction.val(actionData.act_id).trigger('change.select2');
 
-                    if (actionData) {
-                        $newItem.find('.biaya_servis').val(actionData.biaya || 0);
-                        $newItem.find('.modal_sparepart').val(actionData.modal || 0);
+                if (actionData.prod_id && actionData.prod_id != "null" && actionData.prod_id != "") {
+                    setTimeout(() => { $newItem.find('.radio-sparepart-yes')[0].click(); }, 50);
+                    setTimeout(() => {
+                        $selSparepart.val(actionData.prod_id).trigger('change.select2');
+                        const hargaModalOtomatis = $selSparepart.find(':selected').data('harga_modal') || 0;
 
-                        // Set value dropdown jika BUKAN manual
-                        if (!isManual && actionData.act_id && actionData.act_id !== "null") {
-                            $selAction.val(actionData.act_id).trigger('change.select2');
-                        }
-
-                        if (actionData.prod_id && actionData.prod_id != "null" && actionData.prod_id != "") {
-                            setTimeout(() => { $newItem.find('.radio-sparepart-yes')[0].click(); }, 50);
-                            setTimeout(() => {
-                                $selSparepart.val(actionData.prod_id).trigger('change.select2');
-                                const hargaModalOtomatis = $selSparepart.find(':selected').data('harga_modal') || 0;
-                                if(actionData.modal > 0) {
-                                    $newItem.find('.modal_sparepart').val(actionData.modal);
-                                } else {
-                                    $newItem.find('.modal_sparepart').val(hargaModalOtomatis);
-                                }
-                                recalculateAll();
-                            }, 100);
+                        if(actionData.modal > 0) {
+                            $newItem.find('.modal_sparepart').val(formatRupiah(actionData.modal));
                         } else {
-                            recalculateAll();
+                            $newItem.find('.modal_sparepart').val(formatRupiah(hargaModalOtomatis));
                         }
-                    }
-                }
-
-                // LOAD DATA
-                if (existingData && existingData.length > 0) {
-                    existingData.forEach(function(tech) {
-                        const groupObj = addTechnicianGroup(tech);
-                        let actionsArr = [], productsArr = [], biayaArr = [], modalArr = [], manualArr = [];
-                        try {
-                            actionsArr = JSON.parse(tech.service_actions) || [];
-                            productsArr = JSON.parse(tech.products) || [];
-                            biayaArr = JSON.parse(tech.biaya_j) || [];
-                            modalArr = JSON.parse(tech.modal_j) || [];
-
-                            // Parsing nama tindakan (untuk case manual)
-                            manualArr = JSON.parse(tech.tindakan_servis) || [];
-                        } catch (e) { console.error(e); }
-
-                        if (actionsArr.length > 0) {
-                            actionsArr.forEach(function(actId, i) {
-                                const detailData = {
-                                    act_id: actId,
-                                    prod_id: productsArr[i] ?? null,
-                                    biaya: biayaArr[i] ?? 0,
-                                    modal: modalArr[i] ?? 0,
-                                    manual_text: manualArr[i] ?? '' // Kirim teks manual ke fungsi addAction
-                                };
-                                addActionToGroup(groupObj.$element, groupObj.index, detailData);
-                            });
-                        } else {
-                            addActionToGroup(groupObj.$element, groupObj.index);
-                        }
-                    });
-                    setTimeout(recalculateAll, 1000);
+                        recalculateAll();
+                    }, 100);
                 } else {
-                    addTechnicianGroup();
-                }
-
-                // EVENT HANDLERS
-                $('#tambah-teknisi-baru').on('click', function() { addTechnicianGroup(); });
-                $(document).on('click', '.add-action-btn', function() { addActionToGroup($(this).closest('.technician-group')); });
-                $(document).on('click', '.remove-action', function() {
-                    if ($(this).closest('.actions-list-container').children().length > 1) {
-                        if(confirm('Hapus?')) { $(this).closest('.action-item').remove(); recalculateAll(); }
-                    } else alert('Minimal 1 tindakan.');
-                });
-                $(document).on('click', '.remove-group', function() {
-                    if(confirm('Hapus Teknisi?')) { $(this).closest('.technician-group').remove(); recalculateAll(); }
-                });
-
-                $(document).on('select2:select', '.selectAction', function(e) {
-                    const $select = $(this);
-                    const $container = $select.closest('.action-item');
-                    const actionId = $select.val();
-                    if(actionId) {
-                        $.ajax({
-                            url: '/get-action/' + actionId,
-                            type: 'GET',
-                            dataType: 'json',
-                            success: function(data) {
-                                $container.find('.biaya_servis').val(data.biaya);
-                                recalculateAll();
-                            }
-                        });
-                    }
-                });
-
-                $(document).on('change', '.selectSparepart', function() {
-                    const $select = $(this);
-                    const $container = $select.closest('.action-item');
-                    const hargaModal = $select.find(':selected').data('harga_modal') || 0;
-                    $container.find('.modal_sparepart').val(hargaModal);
                     recalculateAll();
-                });
+                }
+            }
+        }
 
-                $(document).on('input', '.biaya_servis, .modal_sparepart', function() { recalculateAll(); });
+        // LOAD DATA
+        if (existingData && existingData.length > 0) {
+            existingData.forEach(function(tech) {
+                const groupObj = addTechnicianGroup(tech);
+                let actionsArr = [], productsArr = [], biayaArr = [], modalArr = [];
+                try {
+                    actionsArr = JSON.parse(tech.service_actions) || [];
+                    productsArr = JSON.parse(tech.products) || [];
+                    biayaArr = JSON.parse(tech.biaya_j) || [];
+                    modalArr = JSON.parse(tech.modal_j) || [];
+                } catch (e) { console.error(e); }
 
-                function recalculateAll() {
-                    let totalBiaya = 0;
-                    let totalModal = 0;
-                    $('.biaya_servis').each(function() { totalBiaya += parseFloat($(this).val()) || 0; });
-                    $('.modal_sparepart').each(function() { totalModal += parseFloat($(this).val()) || 0; });
-                    $('#biaya').val(totalBiaya);
-                    $('#total_modal_sparepart').val(totalModal);
+                if (actionsArr.length > 0) {
+                    actionsArr.forEach(function(actId, i) {
+                        const detailData = {
+                            act_id: actId,
+                            prod_id: productsArr[i] ?? null,
+                            biaya: biayaArr[i] ?? 0,
+                            modal: modalArr[i] ?? 0
+                        };
+                        addActionToGroup(groupObj.$element, groupObj.index, detailData);
+                    });
+                } else {
+                    addActionToGroup(groupObj.$element, groupObj.index);
                 }
             });
-        </script>
+            setTimeout(recalculateAll, 1000);
+        } else {
+            addTechnicianGroup();
+        }
+
+        // EVENT HANDLERS
+        $('#tambah-teknisi-baru').on('click', function() { addTechnicianGroup(); });
+        $(document).on('click', '.add-action-btn', function() { addActionToGroup($(this).closest('.technician-group')); });
+        $(document).on('click', '.remove-action', function() {
+            if ($(this).closest('.actions-list-container').children().length > 1) {
+                if(confirm('Hapus?')) { $(this).closest('.action-item').remove(); recalculateAll(); }
+            } else alert('Minimal 1 tindakan.');
+        });
+        $(document).on('click', '.remove-group', function() {
+            if(confirm('Hapus Teknisi?')) { $(this).closest('.technician-group').remove(); recalculateAll(); }
+        });
+
+        // Event Select Action
+        $(document).on('select2:select', '.selectAction', function(e) {
+            const $select = $(this);
+            const $container = $select.closest('.action-item');
+            const actionId = $select.val();
+            if(actionId) {
+                $.ajax({
+                    url: '/get-action/' + actionId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        // FORMAT RUPIAH SAAT ISI OTOMATIS
+                        $container.find('.biaya_servis').val(formatRupiah(data.biaya));
+                        recalculateAll();
+                    }
+                });
+            }
+        });
+
+        // Event Select Sparepart
+        $(document).on('change', '.selectSparepart', function() {
+            const $select = $(this);
+            const $container = $select.closest('.action-item');
+            const hargaModal = $select.find(':selected').data('harga_modal') || 0;
+            // FORMAT RUPIAH SAAT ISI OTOMATIS
+            $container.find('.modal_sparepart').val(formatRupiah(hargaModal));
+            recalculateAll();
+        });
+
+        $(document).on('input', '.biaya_servis, .modal_sparepart', function() { recalculateAll(); });
+
+        // RECALCULATE ALL (UPDATED: Parse Rupiah)
+        function recalculateAll() {
+            let totalBiaya = 0;
+            let totalModal = 0;
+            // Bersihkan format rupiah sebelum menjumlah
+            $('.biaya_servis').each(function() { totalBiaya += parseRupiah($(this).val()); });
+            $('.modal_sparepart').each(function() { totalModal += parseRupiah($(this).val()); });
+
+            // Set kembali ke input Total dengan format rupiah
+            $('#biaya').val(formatRupiah(totalBiaya));
+            $('#total_modal_sparepart').val(formatRupiah(totalModal));
+
+            // Trigger input agar kalkulasi diskon/tunai di bawah ikut update
+            $('#biaya').trigger('input');
+        }
+    });
+</script>
     @endpush
 </x-toko-layout>

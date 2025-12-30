@@ -288,6 +288,9 @@ class UbahBisaDiambilController extends Controller
 
     public function multiTeknisiProses(Request $request, $id)
     {
+        $request->merge([
+            'total_modal_sparepart' => str_replace('.', '', $request->total_modal_sparepart),
+        ]);
         $itemOrigin = ServiceTransaction::findOrFail($id);
         DB::beginTransaction();
 

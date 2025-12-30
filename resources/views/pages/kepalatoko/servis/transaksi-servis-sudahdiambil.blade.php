@@ -493,38 +493,83 @@
 @endphp
 
 <script>
-$(document).ready(function () {
-    // Ambil total dari input yang disabled
-    let totalBiaya = parseInt($('#total_biaya').val()) || 0;
+    // --- HELPER FUNCTIONS ---
+    function formatRupiah(angka) {
+        if (!angka) return '';
+        var number_string = angka.toString().replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-    // Tambahkan PPN kalau ada
-    let ppn = {{ $ppn }};
-    if (ppn !== 0) {
-        totalBiaya = totalBiaya + Math.round((totalBiaya * ppn) / 100);
-    }
-
-    function updateSisa(from, to) {
-        let diskon = parseInt($('#diskon').val()) || 0;
-        let fromVal = parseInt($(from).val()) || 0;
-
-        let finalvalTotal = totalBiaya - diskon;
-
-        if (fromVal > finalvalTotal) {
-            fromVal = finalvalTotal;
-            $(from).val(fromVal);
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
         }
 
-        // Hitung sisa dan masukkan ke input lawan
-        $(to).val(finalvalTotal - fromVal);
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return rupiah;
     }
 
-    $('#tunai').on('input', function () {
-        updateSisa('#tunai', '#transfer');
-    });
+    function parseRupiah(str) {
+        if (!str) return 0;
+        // Hapus semua titik, lalu ubah ke integer
+        return parseInt(str.toString().replace(/\./g, '')) || 0;
+    }
 
-    $('#transfer').on('input', function () {
-        updateSisa('#transfer', '#tunai');
+    // --- LOGIC ---
+    $(document).ready(function() {
+
+        // 1. Ambil total (Gunakan parseRupiah jaga-jaga jika inputnya sudah ada format titik)
+        let totalBiaya = parseRupiah($('#total_biaya').val());
+
+        // 2. Tambahkan PPN kalau ada
+        let ppn = {{ $ppn }};
+        if (ppn !== 0) {
+            totalBiaya = totalBiaya + Math.round((totalBiaya * ppn) / 100);
+        }
+
+        // Fungsi Update Kalkulasi
+        function updateSisa(from, to) {
+            // Gunakan parseRupiah untuk mengambil nilai angka murni
+            let diskon = parseRupiah($('#diskon').val());
+            let fromVal = parseRupiah($(from).val());
+
+            let finalvalTotal = totalBiaya - diskon;
+
+            // Pastikan tidak minus
+            if (finalvalTotal < 0) finalvalTotal = 0;
+
+            // Cek jika input melebihi total tagihan
+            if (fromVal > finalvalTotal) {
+                fromVal = finalvalTotal;
+            }
+
+            // Format ulang input 'from' agar titiknya muncul saat mengetik
+            $(from).val(formatRupiah(fromVal));
+
+            // Hitung sisa
+            let sisa = finalvalTotal - fromVal;
+
+            // Masukkan sisa ke input 'to' dengan format rupiah
+            $(to).val(formatRupiah(sisa));
+        }
+
+        // --- Event Listeners ---
+
+        $('#tunai').on('input', function() {
+            updateSisa('#tunai', '#transfer');
+        });
+
+        $('#transfer').on('input', function() {
+            updateSisa('#transfer', '#tunai');
+        });
+
+        // Tambahan: Jika diskon berubah, hitung ulang (misal based on Tunai)
+        $('#diskon').on('input', function() {
+            $(this).val(formatRupiah($(this).val())); // Format input diskon juga
+            updateSisa('#tunai', '#transfer');
+        });
     });
-});
 </script>
 

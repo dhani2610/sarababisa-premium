@@ -710,7 +710,10 @@ class BisaDiambilController extends Controller
      public function update(Request $request, $id)
     {
         // dd($request->all());
-       $itemOrigin = ServiceTransaction::findOrFail($id);
+        $request->merge([
+            'total_modal_sparepart' => str_replace('.', '', $request->total_modal_sparepart),
+        ]);
+        $itemOrigin = ServiceTransaction::findOrFail($id);
         DB::beginTransaction();
 
         try {
