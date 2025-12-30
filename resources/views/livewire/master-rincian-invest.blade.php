@@ -117,25 +117,25 @@
             <!-- Filter Tabs -->
             <div class="flex gap-2 mt-4 border-b border-slate-200">
                 <button wire:click="setFilter(0)"
-                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150 
+                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150
         {{ $filterTipe == 0 ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
                     Semua
                 </button>
 
                 <button wire:click="setFilter(1)"
-                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150 
+                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150
         {{ $filterTipe == 1 ? 'border-green-500 text-green-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
                     Masuk (Rp{{ number_format($totals['masuk'], 0, ',', '.') }})
                 </button>
 
                 <button wire:click="setFilter(2)"
-                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150 
+                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150
         {{ $filterTipe == 2 ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
                     Pembagian (Rp{{ number_format($totals['pembagian'], 0, ',', '.') }})
                 </button>
 
                 <button wire:click="setFilter(3)"
-                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150 
+                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-all duration-150
         {{ $filterTipe == 3 ? 'border-gray-500 text-gray-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
                     Lain-lain (Rp{{ number_format($totals['lain'], 0, ',', '.') }})
                 </button>
@@ -173,7 +173,11 @@
                 </div>
             </div>
 
-            <table class="table-auto w-full">
+            <table-responsive>
+
+            </table-responsive>
+           <div class="overflow-x-auto border rounded-sm">
+            <table class="w-full text-xs text-left border-collapse">
                 <thead
                     class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                     <tr>
@@ -357,6 +361,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
 
         <!-- Pagination -->

@@ -72,6 +72,9 @@
                                 @csrf
                                 <div class="px-5 py-4">
                                     <div class="space-y-3">
+                                        @if (Auth::user()->role == 'Investor')
+                                        <input type="hidden" value="Sudah Disetujui" name="tipe"    >
+                                        @else
                                         <div>
                                             <label class="block text-sm font-medium mb-1">Tipe <span class="text-rose-500">*</span></label>
                                             <select name="tipe" class="form-select text-sm py-1 w-full" id="tipe">
@@ -79,6 +82,7 @@
                                                 <option value="Sudah Diambil">Sudah Diambil</option>
                                             </select>
                                         </div>
+                                        @endif
                                         <div>
                                             <label class="block text-sm font-medium mb-1">Mulai tanggal <span class="text-rose-500">*</span></label>
                                             <input id="start_date" name="start_date" class="form-input w-full py-2" type="date" required />
