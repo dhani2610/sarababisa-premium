@@ -473,6 +473,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::get('master-model-seri/data', [KepalaTokoMasterModelSeriController::class, 'getData'])->name('master-model-seri.data');
     Route::post('master-model-seri/delete-batch', [KepalaTokoMasterModelSeriController::class, 'deleteBatch'])->name('master-model-seri.delete-batch');
     Route::resource('master/master-model-seri', KepalaTokoMasterModelSeriController::class);
+    Route::get('manajemen/anggaran/data', [KepalaTokoAnggaranController::class, 'getData'])->name('anggaran.data');
+    Route::post('manajemen/anggaran/delete-batch', [KepalaTokoAnggaranController::class, 'deleteBatch'])->name('anggaran.delete-batch');
     Route::resource('manajemen/anggaran', KepalaTokoAnggaranController::class);
     Route::resource('target', KepalaTokoTargetController::class);
     Route::resource('target-sales', KepalaTokoTargetSalesController::class);
@@ -491,6 +493,9 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::patch('/expenses/update', [KepalaTokoExpenseController::class, 'approveSelected']);
     Route::patch('/expenses/reject', [KepalaTokoExpenseController::class, 'rejectSelected']);
     Route::resource('approve-pengeluaran', KepalaTokoApprovePengeluaranController::class);
+    Route::get('manajemen/inventaris/data', [KepalaTokoInventarisController::class, 'getData'])->name('inventaris.data');
+Route::post('manajemen/inventaris/delete-batch', [KepalaTokoInventarisController::class, 'deleteBatch'])->name('inventaris.delete-batch');
+Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisController::class, 'printSelected'])->name('inventaris.print-selected');
     Route::resource('manajemen/inventaris', KepalaTokoInventarisController::class);
     Route::delete('/inventories/delete', [KepalaTokoInventarisController::class, 'deleteSelected']);
 
