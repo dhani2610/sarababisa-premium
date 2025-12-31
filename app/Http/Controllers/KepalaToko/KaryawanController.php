@@ -42,6 +42,7 @@ class KaryawanController extends Controller
         $query = Worker::with(['user', 'debt', 'incident'])
             ->where('cabang_id', getCabangId())
             ->latest();
+        // dd($query);
 
         return DataTables::of($query)
             ->addIndexColumn()
@@ -49,7 +50,14 @@ class KaryawanController extends Controller
                 return '<input type="checkbox" class="table-item form-checkbox" value="' . $row->id . '" />';
             })
             ->editColumn('gaji', function ($row) {
-                return 'Rp ' . number_format($row->gaji, 0, ',', '.');
+
+                $user = User::where('workers_id',$row->id)->first();
+                if(empty($user->shift_id)){
+                    return 'Rp ' . number_format(0, 0, ',', '.');
+                }
+                $shift = Shift::where('id',$user->shift_id)->first();
+
+                return 'Rp ' . number_format($shift->nominal_gaji ?? 0, 0, ',', '.');
             })
             ->editColumn('absen', function ($row) {
                 return 'Rp ' . number_format($row->absen, 0, ',', '.');

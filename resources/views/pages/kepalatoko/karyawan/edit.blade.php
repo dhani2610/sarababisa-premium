@@ -25,8 +25,8 @@
                             <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                         </svg>
                         <span class="hidden xs:block ml-2">Tambah Karyawan</span>
-                </button>                      
-                
+                </button>
+
             </div>
 
         </div>
@@ -100,10 +100,11 @@
                                     <label class="block text-sm font-medium mb-1" for="bulankerja">Bulan Kerja</label>
                                     <input id="bulankerja" name="bulankerja" class="form-input w-full px-2 py-1" type="date" value="{{ \Carbon\Carbon::parse($item->bulankerja)->format('Y-m-d') }}" />
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1" for="gaji">Gaji Pokok</label>
-                                    <input id="gaji" name="gaji" class="form-input w-full px-2 py-1" type="number" value="{{ $item->gaji }}"/>
-                                </div>
+                                    {{-- <div>
+                                        <label class="block text-sm font-medium mb-1" for="gaji">Gaji Pokok</label>
+                                        <input id="gaji" name="gaji" class="form-input w-full px-2 py-1" type="number" value="{{ $item->gaji }}"/>
+                                    </div> --}}
+                                <input id="gaji" name="gaji" class="form-input w-full px-2 py-1" type="hidden" value="{{ $item->gaji }}"/>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="absen">Tunjangan Kehadiran</label>
                                     <input id="absen" name="absen" class="form-input w-full px-2 py-1" type="number" value="{{ $item->absen }}"/>

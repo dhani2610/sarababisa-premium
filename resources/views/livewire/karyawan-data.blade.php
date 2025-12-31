@@ -42,10 +42,11 @@
                                                 </select>
                                             </div>
                                             <div><label class="block text-sm font-medium mb-1" for="bulankerja">Bulan Kerja <span class="text-rose-500">*</span></label><input id="bulankerja" name="bulankerja" class="form-input w-full px-2 py-1" type="date" required /></div>
-                                            <div>
+                                            {{-- <div>
                                                 <label class="block text-sm font-medium mb-1" for="gaji">Gaji Pokok <span class="text-rose-500">*</span></label>
                                                 <div class="relative"><input id="gaji" name="gaji" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" required /><div class="absolute inset-0 right-auto flex items-center pointer-events-none"><span class="text-sm text-slate-400 font-medium px-3">Rp.</span></div></div>
-                                            </div>
+                                            </div> --}}
+                                            <input id="gaji" name="gaji" class="form-input w-full pl-10 px-2 py-1 input-currency" type="hidden" value="0"/>
                                             <div>
                                                 <label class="block text-sm font-medium mb-1" for="absen">Absen Harian <span class="text-rose-500">*</span></label>
                                                 <div class="relative"><input id="absen" name="absen" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" required placeholder="0" /><div class="absolute inset-0 right-auto flex items-center pointer-events-none"><span class="text-sm text-slate-400 font-medium px-3">Rp.</span></div></div>
