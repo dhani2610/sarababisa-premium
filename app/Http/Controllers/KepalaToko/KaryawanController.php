@@ -44,10 +44,17 @@ class KaryawanController extends Controller
         $filterMonth = $request->input('filter_month'); // Bisa null (semua bulan) atau 1-12
 
         // 2. Ambil semua worker aktif di cabang ini
-        $workers = Worker::with(['user', 'debt', 'incident'])
-            ->where('cabang_id', getCabangId())
-            // ->where('id',12)
-            ->get();
+        if (auth()->user()->role == 'Kepala Toko') {
+            $workers = Worker::with(['user', 'debt', 'incident'])
+                ->where('cabang_id', getCabangId())
+                // ->where('id',12)
+                ->get();
+        }else{
+            $workers = Worker::with(['user', 'debt', 'incident'])
+                ->where('cabang_id', getCabangId())
+                ->where('id',auth()->user()->workers_id)
+                ->get();
+        }
 
         $data = collect();
 
