@@ -4,6 +4,8 @@ namespace App\Http\Controllers\KepalaToko;
 
 use App\Http\Controllers\Controller;
 use App\Models\Shift;
+use App\Models\Worker;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ShiftController extends Controller
@@ -11,9 +13,10 @@ class ShiftController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 25);
-        $shifts = Shift::where('cabang_id',getCabangId())->orderBy('created_at', 'desc')->paginate($perPage);
+        $shifts = Shift::with('worker')->where('cabang_id',getCabangId())->orderBy('created_at', 'desc')->paginate($perPage);
+        $workers = Worker::where('cabang_id', getCabangId())->get();
 
-        return view('pages.kepalatoko.master.shift', compact('shifts'));
+        return view('pages.kepalatoko.master.shift', compact('shifts','workers'));
     }
 
     public function store(Request $request)
@@ -36,10 +39,17 @@ class ShiftController extends Controller
             'potongan_izin' => 'required|integer',
             'potongan_cuti' => 'required|integer',
             'potongan_sakit' => 'required|integer',
+            'worker_id' => 'required|integer',
         ]);
 
         $validated['cabang_id'] = getCabangId();
-        Shift::create($validated);
+        $data = Shift::create($validated);
+
+        $user = User::where('workers_id', $data->worker_id)->first();
+        if ($user) {
+            $user->shift_id = $data->id;
+            $user->save();
+        }
 
         toast('Shift berhasil ditambahkan.', 'success');
         return redirect()->route('shift.index');
@@ -71,11 +81,19 @@ class ShiftController extends Controller
             'potongan_izin' => 'required|integer',
             'potongan_cuti' => 'required|integer',
             'potongan_sakit' => 'required|integer',
+            'worker_id' => 'required|integer',
         ]);
 
         $item = Shift::findOrFail($id);
         $validated['cabang_id'] = getCabangId();
         $item->update($validated);
+
+
+        $user = User::where('workers_id', $item->worker_id)->first();
+        if ($user) {
+            $user->shift_id = $item->id;
+            $user->save();
+        }
 
         toast('Shift berhasil diupdate.', 'success');
         return redirect()->route('shift.index');

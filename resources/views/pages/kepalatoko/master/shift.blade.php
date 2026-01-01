@@ -27,6 +27,18 @@
                                     @csrf
                                     <div class="px-5 py-4 space-y-3">
                                         <div>
+                                            <label class="block text-sm font-medium" for="worker_id">Relasi Data
+                                                Karyawan</label>
+                                            <select id="worker_id" name="worker_id"
+                                                class="form-select text-sm py-1 w-full" required>
+                                                <option selected value="">Pilih Karyawan</option>
+                                                @foreach ($workers as $worker)
+                                                    <option value="{{ $worker->id }}">{{ $worker->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div>
                                             <label class="block text-sm font-medium mb-1">Nama Shift</label>
                                             <input name="nama_shift" class="form-input w-full" required>
                                         </div>
@@ -117,6 +129,7 @@
                         <tr>
                             <th class="text-center px-2 py-3 w-px"><input id="parent-checkbox" class="form-checkbox"
                                     type="checkbox" @click="toggleAll"></th>
+                            <th class="text-center px-2 py-3">Nama Karyawan</th>
                             <th class="text-center px-2 py-3">Nama Shift</th>
                             <th class="text-center px-2 py-3">Jam Masuk</th>
                             <th class="text-center px-2 py-3">Jam Pulang</th>
@@ -134,6 +147,7 @@
                             <tr>
                                 <td class="text-center px-2 py-3"><input class="table-item form-checkbox"
                                         type="checkbox" value="{{ $shift->id }}" @click="uncheckParent"></td>
+                                <td class="text-center px-2 py-3">{{ $shift->worker->name  ?? '-'}}</td>
                                 <td class="text-center px-2 py-3">{{ $shift->nama_shift }}</td>
                                 <td class="text-center px-2 py-3">{{ $shift->jam_masuk }}</td>
                                 <td class="text-center px-2 py-3">{{ $shift->jam_pulang }}</td>
@@ -152,8 +166,9 @@
                                 <td class="text-center px-2 py-3">
                                     <div class="flex space-x-2 justify-center">
                                         <button type="button" class="text-indigo-500"
-                                            @click="openEditModal({ 
+                                            @click="openEditModal({
                                             id: '{{ $shift->id }}',
+                                            worker_id: '{{ $shift->worker_id }}',
                                             nama_shift: '{{ $shift->nama_shift }}',
                                             jam_masuk: '{{ $shift->jam_masuk }}',
                                             jam_pulang: '{{ $shift->jam_pulang }}',
@@ -193,6 +208,18 @@
                             @csrf
                             @method('PUT')
                             <div class="px-5 py-4 space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium" for="worker_id">Relasi Data
+                                        Karyawan</label>
+                                    <select id="worker_id" name="worker_id"
+                                        class="form-select text-sm py-1 w-full" required>
+                                        <option selected value="">Pilih Karyawan</option>
+                                        @foreach ($workers as $worker)
+                                            <option value="{{ $worker->id }}">{{ $worker->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Nama Shift</label>
                                     <input name="nama_shift" x-model="editForm.nama_shift" class="form-input w-full"

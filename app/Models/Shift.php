@@ -20,5 +20,11 @@ class Shift extends Model
         'potongan_cuti',
         'potongan_sakit',
         'cabang_id',
+        'worker_id',
     ];
+
+    public function worker()
+    {
+        return $this->belongsTo(Worker::class, 'worker_id');
+    }
 }
