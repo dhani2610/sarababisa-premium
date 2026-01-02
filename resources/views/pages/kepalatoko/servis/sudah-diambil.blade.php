@@ -44,9 +44,9 @@
             $(document).ready(function() {
 
                 var table = $('#transaksi-servis-table').DataTable({
-                    processing: false,
-                    serverSide: false,
-                    // ajax: '{{ route('transaksi-servis-sudah-diambil.data') }}',
+                    processing: true, // Loading indicator bawaan
+                    serverSide: false, // Client-side processing (karena kita inject data manual)
+                    deferRender: true, // Optimasi render untuk data banyak
                     columns: [
                         @if (Auth::user()->role != 'Investor')
                             {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},
@@ -80,7 +80,7 @@
                             {data: 'aksi', name: 'aksi', orderable: false, searchable: false},
                         @endif
                     ],
-                    order: [],
+                    order: [], // Matikan default sorting agar data masuk sesuai urutan fetch
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
                     },
@@ -89,31 +89,53 @@
                     }
                 });
 
-                // --- custom pagination load bertahap ---
-                let batchSize = 20;
+                // 2. Logic Load Bertahap (Batch Loading)
+                let batchSize = 50; // Jumlah data per request
                 let offset = 0;
-                let loading = false;
+                let isLoading = false;
+                let isFinished = false;
 
                 function loadBatch() {
-                    if (loading) return;
-                    loading = true;
+                    // Cegah request ganda atau jika data sudah habis
+                    if (isLoading || isFinished) return;
+
+                    isLoading = true;
+
                     $.ajax({
-                        url: '{{ route('transaksi-servis-sudah-diambil.data') }}?offset=' + offset + '&limit=' + batchSize,
+                        url: '{{ route('transaksi-servis-sudah-diambil.data') }}',
+                        type: 'GET',
+                        data: {
+                            offset: offset,
+                            limit: batchSize
+                        },
                         success: function(response) {
-                            if (response.data.length > 0) {
+                            // Pastikan response.data ada dan berupa array
+                            if (response.data && response.data.length > 0) {
+
+                                // Tambahkan data ke tabel dan redraw
                                 table.rows.add(response.data).draw(false);
+
+                                // Update offset
                                 offset += batchSize;
-                                loading = false;
-                                // lanjut load batch berikutnya
+                                isLoading = false;
+
+                                // Lanjut load batch berikutnya dengan jeda kecil
                                 setTimeout(loadBatch, 100);
                             } else {
-                                console.log('semua data sudah dimuat');
+                                // Data habis, stop looping
+                                isFinished = true;
+                                isLoading = false;
+                                console.log('Semua data berhasil dimuat.');
                             }
+                        },
+                        error: function() {
+                            isLoading = false;
+                            console.error('Gagal memuat data.');
                         }
                     });
                 }
 
-                // mulai load pertama
+                // 3. Panggil fungsi load pertama kali
                 loadBatch();
 
                 function attachCheckboxHandlers() {
