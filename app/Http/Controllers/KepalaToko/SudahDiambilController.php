@@ -697,7 +697,7 @@ class SudahDiambilController extends Controller
 
             $teknisiServis->push($dummyTeknisi);
         }
-        // return response()->json([$item, $teknisiServis]);
+        // return response()->json($teknisiServis);
 
         return view('pages.kepalatoko.servis.sudah-diambil-edit', [
             'item' => $item,

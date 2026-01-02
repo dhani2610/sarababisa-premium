@@ -268,7 +268,7 @@
         </style>
     @endpush
 
-    @push('scripts')
+   @push('scripts')
         <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -454,15 +454,16 @@
                 const sparepartOptions = `<option selected value="">Pilih Sparepart</option>@foreach (App\Models\Product::where('cabang_id',getCabangId())->get() as $item) <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ addslashes($item->product_name) }}</option> @endforeach`;
                 const salesOptions = `<option selected value="1">Tidak ada Sales</option>@foreach ($sales as $user) <option value="{{ $user->id }}">{{ $user->name }}</option> @endforeach`;
 
-                function generateActionHtml(groupIndex, actionIndex) {
+                // --- [PERBAIKAN] : Fungsi generator menerima parameter isManual (true/false) ---
+                function generateActionHtml(groupIndex, actionIndex, isManual = false) {
                     const uniqueRadioId = 'radio_' + actionIndex;
                     return `
-                    <div class="action-item" x-data="{ useSparepart: false, showInputManual: false }">
+                    <div class="action-item" x-data="{ useSparepart: false, showInputManual: ${isManual} }">
                         <button type="button" class="position-button-x remove-action absolute top-2 right-2 text-rose-500 hover:text-rose-700 font-bold" title="Hapus">&times;</button>
                         <div class="mb-2 pr-6">
                             <div class="flex justify-between items-center mb-1">
                                 <label class="block text-sm font-medium">Tindakan Servis <span class="text-rose-500">*</span></label>
-                                <label class="flex items-center"><input type="checkbox" class="form-checkbox checkbox-manual" x-on:click="showInputManual = !showInputManual"/><span class="text-sm ml-2">Isi Manual</span></label>
+                                <label class="flex items-center"><input type="checkbox" class="form-checkbox checkbox-manual" x-model="showInputManual"/><span class="text-sm ml-2">Isi Manual</span></label>
                             </div>
                             <div x-show="!showInputManual" class="wrapper-select-action"><select name="teknisi[${groupIndex}][tindakan][${actionIndex}][service_actions_id]" class="form-select text-sm py-1 w-full selectAction">${actionOptions}</select></div>
                             <div x-show="showInputManual" class="mt-2 wrapper-input-manual" style="display:none;"><input class="form-input w-full px-2 py-1 input-manual-text" type="text" name="teknisi[${groupIndex}][tindakan][${actionIndex}][tindakan_servis]" placeholder="Ketik manual..."/></div>
@@ -545,7 +546,23 @@
                 function addActionToGroup($groupElement, groupIndex, actionData = null) {
                     if (groupIndex === undefined) groupIndex = $groupElement.attr('data-group-index');
                     const actionIndex = Date.now() + Math.floor(Math.random() * 10000);
-                    const html = generateActionHtml(groupIndex, actionIndex);
+
+                    // --- [PERBAIKAN] : Tentukan status manual SEBELUM generate HTML ---
+                    let isManual = false;
+                    let manualText = '';
+
+                    if (actionData) {
+                        // Prioritas: Jika ada ID select -> Select mode. Jika tidak ada ID tapi ada text manual -> Manual mode.
+                        if (actionData.act_id && actionData.act_id !== "null") {
+                            isManual = false;
+                        } else if (actionData.manual_text) {
+                            isManual = true;
+                            manualText = actionData.manual_text;
+                        }
+                    }
+
+                    // Generate HTML dengan status isManual yang sudah benar
+                    const html = generateActionHtml(groupIndex, actionIndex, isManual);
                     const $newItem = $(html);
                     $groupElement.find('.actions-list-container').append($newItem);
 
@@ -556,7 +573,18 @@
                     if (actionData) {
                         $newItem.find('.biaya_servis').val(formatRupiah(actionData.biaya || 0));
                         $newItem.find('.modal_sparepart').val(formatRupiah(actionData.modal || 0));
-                        if (actionData.act_id && actionData.act_id !== "null") $selAction.val(actionData.act_id).trigger('change.select2');
+
+                        if (!isManual) {
+                            // JIKA MODE SELECT
+                            if(actionData.act_id && actionData.act_id !== "null") {
+                                $selAction.val(actionData.act_id).trigger('change.select2');
+                            }
+                        } else {
+                            // JIKA MODE MANUAL
+                            // Karena isManual sudah true di x-data, checkbox otomatis checked dan input muncul
+                            $newItem.find('.input-manual-text').val(manualText);
+                        }
+
                         if (actionData.prod_id && actionData.prod_id != "null" && actionData.prod_id != "") {
                             setTimeout(() => { $newItem.find('.radio-sparepart-yes')[0].click(); }, 50);
                             setTimeout(() => {
@@ -578,12 +606,13 @@
                 if (existingData && existingData.length > 0) {
                     existingData.forEach(function(tech) {
                         const groupObj = addTechnicianGroup(tech);
-                        let actionsArr = [], productsArr = [], biayaArr = [], modalArr = [];
+                        let actionsArr = [], productsArr = [], biayaArr = [], modalArr = [], tindakanArr = [];
                         try {
                             actionsArr = JSON.parse(tech.service_actions) || [];
                             productsArr = JSON.parse(tech.products) || [];
                             biayaArr = JSON.parse(tech.biaya_j) || [];
                             modalArr = JSON.parse(tech.modal_j) || [];
+                            tindakanArr = JSON.parse(tech.tindakan_servis) || [];
                         } catch (e) { console.error(e); }
 
                         if (actionsArr.length > 0) {
@@ -592,7 +621,8 @@
                                     act_id: actId,
                                     prod_id: productsArr[i] ?? null,
                                     biaya: biayaArr[i] ?? 0,
-                                    modal: modalArr[i] ?? 0
+                                    modal: modalArr[i] ?? 0,
+                                    manual_text: tindakanArr[i] ?? ''
                                 };
                                 addActionToGroup(groupObj.$element, groupObj.index, detailData);
                             });
