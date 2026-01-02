@@ -46,6 +46,7 @@
                                 @csrf
                                 <div class="px-5 py-4">
                                     <div class="space-y-3">
+                                        <span class="text-rose-500 text-sm">Untuk mengatur gaji pokok terdapat di menu shift.</span>
                                         <div><label class="block text-sm font-medium mb-1" for="name">Nama Karyawan
                                                 <span class="text-rose-500">*</span></label><input id="name"
                                                 name="name" class="form-input w-full px-2 py-1" type="text"

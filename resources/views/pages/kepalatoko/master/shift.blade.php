@@ -55,7 +55,7 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium mb-1">Nominal Gaji</label>
+                                            <label class="block text-sm font-medium mb-1">Gaji Pokok</label>
                                             <input name="nominal_gaji" type="text" class="form-input w-full sapator"
                                                 required>
                                         </div>
@@ -133,7 +133,7 @@
                             <th class="text-center px-2 py-3">Nama Shift</th>
                             <th class="text-center px-2 py-3">Jam Masuk</th>
                             <th class="text-center px-2 py-3">Jam Pulang</th>
-                            <th class="text-center px-2 py-3">Nominal Gaji</th>
+                            <th class="text-center px-2 py-3">Gaji Pokok</th>
                             <th class="text-center px-2 py-3">Potongan Terlambat</th>
                             <th class="text-center px-2 py-3">Potongan Tidak Masuk (Alfa)</th>
                             <th class="text-center px-2 py-3">Potongan Tidak Masuk (Izin)</th>
@@ -238,7 +238,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Nominal Gaji</label>
+                                    <label class="block text-sm font-medium mb-1">Gaji Pokok</label>
                                     <input name="nominal_gaji" type="text" x-model="editForm.nominal_gaji"
                                         class="form-input w-full sapator" required>
                                 </div>
