@@ -427,32 +427,6 @@ class LaporanServisController extends Controller
         $total_diskon   = (clone $serviceQuery)->sum('diskon');
         $total_profit   = (clone $serviceQuery)->sum('profittoko');
 
-        // 4. Data Top Brands (Perlu join, jadi kita clone lalu modify)
-        // $topbrands = (clone $serviceQuery)
-        //     ->select('brands.name as brand_name')
-        //     ->join('brands', 'service_transactions.brands_id', '=', 'brands.id')
-        //     ->groupBy('brand_name')
-        //     ->orderBy(DB::raw('COUNT(*)'), 'desc')
-        //     ->limit(3)
-        //     ->get();
-
-        // // 5. Data Top Model
-        // $topmodelseries = (clone $serviceQuery)
-        //     ->select('model_series.name as model_name')
-        //     ->join('model_series', 'service_transactions.model_series_id', '=', 'model_series.id')
-        //     ->groupBy('model_name')
-        //     ->orderBy(DB::raw('COUNT(*)'), 'desc')
-        //     ->limit(3)
-        //     ->get();
-
-        // // 6. Data Top Actions
-        // $topactions = (clone $serviceQuery)
-        //     ->select('service_actions.nama_tindakan as action_name')
-        //     ->join('service_actions', 'service_transactions.service_actions_id', '=', 'service_actions.id')
-        //     ->groupBy('action_name')
-        //     ->orderBy(DB::raw('COUNT(*)'), 'desc')
-        //     ->limit(3)
-        //     ->get();
 
         // 7. Data Services DP (Khusus yg ada DP)
         $servicesDP = (clone $serviceQuery)

@@ -71,6 +71,17 @@
                             @csrf
                             <div class="px-5 py-4">
                                 <div class="space-y-3">
+                                    @if (Auth::user()->role == 'Investor')
+                                    <input type="hidden" value="Sudah Disetujui" name="tipe"    >
+                                    @else
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Tipe <span class="text-rose-500">*</span></label>
+                                        <select name="tipe" class="form-select text-sm py-1 w-full" id="tipe">
+                                            <option value="Sudah Disetujui">Sudah Disetujui</option>
+                                            <option value="Belum Disetujui">Belum Disetujui</option>
+                                        </select>
+                                    </div>
+                                    @endif
                                     <div>
                                         <label class="block text-sm font-medium mb-1">Mulai tanggal <span class="text-rose-500">*</span></label>
                                         <input id="start_date" name="start_date" class="form-input w-full py-2" type="date" required />
@@ -138,7 +149,7 @@
                 <!-- Table body -->
                 <tbody class="text-sm divide-y divide-slate-200">
                     <!-- Row -->
-                    @foreach($product_transactions as $item)                  
+                    @foreach($product_transactions as $item)
                         <tr>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}</div>
@@ -201,5 +212,5 @@
     <div class="mt-8">
         {{ $product_transactions->links() }}
     </div>
-    
+
 </div>

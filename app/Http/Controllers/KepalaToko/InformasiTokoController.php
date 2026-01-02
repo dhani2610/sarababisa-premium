@@ -43,6 +43,7 @@ class InformasiTokoController extends Controller
         ]);
 
         $data = $request->all();
+        $data = $request->except(['id_kepala_toko']);
 
         if ($request->hasFile('profile_photo_path')) {
             $data['profile_photo_path'] = $request->file('profile_photo_path')->store('assets/user', 'public');
