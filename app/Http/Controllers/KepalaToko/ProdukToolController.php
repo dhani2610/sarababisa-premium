@@ -144,6 +144,13 @@ class ProdukToolController extends Controller
      */
     public function store(ProductRequest $request)
     {
+
+        $request->merge([
+            'harga_modal' => str_replace('.', '', $request->harga_modal),
+            'harga_jual_toko' => str_replace('.', '', $request->harga_jual_toko),
+            'harga_jual' => str_replace('.', '', $request->harga_jual),
+        ]);
+
         $namakategori = Category::find($request->categories_id);
 
         // Create product
@@ -223,6 +230,12 @@ class ProdukToolController extends Controller
      */
     public function update(Request $request, $id)
     {
+         $request->merge([
+            'harga_modal' => str_replace('.', '', $request->harga_modal),
+            'harga_jual_toko' => str_replace('.', '', $request->harga_jual_toko),
+            'harga_jual' => str_replace('.', '', $request->harga_jual),
+        ]);
+        
         $item = Product::findOrFail($id);
         $namakategori = Category::find($request->categories_id);
         // Create product

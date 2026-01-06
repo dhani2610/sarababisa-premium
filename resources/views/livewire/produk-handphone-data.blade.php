@@ -189,7 +189,7 @@
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="harga_modal">Harga Modal <span class="text-rose-500">*</span></label>
                                         <div class="relative">
-                                            <input id="harga_modal" name="harga_modal" class="form-input w-full pl-10 px-2 py-1" type="number" required/>
+                                            <input id="harga_modal" name="harga_modal" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" required/>
                                             <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                                 <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                             </div>
@@ -198,7 +198,7 @@
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="harga_jual_toko">Harga Jual Toko<span class="text-rose-500">*</span></label>
                                         <div class="relative">
-                                            <input id="harga_jual_toko" name="harga_jual_toko" class="form-input w-full pl-10 px-2 py-1" type="number" required/>
+                                            <input id="harga_jual_toko" name="harga_jual_toko" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" required/>
                                             <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                                 <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                             </div>
@@ -207,7 +207,7 @@
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="harga_jual">Harga Jual Pelanggan<span class="text-rose-500">*</span></label>
                                         <div class="relative">
-                                            <input id="harga_jual" name="harga_jual" class="form-input w-full pl-10 px-2 py-1" type="number" required/>
+                                            <input id="harga_jual" name="harga_jual" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" required/>
                                             <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                                 <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                             </div>
@@ -737,6 +737,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <script>
+        document.addEventListener('input', function (e) {
+            if (!e.target.classList.contains('input-currency')) return;
+
+            let value = e.target.value;
+
+            // hapus semua selain angka
+            value = value.replace(/\D/g, '');
+
+            // format rupiah pakai titik
+            e.target.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        });
         document.addEventListener('alpine:init', () => {
             Alpine.data('handleSelect', () => ({
                 selectall: false,

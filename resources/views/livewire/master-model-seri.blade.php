@@ -183,7 +183,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <script>
-         document.addEventListener('input', function (e) {
+        document.addEventListener('input', function (e) {
             if (!e.target.classList.contains('input-currency')) return;
 
             let value = e.target.value;

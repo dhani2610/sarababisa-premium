@@ -111,7 +111,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="harga_modal">Harga Modal</label>
                                     <div class="relative">
-                                        <input id="harga_modal" name="harga_modal" class="form-input w-full pl-10 px-2 py-1" type="number" value="{{ $item->harga_modal }}"/>
+                                        <input id="harga_modal" name="harga_modal" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" value="{{ $item->harga_modal }}"/>
                                         <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                             <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                         </div>
@@ -120,7 +120,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="harga_jual_toko">Harga Jual Toko<span class="text-rose-500">*</span></label>
                                     <div class="relative">
-                                        <input id="harga_jual_toko" name="harga_jual_toko" class="form-input w-full pl-10 px-2 py-1" type="number" value="{{ $item->harga_jual_toko }}" required/>
+                                        <input id="harga_jual_toko" name="harga_jual_toko" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" value="{{ $item->harga_jual_toko }}" required/>
                                         <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                             <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                         </div>
@@ -129,7 +129,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="harga_jual">Harga Jual</label>
                                     <div class="relative">
-                                        <input id="harga_jual" name="harga_jual" class="form-input w-full pl-10 px-2 py-1" type="number" value="{{ $item->harga_jual }}"/>
+                                        <input id="harga_jual" name="harga_jual" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" value="{{ $item->harga_jual }}"/>
                                         <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                             <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                         </div>
@@ -233,5 +233,29 @@
                 $('.selectjs1').select2();
             });
         </script>
+        <script>
+        function formatRupiahInput(el) {
+            let value = el.value || '';
+
+            // hapus semua selain angka
+            value = value.replace(/\D/g, '');
+
+            // format pakai titik
+            el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        /* ON INPUT (REAL TIME) */
+        document.addEventListener('input', function (e) {
+            if (!e.target.classList.contains('input-currency')) return;
+            formatRupiahInput(e.target);
+        });
+
+        /* ON LOAD (FORM EDIT) */
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.input-currency').forEach(function (el) {
+                formatRupiahInput(el);
+            });
+        });
+    </script>
     @endpush
 </x-toko-layout>
