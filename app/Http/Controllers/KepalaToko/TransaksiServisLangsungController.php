@@ -40,6 +40,33 @@ class TransaksiServisLangsungController extends Controller
             'tunai' => str_replace('.', '', $request->tunai),
             'transfer' => str_replace('.', '', $request->transfer),
         ]);
+
+
+        if (empty($request->customers_id)) {
+            $insertCustomer = insertManualPelanggan($request->customers_manual);
+            if ($insertCustomer) {
+                $request->customers_id = $insertCustomer;
+            }
+        }
+        if (empty($request->types_id)) {
+            $insertType = insertManualKategori($request->types_manual);
+            if ($insertType) {
+                $request->types_id = $insertType;
+            }
+        }
+        if (empty($request->brands_id)) {
+            $insertBrand = insertManualBrand($request->brands_manual);
+            if ($insertBrand) {
+                $request->brands_id = $insertBrand;
+            }
+        }
+        if (empty($request->model_series_id)) {
+            $insertModelSeri = insertManualModelSerie($request->model_series_manual,$request->brands_id);
+            if ($insertModelSeri) {
+                $request->model_series_id = $insertModelSeri;
+            }
+        }
+        
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99')).rand(10,90);
         $nama_pelanggan = Customer::find($request->customers_id);
 

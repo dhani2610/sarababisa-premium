@@ -3,6 +3,10 @@
 use Illuminate\Support\Facades\Auth;
 use App\Models\StoreSetting;
 use App\Models\Cabang;
+use App\Models\Type;
+use App\Models\Brand;
+use App\Models\Customer;
+use App\Models\ModelSerie;
 use App\Models\TeknisiServis;
 use App\Models\ServiceTransaction;
 
@@ -218,6 +222,80 @@ if (!function_exists('getTypeTeknisiMultiTransaksi')) {
         $data = TeknisiServis::where('service_transactions_id', $transactionId)->where('users_id', $userId)->first();
 
         return $data;
+    }
+}
+if (!function_exists('insertManualPelanggan')) {
+    function insertManualPelanggan($data){
+        try {
+            $new = new Customer();
+            $new->nama = $data;
+            $new->kategori = 'User';
+            $new->nomor_hp = 0;
+            $new->alamat = '-';
+            $new->cabang_id = getCabangId();
+
+            if ($new->save()) {
+                return $new->id;
+            }
+
+            return 0;
+        } catch (\Throwable $th) {
+            return 0;
+        }
+    }
+}
+if (!function_exists('insertManualKategori')) {
+    function insertManualKategori($data){
+        try {
+            $new = new Type();
+            $new->name = $data;
+            $new->cabang_id = getCabangId();
+
+            if ($new->save()) {
+                return $new->id;
+            }
+
+            return 0;
+        } catch (\Throwable $th) {
+            return 0;
+        }
+    }
+}
+if (!function_exists('insertManualBrand')) {
+    function insertManualBrand($data){
+        try {
+            $new = new Brand();
+            $new->name = $data;
+            $new->cabang_id = getCabangId();
+
+            if ($new->save()) {
+                return $new->id;
+            }
+
+            return 0;
+        } catch (\Throwable $th) {
+            return 0;
+        }
+    }
+}
+if (!function_exists('insertManualModelSerie')) {
+    function insertManualModelSerie($data,$brand_id){
+        try {
+            $new = new ModelSerie();
+            $new->name = $data;
+            $new->brands_id = $brand_id ?? 0;
+            $new->id_tipe_os = null;
+            $new->nominal_bonus = 0;
+            $new->cabang_id = getCabangId();
+
+            if ($new->save()) {
+                return $new->id;
+            }
+
+            return 0;
+        } catch (\Throwable $th) {
+            return 0;
+        }
     }
 }
 

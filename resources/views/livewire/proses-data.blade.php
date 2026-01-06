@@ -217,47 +217,101 @@
                                     <input type="hidden" name="status_servis" value="Belum cek">
                                     <div class="space-y-3">
                                         <div>
-                                            <label class="block text-sm font-medium mb-1" for="customers_id">Nama
-                                                Pelanggan <span class="text-rose-500">*</span></label>
-                                            <select name="customers_id" class="form-select text-sm py-1 w-full"
-                                                id="selectjs1" required style="width: 100%">
-                                                <option selected value="">Pilih Pelanggan</option>
+                                            <label class="block text-sm font-medium mb-1">
+                                                Nama Pelanggan <span class="text-rose-500">*</span>
+                                            </label>
+
+                                            <select name="customers_id" id="customers_select"
+                                                class="form-select text-sm  selectjs2 py-1 w-full" required>
+                                                <option value="">Pilih Pelanggan</option>
                                                 @foreach ($customers as $item)
-                                                    <option value="{{ $item->id }}">{{ $item->nama }}
-                                                        {{ $item->nomor_hp }}</option>
+                                                    <option value="{{ $item->id }}">{{ $item->nama }} {{ $item->nomor_hp }}</option>
                                                 @endforeach
                                             </select>
+
+                                            <input type="text" name="customers_manual"
+                                                id="customers_manual"
+                                                class="form-input text-sm py-1 w-full mt-2 hidden"
+                                                placeholder="Isi nama pelanggan manual">
+
+                                            <label class="inline-flex items-center mt-1 text-sm">
+                                                <input type="checkbox" class="form-checkbox"
+                                                    onchange="toggleManual(this, 'customers_select', 'customers_manual')">
+                                                <span class="ml-2">Isi manual</span>
+                                            </label>
                                         </div>
+
                                         <div>
-                                            <label class="block text-sm font-medium mb-1" for="types_id">Jenis Barang
-                                                <span class="text-rose-500">*</span></label>
+                                            <label class="block text-sm font-medium mb-1">
+                                                Jenis Barang <span class="text-rose-500">*</span>
+                                            </label>
+
                                             <select id="types_id" name="types_id"
-                                                class="form-select text-sm py-1 w-full" required>
+                                                class="form-select selectjs2 text-sm py-1 w-full" required>
                                                 @foreach ($types as $type)
                                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                                                 @endforeach
                                             </select>
+
+                                            <input type="text" name="types_manual"
+                                                id="types_manual"
+                                                class="form-input text-sm py-1 w-full mt-2 hidden"
+                                                placeholder="Isi jenis barang manual">
+
+                                            <label class="inline-flex items-center mt-1 text-sm">
+                                                <input type="checkbox" class="form-checkbox"
+                                                    onchange="toggleManual(this, 'types_id', 'types_manual')">
+                                                <span class="ml-2">Isi manual</span>
+                                            </label>
                                         </div>
+
                                         <div>
-                                            <label class="block text-sm font-medium mb-1" for="brands_id">Merek <span
-                                                    class="text-rose-500">*</span></label>
+                                            <label class="block text-sm font-medium mb-1">
+                                                Merek <span class="text-rose-500">*</span>
+                                            </label>
+
                                             <select id="brands_id" name="brands_id"
-                                                class="form-select text-sm py-1 w-full" required>
-                                                <option selected="">Pilih Merek</option>
+                                                class="form-select selectjs2 text-sm py-1 w-full" required>
+                                                <option value="">Pilih Merek</option>
                                                 @foreach ($brands as $brand)
                                                     <option value="{{ $brand->id }}">{{ $brand->name }}</option>
                                                 @endforeach
                                             </select>
+
+                                            <input type="text" name="brands_manual"
+                                                id="brands_manual"
+                                                class="form-input text-sm py-1 w-full mt-2 hidden"
+                                                placeholder="Isi merek manual">
+
+                                            <label class="inline-flex items-center mt-1 text-sm">
+                                                <input type="checkbox" class="form-checkbox"
+                                                    onchange="toggleManual(this, 'brands_id', 'brands_manual')">
+                                                <span class="ml-2">Isi manual</span>
+                                            </label>
                                         </div>
+
                                         <div>
-                                            <label class="block text-sm font-medium mb-1" for="model_series_id">Model
-                                                Seri <span class="text-rose-500">*</span></label>
+                                            <label class="block text-sm font-medium mb-1">
+                                                Model Seri <span class="text-rose-500">*</span>
+                                            </label>
+
                                             <select id="model_series_id" name="model_series_id"
-                                                class="form-select text-sm py-1 w-full selectjs2" required
-                                                style="width: 100%">
-                                                <option selected="">Pilih Model Seri</option>
+                                                class="form-select selectjs2 text-sm py-1 w-full" required>
+                                                <option value="">Pilih Model Seri</option>
                                             </select>
+
+                                            <input type="text" name="model_series_manual"
+                                                id="model_series_manual"
+                                                class="form-input text-sm py-1 w-full mt-2 hidden"
+                                                placeholder="Isi model seri manual">
+
+                                            <label class="inline-flex items-center mt-1 text-sm">
+                                                <input type="checkbox" class="form-checkbox"
+                                                    onchange="toggleManual(this, 'model_series_id', 'model_series_manual')">
+                                                <span class="ml-2">Isi manual</span>
+                                            </label>
                                         </div>
+
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="imei">Nomor Imei
                                                 <span class="text-rose-500">*</span></label>
@@ -407,47 +461,102 @@
                                     <input type="hidden" name="tgl_ambil" value="<?php echo date('Y-m-d H:i:s'); ?>" />
                                     <input type="hidden" name="tgl_disetujui" value="<?php echo date('Y/m/d'); ?>" />
                                     <div class="space-y-3">
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="customers_id">Nama
-                                                Pelanggan <span class="text-rose-500">*</span></label>
-                                            <select name="customers_id" class="form-select text-sm py-1 w-full"
-                                                id="selectjs3" required style="width: 100%">
-                                                <option selected value="">Pilih Pelanggan</option>
+                                        <!-- NAMA PELANGGAN -->
+                                        <div class="manual-wrapper">
+                                            <label class="block text-sm font-medium mb-1">
+                                                Nama Pelanggan <span class="text-rose-500">*</span>
+                                            </label>
+
+                                            <select name="customers_id"
+                                                class="form-select text-sm py-1 w-full selectjs3 manual-select" required>
+                                                <option value="">Pilih Pelanggan</option>
                                                 @foreach ($customers as $item)
                                                     <option value="{{ $item->id }}">{{ $item->nama }}</option>
                                                 @endforeach
                                             </select>
+
+                                            <input type="text"
+                                                name="customers_manual"
+                                                class="form-input text-sm py-1 w-full mt-2 hidden manual-input"
+                                                placeholder="Isi nama pelanggan manual">
+
+                                            <label class="inline-flex items-center mt-1 text-sm">
+                                                <input type="checkbox" class="form-checkbox manual-toggle">
+                                                <span class="ml-2">Isi manual</span>
+                                            </label>
                                         </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="types_id">Jenis Barang
-                                                <span class="text-rose-500">*</span></label>
-                                            <select id="types_id" name="types_id"
-                                                class="form-select text-sm py-1 w-full" required>
+
+                                        <!-- JENIS BARANG -->
+                                        <div class="manual-wrapper mt-3">
+                                            <label class="block text-sm font-medium mb-1">
+                                                Jenis Barang <span class="text-rose-500">*</span>
+                                            </label>
+
+                                            <select name="types_id"
+                                                class="form-select text-sm py-1 w-full manual-select" required>
                                                 @foreach ($types as $type)
                                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                                                 @endforeach
                                             </select>
+
+                                            <input type="text"
+                                                name="types_manual"
+                                                class="form-input text-sm py-1 w-full mt-2 hidden manual-input"
+                                                placeholder="Isi jenis barang manual">
+
+                                            <label class="inline-flex items-center mt-1 text-sm">
+                                                <input type="checkbox" class="form-checkbox manual-toggle">
+                                                <span class="ml-2">Isi manual</span>
+                                            </label>
                                         </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="brands_id">Merek <span
-                                                    class="text-rose-500">*</span></label>
-                                            <select id="merek" name="brands_id"
-                                                class="form-select text-sm py-1 w-full" required>
-                                                <option selected="">Pilih Merek</option>
+
+                                        <!-- MEREK -->
+                                        <div class="manual-wrapper mt-3">
+                                            <label class="block text-sm font-medium mb-1">
+                                                Merek <span class="text-rose-500">*</span>
+                                            </label>
+
+                                            <select name="brands_id"
+                                                class="form-select text-sm py-1 w-full manual-select" required>
+                                                <option value="">Pilih Merek</option>
                                                 @foreach ($brands as $brand)
                                                     <option value="{{ $brand->id }}">{{ $brand->name }}</option>
                                                 @endforeach
                                             </select>
+
+                                            <input type="text"
+                                                name="brands_manual"
+                                                class="form-input text-sm py-1 w-full mt-2 hidden manual-input"
+                                                placeholder="Isi merek manual">
+
+                                            <label class="inline-flex items-center mt-1 text-sm">
+                                                <input type="checkbox" class="form-checkbox manual-toggle">
+                                                <span class="ml-2">Isi manual</span>
+                                            </label>
                                         </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="model_series_id">Model
-                                                Seri <span class="text-rose-500">*</span></label>
-                                            <select id="model" name="model_series_id"
-                                                class="form-select text-sm py-1 w-full selectjs4" required
-                                                style="width: 100%">
-                                                <option selected="">Pilih Model Seri</option>
+
+                                        <!-- MODEL SERI -->
+                                        <div class="manual-wrapper mt-3">
+                                            <label class="block text-sm font-medium mb-1">
+                                                Model Seri <span class="text-rose-500">*</span>
+                                            </label>
+
+                                            <select name="model_series_id"
+                                                class="form-select text-sm py-1 w-full selectjs4 manual-select" required>
+                                                <option value="">Pilih Model Seri</option>
                                             </select>
+
+                                            <input type="text"
+                                                name="model_series_manual"
+                                                class="form-input text-sm py-1 w-full mt-2 hidden manual-input"
+                                                placeholder="Isi model seri manual">
+
+                                            <label class="inline-flex items-center mt-1 text-sm">
+                                                <input type="checkbox" class="form-checkbox manual-toggle">
+                                                <span class="ml-2">Isi manual</span>
+                                            </label>
                                         </div>
+
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="imei">Nomor Imei
                                                 <span class="text-rose-500">*</span></label>
@@ -943,6 +1052,81 @@
 <script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.min.js"></script>
 <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 <script>
+    function toggleManual(checkbox, selectId, inputId) {
+        const select = document.getElementById(selectId);
+        const input  = document.getElementById(inputId);
+
+        const select2Container = select.nextElementSibling; // .select2-container
+
+        if (checkbox.checked) {
+            // hide select2 UI
+            select2Container.classList.add('hidden');
+            select.required = false;
+            select.disabled = true;
+
+            // show manual input
+            input.classList.remove('hidden');
+            input.required = true;
+            input.value = '';
+        } else {
+            // show select2 UI
+            select2Container.classList.remove('hidden');
+            select.required = true;
+            select.disabled = false;
+
+            // hide manual input
+            input.classList.add('hidden');
+            input.required = false;
+            input.value = '';
+        }
+    }
+
+    document.addEventListener('change', function (e) {
+        if (!e.target.classList.contains('manual-toggle')) return;
+
+        const wrapper = e.target.closest('.manual-wrapper');
+        const select  = wrapper.querySelector('.manual-select');
+        const input   = wrapper.querySelector('.manual-input');
+
+        const select2Container =
+            select.nextElementSibling &&
+            select.nextElementSibling.classList.contains('select2-container')
+                ? select.nextElementSibling
+                : null;
+
+        if (e.target.checked) {
+            // hide select / select2
+            if (select2Container) {
+                select2Container.classList.add('hidden');
+                $(select).val(null).trigger('change');
+            } else {
+                select.classList.add('hidden');
+            }
+
+            select.disabled = true;
+            select.required = false;
+
+            // show manual input
+            input.classList.remove('hidden');
+            input.required = true;
+            input.value = '';
+        } else {
+            // show select / select2
+            if (select2Container) {
+                select2Container.classList.remove('hidden');
+            } else {
+                select.classList.remove('hidden');
+            }
+
+            select.disabled = false;
+            select.required = true;
+
+            // hide manual input
+            input.classList.add('hidden');
+            input.required = false;
+            input.value = '';
+        }
+    });
     // 1. Register Plugin
     FilePond.registerPlugin(
         FilePondPluginFileValidateType,

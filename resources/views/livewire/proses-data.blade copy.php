@@ -347,7 +347,7 @@
                                                 for="estimasi_biaya">Estimasi Biaya Servis</label>
                                             <div class="relative">
                                                 <input id="estimasi_biaya" name="estimasi_biaya"
-                                                    class="form-input w-full pl-10 px-2 py-1" type="number"
+                                                    class="form-input w-full pl-10 px-2 py-1 input-currency" type="text"
                                                     placeholder="Kosongkan jika tidak ada" />
                                                 <div
                                                     class="absolute inset-0 right-auto flex items-center pointer-events-none">
@@ -360,7 +360,7 @@
                                                 Muka</label>
                                             <div class="relative">
                                                 <input id="uang_muka" name="uang_muka"
-                                                    class="form-input w-full pl-10 px-2 py-1" type="number"
+                                                    class="form-input w-full pl-10 px-2 py-1 input-currency" type="text"
                                                     placeholder="Kosongkan jika tidak ada" />
                                                 <div
                                                     class="absolute inset-0 right-auto flex items-center pointer-events-none">
@@ -575,11 +575,11 @@
                                             <div class="bg-slate-100 p-3 rounded">
                                                 <div class="mb-2">
                                                     <label class="block text-sm font-medium mb-1" for="total_modal_sparepart">Total Modal Sparepart <span class="text-rose-500">*</span></label>
-                                                    <input class="form-input w-full px-2 py-1 bg-white" type="number" name="total_modal_sparepart" id="total_modal_sparepart" required />
+                                                    <input class="form-input w-full px-2 py-1 bg-white" type="text" name="total_modal_sparepart" id="total_modal_sparepart" required />
                                                 </div>
                                                 <div>
                                                     <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya Servis (Ke Pelanggan) <span class="text-rose-500">*</span></label>
-                                                    <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="number" name="biaya" id="biaya" required />
+                                                    <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="text" name="biaya" id="biaya" required />
                                                 </div>
                                             </div>
 
@@ -615,14 +615,14 @@
                                                                     <label class="block text-sm font-medium mb-1"
                                                                         for="tunai">Tunai</label>
                                                                     <input class="form-input w-full py-1"
-                                                                        type="number" name="tunai" id="tunai"
+                                                                        type="text" name="tunai" id="tunai"
                                                                         value="0" />
                                                                 </div>
                                                                 <div class="w-1/2 mb-3 md:mb-0">
                                                                     <label class="block text-sm font-medium mb-1"
                                                                         for="transfer">Transfer</label>
                                                                     <input class="form-input w-full py-1"
-                                                                        type="number" name="transfer" id="transfer"
+                                                                        type="text" name="transfer" id="transfer"
                                                                         value="0" />
                                                                 </div>
                                                             </div>
@@ -1593,8 +1593,10 @@ $(document).ready(function () {
     let ppn = {{ $ppn }};
 
     function getTotal() {
-        let biaya = parseInt($('#biaya').val()) || 0;
-        let diskon = parseInt($('#diskon').val()) || 0;
+        // PERBAIKAN 1: Gunakan parseRupiah() bukan parseInt() atau parseFloat() biasa
+        // Ini agar angka "1.000.000" terbaca sebagai 1000000
+        let biaya = parseRupiah($('#biaya').val());
+        let diskon = parseRupiah($('#diskon').val());
 
         // Hitung subtotal
         let subtotal = Math.max(biaya - diskon, 0);
@@ -1608,36 +1610,62 @@ $(document).ready(function () {
     }
 
     $(document).ready(function () {
-        // Kalau user ubah tunai
+
+        // 1. Kalau user ketik nominal Tunai
         $('#tunai').on('input', function () {
+            $('#tunai').val(formatRupiah($(this).val()));
+
             if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
                 let total = getTotal();
-                let tunai = parseInt($(this).val()) || 0;
+
+                // Ambil nilai tunai yang sedang diketik (bersihkan titiknya dulu)
+                let tunai = parseRupiah($(this).val());
+
+                // Hitung sisanya untuk transfer
                 let transfer = total - tunai;
-                $('#transfer').val(transfer >= 0 ? transfer : 0);
+
+                // Tampilkan hasil ke input Transfer dengan format Rupiah
+                // Jika hasil minus (tunai > total), set 0
+                $('#transfer').val(transfer >= 0 ? formatRupiah(transfer) : 0);
             }
         });
 
-        // Kalau user ubah transfer
+        // 2. Kalau user ketik nominal Transfer
         $('#transfer').on('input', function () {
+            $('#transfer').val(formatRupiah($(this).val()));
+
             if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
                 let total = getTotal();
-                let transfer = parseInt($(this).val()) || 0;
+
+                // Ambil nilai transfer yang sedang diketik (bersihkan titiknya dulu)
+                let transfer = parseRupiah($(this).val());
+
+                // Hitung sisanya untuk tunai
                 let tunai = total - transfer;
-                $('#tunai').val(tunai >= 0 ? tunai : 0);
+
+                // Tampilkan hasil ke input Tunai dengan format Rupiah
+                $('#tunai').val(tunai >= 0 ? formatRupiah(tunai) : 0);
             }
         });
 
-        // Kalau biaya atau diskon berubah, reset ulang input tunai & transfer
+        // 3. Kalau Biaya atau Diskon berubah, trigger ulang kalkulasi
         $('#biaya, #diskon').on('input', function () {
-            $('#tunai').trigger('input');
+            // Hanya trigger jika mode "Tunai & Transfer" sedang aktif
+            if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
+                // Reset tunai ke Total penuh dulu agar tidak bingung
+                // Atau trigger input event di #tunai agar menghitung ulang transfer based on tunai yang ada
+                $('#tunai').trigger('input');
+            }
         });
 
-        // Saat cara pembayaran diganti
+        // 4. Saat cara pembayaran diganti
         $('#cara_pembayaran').on('change', function () {
             if ($(this).val() === 'Tunai & Transfer') {
-                $('#tunai').trigger('input');
+                // Auto fill Tunai dengan Total (Format Rupiah), Transfer 0
+                $('#tunai').val(formatRupiah(getTotal()));
+                $('#transfer').val(0);
             } else {
+                // Reset jadi 0
                 $('#tunai, #transfer').val(0);
             }
         });
@@ -1767,13 +1795,57 @@ $(document).ready(function () {
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    $(document).ready(function () {
+    // --- 1. HELPER FUNCTIONS FORMAT RUPIAH ---
+    function formatRupiah(angka) {
+        if (!angka) return '';
+        var number_string = angka.toString().replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-        // --- 1. TERIMA DATA DARI CONTROLLER ---
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return rupiah;
+    }
+
+    function parseRupiah(str) {
+        if (!str) return 0;
+        // Hapus semua titik, lalu ubah ke integer
+        return parseInt(str.toString().replace(/\./g, '')) || 0;
+    }
+
+    // --- 2. LOGIC UTAMA ---
+    $(document).ready(function() {
+
+        // A. EVENT LISTENER FORMATTING INPUT
+        $(document).on('input', '.input-currency', function() {
+            $(this).val(formatRupiah($(this).val()));
+        });
+
+        // B. CLEAN DATA SEBELUM SUBMIT
+        $('form').on('submit', function() {
+            // Hapus titik di semua input currency sebelum dikirim ke backend
+            $(this).find('.input-currency').each(function() {
+                var cleanVal = $(this).val().replace(/\./g, '');
+                $(this).val(cleanVal);
+            });
+            // Bersihkan juga field total (readonly)
+            $('#biaya').val($('#biaya').val().replace(/\./g, ''));
+            $('#total_modal_sparepart').val($('#total_modal_spaInirepart').val().replace(/\./g, ''));
+            $('#tunai').val($('#tunai').val().replace(/\./g, ''));
+            $('#transfer').val($('#transfer').val().replace(/\./g, ''));
+        });
+
+        // C. LOGIC DINAMIS TEKNISI
         const existingData = @json($teknisiServis ?? []);
         let groupCounter = 0;
 
-        // --- TEMPLATES ---
+        // TEMPLATES
         const teknisiOptions = `
             <option selected value="">Pilih Teknisi</option>
             @foreach ($users as $user) <option value="{{ $user->id }}">{{ $user->name }}</option> @endforeach
@@ -1793,9 +1865,9 @@ $(document).ready(function () {
             @foreach ($sales as $user) <option value="{{ $user->id }}">{{ $user->name }}</option> @endforeach
         `;
 
-        // --- HTML GENERATOR ---
         function generateActionHtml(groupIndex, actionIndex) {
             const uniqueRadioId = 'radio_' + actionIndex;
+            // PERUBAHAN: Input modal & biaya jadi type="text" + class="input-currency"
             return `
             <div class="action-item" x-data="{ useSparepart: false, showInputManual: false }">
                 <button type="button" class="position-button-x remove-action absolute top-2 right-2 text-rose-500 hover:text-rose-700 font-bold" title="Hapus">&times;</button>
@@ -1812,10 +1884,8 @@ $(document).ready(function () {
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1"
-                        for="garansi">Garansi</label>
-                    <select name="teknisi[${groupIndex}][tindakan][${actionIndex}][garansi]"
-                        class="form-select text-sm py-1 w-full">
+                    <label class="block text-sm font-medium mb-1" for="garansi">Garansi</label>
+                    <select name="teknisi[${groupIndex}][tindakan][${actionIndex}][garansi]" class="form-select text-sm py-1 w-full">
                         <option value="">Tidak Ada</option>
                         <option value="1">1 Hari</option>
                         <option value="2">2 Hari</option>
@@ -1842,7 +1912,7 @@ $(document).ready(function () {
                         <option value="1095">3 Tahun</option>
                         <option value="1460">4 Tahun</option>
                         <option value="1825">5 Tahun</option>
-                    </select>
+                        </select>
                 </div>
                 <div class="konfirmasi-stok border-t border-slate-200 pt-2 mt-2">
                     <label class="block text-sm font-medium mb-1">Pakai Sparepart Toko?</label>
@@ -1855,8 +1925,14 @@ $(document).ready(function () {
                         <div class="mb-2"><label class="block text-sm font-medium mb-1">Sales Sparepart</label><select name="teknisi[${groupIndex}][tindakan][${actionIndex}][sales_id]" class="form-select text-sm py-1 w-full selectSales">${salesOptions}</select></div>
                     </div>
                     <div class="grid grid-cols-2 gap-2 mt-2">
-                        <div><label class="block text-sm font-medium mb-1">Modal Part <span class="text-rose-500">*</span></label><input class="form-input w-full px-2 py-1 modal_sparepart" type="number" name="teknisi[${groupIndex}][tindakan][${actionIndex}][modal_sparepart]" value="0" required /></div>
-                        <div><label class="block text-sm font-medium mb-1">Biaya Servis <span class="text-rose-500">*</span></label><input class="form-input w-full px-2 py-1 biaya_servis" type="number" name="teknisi[${groupIndex}][tindakan][${actionIndex}][biaya_servis]" value="0" required /></div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Modal Part <span class="text-rose-500">*</span></label>
+                            <input class="form-input w-full px-2 py-1 modal_sparepart input-currency" type="text" name="teknisi[${groupIndex}][tindakan][${actionIndex}][modal_sparepart]" value="0" required />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Biaya Servis <span class="text-rose-500">*</span></label>
+                            <input class="form-input w-full px-2 py-1 biaya_servis input-currency" type="text" name="teknisi[${groupIndex}][tindakan][${actionIndex}][biaya_servis]" value="0" required />
+                        </div>
                     </div>
                 </div>
             </div>`;
@@ -1877,8 +1953,10 @@ $(document).ready(function () {
                 <div class="actions-list-container space-y-3"></div>
                 <div class="mt-3 text-center border-t border-dashed border-slate-300 pt-3"><button type="button" class="add-action-btn btn-sm bg-emerald-500 hover:bg-emerald-600 text-white">+ Tambah Tindakan Lain (Untuk Teknisi Ini)</button></div>
             </div>`;
+
             const $newGroup = $(groupHtml);
             $('#main-container').append($newGroup);
+
             if (techData) {
                 $newGroup.find('.selectUser').val(techData.users_id);
                 $newGroup.find('.selectType').val(techData.tipe);
@@ -1900,39 +1978,26 @@ $(document).ready(function () {
             const $selSales = $newItem.find('.selectSales').select2();
 
             if (actionData) {
-                // Set Nilai Duit Awal (PENTING: Pastikan ini jalan)
-                // Gunakan .val() dan pastikan angka (0 jika null/kosong)
-                $newItem.find('.biaya_servis').val(actionData.biaya || 0);
-
-                // Untuk modal, jika 0, nanti akan ditimpa oleh harga modal sparepart jika ada
-                $newItem.find('.modal_sparepart').val(actionData.modal || 0);
+                // FORMAT VALUE SAAT LOAD
+                $newItem.find('.biaya_servis').val(formatRupiah(actionData.biaya || 0));
+                $newItem.find('.modal_sparepart').val(formatRupiah(actionData.modal || 0));
 
                 if (actionData.act_id && actionData.act_id !== "null") $selAction.val(actionData.act_id).trigger('change.select2');
 
-                // Logic Sparepart
                 if (actionData.prod_id && actionData.prod_id != "null" && actionData.prod_id != "") {
                     setTimeout(() => { $newItem.find('.radio-sparepart-yes')[0].click(); }, 50);
-
                     setTimeout(() => {
-                        // Set value sparepart
                         $selSparepart.val(actionData.prod_id).trigger('change.select2');
-
-                        // PENTING: Ambil harga modal dari data-attribute option yang terpilih
-                        // Ini logic fallback jika actionData.modal ternyata 0 atau tidak tersimpan benar
                         const hargaModalOtomatis = $selSparepart.find(':selected').data('harga_modal') || 0;
 
-                        // Jika data modal dari DB ada (>0), pakai itu. Jika 0, ambil dari master barang.
                         if(actionData.modal > 0) {
-                            $newItem.find('.modal_sparepart').val(actionData.modal);
+                            $newItem.find('.modal_sparepart').val(formatRupiah(actionData.modal));
                         } else {
-                            $newItem.find('.modal_sparepart').val(hargaModalOtomatis);
+                            $newItem.find('.modal_sparepart').val(formatRupiah(hargaModalOtomatis));
                         }
-
-                        // Trigger hitung ulang total
                         recalculateAll();
                     }, 100);
                 } else {
-                    // Jika tidak ada sparepart, hitung ulang untuk biaya servis saja
                     recalculateAll();
                 }
             }
@@ -1964,7 +2029,6 @@ $(document).ready(function () {
                     addActionToGroup(groupObj.$element, groupObj.index);
                 }
             });
-            // Delay sedikit untuk rekap total akhir setelah semua timeout selesai
             setTimeout(recalculateAll, 1000);
         } else {
             addTechnicianGroup();
@@ -1982,6 +2046,7 @@ $(document).ready(function () {
             if(confirm('Hapus Teknisi?')) { $(this).closest('.technician-group').remove(); recalculateAll(); }
         });
 
+        // Event Select Action
         $(document).on('select2:select', '.selectAction', function(e) {
             const $select = $(this);
             const $container = $select.closest('.action-item');
@@ -1992,30 +2057,62 @@ $(document).ready(function () {
                     type: 'GET',
                     dataType: 'json',
                     success: function(data) {
-                        $container.find('.biaya_servis').val(data.biaya);
+                        // FORMAT RUPIAH SAAT ISI OTOMATIS
+                        $container.find('.biaya_servis').val(formatRupiah(data.biaya));
                         recalculateAll();
                     }
                 });
             }
         });
 
+        // Event Select Sparepart
         $(document).on('change', '.selectSparepart', function() {
             const $select = $(this);
             const $container = $select.closest('.action-item');
             const hargaModal = $select.find(':selected').data('harga_modal') || 0;
-            $container.find('.modal_sparepart').val(hargaModal);
+            // FORMAT RUPIAH SAAT ISI OTOMATIS
+            $container.find('.modal_sparepart').val(formatRupiah(hargaModal));
             recalculateAll();
         });
 
         $(document).on('input', '.biaya_servis, .modal_sparepart', function() { recalculateAll(); });
 
+        // RECALCULATE ALL (UPDATED: Parse Rupiah)
         function recalculateAll() {
             let totalBiaya = 0;
             let totalModal = 0;
-            $('.biaya_servis').each(function() { totalBiaya += parseFloat($(this).val()) || 0; });
-            $('.modal_sparepart').each(function() { totalModal += parseFloat($(this).val()) || 0; });
-            $('#biaya').val(totalBiaya);
-            $('#total_modal_sparepart').val(totalModal);
+            // Bersihkan format rupiah sebelum menjumlah
+            $('.biaya_servis').each(function() { totalBiaya += parseRupiah($(this).val()); });
+            $('.modal_sparepart').each(function() { totalModal += parseRupiah($(this).val()); });
+
+            // Set kembali ke input Total dengan format rupiah
+            $('#biaya').val(formatRupiah(totalBiaya));
+            $('#total_modal_sparepart').val(formatRupiah(totalModal));
+
+            // Trigger input agar kalkulasi diskon/tunai di bawah ikut update
+            $('#biaya').trigger('input');
         }
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Seleksi semua input dengan class "input-currency"
+        const currencyInputs = document.querySelectorAll('.input-currency');
+
+        currencyInputs.forEach(function(input) {
+            // Format saat user mengetik
+            input.addEventListener('input', function(e) {
+                e.target.value = formatRupiah(e.target.value);
+            });
+        });
+
+        // Optional: Bersihkan titik saat submit form agar data bersih masuk database
+        const forms = document.querySelectorAll('form');
+        forms.forEach(function(form) {
+            form.addEventListener('submit', function() {
+                currencyInputs.forEach(function(input) {
+                    // Hapus titik sebelum submit
+                    input.value = input.value.replace(/\./g, '');
+                });
+            });
+        });
     });
 </script>

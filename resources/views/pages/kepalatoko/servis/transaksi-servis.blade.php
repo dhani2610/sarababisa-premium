@@ -279,7 +279,10 @@
         <script type="text/javascript">
             $(document).ready(function() {
                 $('#selectjs1').select2();
-                $('.selectjs2').select2();
+                $('.selectjs2').select2({
+                    width: '100%'
+                });
+
                 $('#selectjs3').select2();
                 $('.selectjs4').select2();
                 $('#selectjs5').select2();
