@@ -37,19 +37,6 @@ class ModelSeriImport implements ToModel, WithHeadingRow, WithBatchInserts
             return null; // Return null karena sudah di-handle update
         }
 
-        // == KONDISI CREATE (BARU) ==
-        // Data belum ada di cabang ini, kita buat baru.
-        // TAPI cek dulu, apakah nama ini sudah dipakai cabang lain?
-
-        // $finalName = $namaAsli;
-        // $counter = 2;
-
-        // // Loop: Jika nama sudah ada di database (milik cabang manapun), tambah angka (2), (3)...
-        // while (ModelSerie::where('name', $finalName)->exists()) {
-        //     $finalName = $namaAsli . '.';
-        //     $counter++;
-        // }
-
         // Simpan Data Baru dengan nama yang sudah aman
         return new ModelSerie([
             'name'           => $row['Nama Model Seri'], // Nama unik

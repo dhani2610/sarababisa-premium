@@ -299,6 +299,7 @@
         Garansi : <a href="{{ env('APP_URL') }}/garansi" target="_blank" rel="noopener noreferrer">{{ env('APP_URL') }}/garansi</a>
         <br>
         {!! $terms->description !!}
+        <br><strong>No. Rekening : {{ $users->rekening }} {{ $users->bank }} An. {{ $users->pemilik_rekening }} </strong>
         @foreach ($banks as $index => $bank)
             <br><strong>No. Rekening : {{ $bank['rekening'] }}, {{ $bank['bank'] }} An.
                 {{ $bank['pemilik'] }} </strong>

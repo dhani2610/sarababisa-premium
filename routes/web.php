@@ -380,6 +380,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::delete('/akun/{id}', [KepalaTokoAkunController::class, 'destroy'])->name('akun-destroy');
     Route::delete('/accounts/delete', [KepalaTokoAkunController::class, 'deleteSelected']);
     Route::post('/servis/transaksi-servis-langsung', [KepalaTokoTransaksiServisLangsungController::class, 'store'])->name('servis-langsung');
+
+    Route::post('servis/tindakan-servis/import-chunk', [KepalaTokoTindakanServisController::class, 'importChunk'])->name('tindakan.servis.import-chunk');
     Route::resource('servis/tindakan-servis', KepalaTokoTindakanServisController::class);
 
     Route::get('pelanggan/data', [KepalaTokoPelangganController::class, 'getData'])->name('pelanggan.data');
@@ -465,6 +467,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
     Route::get('master-merek/data', [KepalaTokoMasterMerekController::class, 'getData'])->name('master-merek.data');
     Route::post('master-merek/delete-batch', [KepalaTokoMasterMerekController::class, 'deleteBatch'])->name('master-merek.delete-batch');
+    Route::post('master/master-merek/import-chunk', [KepalaTokoMasterMerekController::class, 'importChunk'])->name('master-merek.import-chunk');
     Route::resource('master/master-merek', KepalaTokoMasterMerekController::class);
 
 
@@ -474,6 +477,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
     Route::get('master-model-seri/data', [KepalaTokoMasterModelSeriController::class, 'getData'])->name('master-model-seri.data');
     Route::post('master-model-seri/delete-batch', [KepalaTokoMasterModelSeriController::class, 'deleteBatch'])->name('master-model-seri.delete-batch');
+    Route::post('master/master-model-seri/import-chunk', [KepalaTokoMasterModelSeriController::class, 'importChunk'])->name('model-seri.import-chunk');
     Route::resource('master/master-model-seri', KepalaTokoMasterModelSeriController::class);
     Route::get('manajemen/anggaran/data', [KepalaTokoAnggaranController::class, 'getData'])->name('anggaran.data');
     Route::post('manajemen/anggaran/delete-batch', [KepalaTokoAnggaranController::class, 'deleteBatch'])->name('anggaran.delete-batch');
@@ -532,9 +536,17 @@ Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisControll
     Route::get('top-produk', [KepalaTokoProdukController::class, 'indexTop'])->name('top-produk');
 
     Route::resource('produk/handphone', KepalaTokoProdukHandphoneController::class);
+    Route::post('produk/handphone/import-chunk', [KepalaTokoProdukHandphoneController::class, 'importChunk'])->name('produk.handphone.import-chunk');
+
     Route::resource('produk/sparepart', KepalaTokoProdukSparepartController::class);
+    Route::post('produk/sparepart/import-chunk', [KepalaTokoProdukSparepartController::class, 'importChunk'])->name('produk.sparepart.import-chunk');
+
     Route::resource('produk/aksesoris', KepalaTokoProdukAksesorisController::class);
+    Route::post('produk/aksesoris/import-chunk', [KepalaTokoProdukAksesorisController::class, 'importChunk'])->name('produk.aksesoris.import-chunk');
+
     Route::resource('produk/tool', KepalaTokoProdukToolController::class);
+    Route::post('produk/tool/import-chunk', [KepalaTokoProdukToolController::class, 'importChunk'])->name('produk.tool.import-chunk');
+
     Route::get('produk/purchase/cetak', [KepalaTokoPurchaseProductController::class, 'cetak'])->name('purchase.cetak');
     Route::resource('produk/purchase', KepalaTokoPurchaseProductController::class);
     Route::delete('/purchases/delete', [KepalaTokoPurchaseProductController::class, 'deleteSelected']);

@@ -95,6 +95,12 @@ class TransaksiProdukController extends Controller
         $total = $orderItem->sum('total');
         $subtotal = $orderItem->sum('sub_total');
         $users = User::find(1);
+        
+        if ($order->cabang_id == 1) {
+            $users = User::find(1);
+        }else{
+            $users = User::where('cabang_id',$order->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
         $totalTax = $orderItem->sum('ppn');
         $totalWithoutTax = $order->sub_total - $totalTax;
 
@@ -129,6 +135,17 @@ class TransaksiProdukController extends Controller
         $total = $orderItem->sum('total');
         $subtotal = $orderItem->sum('sub_total');
         $users = User::find(1);
+
+
+        if ($order->cabang_id == 1) {
+            $users = User::find(1);
+        }else{
+            $users = User::where('cabang_id',$order->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
         $terms = Term::find(3);
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
 

@@ -26,8 +26,8 @@ class ModelSeriExport implements FromCollection, WithMapping, WithHeadings, Shou
             $modelserie->id,
             $modelserie->name ?? '-',
             $modelserie->brands_id,
-            $modelserie->id_tipe_os,
-            $modelserie->nominal_bonus,
+            !empty($modelserie->id_tipe_os) ? $modelserie->id_tipe_os : 0,
+            !empty($modelserie->nominal_bonus) ? $modelserie->nominal_bonus : 0,
         ];
     }
 
@@ -44,7 +44,7 @@ class ModelSeriExport implements FromCollection, WithMapping, WithHeadings, Shou
 
     public function styles(Worksheet $sheet)
     {
-        return [
+        return [    
             // Style the first row as bold text.
             1    => ['font' => ['bold' => true]],
         ];

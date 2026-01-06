@@ -33,6 +33,85 @@ class ProdukHandphoneController extends Controller
         return view('pages/kepalatoko/produk/handphone',compact('toko'));
     }
 
+
+    public function import(Request $request)
+    {
+        $data = $request->file('file');
+        $namafile = $data->getClientOriginalName();
+        $data->move('ProdukData', $namafile);
+        Excel::import(new HandphoneImport, \public_path('/ProdukData/' . $namafile));
+        return redirect()->route('handphone.index')->with('success', 'All good!');
+    }
+
+
+    public function importChunk(Request $request)
+    {
+        try {
+            $rows = $request->input('rows');
+            $cabangId = getCabangId();
+            $updatedCount = 0;
+            $insertedCount = 0;
+
+            foreach ($rows as $row) {
+                // Validasi baris kosong
+                if (empty($row['Nama Produk']) && empty($row['Nomor Seri'])) continue;
+
+                $snAsli = trim($row['Nomor Seri']);
+
+                // Cari apakah HP dengan Nomor Seri ini sudah ada di cabang ini?
+                $existing = Product::where('cabang_id', $cabangId)
+                                    ->where('nomor_seri', $snAsli)
+                                    ->first();
+
+                $data = [
+                    'categories_id'     => 1,
+                    'category_name'     => 'Handphone',
+                    'product_name'      => $row['Nama Produk'] ?? '-',
+                    'brands_id'         => $row['ID Merek'] ?? null,
+                    'model_series_id'   => $row['ID Model Seri'] ?? null,
+                    'ram'               => $row['RAM'] ?? null,
+                    'capacities_id'     => $row['ID Kapasitas'] ?? null,
+                    'warna'             => $row['Warna'] ?? null,
+                    'kondisi'           => $row['Kondisi'] ?? 'NEW',
+                    'product_code'      => $row['Kode Produk'] ?? null,
+                    'stok'              => $row['Stok'] ?? 0,
+                    'stok_minimal'      => $row['Stok Minimal'] ?? 0,
+                    'harga_modal'       => $row['Harga Modal'] ?? 0,
+                    'harga_jual_toko'   => $row['Harga Jual Toko'] ?? 0,
+                    'harga_jual'        => $row['Harga Jual Pelanggan'] ?? 0,
+                    'keterangan'        => $row['Keterangan'] ?? null,
+                    'garansi'           => $row['Garansi Produk (Hari)'] ?? 0,
+                    'garansi_imei'      => $row['Garansi IMEI (Hari)'] ?? 0,
+                    'ppn'               => $row['PPN 11%'] ?? 0,
+                    'updated_at'        => now(),
+                ];
+
+                if ($existing) {
+                    $existing->update($data);
+                    $updatedCount++;
+                } else {
+                    $data['nomor_seri'] = $snAsli;
+                    $data['cabang_id']  = $cabangId;
+                    $data['created_at'] = !empty($row['Tgl Masuk']) ? \Carbon\Carbon::parse($row['Tgl Masuk']) : now();
+
+                    Product::create($data);
+                    $insertedCount++;
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'inserted' => $insertedCount,
+                'updated' => $updatedCount
+            ]);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => $th->getMessage()
+            ], 500);
+        }
+    }
     public function deleteSelected(Request $request)
     {
         $selectedIds  = $request->input('selectedIds');
@@ -115,15 +194,6 @@ class ProdukHandphoneController extends Controller
     public function show($id)
     {
         //
-    }
-
-    public function import(Request $request)
-    {
-        $data = $request->file('file');
-        $namafile = $data->getClientOriginalName();
-        $data->move('ProdukData', $namafile);
-        Excel::import(new HandphoneImport, \public_path('/ProdukData/' . $namafile));
-        return redirect()->route('handphone.index')->with('success', 'All good!');
     }
 
     public function export()

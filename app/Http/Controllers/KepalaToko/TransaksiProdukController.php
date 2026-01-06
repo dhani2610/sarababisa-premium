@@ -802,8 +802,15 @@ class TransaksiProdukController extends Controller
      */
     public function show($orders_id)
     {
-        $toko = User::find(1);
+        // $toko = User::find(1);
         $order = Order::with('customer')->where('id', $orders_id)->first();
+
+        if ($order->cabang_id == 1) {
+            $toko = User::find(1);
+        }else{
+            $toko = User::where('cabang_id',$order->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+
         $orderItem = OrderDetail::with('product')->where('orders_id', $orders_id)->orderBy('id', 'DESC')->get();
 
         $produkDetails = '';

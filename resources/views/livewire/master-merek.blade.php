@@ -65,19 +65,29 @@
                 <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen" x-cloak></div>
                 <div class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="modalOpen" x-cloak>
                     <div class="bg-white rounded shadow-lg overflow-auto max-w-xl w-full max-h-full" @click.outside="modalOpen = false">
-                        <form action="{{ route('impor-merek') }}" method="post" enctype="multipart/form-data">
-                            @csrf
+                        <form id="form-import-merek">
                             <div class="px-5 py-3 border-b border-slate-200 flex justify-between">
-                                <div class="font-semibold text-slate-800">Impor Data Merek</div>
+                                <div class="font-semibold text-slate-800">Impor Data Merek (Chunk)</div>
                                 <button type="button" class="text-slate-400" @click="modalOpen = false">&times;</button>
                             </div>
                             <div class="px-5 pt-4 pb-4 space-y-2">
                                 <p class="text-sm">Silahkan download format, isi, dan upload.</p>
-                                <input type="file" name="file" class="btn-sm bg-slate-100 w-full" required>
+                                <input type="file" id="file_import" class="btn-sm bg-slate-100 w-full" accept=".xlsx, .xls" required>
+
+                                <div id="progress-container" class="hidden mt-4">
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm font-medium text-indigo-700">Mengupload...</span>
+                                        <span class="text-sm font-medium text-indigo-700" id="progress-text">0%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-indigo-600 h-2.5 rounded-full" id="progress-bar" style="width: 0%"></div>
+                                    </div>
+                                    <p id="status-text" class="text-xs text-slate-500 mt-1"></p>
+                                </div>
                             </div>
                             <div class="px-5 py-4 border-t flex justify-end space-x-2">
                                 <a href="{{ asset('storage/assets/format_merek.xlsx') }}" class="btn-sm bg-orange-500 text-white">Download Format</a>
-                                <button type="submit" class="btn-sm bg-indigo-500 text-white">Upload File</button>
+                                <button type="submit" id="btn-upload" class="btn-sm bg-indigo-500 text-white">Upload File</button>
                             </div>
                         </form>
                     </div>
@@ -252,6 +262,111 @@
                     }
                 });
             };
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // --- LOGIKA IMPORT CHUNK ---
+            $('#form-import-merek').on('submit', function(e) {
+                e.preventDefault();
+
+                var fileInput = document.getElementById('file_import');
+                if (fileInput.files.length === 0) {
+                    alert('Pilih file terlebih dahulu!');
+                    return;
+                }
+
+                var file = fileInput.files[0];
+                var reader = new FileReader();
+
+                // Tampilkan Progress UI
+                $('#progress-container').removeClass('hidden');
+                $('#progress-bar').css('width', '0%');
+                $('#progress-text').text('0%');
+                $('#status-text').text('Membaca file...');
+                $('#btn-upload').prop('disabled', true).text('Memproses...');
+
+                reader.onload = function(e) {
+                    var data = new Uint8Array(e.target.result);
+                    var workbook = XLSX.read(data, { type: 'array' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+
+                    // Convert Excel ke JSON
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (jsonData.length === 0) {
+                        alert('File kosong atau format salah!');
+                        resetUploadUI();
+                        return;
+                    }
+
+                    // Proses Chunking
+                    uploadChunks(jsonData);
+                };
+
+                reader.readAsArrayBuffer(file);
+            });
+
+            async function uploadChunks(data) {
+                const chunkSize = 200; // Jumlah baris per request
+                const totalChunks = Math.ceil(data.length / chunkSize);
+                let totalInserted = 0;
+                let totalSkipped = 0;
+
+                for (let i = 0; i < totalChunks; i++) {
+                    const start = i * chunkSize;
+                    const end = start + chunkSize;
+                    const chunk = data.slice(start, end);
+
+                    try {
+                        const response = await $.ajax({
+                            url: "{{ route('master-merek.import-chunk') }}",
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                rows: chunk
+                            }
+                        });
+
+                        if (response.status === 'success') {
+                            totalInserted += response.inserted;
+                            totalSkipped += response.skipped;
+                        }
+
+                        // Update Progress Bar
+                        const percent = Math.round(((i + 1) / totalChunks) * 100);
+                        $('#progress-bar').css('width', percent + '%');
+                        $('#progress-text').text(percent + '%');
+                        $('#status-text').text(`Memproses data ke ${Math.min(end, data.length)} dari ${data.length}...`);
+
+                    } catch (error) {
+                        console.error(error);
+                        alert('Terjadi kesalahan saat upload chunk ke-' + (i + 1));
+                        resetUploadUI();
+                        return; // Stop loop jika error
+                    }
+                }
+
+                // Selesai
+                $('#status-text').text('Selesai! ' + totalInserted + ' data masuk, ' + totalSkipped + ' dilewati (duplikat).');
+                setTimeout(() => {
+                    alert('Import Selesai!\nData Masuk: ' + totalInserted + '\nDuplikat (Skip): ' + totalSkipped);
+                    resetUploadUI();
+                    $('#file_import').val(''); // Reset input file
+                    table.ajax.reload(); // Reload DataTable
+                    // Tutup modal secara manual (karena pake x-data alpine, kita trigger click tombol close atau reload page)
+                    // window.location.reload();
+                }, 500);
+            }
+
+            function resetUploadUI() {
+                $('#progress-container').addClass('hidden');
+                $('#btn-upload').prop('disabled', false).text('Upload File');
+            }
         });
     </script>
 @endpush

@@ -24,7 +24,7 @@ class MasterMerekController extends Controller
     }
 
 
-    
+
     // Method DataTables AJAX
     public function getData(Request $request)
     {
@@ -168,9 +168,9 @@ public function store(BrandRequest $request)
     // Jika "Samsung." ada, dia akan ngecek "Samsung.."
     // Dan seterusnya...
     // while (Brand::withTrashed()->where('name', $finalName)->exists()) {
-        
-    //     $finalName = $finalName . '.'; 
-        
+
+    //     $finalName = $finalName . '.';
+
     // }
 
     // Set nama final yang sudah unik
@@ -189,6 +189,71 @@ public function store(BrandRequest $request)
         $data->move('BrandData', $namafile);
         Excel::import(new BrandImport, \public_path('/BrandData/' . $namafile));
         return redirect()->route('master-merek.index')->with('success', 'All good!');
+    }
+
+    public function importChunk(Request $request)
+    {
+        try {
+            $rows = $request->input('rows');
+            $cabangId = getCabangId(); // Pastikan helper ini tersedia
+
+            // Ambil semua nama merek dari chunk yang dikirim untuk optimasi query
+            $chunkNames = collect($rows)->pluck('Nama Merek')->filter()->toArray();
+
+            // Ambil data yang sudah ada di Database (berdasarkan nama & cabang)
+            $existingBrands = Brand::whereIn('name', $chunkNames)
+                ->where('cabang_id', $cabangId)
+                ->pluck('name')
+                ->toArray();
+
+            // Ubah ke lowercase agar perbandingannya case-insensitive (opsional)
+            $existingBrandsLower = array_map('strtolower', $existingBrands);
+
+            $insertData = [];
+            $skippedCount = 0;
+
+            foreach ($rows as $row) {
+                // Validasi nama kosong
+                if (empty($row['Nama Merek'])) {
+                    continue;
+                }
+
+                $namaMerek = trim($row['Nama Merek']);
+
+                // Cek apakah merek sudah ada (Case insensitive check)
+                if (in_array(strtolower($namaMerek), $existingBrandsLower)) {
+                    $skippedCount++;
+                    continue;
+                }
+
+                // Masukkan ke array insert
+                $insertData[] = [
+                    'name'       => $namaMerek,
+                    'cabang_id'  => $cabangId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            // Lakukan Insert Batch
+            if (!empty($insertData)) {
+                Brand::insert($insertData);
+            }
+
+            return response()->json([
+                'status'   => 'success',
+                'inserted' => count($insertData),
+                'skipped'  => $skippedCount
+            ]);
+
+        } catch (\Throwable $th) {
+            Log::error('Import Merek Error: ' . $th->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'msg'    => $th->getMessage(),
+            ], 500);
+        }
     }
 
     public function export()

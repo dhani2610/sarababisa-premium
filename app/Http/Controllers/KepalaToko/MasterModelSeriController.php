@@ -24,6 +24,70 @@ class MasterModelSeriController extends Controller
         return view('pages/kepalatoko/master/model-seri');
     }
 
+    public function importChunk(Request $request)
+    {
+        try {
+            $rows = $request->input('rows');
+            $cabangId = getCabangId();
+
+            $insertData = [];
+            $updatedCount = 0;
+
+            foreach ($rows as $row) {
+                // return response()->json([
+                //     'status' => 'success',
+                //     'row' => $row,
+                // ]);
+                // Validasi baris kosong
+                if (empty($row['Nama Model Seri'])) continue;
+
+                $namaModel = trim($row['Nama Model Seri']);
+
+                // Cek apakah model sudah ada di cabang ini
+                $existing = ModelSerie::where('cabang_id', $cabangId)
+                                    ->where('name', $namaModel)
+                                    ->first();
+
+                if ($existing) {
+                    // UPDATE
+                    $existing->update([
+                        'brands_id'     => $row['ID Merek'] ?? $existing->brands_id,
+                        'id_tipe_os'    => $row['ID TIPE OS'] ?? $existing->id_tipe_os,
+                        'nominal_bonus' => $row['Nominal Bonus'] ?? 0,
+                    ]);
+                    $updatedCount++;
+                } else {
+                    // PREPARE INSERT
+                    $insertData[] = [
+                        'name'          => $namaModel,
+                        'brands_id'     => $row['ID Merek'],
+                        'id_tipe_os'    => $row['ID TIPE OS'],
+                        'nominal_bonus' => $row['Nominal Bonus'] ?? 0,
+                        'cabang_id'     => $cabangId,
+                        'created_at'    => now(),
+                        'updated_at'    => now(),
+                    ];
+                }
+            }
+
+            if (!empty($insertData)) {
+                ModelSerie::insert($insertData);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'inserted' => count($insertData),
+                'updated' => $updatedCount
+            ]);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => $th->getMessage(),
+            ], 500);
+        }
+    }
+
     public function getData(Request $request)
     {
         // Eager load relasi brand agar query lebih efisien

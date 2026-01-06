@@ -88,21 +88,19 @@
                 <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen" x-cloak></div>
                 <div class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="modalOpen" x-cloak>
                     <div class="bg-white rounded shadow-lg overflow-auto max-w-xl w-full max-h-full" @click.outside="modalOpen = false">
-                        <form id="importForm" enctype="multipart/form-data">
+                        <form action="{{ route('impor-model') }}" method="post" enctype="multipart/form-data">
                             @csrf
+                            <div class="px-5 py-3 border-b border-slate-200 flex justify-between">
+                                <div class="font-semibold text-slate-800">Impor Data Model Seri</div>
+                                <button type="button" class="text-slate-400" @click="modalOpen = false">&times;</button>
+                            </div>
                             <div class="px-5 pt-4 pb-4 space-y-2">
                                 <p class="text-sm">Silahkan download format, isi, dan upload.</p>
-                                <input type="file" id="fileInput" class="btn-sm bg-slate-100 w-full" accept=".xlsx, .xls" required>
-                                <div id="progressContainer" class="hidden">
-                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                        <div id="progressBar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
-                                    </div>
-                                    <p id="progressText" class="text-xs mt-1 text-slate-500">Processing...</p>
-                                </div>
+                                <input type="file" name="file" class="btn-sm bg-slate-100 w-full" required>
                             </div>
                             <div class="px-5 py-4 border-t flex justify-end space-x-2">
                                 <a href="{{ asset('storage/assets/format_model_seri.xlsx') }}" class="btn-sm bg-orange-500 text-white">Download Format</a>
-                                <button type="submit" id="btnUpload" class="btn-sm bg-indigo-500 text-white">Upload File</button>
+                                <button type="submit" class="btn-sm bg-indigo-500 text-white">Upload File</button>
                             </div>
                         </form>
                     </div>
@@ -271,61 +269,6 @@
                     }
                 });
             };
-        });
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script>
-        document.getElementById('importForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-
-            reader.onload = async function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { defval: null });
-
-                const chunkSize = 100; // Kirim per 100 baris
-                const totalRows = jsonData.length;
-                let processed = 0;
-
-                // Tampilkan progress bar
-                $('#progressContainer').removeClass('hidden');
-                $('#btnUpload').prop('disabled', true).text('Processing...');
-                console.log('====================================');
-                console.log(jsonData);
-                console.log('====================================');
-                for (let i = 0; i < totalRows; i += chunkSize) {
-                    const chunk = jsonData.slice(i, i + chunkSize);
-                    try {
-                        await $.ajax({
-                            url: "{{ route('model-seri.import-chunk') }}",
-                            method: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}",
-                                rows: chunk
-                            }
-                        });
-
-                        processed += chunk.length;
-                        let percent = Math.round((processed / totalRows) * 100);
-                        $('#progressBar').css('width', percent + '%');
-                        $('#progressText').text(`Mengirim ${processed} dari ${totalRows} data...`);
-
-                    } catch (err) {
-                        alert('Gagal mengimpor data pada baris ke-' + i);
-                        break;
-                    }
-                }
-
-                alert('Import Selesai!');
-                location.reload();
-            };
-
-            reader.readAsArrayBuffer(file);
         });
     </script>
 @endpush

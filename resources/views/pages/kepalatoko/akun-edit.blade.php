@@ -100,15 +100,7 @@
                                     <label class="block text-sm font-medium mb-1" for="alamat">Alamat</label>
                                     <textarea id="alamat" name="alamat" class="form-textarea w-full px-2 py-1" rows="4">{{ $item->alamat }}</textarea>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1" for="shift_id">Shift</label>
-                                    <select id="shift_id" name="shift_id"
-                                        class="form-select text-sm py-1 w-full">
-                                        @foreach ($shift as $its)
-                                            <option value="{{ $its->id }}" {{ $item->shift_id == $its->id ? 'selected' : '' }}>{{ $its->nama_shift }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="role">Role</label>
                                     <select id="role" name="role" class="form-select text-sm py-2 w-full">
@@ -120,6 +112,15 @@
                                     </select>
                                 </div>
 
+                                <div id="shoft_input" style="display: none">
+                                    <label class="block text-sm font-medium mb-1" for="shift_id">Shift</label>
+                                    <select id="shift_id" name="shift_id"
+                                        class="form-select text-sm py-1 w-full">
+                                        @foreach ($shift as $its)
+                                            <option value="{{ $its->id }}" {{ $item->shift_id == $its->id ? 'selected' : '' }}>{{ $its->nama_shift }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
                                 {{-- Hanya muncul kalau role = Investor --}}
                                 <div id="upload-investor" style="display: none;">
@@ -301,6 +302,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const spesialisInput = document.getElementById('spesialis-input');
     const bonusPersen = document.getElementById('bonus-persen');
     const bonusInterfaceInput = document.getElementById('bonus-interface-input');
+    const ShiftInput = document.getElementById('shoft_input');
 
     function toggleInputs() {
         const role = roleSelect.value;
@@ -311,18 +313,21 @@ document.addEventListener('DOMContentLoaded', function() {
             bonusAdmin.style.display = 'none';
             spesialisInput.style.display = 'none';
             bonusInterfaceInput.style.display = 'none';
+            ShiftInput.style.display = 'none';
         } else if (role === 'Kepala Toko') {
             extraFields.style.display = 'none';
             uploadInvestor.style.display = 'none';
             bonusAdmin.style.display = 'none';
             spesialisInput.style.display = 'none';
             bonusInterfaceInput.style.display = 'none';
+            ShiftInput.style.display = 'none';
         } else if (role === 'Admin Toko') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
             bonusAdmin.style.display = 'block';
             spesialisInput.style.display = 'none';
             bonusInterfaceInput.style.display = 'none';
+            ShiftInput.style.display = 'block';
         } else if (role === 'Teknisi') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
@@ -330,6 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
             spesialisInput.style.display = 'block';
             bonusPersen.style.display = 'block';
             bonusInterfaceInput.style.display = 'block';
+            ShiftInput.style.display = 'block';
         } else if (role === 'Sales') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
@@ -337,6 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
             spesialisInput.style.display = 'none';
             bonusPersen.style.display = 'block';
             bonusInterfaceInput.style.display = 'none';
+            ShiftInput.style.display = 'block';
         }
     }
 

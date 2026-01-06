@@ -27,6 +27,87 @@ class ProdukAksesorisController extends Controller
 
         return view('pages/kepalatoko/produk/aksesoris',compact('toko'));
     }
+    public function importChunk(Request $request)
+    {
+        try {
+            $rows = $request->input('rows', []);
+            $cabangId = getCabangId();
+
+            $insertedCount = 0;
+            $updatedCount  = 0;
+            $skippedCount  = 0;
+
+            foreach ($rows as $row) {
+
+                // ===============================
+                // Validasi baris kosong
+                // ===============================
+                if (empty($row['Nama Produk'])) {
+                    $skippedCount++;
+                    continue;
+                }
+
+                $namaProduk = trim($row['Nama Produk']);
+
+                // ===============================
+                // Cek produk aksesoris di cabang ini
+                // ===============================
+                $existing = Product::where('cabang_id', $cabangId)
+                    ->where('product_name', $namaProduk)
+                    ->first();
+
+                $data = [
+                    'categories_id'     => 3,
+                    'category_name'     => 'Aksesoris',
+                    'sub_categories_id' => $row['ID Sub Kategori'] ?? null,
+                    'model_series_id'   => $row['ID Model Seri'] ?? null,
+                    'product_code'      => $row['Kode Produk'] ?? null,
+                    'stok'              => $row['Stok'] ?? 0,
+                    'stok_minimal'      => $row['Stok Minimal'] ?? 0,
+                    'harga_modal'       => $row['Harga Modal'] ?? 0,
+                    'harga_jual_toko'   => $row['Harga Jual Toko'] ?? 0,
+                    'harga_jual'        => $row['Harga Jual Pelanggan'] ?? 0,
+                    'keterangan'        => $row['Keterangan'] ?? null,
+                    'garansi'           => $row['Garansi Produk (Hari)'] ?? 0,
+                    'ppn'               => $row['PPN 11%'] ?? 0,
+                    'updated_at'        => now(),
+                ];
+
+                // ===============================
+                // UPDATE jika sudah ada
+                // ===============================
+                if ($existing) {
+                    $existing->update($data);
+                    $updatedCount++;
+                    continue;
+                }
+
+                // ===============================
+                // CREATE jika belum ada
+                // ===============================
+                $data['product_name'] = $namaProduk;
+                $data['cabang_id']    = $cabangId;
+                $data['created_at']  = now();
+
+                Product::create($data);
+                $insertedCount++;
+            }
+
+            return response()->json([
+                'status'   => 'success',
+                'inserted'=> $insertedCount,
+                'updated' => $updatedCount,
+                'skipped' => $skippedCount,
+            ]);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'msg'    => $th->getMessage(),
+            ], 500);
+        }
+    }
+
 
     public function deleteSelected(Request $request)
     {

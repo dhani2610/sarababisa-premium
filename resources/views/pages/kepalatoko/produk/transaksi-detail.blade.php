@@ -303,6 +303,26 @@
                             $waProductList .= "   📄 Cek QC: " . $linkQc . "%0A";
                         }
                     @endphp
+                    @php
+                        $banks = json_decode($toko->banks ?? '[]', true);
+
+                        $infoBayar = 'Informasi Pembayaran :%0A';
+                        $infoBayar .= 'Bank : '. $toko->bank . '%0A';
+                        $infoBayar .= 'Norek : '. $toko->rekening . '%0A';
+                        $infoBayar .= 'a.n : '. $toko->pemilik_rekening . '%0A';
+
+                        if (!empty($banks)) {
+                            foreach ($banks as $bank) {
+                                $infoBayar .= 'Bank : '. $bank['bank'] . '%0A';
+                                $infoBayar .= 'Norek : '. $bank['rekening'] . '%0A';
+                                $infoBayar .= 'a.n : '. $bank['pemilik'] . '%0A';
+                            }
+                        }
+
+                        $infoBayar .= '%0A%0A';
+
+                        $infoBayarLink = str_replace(' ', '%20', $infoBayar);
+                    @endphp
                     {{-- <a href="https://wa.me/{{ $nomorwa }}/?text=*Notifikasi%20Penjualan*%0A{{ $toko->nama_toko }}%0A%0ANo.%20Nota%20:%20{{ $order->invoice_no }}%0ANama%20pelanggan%20:%20*{{ $order->nama_pelanggan }}*%0AProduk%20:%0A{{ $produkDetails }}%0APembayaran%20:%20{{ $order->payment_method }}%0A%0ALink%20garansi%20:%20{{ $toko->link_toko }}/garansi%0A%0ATerimakasih"  target="_blank"> --}}
                     <a href="javascript:void(0)"
                         @click="
@@ -317,6 +337,7 @@
                                     'Pembayaran : {{ $order->payment_method }}%0A%0A' +
                                     'Link garansi : {{ env('APP_URL') }}/garansi%0A' +
                                     'Link nota : {{ route('lunas-cetak-inkjet', $order->id) }}%0A%0A' +
+                                    '{{ $infoBayar }}' +
                                     'Terimakasih'
                                 )
                             @else
@@ -329,6 +350,7 @@
                                     'Pembayaran%20:%20{{ $order->payment_method }}%0A%0A' +
                                     'Link%20garansi%20:%20{{ env('APP_URL') }}/garansi%0A' +
                                     'Link%20nota%20:%20{{ route('lunas-cetak-inkjet', $order->id) }}%0A%0A' +
+                                    '{{ $infoBayar }}' +
                                     'Terimakasih',
                                     '_blank'
                                 );

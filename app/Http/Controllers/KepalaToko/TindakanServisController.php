@@ -19,6 +19,79 @@ class TindakanServisController extends Controller
         return view('pages/kepalatoko/servis/tindakan-servis', compact('actions', 'actions_count'));
     }
 
+    public function importChunk(Request $request)
+    {
+        try {
+            $rows = $request->input('rows', []);
+            $cabangId = getCabangId();
+
+            $insertedCount = 0;
+            $updatedCount  = 0;
+            $skippedCount  = 0;
+
+            foreach ($rows as $row) {
+
+                // ===============================
+                // Validasi baris kosong
+                // ===============================
+                if (empty($row['Nama Tindakan'])) {
+                    $skippedCount++;
+                    continue;
+                }
+
+                $namaTindakan = trim($row['Nama Tindakan']);
+
+                // ===============================
+                // Cek Service Action di cabang ini
+                // ===============================
+                $existing = ServiceAction::where('cabang_id', $cabangId)
+                    ->where('nama_tindakan', $namaTindakan)
+                    ->first();
+
+                $data = [
+                    'modal_sparepart' => $row['Modal Sparepart'] ?? 0,
+                    'harga_toko'      => $row['Harga Pelanggan Toko'] ?? 0,
+                    'harga_pelanggan' => $row['Harga Pelanggan Biasa'] ?? 0,
+                    'garansi'         => $row['Garansi'] ?? 0,
+                    'updated_at'      => now(),
+                ];
+
+                // ===============================
+                // UPDATE jika sudah ada
+                // ===============================
+                if ($existing) {
+                    $existing->update($data);
+                    $updatedCount++;
+                    continue;
+                }
+
+                // ===============================
+                // CREATE jika belum ada
+                // ===============================
+                $data['nama_tindakan'] = $namaTindakan;
+                $data['cabang_id']     = $cabangId;
+                $data['created_at']   = now();
+
+                ServiceAction::create($data);
+                $insertedCount++;
+            }
+
+            return response()->json([
+                'status'   => 'success',
+                'inserted'=> $insertedCount,
+                'updated' => $updatedCount,
+                'skipped' => $skippedCount,
+            ]);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'msg'    => $th->getMessage(),
+            ], 500);
+        }
+    }
+
+
     public function deleteSelected(Request $request)
     {
         $selectedIds  = $request->input('selectedIds');
