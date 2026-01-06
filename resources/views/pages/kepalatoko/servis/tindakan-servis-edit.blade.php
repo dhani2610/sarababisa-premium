@@ -25,12 +25,12 @@
                         <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                     </svg>
                     <span class="hidden xs:block ml-2">Tambah Tindakan</span>
-                </button>                        
-                
+                </button>
+
             </div>
 
         </div>
-     
+
         <div x-data="{ modalOpen: true }">
             <!-- Modal backdrop -->
             <div
@@ -86,7 +86,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="modal_sparepart">Modal Sparepart <span class="text-rose-500">*</span></label>
                                     <div class="relative">
-                                        <input id="modal_sparepart" name="modal_sparepart" class="form-input w-full pl-10 px-2 py-1" type="number" value="{{ $item->modal_sparepart }}"/>
+                                        <input id="modal_sparepart" name="modal_sparepart" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" value="{{ $item->modal_sparepart }}"/>
                                         <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                             <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                         </div>
@@ -98,7 +98,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="harga_toko">Harga Toko <span class="text-rose-500">*</span></label>
                                     <div class="relative">
-                                        <input id="harga_toko" name="harga_toko" class="form-input w-full pl-10 px-2 py-1" type="number" value="{{ $item->harga_toko }}"/>
+                                        <input id="harga_toko" name="harga_toko" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" value="{{ $item->harga_toko }}"/>
                                         <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                             <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                         </div>
@@ -107,7 +107,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="harga_pelanggan">Harga Pelanggan <span class="text-rose-500">*</span></label>
                                     <div class="relative">
-                                        <input id="harga_pelanggan" name="harga_pelanggan" class="form-input w-full pl-10 px-2 py-1" type="number" value="{{ $item->harga_pelanggan }}"/>
+                                        <input id="harga_pelanggan" name="harga_pelanggan" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" value="{{ $item->harga_pelanggan }}"/>
                                         <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                             <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                         </div>
@@ -159,7 +159,32 @@
                     </form>
                 </div>
             </div>
-        </div> 
+        </div>
 
     </div>
+    <script>
+        function formatRupiahInput(el) {
+            let value = el.value || '';
+
+            // hapus semua selain angka
+            value = value.replace(/\D/g, '');
+
+            // format pakai titik
+            el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        /* ON INPUT (REAL TIME) */
+        document.addEventListener('input', function (e) {
+            if (!e.target.classList.contains('input-currency')) return;
+            formatRupiahInput(e.target);
+        });
+
+        /* ON LOAD (FORM EDIT) */
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.input-currency').forEach(function (el) {
+                formatRupiahInput(el);
+            });
+        });
+    </script>
+
 </x-toko-layout>

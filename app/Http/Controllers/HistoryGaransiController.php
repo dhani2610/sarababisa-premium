@@ -177,8 +177,43 @@ class HistoryGaransiController extends Controller
         toast('Data berhasil disimpan.', 'success');
         return redirect()->route('history-garansi.index')->with('success', 'Data berhasil disimpan');
     }
+
+    function cleanRupiah($value)
+    {
+        return (int) str_replace('.', '', $value ?? 0);
+    }
+
     public function update(Request $request,$id)
     {
+        // dd($request->all());
+
+        $request->merge([
+            'total_biaya_tindakan' => str_replace('.', '', $request->total_biaya_tindakan),
+            'modal_sparepart' => str_replace('.', '', $request->modal_sparepart),
+            'total_biaya' => str_replace('.', '', $request->total_biaya),
+        ]);
+
+        $tindakan = $request->tindakan ?? [];
+
+        foreach ($tindakan as $key => $row) {
+            if (isset($row['harga'])) {
+                $tindakan[$key]['harga'] = $this->cleanRupiah($row['harga']);
+            }
+        }
+
+        $sparepart = $request->sparepart ?? [];
+
+        foreach ($sparepart as $key => $row) {
+            if (isset($row['harga'])) {
+                $sparepart[$key]['harga'] = $this->cleanRupiah($row['harga']);
+            }
+
+            if (isset($row['qty'])) {
+                $sparepart[$key]['qty'] = (int) $row['qty'];
+            }
+        }
+
+
 
         $qc_masuk_data = $request->qc_masuk ?? [];
         $qc_keluar_data = $request->qc_keluar ?? [];
@@ -207,8 +242,8 @@ class HistoryGaransiController extends Controller
         }
         $data->id_customer  = $request->id_customer;
         $data->teknisi_id  = $request->teknisi_id;
-        $data->tindakan   =  !empty($request->tindakan) ? json_encode($request->tindakan) : [];
-        $data->sparepart   =  !empty($request->sparepart) ? json_encode($request->sparepart) : [];
+        $data->tindakan   =  !empty($tindakan) ? json_encode($tindakan) : [];
+        $data->sparepart   =  !empty($sparepart) ? json_encode($sparepart) : [];
         $data->modal_sparepart = $request->modal_sparepart ?? 0;
         $data->total_biaya_tindakan = $request->total_biaya_tindakan;
         $data->total_biaya = $request->total_biaya;
@@ -250,8 +285,8 @@ class HistoryGaransiController extends Controller
             // }
         }
 
-        if (!empty($request->sparepart)) {
-            foreach ($request->sparepart as $row) {
+        if (!empty($sparepart)) {
+            foreach ($sparepart as $row) {
 
                 // Pastikan ada id & qty
                 if (empty($row['id']) || empty($row['qty'])) {

@@ -147,8 +147,13 @@ class InventarisController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(InventoryRequest $request)
+    public function store(Request $request)
     {
+
+        $request->merge([
+            'price' => str_replace('.', '', $request->price),
+        ]);
+
         $masa_penggantian = Carbon::now();
         $expired = $masa_penggantian->addDays(
             $request->masa_penggantian
@@ -207,6 +212,10 @@ class InventarisController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'price' => str_replace('.', '', $request->price),
+        ]);
+
         $item = Inventory::findOrFail($id);
         // Transaction update
         $item->update([

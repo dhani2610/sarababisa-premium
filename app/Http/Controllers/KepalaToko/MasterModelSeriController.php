@@ -249,37 +249,26 @@ class MasterModelSeriController extends Controller
     //     return redirect()->back()->with('success', 'Model seri berhasil ditambahkan.');
     // }
 
-    public function store(ModelSerieRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->validated();
+        $request->merge([
+            'nominal_bonus' => str_replace('.', '', $request->nominal_bonus),
+        ]);
+
+        $data = $request->all();
         $data['cabang_id'] = getCabangId();
 
         $namaAsli = $data['name'];
         $finalName = $namaAsli;
 
-        // Loop Cek Duplikat
-        // Menggunakan withTrashed() agar mengecek seluruh data termasuk yang sudah dihapus.
-        // Jika "iPhone 11" ada di sampah, maka input baru akan menjadi "iPhone 11 (2)"
-        // while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
-        //     $finalName = $namaAsli . '.';
-        //     $counter++;
-        // }
 
         $finalName = $request->name;
 
-        // Cek keberadaan nama (termasuk yang sudah dihapus/withTrashed)
-        // while (\App\Models\ModelSerie::withTrashed()->where('name', $finalName)->exists()) {
 
-        //     // Jika ada, tambahkan satu titik di belakang nama yang sedang dicek
-        //     $finalName = $finalName . '.';
-
-        // }
-        // Update nama di array data dengan nama yang sudah unik
         $data['name'] = $finalName;
 
-        // Selalu Create Baru (Logic restore dihapus total)
-        \App\Models\ModelSerie::create($data);
-
+        $insert = \App\Models\ModelSerie::create($data);
+        // dd($request,$insert);
         return redirect()->back()->with('success', 'Model seri berhasil ditambahkan.');
     }
 
@@ -337,6 +326,9 @@ class MasterModelSeriController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'nominal_bonus' => str_replace('.', '', $request->nominal_bonus),
+        ]);
         $data = $request->all();
 
         $item = ModelSerie::findOrFail($id);

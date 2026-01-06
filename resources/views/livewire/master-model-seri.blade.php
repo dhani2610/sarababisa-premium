@@ -51,7 +51,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="nominal_bonus">Nominal Bonus <span class="text-rose-500">*</span></label>
-                                        <input id="nominal_bonus" name="nominal_bonus" class="form-input w-full px-2 py-1" type="number" required />
+                                        <input id="nominal_bonus" name="nominal_bonus" class="form-input w-full px-2 py-1 input-currency" type="text" required />
                                     </div>
                                 </div>
                             </div>
@@ -183,6 +183,17 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <script>
+         document.addEventListener('input', function (e) {
+            if (!e.target.classList.contains('input-currency')) return;
+
+            let value = e.target.value;
+
+            // hapus semua selain angka
+            value = value.replace(/\D/g, '');
+
+            // format rupiah pakai titik
+            e.target.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        });
         $(document).ready(function() {
             var table = $('#model-seri-table').DataTable({
                 processing: false,

@@ -224,6 +224,10 @@ class KasbonController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'total' => str_replace('.', '', $request->total),
+        ]);
+
         $data = $request->all();
 
         $item = Debt::findOrFail($id);

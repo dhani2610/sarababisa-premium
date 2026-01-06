@@ -515,7 +515,7 @@ class KaryawanController extends Controller
     public function edit($id)
     {
         $item = Worker::findOrFail($id);
-        $budgets = Budget::all();
+        $budgets = Budget::where('cabang_id',getCabangId())->get();
 
         return view('pages.kepalatoko.karyawan.edit', [
             'item' => $item,
@@ -532,6 +532,10 @@ class KaryawanController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'absen' => str_replace('.', '', $request->absen),
+            'bpjs' => str_replace('.', '', $request->bpjs),
+        ]);
         $item = Worker::findOrFail($id);
 
         $data = $request->all();

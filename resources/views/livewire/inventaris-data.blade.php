@@ -40,7 +40,7 @@
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="price">Harga <span class="text-rose-500">*</span></label>
                                             <div class="relative">
-                                                <input id="price" name="price" class="form-input w-full pl-10 px-2 py-1" type="number" required/>
+                                                <input id="price" name="price" class="form-input input-currency w-full pl-10 px-2 py-1" type="text" required/>
                                                 <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                                     <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                                 </div>
@@ -159,6 +159,17 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <script>
+        document.addEventListener('input', function (e) {
+            if (!e.target.classList.contains('input-currency')) return;
+
+            let value = e.target.value;
+
+            // hapus semua selain angka
+            value = value.replace(/\D/g, '');
+
+            // format rupiah pakai titik
+            e.target.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        });
         $(document).ready(function() {
             var table = $('#inventaris-table').DataTable({
                 processing: false,

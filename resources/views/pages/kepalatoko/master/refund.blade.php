@@ -141,8 +141,8 @@
                                             <div>
                                                 <label class="block text-sm font-medium mb-1">Pengembalian Biaya<span
                                                         class="text-rose-500">*</span></label>
-                                                <input name="nominal_servis" type="number" id="nominal_input_servis"
-                                                    class="form-input w-full disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" readonly style="background: rgb(223, 221, 221)" />
+                                                <input name="nominal_servis" type="text" id="nominal_input_servis"
+                                                    class="form-input w-full input-currency disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" readonly style="background: rgb(223, 221, 221)" />
                                             </div>
 
                                             <div>
@@ -361,6 +361,17 @@
         const NominalInput = document.getElementById('nominal_input');
         const NominalInputServis = document.getElementById('nominal_input_servis');
 
+
+        function formatRupiahInput(el) {
+            let value = el.value || '';
+
+            // hapus semua selain angka
+            value = value.replace(/\D/g, '');
+
+            // format pakai titik
+            el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
         $('#servis_select').on('select2:select change', function () {
             const id = $(this).val();
             teknisiNameInput.value = '';
@@ -377,7 +388,10 @@
                     console.log(data);
                     teknisiNameInput.value = data.teknisi_name ?? '';
                     NominalInput.value = data.nominal ?? 0;
+                    formatRupiahInput(NominalInput);
+
                     NominalInputServis.value = data.nominal_servis ?? 0;
+                    formatRupiahInput(NominalInputServis);
                 })
                 .catch(err => {
                     console.error(err);

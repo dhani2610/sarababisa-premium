@@ -112,6 +112,12 @@ class TindakanServisController extends Controller
 
     public function store(ServiceActionRequest $request)
     {
+
+        $request->merge([
+            'modal_sparepart' => str_replace('.', '', $request->modal_sparepart),
+            'harga_toko' => str_replace('.', '', $request->harga_toko),
+            'harga_pelanggan' => str_replace('.', '', $request->harga_pelanggan),
+        ]);
         $data = $request->all();
 
         $data['cabang_id'] = getCabangId();
@@ -145,6 +151,11 @@ class TindakanServisController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'modal_sparepart' => str_replace('.', '', $request->modal_sparepart),
+            'harga_toko' => str_replace('.', '', $request->harga_toko),
+            'harga_pelanggan' => str_replace('.', '', $request->harga_pelanggan),
+        ]);
         $data = $request->all();
 
         $item = ServiceAction::findOrFail($id);

@@ -118,7 +118,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="nominal_bonus">Nominal Bonus <span class="text-rose-500">*</span></label>
-                                    <input id="nominal_bonus" name="nominal_bonus" class="form-input w-full px-2 py-1" value="{{ $item->nominal_bonus }}" type="text" required />
+                                    <input id="nominal_bonus" name="nominal_bonus" class="form-input w-full px-2 py-1 input-currency" value="{{ $item->nominal_bonus }}" type="text" required />
                                 </div>
                             </div>
                         </div>
@@ -137,4 +137,29 @@
         </div>
 
     </div>
+
+    <script>
+        function formatRupiahInput(el) {
+            let value = el.value || '';
+
+            // hapus semua selain angka
+            value = value.replace(/\D/g, '');
+
+            // format pakai titik
+            el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        /* ON INPUT (REAL TIME) */
+        document.addEventListener('input', function (e) {
+            if (!e.target.classList.contains('input-currency')) return;
+            formatRupiahInput(e.target);
+        });
+
+        /* ON LOAD (FORM EDIT) */
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.input-currency').forEach(function (el) {
+                formatRupiahInput(el);
+            });
+        });
+    </script>
 </x-toko-layout>

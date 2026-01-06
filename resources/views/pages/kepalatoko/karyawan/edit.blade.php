@@ -107,11 +107,11 @@
                                 <input id="gaji" name="gaji" class="form-input w-full px-2 py-1" type="hidden" value="{{ $item->gaji }}"/>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="absen">Tunjangan Kehadiran</label>
-                                    <input id="absen" name="absen" class="form-input w-full px-2 py-1" type="number" value="{{ $item->absen }}"/>
+                                    <input id="absen" name="absen" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ $item->absen }}"/>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="bpjs">Tunjangan BPJS</label>
-                                    <input id="bpjs" name="bpjs" class="form-input w-full px-2 py-1" type="number" value="{{ $item->bpjs }}"/>
+                                    <input id="bpjs" name="bpjs" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ $item->bpjs }}"/>
                                 </div>
                             </div>
                         </div>
@@ -130,4 +130,28 @@
         </div>
 
     </div>
+    <script>
+        function formatRupiahInput(el) {
+            let value = el.value || '';
+
+            // hapus semua selain angka
+            value = value.replace(/\D/g, '');
+
+            // format pakai titik
+            el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        /* ON INPUT (REAL TIME) */
+        document.addEventListener('input', function (e) {
+            if (!e.target.classList.contains('input-currency')) return;
+            formatRupiahInput(e.target);
+        });
+
+        /* ON LOAD (FORM EDIT) */
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.input-currency').forEach(function (el) {
+                formatRupiahInput(el);
+            });
+        });
+    </script>
 </x-toko-layout>

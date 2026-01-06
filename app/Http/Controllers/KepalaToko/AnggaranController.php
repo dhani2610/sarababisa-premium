@@ -104,6 +104,9 @@ class AnggaranController extends Controller
     public function store(Request $request)
     {
         // Transaction create
+        $request->merge([
+            'price' => str_replace('.', '', $request->price),
+        ]);
         Budget::create([
             'name' => $request->name,
             'quantity' => $request->quantity,
@@ -150,6 +153,9 @@ class AnggaranController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'price' => str_replace('.', '', $request->price),
+        ]);
         $item = Budget::findOrFail($id);
         $item->update([
             'name' => $request->name,

@@ -105,10 +105,12 @@ class RefundController extends Controller
         return response()->json(['message' => 'Data pengembalian dana berhasil dihapus.']);
     }
 
-    public function store(RefundRequest $request)
+    public function store(Request $request)
     {
-        // dd($request->all());
-        $data = $request->validated();
+        $request->merge([
+            'nominal_servis' => str_replace('.', '', $request->nominal_servis),
+        ]);
+        $data = $request->all();
 
         // convert period from "YYYY-MM" to YYYY-MM-01 (date)
         if (!empty($data['period'])) {
@@ -150,9 +152,12 @@ class RefundController extends Controller
         ]);
     }
 
-    public function update(RefundRequest $request, $id)
+    public function update(Request $request, $id)
     {
-        $data = $request->validated();
+        $request->merge([
+            'nominal_servis' => str_replace('.', '', $request->nominal_servis),
+        ]);
+        $data = $request->all();
 
         if (!empty($data['period'])) {
             $data['period'] = $data['period'] . '-01';

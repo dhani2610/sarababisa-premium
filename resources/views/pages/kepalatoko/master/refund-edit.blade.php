@@ -30,8 +30,8 @@
             <div>
                 <label class="block text-sm font-medium mb-1">Pengembalian Biaya<span
                         class="text-rose-500">*</span></label>
-                <input name="nominal_servis" type="number" id="nominal_input_servis" value="{{ $item->nominal_servis }}"
-                    class="form-input w-full disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" readonly style="background: rgb(223, 221, 221)" />
+                <input name="nominal_servis" type="text" id="nominal_input_servis" value="{{ $item->nominal_servis }}"
+                    class="form-input w-full input-currency disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" readonly style="background: rgb(223, 221, 221)" />
             </div>
 
             <div>
@@ -55,6 +55,29 @@
 
 @push('scripts')
 <script>
+function formatRupiahInput(el) {
+    let value = el.value || '';
+
+    // hapus semua selain angka
+    value = value.replace(/\D/g, '');
+
+    // format pakai titik
+    el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+/* ON INPUT (REAL TIME) */
+document.addEventListener('input', function (e) {
+    if (!e.target.classList.contains('input-currency')) return;
+    formatRupiahInput(e.target);
+});
+
+/* ON LOAD (FORM EDIT) */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.input-currency').forEach(function (el) {
+        formatRupiahInput(el);
+    });
+});
+
 document.addEventListener('DOMContentLoaded', function () {
     const servisSelect = document.getElementById('servis_select_edit');
     const teknisiInput = document.getElementById('teknisi_name_edit');
@@ -72,9 +95,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     teknisiInput.value = data.teknisi_name ?? '';
                     NominalInput.value = data.nominal ?? 0;
+                    formatRupiahInput(NominalInput);
+
                     NominalInputServis.value = data.nominal_servis ?? 0;
+                    formatRupiahInput(NominalInputServis);
+
                 }).catch(err => console.error(err));
         });
     }
 });
+
 </script>

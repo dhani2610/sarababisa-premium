@@ -38,6 +38,8 @@ class ModelSerieRequest extends FormRequest
                 //     }
                 // }
             ],
+            'id_tipe_os' => 'nullable',
+            'nominal_bonus' => 'nullable',
             'brands_id' => 'exists:brands,id',
         ];
     }

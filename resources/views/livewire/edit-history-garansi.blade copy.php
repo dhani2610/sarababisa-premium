@@ -65,8 +65,10 @@
 
                                     <div x-show="showDetails" class="mt-3 space-y-3">
 
+                                        <!-- Teknisi -->
                                         <div>
-                                            <label class="block text-sm font-medium mb-1">Teknisi<span class="text-rose-500">*</span></label>
+                                            <label class="block text-sm font-medium mb-1">Teknisi<span
+                                                    class="text-rose-500">*</span></label>
                                             <select name="teknisi_id" class="form-select w-full ">
                                                 <option value="">-- Pilih Teknisi --</option>
                                                 @foreach ($users as $u)
@@ -74,30 +76,33 @@
                                                 @endforeach
                                             </select>
                                         </div>
-
+                                        <!-- Tindakan -->
                                         <div class="mb-3">
                                             <label class="block text-sm font-medium mb-1">Tindakan</label>
-                                            <button type="button" id="addTindakanRow" class="btn-sm bg-indigo-500 text-white mb-2">
+                                            <button type="button" id="addTindakanRow"
+                                                class="btn-sm bg-indigo-500 text-white mb-2">
                                                 + Tambah Tindakan
                                             </button>
                                             <div id="tindakanContainer"></div>
                                         </div>
 
+                                        <!-- Total Biaya Servis -->
                                         <div>
                                             <label class="block text-sm font-medium mb-1">Total Modal Tindakan</label>
-                                            <input type="text" name="total_biaya_tindakan" id="total_biaya_tindakan" value="0"
-                                                class="form-input w-full text-right" onkeyup="formatCurrency(this); updateTotalModal()">
+                                            <input type="number" name="total_biaya_tindakan" id="total_biaya_tindakan"
+                                                value="0" class="form-input w-full" onkeyup="updateTotalModal()">
                                         </div>
 
                                         <hr>
 
+                                        <!-- Checkbox sebelum sparepart -->
                                         <div class="form-check mb-3">
                                             <input class="form-check-input" type="checkbox" id="useSparepartCheckbox">
                                             <label class="form-check-label" for="useSparepartCheckbox">
                                                 Apakah menggunakan stok sparepart toko?
                                             </label>
                                         </div>
-
+                                        <!-- Sparepart Dynamic -->
                                         <div id="sparepart_wrapper" style="display:none;">
                                             <label class="block text-sm font-medium mb-1">Sparepart</label>
                                             <button type="button" id="addSparepartRow" class="btn-sm bg-indigo-500 text-white">
@@ -106,14 +111,19 @@
                                             <div class="mt-2" id="rowContainer"></div>
                                         </div>
 
+                                        <!-- Total Biaya -->
                                         <div style="display:none;" id="modal_sparepart_wrapper">
-                                            <label class="block text-sm font-medium mb-1">Modal Sparepart<span class="text-rose-500">*</span></label>
-                                            <input type="text" name="modal_sparepart" id="modal_sparepart" value="0" class="form-input w-full text-right" readonly>
+                                            <label class="block text-sm font-medium mb-1">Modal Sparepart<span
+                                                    class="text-rose-500">*</span></label>
+                                            <input type="number" name="modal_sparepart" id="modal_sparepart" value="0"
+                                                class="form-input w-full">
                                         </div>
-
+                                        <!-- Total Biaya -->
                                         <div>
-                                            <label class="block text-sm font-medium mb-1">Total Modal<span class="text-rose-500">*</span></label>
-                                            <input type="text" name="total_biaya" id="total_biaya" value="0" class="form-input w-full text-right" readonly>
+                                            <label class="block text-sm font-medium mb-1">Total Modal<span
+                                                    class="text-rose-500">*</span></label>
+                                            <input type="number" name="total_biaya" id="total_biaya" value="0"
+                                                class="form-input w-full">
                                         </div>
                                     </div>
                                     <!-- Catatan -->
@@ -215,59 +225,36 @@
     <!-- Select2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<script>
-    // Fungsi untuk memformat angka jadi format ribuan (contoh: 10000 -> 10.000)
-    function formatCurrency(input) {
-        // Ambil value, hapus karakter selain angka
-        let value = input.value.replace(/[^0-9]/g, '');
-        // Format dengan titik
-        if (value) {
-            value = parseInt(value, 10).toLocaleString('id-ID');
-        }
-        input.value = value;
-    }
 
-    // Fungsi untuk mengubah format rupiah (10.000) kembali ke angka (10000) untuk perhitungan
-    function parseCurrency(value) {
-        if (!value) return 0;
-        // Hapus titik, lalu parse ke float
-        return parseFloat(value.toString().replace(/\./g, '')) || 0;
-    }
-
-    // Helper untuk memformat angka biasa ke string ribuan (dipakai saat set value otomatis)
-    function numberToCurrency(number) {
-        return (parseFloat(number) || 0).toLocaleString('id-ID');
-    }
-</script>
      <script>
-    // Struktur: [ArrayStandar, ObjectMasuk, ObjectKeluar]
-    const fullData = @json([$qcItems, $qcMasuk, $qcKeluar]);
+        // Struktur: [ArrayStandar, ObjectMasuk, ObjectKeluar]
+        const fullData = @json([$qcItems, $qcMasuk, $qcKeluar]);
 
-    // Pecah data ke variabel biar mudah dibaca
-    const standardItems = fullData[0]; // List Nama Item
-    const dataMasuk = fullData[1] || {}; // Data Value Masuk
-    const dataKeluar = fullData[2] || {}; // Data Value Keluar
+        // Pecah data ke variabel biar mudah dibaca
+        const standardItems = fullData[0];       // List Nama Item
+        const dataMasuk     = fullData[1] || {}; // Data Value Masuk
+        const dataKeluar    = fullData[2] || {}; // Data Value Keluar
 
-    document.addEventListener('DOMContentLoaded', function() {
-        renderAllChecklists();
-    });
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAllChecklists();
+        });
 
-    // --- FUNGSI RENDER UTAMA ---
-    function renderAllChecklists() {
-        const tbodyTab2 = document.getElementById('checklist-tbody-tab2');
-        tbodyTab2.innerHTML = '';
+        // --- FUNGSI RENDER UTAMA ---
+        function renderAllChecklists() {
+            const tbodyTab2 = document.getElementById('checklist-tbody-tab2');
+            tbodyTab2.innerHTML = '';
 
-        standardItems.forEach((item, index) => {
-            let valMasuk = dataMasuk[item] || '';
-            let valKeluar = dataKeluar[item] || '';
+            standardItems.forEach((item, index) => {
+                let valMasuk = dataMasuk[item] || '';
+                let valKeluar = dataKeluar[item] || '';
 
-            if (valMasuk === null) valMasuk = '';
-            if (valKeluar === null) valKeluar = '';
+                if(valMasuk === null) valMasuk = '';
+                if(valKeluar === null) valKeluar = '';
 
-            const tr = document.createElement('tr');
-            tr.className = "border-b border-slate-200 hover:bg-slate-50";
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-200 hover:bg-slate-50";
 
-            tr.innerHTML = `
+                tr.innerHTML = `
                     <td class="border border-slate-300 p-1 text-center font-bold row-num">${index + 1}</td>
                     <td class="border border-slate-300 p-1 font-medium bg-slate-50">${item}</td>
                     <td class="border border-slate-300 p-0">
@@ -282,30 +269,30 @@
                         </button>
                     </td>
                 `;
-            tbodyTab2.appendChild(tr);
-        });
+                tbodyTab2.appendChild(tr);
+            });
 
-        const allKeys = new Set([...Object.keys(dataMasuk), ...Object.keys(dataKeluar)]);
+            const allKeys = new Set([...Object.keys(dataMasuk), ...Object.keys(dataKeluar)]);
 
-        allKeys.forEach(key => {
-            if (!standardItems.includes(key)) {
-                let valMasuk = dataMasuk[key] || '';
-                let valKeluar = dataKeluar[key] || '';
+            allKeys.forEach(key => {
+                if (!standardItems.includes(key)) {
+                    let valMasuk = dataMasuk[key] || '';
+                    let valKeluar = dataKeluar[key] || '';
 
-                addCustomRowTab2(key, valMasuk, valKeluar);
-            }
-        });
-    }
+                    addCustomRowTab2(key, valMasuk, valKeluar);
+                }
+            });
+        }
 
-    // --- MODIFIKASI FUNGSI CUSTOM ROW ---
-    // Tambahkan parameter agar bisa diisi value-nya saat load data
-    function addCustomRowTab2(name = '', valMasuk = '', valKeluar = '') {
-        const tbody = document.getElementById('checklist-tbody-tab2');
-        const rowCount = tbody.rows.length + 1;
-        const tr = document.createElement('tr');
-        tr.className = "border-b border-slate-200 hover:bg-yellow-50";
+        // --- MODIFIKASI FUNGSI CUSTOM ROW ---
+        // Tambahkan parameter agar bisa diisi value-nya saat load data
+        function addCustomRowTab2(name = '', valMasuk = '', valKeluar = '') {
+            const tbody = document.getElementById('checklist-tbody-tab2');
+            const rowCount = tbody.rows.length + 1;
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-slate-200 hover:bg-yellow-50";
 
-        tr.innerHTML = `
+            tr.innerHTML = `
                 <td class="border border-slate-300 p-1 text-center font-bold row-num">${rowCount}</td>
                 <td class="border border-slate-300 p-0">
                     <input type="text" name="custom_item_name[]" value="${name}" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent font-medium text-indigo-600" placeholder="Ketik Nama Item..." required>
@@ -322,169 +309,166 @@
                     </button>
                 </td>
             `;
-        tbody.appendChild(tr);
-    }
+            tbody.appendChild(tr);
+        }
 
-    function deleteRow(btn) {
-        const row = btn.closest('tr');
-        const tbody = row.parentNode;
-        row.remove();
-        Array.from(tbody.rows).forEach((r, index) => {
-            const numCell = r.querySelector('.row-num');
-            if (numCell) numCell.innerText = index + 1;
-        });
-    }
-</script>
-<script>
-    $(document).ready(function() {
-        // aktifkan select2
-        $('.select2').select2({
-            width: '100%', // biar full width
-            dropdownParent: $('#tambah-modal-data') // penting supaya muncul di dalam modal
-        });
+        function deleteRow(btn) {
+            const row = btn.closest('tr');
+            const tbody = row.parentNode;
+            row.remove();
+            Array.from(tbody.rows).forEach((r, index) => {
+                const numCell = r.querySelector('.row-num');
+                if(numCell) numCell.innerText = index + 1;
+            });
+        }
+    </script>
+    <script>
+        $(document).ready(function() {
+            // aktifkan select2
+            $('.select2').select2({
+                width: '100%', // biar full width
+                dropdownParent: $('#tambah-modal-data') // penting supaya muncul di dalam modal
+            });
 
-        // update teknisi + garansi saat service_id berubah
-        $('#service_id').on('change', function() {
-            let selected = $(this).find(':selected');
-            $('#prev_teknisi').text(selected.data('teknisi'));
-            $('#exp_garansi').text(selected.data('expired'));
-            let notaUrl = selected.data('nota');
-            if (notaUrl) {
-                $('#link_nota').html(
-                    `<a href="${notaUrl}" target="_blank" class="text-blue-600 underline">Lihat Nota</a>`
-                );
-            } else {
-                $('#link_nota').html('');
-            }
-        });
-
-    });
-</script>
-
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('handleSelect', () => ({
-            selected: [],
-            deleteUrl: '{{ route('history-garansi.bulkDelete') }}', // kita buat route ini
-            toggleAll(e) {
-                const checked = e.target.checked;
-                this.selected = [];
-                document.querySelectorAll('.table-item').forEach(el => {
-                    el.checked = checked;
-                    if (checked) this.selected.push(el.value);
-                });
-                this.toggleAction();
-            },
-            uncheckParent() {
-                const all = document.querySelectorAll('.table-item');
-                const selected = Array.from(all).filter(x => x.checked).map(x => x.value);
-                this.selected = selected;
-                document.getElementById('parent-checkbox').checked = selected.length === all.length;
-                this.toggleAction();
-            },
-            toggleAction() {
-                const action = document.querySelector('.table-items-action');
-                const countEl = document.querySelector('.table-items-count');
-                if (this.selected.length > 0) {
-                    action.classList.remove('hidden');
-                    countEl.textContent = this.selected.length;
-                } else {
-                    action.classList.add('hidden');
-                }
-            },
-            deleteSelected() {
-                if (this.selected.length === 0) return;
-
-                if (!confirm('Yakin ingin menghapus data terpilih?')) return;
-
-                fetch(this.deleteUrl, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            ids: this.selected
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message);
-                            window.location.reload();
-                        }
-                    })
-                    .catch(err => console.error(err));
-            }
-        }))
-    });
-</script>
-
-
-<script>
-    $(document).on('click', '.toggle-status', function() {
-        let id = $(this).data('id');
-        let btn = $(this);
-
-        $.ajax({
-            url: `/history-garansi/${id}/toggle-status`,
-            method: "PATCH",
-            data: {
-                _token: "{{ csrf_token() }}"
-            },
-            success: function(res) {
-                if (res.success) {
-                    btn.text(res.label);
-
-                    btn.removeClass(
-                        'bg-yellow-100 text-yellow-700 bg-green-100 text-green-700 bg-red-100 text-red-700'
+            // update teknisi + garansi saat service_id berubah
+            $('#service_id').on('change', function() {
+                let selected = $(this).find(':selected');
+                $('#prev_teknisi').text(selected.data('teknisi'));
+                $('#exp_garansi').text(selected.data('expired'));
+                let notaUrl = selected.data('nota');
+                if (notaUrl) {
+                    $('#link_nota').html(
+                        `<a href="${notaUrl}" target="_blank" class="text-blue-600 underline">Lihat Nota</a>`
                     );
-
-                    if (res.status == 1) {
-                        btn.addClass('bg-yellow-100 text-yellow-700');
-                    } else if (res.status == 2) {
-                        btn.addClass('bg-green-100 text-green-700');
-                    } else {
-                        btn.addClass('bg-red-100 text-red-700');
-                    }
+                } else {
+                    $('#link_nota').html('');
                 }
-            },
-            error: function() {
-                alert('Gagal update status!');
-            }
+            });
+
         });
-    });
+    </script>
+
+  <script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('handleSelect', () => ({
+        selected: [],
+        deleteUrl: '{{ route("history-garansi.bulkDelete") }}', // kita buat route ini
+        toggleAll(e) {
+            const checked = e.target.checked;
+            this.selected = [];
+            document.querySelectorAll('.table-item').forEach(el => {
+                el.checked = checked;
+                if (checked) this.selected.push(el.value);
+            });
+            this.toggleAction();
+        },
+        uncheckParent() {
+            const all = document.querySelectorAll('.table-item');
+            const selected = Array.from(all).filter(x => x.checked).map(x => x.value);
+            this.selected = selected;
+            document.getElementById('parent-checkbox').checked = selected.length === all.length;
+            this.toggleAction();
+        },
+        toggleAction() {
+            const action = document.querySelector('.table-items-action');
+            const countEl = document.querySelector('.table-items-count');
+            if (this.selected.length > 0) {
+                action.classList.remove('hidden');
+                countEl.textContent = this.selected.length;
+            } else {
+                action.classList.add('hidden');
+            }
+        },
+        deleteSelected() {
+            if (this.selected.length === 0) return;
+
+            if (!confirm('Yakin ingin menghapus data terpilih?')) return;
+
+            fetch(this.deleteUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ids: this.selected })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    }))
+});
 </script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        let products = @json($products);
-        let rowId = 0;
 
-        document.getElementById("addSparepartRow").addEventListener("click", function() {
-            rowId++;
-            let container = document.getElementById("rowContainer");
+    <script>
+        $(document).on('click', '.toggle-status', function() {
+            let id = $(this).data('id');
+            let btn = $(this);
 
-            let div = document.createElement("div");
-            div.classList.add(
-                "grid",
-                "grid-cols-1", // default 1 kolom (mobile)
-                "md:grid-cols-4", // di desktop jadi 4 kolom
-                "gap-2",
-                "items-center",
-                "mb-2"
-            );
+            $.ajax({
+                url: `/history-garansi/${id}/toggle-status`,
+                method: "PATCH",
+                data: {
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    if (res.success) {
+                        btn.text(res.label);
 
-            // Perubahan: input harga jadi type text
-            div.innerHTML = `
+                        btn.removeClass(
+                            'bg-yellow-100 text-yellow-700 bg-green-100 text-green-700 bg-red-100 text-red-700'
+                        );
+
+                        if (res.status == 1) {
+                            btn.addClass('bg-yellow-100 text-yellow-700');
+                        } else if (res.status == 2) {
+                            btn.addClass('bg-green-100 text-green-700');
+                        } else {
+                            btn.addClass('bg-red-100 text-red-700');
+                        }
+                    }
+                },
+                error: function() {
+                    alert('Gagal update status!');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let products = @json($products);
+            let rowId = 0;
+
+            document.getElementById("addSparepartRow").addEventListener("click", function() {
+                rowId++;
+                let container = document.getElementById("rowContainer");
+
+                let div = document.createElement("div");
+                div.classList.add(
+                    "grid",
+                    "grid-cols-1", // default 1 kolom (mobile)
+                    "md:grid-cols-4", // di desktop jadi 4 kolom
+                    "gap-2",
+                    "items-center",
+                    "mb-2"
+                );
+
+                div.innerHTML = `
                         <select name="sparepart[${rowId}][id]"
                                 class="form-select sparepartSelect select2 w-full" >
                             <option value="">-- Pilih Sparepart --</option>
                             ${products.map(p => `<option value="${p.id}" data-harga="${p.harga_modal}">${p.product_name}</option>`).join("")}
                         </select>
 
-                        <input type="text" name="sparepart[${rowId}][harga]"
-                            class="form-input harga w-full text-right" placeholder="Harga" >
+                        <input type="number" name="sparepart[${rowId}][harga]"
+                            class="form-input harga w-full" placeholder="Harga" >
 
                         <input type="number" name="sparepart[${rowId}][qty]"
                             class="form-input qty w-full" placeholder="Qty" value="1" min="1" >
@@ -495,125 +479,100 @@
                         </button>
                     `;
 
-            container.appendChild(div);
+                container.appendChild(div);
 
-            // Initialize Select2 pada row baru jika diperlukan
-            // $(div.querySelector('.select2')).select2(); // Uncomment jika pakai JQuery Select2
+                // update harga otomatis
+                div.querySelector(".sparepartSelect").addEventListener("change", function() {
+                    let harga = this.options[this.selectedIndex].dataset.harga || 0;
+                    div.querySelector(".harga").value = harga;
+                    calculateTotal();
+                });
 
-            // update harga otomatis
-            div.querySelector(".sparepartSelect").addEventListener("change", function() {
-                let rawHarga = this.options[this.selectedIndex].dataset.harga || 0;
-                // Format harga ke currency saat dipilih
-                div.querySelector(".harga").value = numberToCurrency(rawHarga);
-                calculateTotal();
+                div.querySelector(".harga").addEventListener("input", calculateTotal);
+                div.querySelector(".qty").addEventListener("input", calculateTotal);
+                div.querySelector(".tindakanHarga").addEventListener("input", calculateTotal);
+
+                div.querySelector(".removeRow").addEventListener("click", function() {
+                    div.remove();
+                    calculateTotal();
+                });
             });
 
-            // Event listener untuk input harga (manual typing) -> format on keyup
-            let hargaInput = div.querySelector(".harga");
-            hargaInput.addEventListener("keyup", function() {
-                formatCurrency(this);
-                calculateTotal();
-            });
+            function calculateTotal() {
+                let total = 0;
+                document.querySelectorAll("#rowContainer > div").forEach(row => {
+                    let harga = parseFloat(row.querySelector(".harga").value || 0);
+                    let qty = parseInt(row.querySelector(".qty").value || 0);
 
-            div.querySelector(".qty").addEventListener("input", calculateTotal);
+                    total += harga * qty;
+                    console.log(total);
 
-            div.querySelector(".removeRow").addEventListener("click", function() {
-                div.remove();
-                calculateTotal();
-            });
-        });
+                });
+                // ubah ke angka biar gak digabung string
+                let total_biaya_tindakan = parseFloat($('#total_biaya_tindakan').val() || 0);
 
-        function calculateTotal() {
-            let total = 0;
-            document.querySelectorAll("#rowContainer > div").forEach(row => {
-                // Gunakan parseCurrency untuk membersihkan titik sebelum kalkulasi
-                let harga = parseCurrency(row.querySelector(".harga").value);
-                let qty = parseInt(row.querySelector(".qty").value || 0);
+                // hitung total keseluruhan
+                let totalKeseluruhan = total + total_biaya_tindakan;
 
-                total += harga * qty;
-            });
-
-            // Ambil total biaya tindakan (bersihkan titik)
-            let total_biaya_tindakan = parseCurrency(document.getElementById('total_biaya_tindakan').value);
-
-            // hitung total keseluruhan
-            let totalKeseluruhan = total + total_biaya_tindakan;
-
-            // Set value dengan format currency
-            document.getElementById('total_biaya').value = numberToCurrency(totalKeseluruhan);
-            document.getElementById("modal_sparepart").value = numberToCurrency(total);
-        }
-    });
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const sparepartCheckbox = document.getElementById("useSparepartCheckbox");
-        const sparepartWrapper = document.getElementById("sparepart_wrapper");
-        const modalSparepartWrapper = document.getElementById("modal_sparepart_wrapper");
-        const rowContainer = document.getElementById("rowContainer");
-
-        sparepartCheckbox.addEventListener("change", function() {
-            if (this.checked) {
-                sparepartWrapper.style.display = "block";
-                modalSparepartWrapper.style.display = "block";
-                // semua input sparepart wajib diisi (required)
-                rowContainer.querySelectorAll("select, input").forEach(el => el.required = true);
-            } else {
-                sparepartWrapper.style.display = "none";
-                modalSparepartWrapper.style.display = "none";
-                // reset value dan hilangkan semua row sparepart
-                rowContainer.innerHTML = "";
-                // hilangkan required
-                rowContainer.querySelectorAll("select, input").forEach(el => el.required = false);
-                // reset total biaya sparepart (biar ga ikut ngitung)
-                calculateTotal();
-
+                $('#total_biaya').val(totalKeseluruhan);
+                document.getElementById("modal_sparepart").value = total;
             }
         });
+        document.addEventListener("DOMContentLoaded", function() {
+            const sparepartCheckbox = document.getElementById("useSparepartCheckbox");
+            const sparepartWrapper = document.getElementById("sparepart_wrapper");
+            const modalSparepartWrapper = document.getElementById("modal_sparepart_wrapper");
+            const rowContainer = document.getElementById("rowContainer");
 
-        // fungsi hitung total (sama kayak sebelumnya tapi dengan parseCurrency)
-        function calculateTotal() {
-            let total = 0;
-            document.querySelectorAll("#rowContainer > div").forEach(row => {
-                let harga = parseCurrency(row.querySelector(".harga")?.value);
-                let qty = parseInt(row.querySelector(".qty")?.value || 0);
-                total += harga * qty;
+            sparepartCheckbox.addEventListener("change", function() {
+                if (this.checked) {
+                    sparepartWrapper.style.display = "block";
+                    modalSparepartWrapper.style.display = "block";
+                    // semua input sparepart wajib diisi (required)
+                    rowContainer.querySelectorAll("select, input").forEach(el => el.required = true);
+                } else {
+                    sparepartWrapper.style.display = "none";
+                    modalSparepartWrapper.style.display = "none";
+                    // reset value dan hilangkan semua row sparepart
+                    rowContainer.innerHTML = "";
+                    // hilangkan required
+                    rowContainer.querySelectorAll("select, input").forEach(el => el.required = false);
+                    // reset total biaya sparepart (biar ga ikut ngitung)
+                    calculateTotal();
+
+                }
             });
-            // Update UI dengan format currency
-            document.getElementById("modal_sparepart").value = numberToCurrency(total);
 
-            // Trigger update total akhir
-            updateTotalModal();
+            // fungsi hitung total (sama kayak sebelumnya)
+            function calculateTotal() {
+                let total = 0;
+                document.querySelectorAll("#rowContainer > div").forEach(row => {
+                    let harga = parseFloat(row.querySelector(".harga")?.value || 0);
+                    let qty = parseInt(row.querySelector(".qty")?.value || 0);
+                    total += harga * qty;
+                });
+                document.getElementById("modal_sparepart").value = total;
+            }
+        });
+    </script>
+    <script>
+        function updateTotalModal() {
+            const tindakan = parseFloat(document.getElementById('total_biaya_tindakan').value) || 0;
+            document.getElementById('total_biaya').value = tindakan;
         }
-    });
-</script>
-<script>
-    // Update fungsi updateTotalModal agar membaca format currency
-    function updateTotalModal() {
-        const tindakan = parseCurrency(document.getElementById('total_biaya_tindakan').value);
-        const modalPart = parseCurrency(document.getElementById('modal_sparepart').value);
+        document.addEventListener("DOMContentLoaded", function() {
+            let tindakanList = @json($serviceActions); // pastikan kamu kirim $serviceActions dari controller
+            let tindakanContainer = document.getElementById("tindakanContainer");
+            let totalBiayaInput = document.getElementById("total_biaya_tindakan");
+            let totalBiayaFinal = document.getElementById("total_biaya");
+            let addTindakanBtn = document.getElementById("addTindakanRow");
+            let tindakanRowId = 0;
 
-        // Penjumlahan
-        const totalAkhir = tindakan + modalPart;
-
-        // Tampilkan hasil format currency
-        document.getElementById('total_biaya').value = numberToCurrency(totalAkhir);
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        let tindakanList = @json($serviceActions); // pastikan kamu kirim $serviceActions dari controller
-        let tindakanContainer = document.getElementById("tindakanContainer");
-        let totalBiayaInput = document.getElementById("total_biaya_tindakan");
-        let totalBiayaFinal = document.getElementById("total_biaya");
-        let addTindakanBtn = document.getElementById("addTindakanRow");
-        let tindakanRowId = 0;
-
-        addTindakanBtn.addEventListener("click", function() {
-            tindakanRowId++;
-            let div = document.createElement("div");
-            div.classList.add("grid", "grid-cols-1", "md:grid-cols-3", "gap-2", "items-center", "mb-2");
-
-            // Ubah input harga jadi type text
-            div.innerHTML = `
+            addTindakanBtn.addEventListener("click", function() {
+                tindakanRowId++;
+                let div = document.createElement("div");
+                div.classList.add("grid", "grid-cols-1", "md:grid-cols-3", "gap-2", "items-center", "mb-2");
+                div.innerHTML = `
                 <select name="tindakan[${tindakanRowId}][id]"
                         class="form-select tindakanSelect w-full" >
                     <option value="">-- Pilih Tindakan --</option>
@@ -626,78 +585,70 @@
                     <label for="manual-${tindakanRowId}" class="text-sm text-slate-600">Input manual</label>
                 </div>
 
-                <input type="text" name="tindakan[${tindakanRowId}][harga]"
-                       class="form-input tindakanHarga w-full text-right" placeholder="Harga" value="0" >
+                <input type="number" name="tindakan[${tindakanRowId}][harga]"
+                       class="form-input tindakanHarga w-full" placeholder="Harga" value="0" >
                 <button type="button" class="btn-sm bg-rose-500 text-white removeTindakan w-full md:w-auto">✕</button>
             `;
 
-            tindakanContainer.appendChild(div);
+                tindakanContainer.appendChild(div);
 
-            // toggle manual input
-            div.querySelector(".toggleManual").addEventListener("change", function() {
-                let manual = div.querySelector(".tindakanManual");
+                // toggle manual input
+                div.querySelector(".toggleManual").addEventListener("change", function() {
+                    let manual = div.querySelector(".tindakanManual");
+                    let select = div.querySelector(".tindakanSelect");
+
+                    if (this.checked) {
+                        select.classList.add("hidden");
+                        select.removeAttribute("required");
+                        manual.classList.remove("hidden");
+                        manual.setAttribute("required", true);
+                        $(select).val('').trigger('change');
+                    } else {
+                        manual.classList.add("hidden");
+                        manual.removeAttribute("required");
+                        select.classList.remove("hidden");
+                        select.setAttribute("required", true);
+                        manual.value = '';
+                    }
+                });
+
                 let select = div.querySelector(".tindakanSelect");
+                let hargaInput = div.querySelector(".tindakanHarga");
 
-                if (this.checked) {
-                    select.classList.add("hidden");
-                    select.removeAttribute("required");
-                    manual.classList.remove("hidden");
-                    manual.setAttribute("required", true);
-                    $(select).val('').trigger('change');
-                } else {
-                    manual.classList.add("hidden");
-                    manual.removeAttribute("required");
-                    select.classList.remove("hidden");
-                    select.setAttribute("required", true);
-                    manual.value = '';
-                }
+                div.querySelector(".tindakanHarga").addEventListener("input", calculateTindakanTotal);
+
+                // ketika pilih tindakan
+                select.addEventListener("change", function() {
+                    let harga = parseFloat(select.options[select.selectedIndex].dataset.harga || 0);
+                    hargaInput.value = harga;
+                    calculateTindakanTotal();
+                });
+
+                // hapus row tindakan
+                div.querySelector(".removeTindakan").addEventListener("click", function() {
+                    div.remove();
+                    calculateTindakanTotal();
+                });
             });
 
-            let select = div.querySelector(".tindakanSelect");
-            let hargaInput = div.querySelector(".tindakanHarga");
+            function calculateTindakanTotal() {
+                let total = 0;
+                document.querySelectorAll("#tindakanContainer .tindakanHarga").forEach(input => {
+                    total += parseFloat(input.value || 0);
+                });
+                totalBiayaInput.value = total;
+                calculateFinalTotal();
+            }
 
-            // Event listener input manual harga (formatting)
-            hargaInput.addEventListener("keyup", function() {
-                formatCurrency(this);
-                calculateTindakanTotal();
-            });
+            function calculateFinalTotal() {
+                let totalTindakan = parseFloat(totalBiayaInput.value || 0);
+                let modalSparepart = parseFloat(document.getElementById("modal_sparepart").value || 0);
+                totalBiayaFinal.value = totalTindakan + modalSparepart;
+            }
 
-            // ketika pilih tindakan
-            select.addEventListener("change", function() {
-                let rawHarga = select.options[select.selectedIndex].dataset.harga || 0;
-                // Set harga formatted
-                hargaInput.value = numberToCurrency(rawHarga);
-                calculateTindakanTotal();
-            });
-
-            // hapus row tindakan
-            div.querySelector(".removeTindakan").addEventListener("click", function() {
-                div.remove();
-                calculateTindakanTotal();
-            });
+            // jika modal_sparepart berubah, update total akhir
+            document.getElementById("modal_sparepart").addEventListener("input", calculateFinalTotal);
         });
-
-        function calculateTindakanTotal() {
-            let total = 0;
-            document.querySelectorAll("#tindakanContainer .tindakanHarga").forEach(input => {
-                total += parseCurrency(input.value);
-            });
-            // Update UI total modal tindakan dengan format currency
-            totalBiayaInput.value = numberToCurrency(total);
-            calculateFinalTotal();
-        }
-
-        function calculateFinalTotal() {
-            let totalTindakan = parseCurrency(totalBiayaInput.value);
-            let modalSparepart = parseCurrency(document.getElementById("modal_sparepart").value);
-
-            // Set Total Akhir dengan format
-            totalBiayaFinal.value = numberToCurrency(totalTindakan + modalSparepart);
-        }
-
-        // Panggil calculateFinalTotal saat script load untuk inisialisasi awal (jika ada nilai default)
-        // Tetapi karena nilai awal 0, fungsi ini akan dipanggil via event listener
-    });
-</script>
+    </script>
 
 </div>

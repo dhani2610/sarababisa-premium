@@ -267,6 +267,10 @@ class ExpenseController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        $request->merge([
+            'price' => str_replace('.', '', $request->price),
+        ]);
         $item = Expense::findOrFail($id);
         // Transaction update
         $item->update([

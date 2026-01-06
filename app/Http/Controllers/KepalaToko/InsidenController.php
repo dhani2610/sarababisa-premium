@@ -8,6 +8,7 @@ use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
 use App\Models\Worker;
 use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 class InsidenController extends Controller
 {
     /**
@@ -177,7 +178,7 @@ class InsidenController extends Controller
     public function edit($id)
     {
         $item = Incident::findOrFail($id);
-        $users = Worker::where('jabatan', 'like', '%' . 'Teknisi' . '%')->get();
+        $users = Worker::where('cabang_id',getCabangId())->where('jabatan', 'like', '%' . 'Teknisi' . '%')->get();
 
         return view('pages.kepalatoko.insiden-edit', [
             'item' => $item,
