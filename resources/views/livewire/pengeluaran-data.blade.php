@@ -92,7 +92,7 @@
         <div class="sm:flex sm:justify-between sm:items-center mb-5">
              <div class="mb-2"></div>
              <div class="relative inline-flex" x-data="{ modalOpen: false }">
-                
+
 
                 <button class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600 mb-2 md:mb-0" @click.prevent="modalOpen = true">
                     <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16"><path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" /></svg>
@@ -108,7 +108,7 @@
                         <form action="{{ route('cetak-laporan-pengeluaran') }}" method="get" target="_blank">
                              @csrf
                              <div class="px-5 py-4 space-y-3">
-                                
+
                                  <div>
                                     <label class="block text-sm font-medium mb-1">Tipe <span class="text-rose-500">*</span></label>
                                     <select name="tipe" class="form-select text-sm py-1 w-full">
@@ -132,8 +132,8 @@
 
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
 
-           
-            
+
+
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 <h2 class="font-semibold text-slate-800">Semua Pengeluaran <span class="text-slate-400 font-medium">{{  $expenses_count  }}</span></h2>
                 <div class="relative inline-flex">
@@ -242,7 +242,7 @@
                     $(this).val(cleanVal);
                 });
             });
-            
+
 
             // 3. DataTables Init
             var table = $('#pengeluaran-table').DataTable({
@@ -253,7 +253,7 @@
                     {
                         data: null,
                         render: function (data, type, row, meta) {
-                            return meta.row + 1; 
+                            return meta.row + 1;
                         }
                     },
                     { data: 'created_at', name: 'created_at' },
@@ -403,7 +403,7 @@
                     },
                     success: function(response) {
                         alert(response.message);
-                        table.ajax.reload();
+                        window.location.reload();
                         $('.table-items-action').addClass('hidden');
                     },
                     error: function(xhr) {
