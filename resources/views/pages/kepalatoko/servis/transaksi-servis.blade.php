@@ -282,9 +282,14 @@
                 $('.selectjs2').select2({
                     width: '100%'
                 });
+                $('.selectjs3').select2({
+                    width: '100%'
+                });
+                $('.selectjs4').select2({
+                    width: '100%'
+                });
 
                 $('#selectjs3').select2();
-                $('.selectjs4').select2();
                 $('#selectjs5').select2();
                 $('#selectjs6').select2();
             });
