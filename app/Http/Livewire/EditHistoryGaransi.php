@@ -31,7 +31,7 @@ class EditHistoryGaransi extends Component
         if (auth()->user()->role == 'Teknisi') {
             $users = User::where('id','!=',1)->where('cabang_id',getCabangId())->where('id',auth()->user()->id)->where('role','!=','Investor')->get();
         }else{
-            $users = User::where('id','!=',1)->where('cabang_id',getCabangId())->where('role','!=','Investor')->get();
+            $users = User::where('id','!=',1)->where('cabang_id',getCabangId())->where('role','Teknisi')->get();
         }
 
         $serviceTransactions = ServiceTransaction::where('cabang_id',getCabangId())->orderBy('created_at', 'desc')->get();
