@@ -11,7 +11,7 @@
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Masukkan nama supplier" />
+            {{-- <x-search-form placeholder="Masukkan nama supplier" /> --}}
 
             <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
@@ -94,7 +94,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
     </div>
@@ -116,7 +116,7 @@
             </div>
             <!-- Table -->
             <div class="overflow-x-auto">
-                <table class="table-auto w-full">
+                <table id="supplier-table" class="table-auto w-full">
                     <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
@@ -151,7 +151,7 @@
                         @php
                             $i = 1
                         @endphp
-                        @foreach($suppliers as $item)                  
+                        {{-- @foreach($suppliers as $item)
                             <tr>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
@@ -252,18 +252,85 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>                                            
+                                            </div>
                                         </div>
                                         <!-- End -->
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @endforeach --}}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <style>
+        .dataTables_wrapper .dataTables_length select {
+            padding-right: 30px;
+            width: auto;
+        }
+    </style>
+
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+    $(function () {
+        const table = $('#supplier-table').DataTable({
+            ajax: "{{ route('supplier.data') }}",
+            processing: false,
+            serverSide: false,
+            columns: [
+                { data: 'checkbox', orderable:false, searchable:false },
+                { data: 'DT_RowIndex', searchable:false },
+                { data: 'name' },
+                { data: 'phone_number' },
+                { data: 'address' },
+                { data: 'aksi', orderable:false, searchable:false },
+            ],
+            order: [[1, 'asc']], // Default urut berdasarkan Nama (index ke-2)
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                paginate: {
+                    first: "Awal",
+                    last: "Akhir",
+                    next: "Lanjut",
+                    previous: "Kembali"
+                }
+            },
+            drawCallback: function () {
+                $('#parent-checkbox').prop('checked', false);
+                document.querySelector('.table-items-action')?.classList.add('hidden');
+            }
+        });
+
+
+        $('#parent-checkbox').on('click', function () {
+            $('.table-item').prop('checked', this.checked);
+            toggleBulk();
+        });
+
+        $(document).on('change', '.table-item', toggleBulk);
+
+        function toggleBulk() {
+            let count = $('.table-item:checked').length;
+            $('.table-items-count').text(count);
+            $('.table-items-action').toggleClass('hidden', count === 0);
+        }
+
+        window.reloadSupplierTable = () => table.ajax.reload();
+    });
+    </script>
+
 
     <script>
         document.addEventListener('alpine:init', () => {
@@ -317,7 +384,7 @@
                     });
                 },
             }))
-        })    
+        })
     </script>
 
     <!-- Pagination -->

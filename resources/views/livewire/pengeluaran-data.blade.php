@@ -11,7 +11,7 @@
             </div>
 
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-                <x-search-form placeholder="Cari pengeluaran..." />
+                {{-- <x-search-form placeholder="Cari pengeluaran..." /> --}}
 
                 <div x-data="{ modalOpen: false }">
                     <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
@@ -45,6 +45,15 @@
                                                     <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1" for="tipe">Tipe <span class="text-rose-500">*</span></label>
+                                            <select id="tipe" name="tipe" class="form-select text-sm py-1 w-full" required>
+                                                <option selected value="">Pilih Tipe</option>
+                                                <option value="0">Operasional</option>
+                                                <option value="1">Servis</option>
+                                                <option value="2">Penjualan</option>
+                                            </select>
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="users_id">Akun <span class="text-rose-500">*</span></label>
@@ -83,6 +92,8 @@
         <div class="sm:flex sm:justify-between sm:items-center mb-5">
              <div class="mb-2"></div>
              <div class="relative inline-flex" x-data="{ modalOpen: false }">
+                
+
                 <button class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600 mb-2 md:mb-0" @click.prevent="modalOpen = true">
                     <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16"><path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" /></svg>
                     <span class="hidden xs:block ml-2">Cetak Laporan</span>
@@ -97,6 +108,16 @@
                         <form action="{{ route('cetak-laporan-pengeluaran') }}" method="get" target="_blank">
                              @csrf
                              <div class="px-5 py-4 space-y-3">
+                                
+                                 <div>
+                                    <label class="block text-sm font-medium mb-1">Tipe <span class="text-rose-500">*</span></label>
+                                    <select name="tipe" class="form-select text-sm py-1 w-full">
+                                        <option value="">Semua Tipe</option>
+                                        <option value="0">Operasional</option>
+                                        <option value="1">Servis</option>
+                                        <option value="2">Penjualan</option>
+                                    </select>
+                                </div>
                                  <div><label class="block text-sm font-medium mb-1">Mulai tanggal <span class="text-rose-500">*</span></label><input name="start_date" class="form-input w-full py-2" type="date" required /></div>
                                  <div><label class="block text-sm font-medium mb-1">Sampai tanggal <span class="text-rose-500">*</span></label><input name="end_date" class="form-input w-full py-2" type="date" required /></div>
                              </div>
@@ -110,13 +131,27 @@
         </div>
 
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
+
+           
+            
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
-                <h2 class="font-semibold text-slate-800">Semua Pengeluaran <span class="text-slate-400 font-medium">{{ $expenses_count }}</span></h2>
+                <h2 class="font-semibold text-slate-800">Semua Pengeluaran <span class="text-slate-400 font-medium" id="total-count">0</span></h2>
                 <div class="relative inline-flex">
                     <div class="table-items-action hidden">
                         <div class="flex items-center">
                             <div class="text-sm italic mr-2 whitespace-nowrap"><span class="table-items-count">0</span> item yang dipilih</div>
                             <div class="space-x-1">
+                                 <button class="btn bg-white border-slate-200 hover:border-slate-300 text-blue-500" onclick="bulkActionTipe('tipe', 0)">
+                                    Operasional
+                                </button>
+
+                                <button class="btn bg-white border-slate-200 hover:border-slate-300 text-amber-500" onclick="bulkActionTipe('tipe', 1)">
+                                    Servis
+                                </button>
+
+                                <button class="btn bg-white border-slate-200 hover:border-slate-300 text-emerald-500" onclick="bulkActionTipe('tipe', 2)">
+                                    Penjualan
+                                </button>
                                 <button class="btn bg-white border-slate-200 hover:border-slate-300 text-blue-500 hover:text-blue-600" onclick="bulkAction('approve')">Setujui</button>
                                 <button class="btn bg-white border-slate-200 hover:border-slate-300 text-gray-900 hover:text-gray-950" onclick="bulkAction('reject')">Tolak</button>
                                 <button class="btn bg-white border-slate-200 hover:border-slate-300 text-rose-500 hover:text-rose-600" onclick="bulkAction('delete')">Hapus</button>
@@ -124,6 +159,15 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="w-48 ml-2">
+                <select id="filter-tipe" class="form-select text-sm py-1 w-full">
+                    <option value="">Semua Tipe</option>
+                    <option value="0">Operasional</option>
+                    <option value="1">Servis</option>
+                    <option value="2">Penjualan</option>
+                </select>
             </div>
 
             <div class="overflow-x-auto p-4">
@@ -142,6 +186,7 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Tgl Pengeluaran</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Nama Akun</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Item Pengeluaran</th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Tipe Pengeluaran</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Biaya</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Status</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Aksi</th>
@@ -197,18 +242,26 @@
                     $(this).val(cleanVal);
                 });
             });
+            
 
             // 3. DataTables Init
             var table = $('#pengeluaran-table').DataTable({
                 processing: false,
                 serverSide: false,
                 ajax: "{{ route('pengeluaran.data') }}",
+                   ajax: {
+                    url: "{{ route('pengeluaran.data') }}",
+                    data: function (d) {
+                        d.tipe = $('#filter-tipe').val(); 
+                    }
+                },
                 columns: [
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                     { data: 'created_at', name: 'created_at' },
                     { data: 'user_name', name: 'user.name' },
                     { data: 'name', name: 'name' },
+                    { data: 'tipe', name: 'tipe' },
                     { data: 'price', name: 'price' },
                     { data: 'is_approve', name: 'is_approve' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
@@ -224,6 +277,16 @@
                 drawCallback: function() {
                     attachCheckboxHandlers();
                 }
+            });
+
+            table.on('xhr', function () {
+                var json = table.ajax.json();
+
+                $('#total-count').text(json.recordsFiltered);
+            });
+            
+            $('#filter-tipe').on('change', function () {
+                table.ajax.reload();
             });
 
             // 4. Logic Checkbox & Bulk Actions
@@ -289,6 +352,32 @@
                     success: function(response) {
                         alert(response.message);
                         table.ajax.reload();
+                        $('.table-items-action').addClass('hidden');
+                    },
+                    error: function(xhr) {
+                        var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Gagal memproses data.';
+                        alert(msg);
+                    }
+                });
+            };
+            window.bulkActionTipe = function(actionType,value = null) {
+                var selectedIds = $('input.table-item:checked').map(function() {
+                    return $(this).val();
+                }).get();
+
+                if (selectedIds.length === 0) return alert('Pilih data terlebih dahulu.');
+
+                $.ajax({
+                    url: "{{ route('pengeluaran.tipe-batch') }}",
+                    method: 'POST',
+                    data: {
+                        ids: selectedIds,
+                        tipe: value,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        alert(response.message);
+                        window.location.reload();
                         $('.table-items-action').addClass('hidden');
                     },
                     error: function(xhr) {

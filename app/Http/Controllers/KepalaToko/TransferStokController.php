@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
+use Yajra\DataTables\Facades\DataTables;
+
 
 class TransferStokController extends Controller
 {
@@ -40,6 +42,122 @@ class TransferStokController extends Controller
             'products' => $products,
         ]);
     }
+    public function data(Request $request)
+    {
+        $query = TransferStok::with([
+                'dariCabang',
+                'keCabang',
+                'dariProduk',
+                'keProduk',
+                'pic'
+            ])
+            ->orderByDesc('created_at');
+
+        // filter tanggal (tetap)
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('tanggal', [
+                Carbon::parse($request->start_date)->startOfDay(),
+                Carbon::parse($request->end_date)->endOfDay(),
+            ]);
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+
+            ->addColumn('checkbox', function ($t) {
+                return '
+                    <input
+                        type="checkbox"
+                        class="table-item"
+                        value="'.$t->id.'"
+                        @click="uncheckParent"
+                    >
+                ';
+            })
+
+            ->addColumn('tanggal', fn($t) =>
+                Carbon::parse($t->tanggal)->format('d-m-Y')
+            )
+
+            ->addColumn('dari_cabang', fn($t) =>
+                optional($t->dariCabang)->nama_cabang
+            )
+
+            ->addColumn('produk_asal', fn($t) =>
+                optional($t->dariProduk)->product_name
+            )
+
+            ->addColumn('ke_cabang', fn($t) =>
+                optional($t->keCabang)->nama_cabang
+            )
+
+            ->addColumn('produk_tujuan', fn($t) =>
+                optional($t->keProduk)->product_name
+            )
+
+            ->addColumn('stok', fn($t) => $t->stok)
+
+            ->addColumn('status', function ($t) {
+                if ($t->status == 0) {
+                    return '<span class="px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-700">
+                        Menunggu Persetujuan
+                    </span>';
+                }
+                return '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
+                    Disetujui
+                </span>';
+            })
+
+            ->addColumn('pic', fn($t) => $t->pic->name ?? '-')
+
+            // ✅ ACTION (APPROVE + DELETE DISAMAKAN PERSIS)
+            ->addColumn('aksi', function ($t) {
+                $approveBtn = '';
+                if ($t->status == 0 && auth()->user()->role == 'Kepala Toko') {
+                    $approveBtn = '
+                    <form action="'.route('transfer-stok.approve', $t->id).'"
+                        method="POST"
+                        class="inline-block">
+                        '.csrf_field().'
+                        <button type="submit"
+                            class="px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs hover:bg-green-600 transition flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                            Approve
+                        </button>
+                    </form>';
+                }
+
+                $deleteBtn = '';
+                if ($t->status != 1 || auth()->user()->role == 'Kepala Toko') {
+                    $deleteBtn = '
+                    <form action="'.route('transfer-stok.destroy', $t->id).'"
+                        method="POST"
+                        class="inline-block"
+                        onsubmit="return confirm(\'Yakin hapus transfer ini?\')">
+                        '.csrf_field().method_field('DELETE').'
+                        <button
+                            class="px-3 py-1.5 rounded-lg bg-rose-500 text-white text-xs hover:bg-rose-600 transition flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Hapus
+                        </button>
+                    </form>';
+                }
+
+                return '<div class="flex justify-center gap-1">'.$approveBtn.$deleteBtn.'</div>';
+            })
+
+            ->rawColumns(['checkbox','status','aksi'])
+            ->make(true);
+    }
+
 
     public function productsByCabang($cabangId,$kategori)
     {
@@ -51,7 +169,7 @@ class TransferStokController extends Controller
         return response()->json($products);
     }
 
-    
+
 
 
     public function store(Request $request)
@@ -170,7 +288,7 @@ class TransferStokController extends Controller
 
                 } else {
                     // kategori NON-IMEI → jangan disalin biar tidak duplicate
-                    $cloned->nomor_seri = null; 
+                    $cloned->nomor_seri = null;
                     // atau hapus saja: unset($cloned->nomor_seri);
                 }
                 $cloned->cabang_id = $transfer->ke_cabang_id;

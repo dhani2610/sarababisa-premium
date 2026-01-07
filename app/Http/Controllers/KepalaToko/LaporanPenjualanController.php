@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\OrderDetail;
+use App\Models\Expense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -330,6 +331,16 @@ class LaporanPenjualanController extends Controller
         $total_transfer = (clone $orderQuery)->sum('transfer');
         $total_kredit   = (clone $orderQuery)->sum('due'); // due = hutang/kredit
 
+
+        $expenses = Expense::with('user')
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
+            ->where('tipe', 2)
+            ->orderBy('created_at', 'asc')
+            ->get();
+        $total_pengeluaran = $expenses->sum('price');
+
         // 6. RENDER PDF
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-penjualan', [
             'users'           => $users,
@@ -345,6 +356,8 @@ class LaporanPenjualanController extends Controller
             'total_tunai'     => $total_tunai,
             'total_transfer'  => $total_transfer,
             'total_kredit'    => $total_kredit,
+            'pengeluaran_data'          => $expenses, // Kirim variabel expenses yg sudah di query
+            'total_pengeluaran'          => $total_pengeluaran, // Kirim variabel expenses yg sudah di query
             'tipe_laporan'    => $tipe // (Opsional) jika ingin menampilkan judul tipe di PDF
         ]);
 

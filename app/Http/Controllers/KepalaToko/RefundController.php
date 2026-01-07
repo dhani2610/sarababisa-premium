@@ -131,6 +131,7 @@ class RefundController extends Controller
             Expense::create([
                 'name' => 'Refund #'. $servis->nomor_servis,
                 'price' => $servis->biaya,
+                'tipe' => 1, // tipe servis
                 'users_id' => auth()->user()->id,
                 'cabang_id' => getCabangId()
             ]);

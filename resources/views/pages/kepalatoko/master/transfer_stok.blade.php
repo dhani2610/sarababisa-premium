@@ -77,7 +77,7 @@
                                     @csrf
                                     <div class="px-5 py-4  gap-3">
 
-                                 
+
 
                                         <div class="mb-3">
                                             <label>Kategori<span class="text-rose-500">*</span></label>
@@ -90,7 +90,7 @@
                                             </select>
                                         </div>
 
-                                        
+
                                         <div class="mb-3" >
                                             <label>Asal Cabang<span class="text-rose-500">*</span></label>
                                             <select id="dari_cabang_id" name="dari_cabang_id" class="form-select w-full" required>
@@ -172,7 +172,7 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="table-auto w-full">
+                <table id="transfer-table" class="table-auto w-full">
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
                             <th class="text-center px-2 py-3">
@@ -193,27 +193,23 @@
 
                     <tbody class="text-sm divide-y">
 
-                        @php $i = ($transfers->currentPage()-1)*$transfers->perPage()+1; @endphp
+                        {{-- @php $i = ($transfers->currentPage()-1)*$transfers->perPage()+1; @endphp
 
                         @foreach($transfers as $t)
                         <tr class="hover:bg-slate-50">
 
-                            {{-- Checkbox --}}
                             <td class="text-center px-3 py-3">
                                 <input class="table-item" type="checkbox" value="{{ $t->id }}" @click="uncheckParent">
                             </td>
 
-                            {{-- No --}}
                             <td class="text-center px-3 py-3 font-medium">
                                 {{ $i++ }}
                             </td>
 
-                            {{-- Tanggal --}}
                             <td class="text-center px-3 py-3">
                                 {{ \Carbon\Carbon::parse($t->tanggal)->format('d-m-Y') }}
                             </td>
 
-                            {{-- Dari Cabang --}}
                             <td class="px-3 py-3 text-left">
                                 <div class="font-semibold text-slate-800">{{ optional($t->dariCabang)->nama_cabang }}</div>
                             </td>
@@ -221,21 +217,17 @@
                                 <div class=" text-slate-500">Produk : {{ optional($t->dariProduk)->product_name }}</div>
                             </td>
 
-                            {{-- Ke Cabang --}}
                             <td class="px-3 py-3 text-left">
                                 <div class="font-semibold text-slate-800">{{ optional($t->keCabang)->nama_cabang }}</div>
                             </td>
-                            {{-- Ke Cabang --}}
                             <td class="px-3 py-3 text-left">
                                 <div class=" text-slate-500">Produk : {{ optional($t->keProduk)->product_name }}</div>
                             </td>
 
-                            {{-- Stok --}}
                             <td class="text-center px-3 py-3 font-semibold">
                                 {{ $t->stok }}
                             </td>
-                           
-                            {{-- Status --}}
+
                             <td class="text-center px-3 py-3">
                                 @if ($t->status == 0)
                                     <span class="px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-700">
@@ -252,10 +244,8 @@
                                 {{ $t->pic->name ?? '-' }}
                             </td>
 
-                            {{-- Aksi --}}
                             <td class="text-center px-3 py-3 space-x-1">
 
-                                {{-- APPROVE --}}
                                 @if ($t->status == 0 && Auth::user()->role == 'Kepala Toko')
                                 <form action="{{ route('transfer-stok.approve', $t->id) }}"
                                     method="POST"
@@ -273,7 +263,6 @@
                                 </form>
                                 @endif
 
-                                {{-- DELETE --}}
                                 @if ($t->status != 1 || Auth::user()->role == 'Kepala Toko')
                                 <form action="{{ route('transfer-stok.destroy', $t->id) }}"
                                     method="POST"
@@ -296,7 +285,7 @@
                             </td>
 
                         </tr>
-                        @endforeach
+                        @endforeach --}}
 
                     </tbody>
 
@@ -308,6 +297,78 @@
             </div>
         </div>
     </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <style>
+        .dataTables_wrapper .dataTables_length select {
+            padding-right: 30px;
+            width: auto;
+        }
+    </style>
+
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+    $(function () {
+        const table = $('#transfer-table').DataTable({
+            processing: false,
+            serverSide: false,
+            ajax: "{{ route('transfer-stok.data') }}",
+            columns: [
+                { data: 'checkbox', orderable:false, searchable:false },
+                { data: 'DT_RowIndex', searchable:false },
+                { data: 'tanggal' },
+                { data: 'dari_cabang' },
+                { data: 'produk_asal' },
+                { data: 'ke_cabang' },
+                { data: 'produk_tujuan' },
+                { data: 'stok' },
+                { data: 'status', orderable:false },
+                { data: 'pic' },
+                { data: 'aksi', orderable:false, searchable:false },
+            ],
+            order: [[1, 'asc']], // Default urut berdasarkan Nama (index ke-2)
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                paginate: {
+                    first: "Awal",
+                    last: "Akhir",
+                    next: "Lanjut",
+                    previous: "Kembali"
+                }
+            },
+            drawCallback: function () {
+                document.getElementById('parent-checkbox').checked = false;
+                document.querySelector('.table-items-action')?.classList.add('hidden');
+            }
+        });
+
+        $('#parent-checkbox').on('click', function () {
+            $('.table-item').prop('checked', this.checked);
+            toggleBulk();
+        });
+
+        $(document).on('change', '.table-item', toggleBulk);
+
+        function toggleBulk() {
+            let count = $('.table-item:checked').length;
+            $('.table-items-count').text(count);
+            $('.table-items-action').toggleClass('hidden', count === 0);
+        }
+
+        window.reloadTransferTable = () => table.ajax.reload();
+    });
+    </script>
+
     <script>
 document.addEventListener('alpine:init', () => {
     Alpine.data('handleSelect', () => ({
@@ -350,7 +411,7 @@ document.addEventListener('alpine:init', () => {
     }))
 })
 </script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+{{-- <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> --}}
 
 <!-- Select2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

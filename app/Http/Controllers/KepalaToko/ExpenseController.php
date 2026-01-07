@@ -27,11 +27,16 @@ class ExpenseController extends Controller
 
     public function getData(Request $request)
     {
+        $limit = $request->get('limit', 200);
+        $offset = $request->get('offset', 0);
         $query = Expense::with('user')
             ->where('cabang_id', getCabangId())
             ->orderByRaw('is_approve IS NULL DESC') // Pending di atas
             ->orderBy('created_at', 'desc');
 
+        if ($request->filled('tipe')) {
+            $query->where('tipe', $request->tipe);
+        }
         return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('checkbox', function ($row) {
@@ -39,6 +44,15 @@ class ExpenseController extends Controller
             })
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->format('d/m/Y');
+            })
+            ->editColumn('tipe', function ($row) {
+                if($row->tipe == 0){
+                    return 'Operasional';
+                } else if($row->tipe == 1){
+                    return 'Servis';
+                } else if($row->tipe == 2){
+                    return 'Penjualan';
+                } 
             })
             ->addColumn('user_name', function ($row) {
                 return $row->user->name ?? '<span class="text-rose-600">Akun Terhapus</span>';
@@ -115,6 +129,13 @@ class ExpenseController extends Controller
         return response()->json(['message' => 'Data pengeluaran berhasil dihapus.']);
     }
 
+    public function tipeBatch(Request $request)
+    {
+        $ids = $request->input('ids');
+        $tanggal = Carbon::now()->translatedFormat('Y-m-d');
+        Expense::whereIn('id', $ids)->update(['tipe' => $request->tipe]);
+        return response()->json(['message' => 'Data pengeluaran berhasil diubah.']);
+    }
     public function approveBatch(Request $request)
     {
         $ids = $request->input('ids');
@@ -174,13 +195,21 @@ class ExpenseController extends Controller
      */
     public function store(Request $request)
     {
+        if (Auth::user()->role == 'Kepala Toko') {
+            $is_approve = 'Setuju';
+            $tanggal_approve = date('Y-m-d');
+        }else{
+            $is_approve = null;
+            $tanggal_approve = null;
+        }
         // Transaction create
         Expense::create([
             'name' => $request->name,
             'price' => $request->price,
             'users_id' => $request->users_id,
-            'is_approve' => 'Setuju',
-            'tgl_disetujui' => $request->tgl_disetujui,
+            'tipe' => $request->tipe,
+            'is_approve' => $is_approve,
+            'tgl_disetujui' => $tanggal_approve,
             'cabang_id' => getCabangId(),
         ]);
 
@@ -207,6 +236,16 @@ class ExpenseController extends Controller
         // Mengambil logo dan nama toko
         $users = User::find(1);
 
+        if (getCabangId() == 1) {
+            $users = User::find(1);
+        }else{
+            $users = User::where('cabang_id',getCabangId())->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
+
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
 
@@ -214,20 +253,36 @@ class ExpenseController extends Controller
         $start_date = $request->start_date;
         $end_date = $request->end_date;
 
-        // Mengambil data pengeluaran
-        $expenses = Expense::with('user')->whereDate('created_at', '>=', $start_date)
+        if ($request->tipe) {
+            $expenses = Expense::with('user')->whereDate('created_at', '>=', $start_date)
+                ->whereDate('created_at', '<=', $end_date)
+                ->where('tipe', $request->tipe)
+                ->where('cabang_id', getCabangId())
+                ->orderBy('created_at', 'asc')
+                ->get();
+        } else {
+            // Mengambil data pengeluaran
+            $expenses = Expense::with('user')->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
             ->where('cabang_id', getCabangId())
             ->orderBy('created_at', 'asc')
             ->get();
-
+        }
         // Menghitung total pengeluaran
-        $total_pengeluaran = Expense::whereDate('created_at', '>=', $start_date)
-            ->whereDate('created_at', '<=', $end_date)
-            ->where('cabang_id', getCabangId())
-            ->sum('price');
+        $total_pengeluaran = $expenses->sum('price');
+
+        if ($request->tipe == 0) {
+            $tipe = 'Operasional';
+        } else if ($request->tipe == 1) {
+            $tipe = 'Servis';
+        } else if ($request->tipe == 2) {
+            $tipe = 'Penjualan';
+        } else {
+            $tipe = 'Semua';
+        }
 
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-pengeluaran', [
+            'tipe' => $tipe,
             'users' => $users,
             'imagePath' => $imagePath,
             'expenses' => $expenses,
@@ -236,7 +291,7 @@ class ExpenseController extends Controller
             'total_pengeluaran' => $total_pengeluaran
         ]);
 
-        $filename = 'Laporan Pengeluaran' . ' ' . $start_date . ' ' . 'sd' . ' ' . $end_date . '.pdf';
+        $filename = 'Laporan Pengeluaran' . ' ' . $start_date . ' ' . 'sd' . ' ' . $end_date . ' '.$tipe.'.pdf';
 
         return $pdf->stream($filename);
     }
@@ -276,6 +331,7 @@ class ExpenseController extends Controller
         $item->update([
             'name' => $request->name,
             'price' => $request->price,
+            'tipe' => $request->tipe,
             'users_id' => $request->users_id,
             'created_at' => $request->created_at,
             'tgl_disetujui' => $request->tgl_disetujui,

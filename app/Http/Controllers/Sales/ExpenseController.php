@@ -41,9 +41,11 @@ class ExpenseController extends Controller
     {
         // Transaction create
         Expense::create([
+            'tipe' => 0, // tipe operasional
             'name' => $request->name,
             'price' => $request->price,
             'users_id' => Auth::user()->id,
+            'cabang_id' => getCabangId(),
         ]);
 
         return redirect()->route('sales-pengeluaran.index');

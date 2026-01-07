@@ -359,6 +359,7 @@ class LaporanServisController extends Controller
 
         $expenseQuery = Expense::whereDate('created_at', '>=', $start_date)
             ->where('cabang_id', getCabangId())
+            ->where('tipe', 1)
             ->whereDate('created_at', '<=', $end_date);
 
         if ($isTeknisi) {

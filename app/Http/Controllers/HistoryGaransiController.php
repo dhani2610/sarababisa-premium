@@ -277,9 +277,11 @@ class HistoryGaransiController extends Controller
 
                 if ($servis->biaya > 0) {
                     Expense::create([
+                        'tipe' => 1, // tipe servis
                         'name' => 'Refund #'. $servis->nomor_servis,
                         'price' => $servis->biaya,
-                        'users_id' => auth()->user()->id
+                        'users_id' => auth()->user()->id,
+                        'cabang_id' => getCabangId()
                     ]);
                 }
             // }
@@ -326,9 +328,11 @@ class HistoryGaransiController extends Controller
 
         if ($request->total_biaya > 0) {
             Expense::create([
+                'tipe' => 1, // tipe servis
                 'name' => 'Klaim Garansi #'. $servis2->nomor_servis,
                 'price' => $request->total_biaya,
-                'users_id' => auth()->user()->id
+                'users_id' => auth()->user()->id,
+                'cabang_id' => getCabangId()
             ]);
         }
         toast('Data berhasil disimpan.', 'success');

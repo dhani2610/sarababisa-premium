@@ -453,6 +453,7 @@ class LaporanServisController extends Controller
             ->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
             ->where('cabang_id', getCabangId())
+            ->where('tipe', 1)
             ->orderBy('created_at', 'asc')
             ->get();
 

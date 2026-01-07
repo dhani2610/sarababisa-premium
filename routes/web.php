@@ -252,7 +252,7 @@ Route::get('/{id}/restore-keranjang-penjualan', [RecycleBinController::class, 'r
 Route::post('bersihkan-keranjang-penjualan', [RecycleBinController::class, 'cleanOrder'])->name('bersihkan-keranjang-penjualan');
 
 Route::delete('/customers/delete', [KepalaTokoPelangganController::class, 'deleteSelected']);
-Route::delete('/service-actions/delete', [KepalaTokoTindakanServisController::class, 'deleteSelected']);
+Route::delete('/service-actions/delete', [KepalaTokoTindakanServisController::class, 'deleteSelected'])->name('tindakan-servis.delete-batch');
 Route::delete('/categories/delete', [KepalaTokoKategoriController::class, 'deleteSelected']);
 Route::delete('/sub-categories/delete', [KepalaTokoSubKategoriController::class, 'deleteSelected']);
 Route::delete('/suppliers/delete', [KepalaTokoSupplierController::class, 'deleteSelected']);
@@ -353,6 +353,8 @@ Route::get('master/master-absensi/export', [AttendanceController::class, 'export
     // 4. Proses Simpan Password (POST)
     Route::post('/lupa-password/update', [DirectPasswordResetController::class, 'updatePassword'])->name('direct.reset.update');
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja'])->group(function () {
+
+    Route::get('top-produk-kepala-toko/data',[KepalaTokoProdukController::class, 'dataTop'])->name('top-produk-kepala-toko.data');
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTopNew'])->name('top-produk-kepala-toko');
 
     Route::get('/dashboard', [KepalaTokoDashboardController::class, 'index'])->name('kepalatoko-dashboard');
@@ -383,6 +385,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::post('/servis/transaksi-servis-langsung', [KepalaTokoTransaksiServisLangsungController::class, 'store'])->name('servis-langsung');
 
     Route::post('servis/tindakan-servis/import-chunk', [KepalaTokoTindakanServisController::class, 'importChunk'])->name('tindakan.servis.import-chunk');
+    Route::get('servis/tindakan-servis/data',[KepalaTokoTindakanServisController::class, 'getData'])->name('tindakan-servis.data');
     Route::resource('servis/tindakan-servis', KepalaTokoTindakanServisController::class);
 
     Route::get('pelanggan/data', [KepalaTokoPelangganController::class, 'getData'])->name('pelanggan.data');
@@ -456,6 +459,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::get('/refund-cetak', [RefundController::class, 'cetak'])->name('refunds.cetak');
 
 
+    Route::get('transfer-stok/data',[TransferStokController::class, 'data'])->name('transfer-stok.data');
     Route::resource('transfer-stok', TransferStokController::class)->names('transfer-stok');
     Route::get('/api/products-by-cabang/{cabang}/{kategori}', [TransferStokController::class, 'productsByCabang'])
     ->name('api.productsByCabang');
@@ -512,6 +516,7 @@ Route::post('manajemen/kasbon/reject-batch', [KepalaTokoKasbonController::class,
 Route::post('manajemen/pengeluaran/delete-batch', [KepalaTokoExpenseController::class, 'deleteBatch'])->name('pengeluaran.delete-batch');
 Route::post('manajemen/pengeluaran/approve-batch', [KepalaTokoExpenseController::class, 'approveBatch'])->name('pengeluaran.approve-batch');
 Route::post('manajemen/pengeluaran/reject-batch', [KepalaTokoExpenseController::class, 'rejectBatch'])->name('pengeluaran.reject-batch');
+Route::post('manajemen/pengeluaran/tipe-batch', [KepalaTokoExpenseController::class, 'tipeBatch'])->name('pengeluaran.tipe-batch');
     Route::resource('manajemen/pengeluaran', KepalaTokoExpenseController::class);
     Route::patch('/expenses/update', [KepalaTokoExpenseController::class, 'approveSelected']);
     Route::patch('/expenses/reject', [KepalaTokoExpenseController::class, 'rejectSelected']);
@@ -527,7 +532,10 @@ Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisControll
     Route::post('produk/sub-kategori/delete-batch', [KepalaTokoSubKategoriController::class, 'deleteBatch'])->name('sub-kategori.delete-batch');
     Route::resource('produk/sub-kategori', KepalaTokoSubKategoriController::class);
 
+
+    Route::get('produk/supplier/data',[KepalaTokoSupplierController::class, 'getData'])->name('supplier.data');
     Route::resource('produk/supplier', KepalaTokoSupplierController::class);
+
 
     Route::get('produk/item/data', [ProdukController::class, 'getData'])->name('produk-item.data');
     Route::post('produk/item/upload-foto', [ProdukController::class, 'uploadFotoAjax'])->name('produk-item.upload-foto');

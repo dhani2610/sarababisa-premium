@@ -19,6 +19,8 @@ use Picqer\Barcode\BarcodeGeneratorPNG;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\OrderDetail;
+
 class ProdukController extends Controller
 {
     /**
@@ -37,6 +39,64 @@ class ProdukController extends Controller
     {
         return view('pages/kepalatoko/produk/top');
     }
+
+    public function dataTop(Request $request)
+    {
+        $query = OrderDetail::select(
+            'products.model_series_id',
+            'model_series.name as model_name',
+            DB::raw('SUM(order_details.quantity) as total_terjual'),
+            DB::raw('SUM(order_details.quantity * products.harga_jual) as omzet'),
+            DB::raw('MAX(products.id) as product_id'),
+            DB::raw('MAX(products.product_name) as product_name'),
+            DB::raw('MAX(products.kondisi) as kondisi'),
+            DB::raw('MAX(products.warna) as warna'),
+            DB::raw('MAX(products.ram) as ram'),
+            DB::raw('MAX(products.nomor_seri) as nomor_seri'),
+            DB::raw('MAX(products.categories_id) as categories_id')
+        )
+            ->join('products', 'products.id', '=', 'order_details.products_id')
+            ->join('model_series', 'model_series.id', '=', 'products.model_series_id')
+            ->where('products.cabang_id', getCabangId())
+            ->groupBy('products.model_series_id', 'model_series.name')
+            ->orderByDesc('total_terjual');
+
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+            $query->where('model_series.name', 'like', '%' . $request->search . '%');
+        }
+
+        // 🧩 FILTER KATEGORI
+        if ($request->filled('category_id')) {
+            $query->where('products.categories_id', $request->category_id);
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+
+            ->addColumn('display', function ($item) {
+                if ($item->categories_id == 1) {
+                    return $item->product_name.' '.$item->kondisi.' '.$item->warna.' '.$item->ram.
+                        ' (IMEI '.$item->nomor_seri.')';
+                }
+                return $item->product_name.' '.$item->nomor_seri;
+            })
+
+            ->addColumn('stat', function ($item) {
+                return '
+                    <p class="text-sm">
+                        Terjual: <span class="font-semibold">'.$item->total_terjual.'</span>
+                    </p>
+                    <p class="text-sm text-emerald-600">
+                        Rp '.number_format($item->omzet, 0, ',', '.').'
+                    </p>
+                ';
+            })
+
+            ->rawColumns(['stat'])
+            ->make(true);
+    }
+
 
     public function getData(Request $request)
     {

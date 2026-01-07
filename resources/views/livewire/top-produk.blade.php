@@ -11,7 +11,7 @@
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
             <!-- Search form -->
-            <x-search-form placeholder="Masukkan nama produk" />
+            {{-- <x-search-form placeholder="Masukkan nama produk" /> --}}
 
         </div>
 
@@ -63,14 +63,14 @@
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
             <!-- Print button -->
            
-            <div>
+            {{-- <div>
                 <select wire:model="paginate" id="" class="form-select">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                 </select>
-            </div>
+            </div> --}}
         </div>
     </div>
 
@@ -81,7 +81,21 @@
             <h2 class="font-semibold text-slate-800">Top Produk Terlaris</h2>
         </div>
         <div class="divide-y divide-slate-200">
-            @php
+
+             <div class="overflow-x-auto">
+                <table id="top-produk-list" class="table-auto w-full">
+                    <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
+                    <tr>
+                        <th>#</th>
+                        <th>Produk</th>
+                        <th>Stat</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+            {{-- @php
                 $rank = ($topProducts->currentPage() - 1) * $topProducts->perPage() + 1;
             @endphp
 
@@ -107,9 +121,95 @@
                         <p class="text-sm text-emerald-600">Rp {{ number_format($itemtop->omzet, 0, ',', '.') }}</p>
                     </div>
                 </div>
-            @endforeach
+            @endforeach --}}
         </div>
     </div>
+
+    
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <style>
+        .dataTables_wrapper .dataTables_length select {
+            padding-right: 30px;
+            width: auto;
+        }
+    </style>
+
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+    $(function () {
+
+        let categoryId = "{{ request('id') }}";
+
+        const table = $('#top-produk-list').DataTable({
+            processing: false,
+            serverSide: false,
+            paging: true,
+            searching: true,
+            info: false,
+            ordering: false,
+            ajax: {
+                url: "{{ route('top-produk-kepala-toko.data') }}",
+                data: function (d) {
+                    d.search = $('input[type=search]').val();
+                    d.category_id = categoryId;
+                }
+            },
+            pageLength: 10,
+            columns: [
+                { data: 'DT_RowIndex', searchable:false },
+                { data: 'display' },
+                { data: 'stat' },
+            ],
+            
+            order: [[1, 'asc']], // Default urut berdasarkan Nama (index ke-2)
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                paginate: {
+                    first: "Awal",
+                    last: "Akhir",
+                    next: "Lanjut",
+                    previous: "Kembali"
+                }
+            },
+            rowCallback: function (row, data, index) {
+                const rank = data.DT_RowIndex;
+                $(row).html(`
+                    <td colspan="3">
+                        <div class="flex justify-between items-center px-5 py-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold text-slate-500">${rank}.</span>
+                                <span class="font-medium text-slate-800">${data.display}</span>
+                            </div>
+                            <div class="text-right">${data.stat}</div>
+                        </div>
+                    </td>
+                `);
+            }
+
+        });
+
+        // 🔍 SEARCH
+        $(document).on('input', 'input[type=search]', function () {
+            table.ajax.reload();
+        });
+
+        // 📄 PAGINATION SELECT
+        $('select[wire\\:model="paginate"]').on('change', function () {
+            table.page.len($(this).val()).draw();
+        });
+
+    });
+    </script>
 
     <script>
         document.addEventListener('alpine:init', () => {
@@ -167,7 +267,7 @@
     </script>
 
     <!-- Pagination -->
-    <div class="mt-8">
+    {{-- <div class="mt-8">
         {{ $topProducts->links() }}
-    </div>
+    </div> --}}
 </div>

@@ -366,6 +366,7 @@ class PurchaseProductController extends Controller
                 // Simpan Pengeluaran (Expense)
                 if ($request->product_price[$i] > 0) {
                     Expense::create([
+                        'tipe' => 2, // tipe pembelian
                         'name' => 'Pembelian produk ' . $purchase->product_name,
                         'price' => cleanNumber($purchase->total_price),
                         'users_id' => auth()->user()->id,

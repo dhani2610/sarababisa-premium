@@ -145,8 +145,8 @@
 			<tr>
 				<th>Total Profit</th>
 				<th>: Rp. {{ number_format($total_profit) }}</th>
-				<th></th>
-				<th></th>
+                <th>Total Pengeluaran</th>
+                <th>: Rp. {{ number_format($total_pengeluaran) }}</th>
 			</tr>
 			<tr>
 				<th>Total Item Penjualan</th>
@@ -241,5 +241,54 @@
 			@endforeach
 		</tbody>
 	</table>
+
+     <hr>
+    <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
+        Pengeluaran
+    </h4>
+
+    <table id="detail">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Tgl Pengeluaran</th>
+                <th>Nama</th>
+                <th>Item Pengeluaran</th>
+                <th>Status</th>
+                <th>Biaya</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($pengeluaran_data as $item)
+                <tr>
+                    <td style="width: 10px;">{{ $loop->iteration }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</td>
+                    <td>
+                        @if ($item->user)
+                            {{ $item->user->name }}
+                        @else
+                            Akun sudah dihapus
+                        @endif
+                    </td>
+                    <td>{{ $item->name }}</td>
+                    <td>
+                        @if ($item->is_approve === null)
+                            Belum Disetujui
+                        @elseif ($item->is_approve === 'Setuju')
+                            Sudah Disetujui
+                        @else
+                            Ditolak
+                        @endif
+                    </td>
+                    <td>Rp. {{ number_format($item->price) }}</td>
+                </tr>
+            @endforeach
+            <tr>
+                <th colspan="5">Total Biaya</th>
+                <td style="text-align: right;">Rp. {{ number_format($total_pengeluaran) }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
 </body>
 </html>

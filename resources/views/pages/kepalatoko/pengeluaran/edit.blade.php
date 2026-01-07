@@ -17,7 +17,7 @@
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
                 <!-- Search form -->
-                <x-search-form placeholder="Cari berdasarkan nama pengeluaran" />
+                {{-- <x-search-form placeholder="Cari berdasarkan nama pengeluaran" /> --}}
 
                 <!-- Create invoice button -->
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white">
@@ -95,6 +95,15 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="price">Biaya</label>
                                     <input id="price" name="price" class="form-input input-currency w-full px-2 py-1" type="text" value="{{ $item->price }}"/>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="tipe">Tipe <span class="text-rose-500">*</span></label>
+                                    <select id="tipe" name="tipe" class="form-select text-sm py-1 w-full" required>
+                                        <option selected value="">Pilih Tipe</option>
+                                        <option value="0" {{ $item->tipe == 0 ? 'selected' : '' }}>Operasional</option>
+                                        <option value="1" {{ $item->tipe == 1 ? 'selected' : '' }}>Servis</option>
+                                        <option value="2" {{ $item->tipe == 2 ? 'selected' : '' }}>Penjualan</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="users_id">Akun</label>
