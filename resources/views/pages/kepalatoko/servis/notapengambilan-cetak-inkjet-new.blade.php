@@ -32,6 +32,7 @@
 
         /* Borders Helpers */
         .b-top { border-top: 1px solid #000; }
+        .b-top2 { border-top: 2px solid #000; }
         .b-bottom { border-bottom: 1px solid #000; }
         .b-left { border-left: 1px solid #000; }
         .b-right { border-right: 1px solid #000; }
@@ -272,7 +273,7 @@
 
             @if (($items->uang_muka != null && $items->uang_muka != 0) && ($items->diskon != null && $items->diskon != 0))
                 <tr class="b-right">
-                    <td class="b-left row-line">Tindakan Servis</td>
+                    <td class="b-left row-line b-bottom">Tindakan Servis</td>
                     <td class="capital row-line">{{ $tindakanList() }}</td>
                     <td class="b-left row-line"></td>
                     <td class="row-line"></td>
@@ -301,7 +302,7 @@
 
             @elseif (($items->uang_muka != null && $items->uang_muka != 0) && ($items->diskon == null || $items->diskon == 0))
                 <tr class="b-right">
-                    <td class="b-left row-line">Tindakan Servis</td>
+                    <td class="b-left row-line b-bottom">Tindakan Servis</td>
                     <td class="capital row-line">{{ $tindakanList() }}</td>
                     {{ $rincianBiaya() }}
                     <td class="b-left row-line">Uang Muka</td>
@@ -320,7 +321,7 @@
 
             @elseif (($items->diskon != null && $items->diskon != 0) && ($items->uang_muka == null || $items->uang_muka == 0))
                 <tr class="b-right">
-                    <td class="b-left row-line">Tindakan Servis</td>
+                    <td class="b-left row-line b-bottom">Tindakan Servis</td>
                     <td class="capital row-line">{{ $tindakanList() }}</td>
                     {{ $rincianBiaya() }}
                     <td class="b-left row-line">Diskon</td>
@@ -356,6 +357,9 @@
                     @endif
                 </tr>
             @endif
+            <tr>
+                <td class="b-top2" colspan="6">    </td>
+            </tr>
         </tbody>
     </table>
 
