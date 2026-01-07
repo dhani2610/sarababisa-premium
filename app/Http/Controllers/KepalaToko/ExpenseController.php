@@ -32,7 +32,11 @@ class ExpenseController extends Controller
         $query = Expense::with('user')
             ->where('cabang_id', getCabangId())
             ->orderByRaw('is_approve IS NULL DESC') // Pending di atas
-            ->orderBy('created_at', 'desc');
+            // ->orderBy('created_at', 'desc')
+            ->orderByDesc('updated_at')
+            ->latest()
+            ->skip($offset)
+            ->take($limit);
 
         if ($request->filled('tipe')) {
             $query->where('tipe', $request->tipe);

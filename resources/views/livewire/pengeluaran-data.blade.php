@@ -135,7 +135,7 @@
            
             
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
-                <h2 class="font-semibold text-slate-800">Semua Pengeluaran <span class="text-slate-400 font-medium" id="total-count">0</span></h2>
+                <h2 class="font-semibold text-slate-800">Semua Pengeluaran <span class="text-slate-400 font-medium">{{  $expenses_count  }}</span></h2>
                 <div class="relative inline-flex">
                     <div class="table-items-action hidden">
                         <div class="flex items-center">
@@ -248,16 +248,14 @@
             var table = $('#pengeluaran-table').DataTable({
                 processing: false,
                 serverSide: false,
-                ajax: "{{ route('pengeluaran.data') }}",
-                   ajax: {
-                    url: "{{ route('pengeluaran.data') }}",
-                    data: function (d) {
-                        d.tipe = $('#filter-tipe').val(); 
-                    }
-                },
                 columns: [
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
-                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                    {
+                        data: null,
+                        render: function (data, type, row, meta) {
+                            return meta.row + 1; 
+                        }
+                    },
                     { data: 'created_at', name: 'created_at' },
                     { data: 'user_name', name: 'user.name' },
                     { data: 'name', name: 'name' },
@@ -266,7 +264,7 @@
                     { data: 'is_approve', name: 'is_approve' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                 ],
-                order: [[1, 'asc']], // Urut berdasarkan tanggal
+                order: [[0, 'asc']], // Urut berdasarkan tanggal
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
                     search: "Cari:",
@@ -279,15 +277,69 @@
                 }
             });
 
-            table.on('xhr', function () {
-                var json = table.ajax.json();
+            let batchSize = 200;
+            let offset = 0;
+            let isLoading = false;
+            let totalSet = false;
 
-                $('#total-count').text(json.recordsFiltered);
-            });
-            
+
+            function loadBatch() {
+                if (isLoading) return;
+
+                isLoading = true;
+                $('#filter-tipe').prop('disabled', true);
+                $('#loading-info').removeClass('hidden');
+
+                $.ajax({
+                    url: "{{ route('pengeluaran.data') }}",
+                    data: {
+                        offset: offset,
+                        limit: batchSize,
+                        tipe: $('#filter-tipe').val()
+                    },
+                    success: function (res) {
+
+                        if (!totalSet) {
+                            $('#total-count').text(res.total);
+                            totalSet = true;
+                        }
+
+                        if (res.data.length === 0) {
+                            isLoading = false;
+                            $('#filter-tipe').prop('disabled', false);
+                            $('#loading-info').addClass('hidden');
+                            return;
+                        }
+
+                        table.rows.add(res.data).draw(false);
+                        offset += batchSize;
+
+                        isLoading = false;
+
+                        // lanjut batch berikutnya (smooth)
+                        setTimeout(loadBatch, 80);
+                    }
+                });
+            }
+
+
+            // mulai load pertama
+            loadBatch();
+
             $('#filter-tipe').on('change', function () {
-                table.ajax.reload();
+                if (isLoading) {
+                    alert('Data masih dimuat, tunggu sampai selesai');
+                    return;
+                }
+
+                // reset
+                table.clear().draw();
+                offset = 0;
+                totalSet = false;
+
+                loadBatch();
             });
+
 
             // 4. Logic Checkbox & Bulk Actions
             function attachCheckboxHandlers() {
