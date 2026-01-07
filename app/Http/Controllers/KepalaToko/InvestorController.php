@@ -12,6 +12,7 @@ use App\Models\OrderDetail;
 use App\Models\Budget;
 use App\Models\Expense;
 use App\Models\Incident;
+use App\Models\User;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
 
@@ -109,6 +110,18 @@ class InvestorController extends Controller
         // 3. Hitung Total Keseluruhan untuk Footer
         $totalSisaProfit = $dataCollection->sum('sisa_profit');
 
+        $userInvestor = User::where('cabang_id', getCabangId())->where('role', 'Investor')->first();
+        if ($userInvestor) {
+            $persenInvestor = $userInvestor->persen_investor ?? 0;
+        } else {
+            $persenInvestor = 0;
+        }
+
+        $pembagiPersen = 100 - $persenInvestor;
+
+        $shareHF       = $totalSisaProfit * ($pembagiPersen / 100);
+        $shareInvestor = $totalSisaProfit * ($persenInvestor / 100);
+
         // 4. Return Yajra DataTables
         return DataTables::of($dataCollection)
             ->addIndexColumn()
@@ -122,6 +135,8 @@ class InvestorController extends Controller
             ->editColumn('result', fn($row) => $row['result'] . '%')
 
             // Kirim data totalan ke JSON response agar bisa diambil JS Footer
+
+
             ->with([
                 'total_transaksi'   => $dataCollection->sum('transaksi'),
                 'total_omset'       => number_format($dataCollection->sum('omset'), 0, ',', '.'),
@@ -131,8 +146,10 @@ class InvestorController extends Controller
                 'total_insiden'     => number_format($dataCollection->sum('insiden'), 0, ',', '.'),
                 'total_sisa_profit' => number_format($totalSisaProfit, 0, ',', '.'),
                 // Hitung bagi hasil
-                'share_hf'          => number_format($totalSisaProfit * 0.60, 0, ',', '.'), // 60%
-                'share_investor'    => number_format($totalSisaProfit * 0.40, 0, ',', '.'), // 40%
+                'share_hf'          => number_format($shareHF, 0, ',', '.'), // 60%
+                'share_investor'    => number_format($shareInvestor, 0, ',', '.'), // 40%
+                'pembagiPersen'     => $pembagiPersen, // 40%
+                'persenInvestor'     => $persenInvestor, // 40%
             ])
             ->make(true);
     }

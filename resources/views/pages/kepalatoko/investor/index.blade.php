@@ -73,14 +73,14 @@
 
                         <tr>
                             <td colspan="2" class="border-none"></td>
-                            <td class="px-2 py-2 border border-slate-300 text-center bg-white">HF</td>
+                            <td class="px-2 py-2 border border-slate-300 text-center bg-white">TOKO</td>
                             <td class="px-2 py-2 border border-slate-300 text-center bg-white">INVESTOR</td>
                             <td colspan="6" class="border-none"></td>
                         </tr>
                         <tr>
                             <td colspan="2" class="border-none"></td>
-                            <td class="px-2 py-1 border border-slate-300 text-center bg-white font-normal">60%</td>
-                            <td class="px-2 py-1 border border-slate-300 text-center bg-white font-normal">40%</td>
+                            <td class="px-2 py-1 border border-slate-300 text-center bg-white font-normal persen-toko">60%</td>
+                            <td class="px-2 py-1 border border-slate-300 text-center bg-white font-normal persen-investor">40%</td>
                             <td colspan="6" class="border-none"></td>
                         </tr>
                         <tr>
@@ -158,6 +158,9 @@
                         // Mengisi Baris Bagi Hasil (HF & Investor)
                         $('#val-hf').text('Rp ' + json.share_hf);
                         $('#val-investor').text('Rp ' + json.share_investor);
+
+                        $('.persen-toko').text(json.pembagiPersen+'%');
+                        $('.persen-investor').text(json.persenInvestor+'%');
                     }
                 }
             });

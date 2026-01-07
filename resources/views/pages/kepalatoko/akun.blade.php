@@ -113,7 +113,14 @@
                                             </select>
                                         </div>
 
-                                        <div id="shoft_input" style="display: none">
+                                        <div id="persen_investor_input" style="display: none">
+                                            <label class="block text-sm font-medium mb-1" for="persen_investor">Persentase Pembagian <span
+                                                    class="text-rose-500">*</span></label>
+                                            <input id="persen_investor" name="persen_investor" class="form-input w-full px-2 py-1"
+                                                type="number" required />
+                                        </div>
+
+                                        <div id="shift_input" style="display: none">
                                             <label class="block text-sm font-medium mb-1" for="shift_id">Shift</label>
                                             <select id="shift_id" name="shift_id"
                                                 class="form-select text-sm py-1 w-full">
@@ -395,6 +402,9 @@
                                 <div class="font-semibold text-left">PDF Investor</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Persen Pembagian Investor</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Shift</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -431,7 +441,8 @@
         const spesialisInput = document.getElementById('spesialis-input');
         const bonusPersen = document.getElementById('bonus-persen');
         const bonusInterfaceInput = document.getElementById('bonus-interface-input');
-        const ShiftInput = document.getElementById('shoft_input');
+        const ShiftInput = document.getElementById('shift_input');
+        const persenInvestorInput = document.getElementById('persen_investor_input');
 
         if (role === 'Investor') {
             extraFields.style.display = 'none';
@@ -440,6 +451,7 @@
             spesialisInput.style.display = 'none';
             bonusInterfaceInput.style.display = 'none';
             ShiftInput.style.display = 'none';
+            persenInvestorInput.style.display = 'block';
         } else if (role === 'Kepala Toko') {
             extraFields.style.display = 'none';
             uploadInvestor.style.display = 'none';
@@ -447,6 +459,7 @@
             spesialisInput.style.display = 'none';
             ShiftInput.style.display = 'none';
             bonusInterfaceInput.style.display = 'none';
+            persenInvestorInput.style.display = 'none';
         } else if (role === 'Admin Toko') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
@@ -454,6 +467,7 @@
             spesialisInput.style.display = 'none';
             bonusInterfaceInput.style.display = 'none';
             ShiftInput.style.display = 'block';
+            persenInvestorInput.style.display = 'none';
         } else if (role === 'Teknisi') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
@@ -462,6 +476,7 @@
             bonusPersen.style.display = 'block';
             bonusInterfaceInput.style.display = 'block';
             ShiftInput.style.display = 'block';
+            persenInvestorInput.style.display = 'none';
         } else if (role === 'Sales') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
@@ -470,6 +485,7 @@
             bonusPersen.style.display = 'block';
             bonusInterfaceInput.style.display = 'none';
             ShiftInput.style.display = 'block';
+            persenInvestorInput.style.display = 'none';
         }
     }
 
@@ -544,6 +560,7 @@
                         { data: 'hak_akses', name: 'role' }, // Searchable by role
                         { data: 'persen', name: 'persen' },
                         { data: 'pdf_investor', name: 'pdf_investor', orderable: false, searchable: false },
+                        { data: 'persen_investor', name: 'persen_investor' },
                         { data: 'shift_name', name: 'shift.nama_shift' },
                         { data: 'foto_ktp', name: 'foto_ktp', orderable: false, searchable: false },
                         { data: 'foto_kk', name: 'foto_kk', orderable: false, searchable: false },

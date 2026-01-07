@@ -126,6 +126,9 @@ class AkunController extends Controller
                 }
                 return '-';
             })
+            ->addColumn('persen_investor', function ($row) {
+                return '<div class="font-medium">' . ($row->persen_investor ?? '0') . '%</div>';
+            })
             ->addColumn('shift_name', function ($row) {
                 return '<div class="font-medium">' . ($row->shift ? e($row->shift->nama_shift) : '-') . '</div>';
             })
@@ -200,7 +203,7 @@ class AkunController extends Controller
                 ';
             })
             // Tambahkan nama kolom baru ke rawColumns agar HTML link terbaca
-            ->rawColumns(['checkbox', 'name', 'username', 'bagian_teknisi', 'nik', 'alamat', 'nomor_hp', 'hak_akses', 'persen', 'pdf_investor', 'shift_name', 'foto_ktp', 'foto_kk', 'foto_ijasah', 'dokumen_lain', 'aksi'])
+            ->rawColumns(['checkbox', 'name', 'username', 'bagian_teknisi', 'nik', 'alamat', 'nomor_hp', 'hak_akses', 'persen', 'pdf_investor','persen_investor', 'shift_name', 'foto_ktp', 'foto_kk', 'foto_ijasah', 'dokumen_lain', 'aksi'])
             ->make(true);
     }
 
@@ -450,6 +453,7 @@ class AkunController extends Controller
             'persen' => $request->persen,
             'tipe_bonus_admin' => $request->tipe_bonus_admin,
             'nominal_bonus_admin' => $request->nominal_bonus_admin,
+            'persen_investor' => $request->persen_investor ?? 0,
             'shift_id' => $request->shift_id,
             'exp_date' => $langganan,
             'total_cabang' => $total_cabang,
@@ -512,6 +516,7 @@ class AkunController extends Controller
             'alamat' => $request->alamat,
             'persen' => $request->persen,
             'tipe_bonus_admin' => $request->tipe_bonus_admin,
+            'persen_investor' => $request->persen_investor ?? 0,
             'nominal_bonus_admin' => $request->nominal_bonus_admin,
             'shift_id' => $request->shift_id,
             'exp_date' => $langganan,
