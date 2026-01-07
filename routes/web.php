@@ -3,6 +3,7 @@
 use App\Http\Controllers\KepalaToko\ProdukController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\RincianInvestController;
+use App\Http\Controllers\KepalaToko\InvestorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\MasterAbsensi;
 
@@ -401,6 +402,9 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     ->name('transaksi-servis.update-pin-pola');
 
 
+    Route::get('investor/pembagian-hasil', [InvestorController::class, 'index'])->name('investor.index');
+    Route::get('investor/pembagian-hasil/data', [InvestorController::class, 'getData'])->name('investor.data');
+
     Route::get('rincian-invest', [RincianInvestController::class, 'index'])->name('rincian-invest.index');
     Route::post('rincian-invest', [RincianInvestController::class, 'store'])->name('rincian-invest.store');
     Route::put('rincian-invest/{id}', [RincianInvestController::class, 'update'])->name('rincian-invest.update');
@@ -428,9 +432,9 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::resource('master/master-jenis-barang', KepalaTokoMasterJenisBarangController::class);
 
 
-    Route::get('master-warna/data', [KepalaTokoMasterWarnaController::class, 'getData'])->name('master-warna.data');
 
     Route::post('master-warna/delete-batch', [KepalaTokoMasterWarnaController::class, 'deleteBatch'])->name('master-warna.delete-batch');
+    Route::get('master-warna/data', [KepalaTokoMasterWarnaController::class, 'getData'])->name('master-warna.data');
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
 
 

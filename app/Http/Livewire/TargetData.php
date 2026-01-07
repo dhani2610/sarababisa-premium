@@ -28,6 +28,8 @@ class TargetData extends Component
     public function render()
     {
         $targets_count = Target::where('cabang_id',getCabangId())->get()->count();
+        // $targets_count = Target::where('cabang_id',getCabangId())->get();
+        // dd($targets_count);
         return view('livewire.target-data', [
             'targets_count' => $targets_count,
             'targets' => $this->search === null ?
