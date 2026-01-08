@@ -288,6 +288,12 @@
                 $('.selectjs4').select2({
                     width: '100%'
                 });
+                $('.selectjs5').select2({
+                    width: '100%'
+                });
+                $('.selectjs6').select2({
+                    width: '100%'
+                });
 
                 $('#selectjs3').select2();
                 $('#selectjs5').select2();
@@ -299,6 +305,8 @@
             $(function() {
                 $(document).on('change', '#brands_id', function() {
                     var brands_id = $(this).val();
+                    console.log(brands_id);
+
                     $.ajax({
                         url: "{{ route('get-modelserie') }}",
                         type: "GET",
@@ -334,6 +342,28 @@
                                     '</option>';
                             });
                             $('#model').html(html);
+                        }
+                    })
+                });
+            });
+        </script>
+        <script type="text/javascript">
+            $(function() {
+                $(document).on('change', '#brands_ids', function() {
+                    var brands_id = $(this).val();
+                    $.ajax({
+                        url: "{{ route('get-modelserie') }}",
+                        type: "GET",
+                        data: {
+                            brands_id: brands_id
+                        },
+                        success: function(data) {
+                            var html = '<option value="">Pilih Model Seri</option>';
+                            $.each(data, function(key, v) {
+                                html += '<option value=" ' + v.id + ' "> ' + v.name +
+                                    '</option>';
+                            });
+                            $('#model_series_ids').html(html);
                         }
                     })
                 });

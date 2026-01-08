@@ -542,7 +542,7 @@
                                             </label>
 
                                             <select name="types_id"
-                                                class="form-select text-sm py-1 w-full manual-select" required>
+                                                class="form-select selectjs5 text-sm py-1 w-full manual-select" required>
                                                 @foreach ($types as $type)
                                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                                                 @endforeach
@@ -565,8 +565,8 @@
                                                 Merek <span class="text-rose-500">*</span>
                                             </label>
 
-                                            <select name="brands_id"
-                                                class="form-select text-sm py-1 w-full manual-select" required>
+                                            <select name="brands_id" id="brands_ids"
+                                                class="form-select text-sm py-1 w-full selectjs6 manual-select" required>
                                                 <option value="">Pilih Merek</option>
                                                 @foreach ($brands as $brand)
                                                     <option value="{{ $brand->id }}">{{ $brand->name }}</option>
@@ -590,7 +590,7 @@
                                                 Model Seri <span class="text-rose-500">*</span>
                                             </label>
 
-                                            <select name="model_series_id"
+                                            <select name="model_series_id" id="model_series_ids"
                                                 class="form-select text-sm py-1 w-full selectjs4 manual-select" required>
                                                 <option value="">Pilih Model Seri</option>
                                             </select>
