@@ -225,13 +225,13 @@ if (!function_exists('getTypeTeknisiMultiTransaksi')) {
     }
 }
 if (!function_exists('insertManualPelanggan')) {
-    function insertManualPelanggan($data){
+    function insertManualPelanggan($data,$tlp,$kategori,$alamat){
         try {
             $new = new Customer();
             $new->nama = $data;
-            $new->kategori = 'User';
-            $new->nomor_hp = 0;
-            $new->alamat = '-';
+            $new->kategori = $kategori;
+            $new->nomor_hp = $tlp;
+            $new->alamat = $alamat;
             $new->cabang_id = getCabangId();
 
             if ($new->save()) {

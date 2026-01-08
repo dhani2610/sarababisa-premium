@@ -43,7 +43,7 @@ class TransaksiServisLangsungController extends Controller
 
 
         if (empty($request->customers_id)) {
-            $insertCustomer = insertManualPelanggan($request->customers_manual);
+            $insertCustomer = insertManualPelanggan($request->customers_manual,$request->customers_tlp_manual,$request->customers_kategori_manual,$request->customers_alamat_manual);
             if ($insertCustomer) {
                 $request->customers_id = $insertCustomer;
             }
@@ -66,7 +66,7 @@ class TransaksiServisLangsungController extends Controller
                 $request->model_series_id = $insertModelSeri;
             }
         }
-        
+
         $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99')).rand(10,90);
         $nama_pelanggan = Customer::find($request->customers_id);
 

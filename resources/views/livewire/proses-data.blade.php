@@ -222,21 +222,45 @@
                                             </label>
 
                                             <select name="customers_id" id="customers_select"
-                                                class="form-select text-sm  selectjs2 py-1 w-full" required>
+                                                class="form-select text-sm selectjs2 py-1 w-full" required>
                                                 <option value="">Pilih Pelanggan</option>
                                                 @foreach ($customers as $item)
                                                     <option value="{{ $item->id }}">{{ $item->nama }} {{ $item->nomor_hp }}</option>
                                                 @endforeach
                                             </select>
 
-                                            <input type="text" name="customers_manual"
-                                                id="customers_manual"
-                                                class="form-input text-sm py-1 w-full mt-2 hidden"
-                                                placeholder="Isi nama pelanggan manual">
+                                            <div id="manual_container_tab1" class="hidden mt-2 space-y-2">
+                                                <input type="text" name="customers_manual"
+                                                    class="form-input text-sm py-1 w-full"
+                                                    placeholder="Isi nama pelanggan manual">
+
+                                                <label class="block text-sm font-medium mb-1">
+                                                    Telepon Pelanggan <span class="text-rose-500">*</span>
+                                                </label>
+                                                <input type="text" name="customers_tlp_manual"
+                                                    class="form-input text-sm py-1 w-full"
+                                                    placeholder="Isi nomor telepon pelanggan manual">
+
+                                                <label class="block text-sm font-medium mb-1">
+                                                    Kategori Pelanggan <span class="text-rose-500">*</span>
+                                                </label>
+                                                <select name="customers_kategori_manual" class="form-select text-sm py-1 w-full">
+                                                    <option value="" selected disabled>{{ __('Pilih kategori') }}</option>
+                                                    <option value="User">User</option>
+                                                    <option value="Toko">Toko</option>
+                                                </select>
+
+                                                <label class="block text-sm font-medium mb-1">
+                                                    Alamat Pelanggan <span class="text-rose-500">*</span>
+                                                </label>
+                                                <input type="text" name="customers_alamat_manual"
+                                                    class="form-input text-sm py-1 w-full"
+                                                    placeholder="Isi alamat pelanggan manual">
+                                            </div>
 
                                             <label class="inline-flex items-center mt-1 text-sm">
                                                 <input type="checkbox" class="form-checkbox"
-                                                    onchange="toggleManual(this, 'customers_select', 'customers_manual')">
+                                                    onchange="toggleManual(this, 'customers_select', 'manual_container_tab1')">
                                                 <span class="ml-2">Isi manual <small class="text-rose-500">*data akan auto masuk ke master data</small></span>
                                             </label>
                                         </div>
@@ -475,10 +499,35 @@
                                                 @endforeach
                                             </select>
 
-                                            <input type="text"
-                                                name="customers_manual"
-                                                class="form-input text-sm py-1 w-full mt-2 hidden manual-input"
-                                                placeholder="Isi nama pelanggan manual">
+                                            <div class="manual-input hidden mt-2 space-y-2">
+                                                <input type="text" name="customers_manual"
+                                                    class="form-input text-sm py-1 w-full"
+                                                    placeholder="Isi nama pelanggan manual">
+
+                                                <label class="block text-sm font-medium mb-1">
+                                                    Telepon Pelanggan <span class="text-rose-500">*</span>
+                                                </label>
+
+                                                <input type="text" name="customers_tlp_manual" id="customers_tlp_manual"
+                                                    class="form-input text-sm py-1 w-full"
+                                                    placeholder="Isi nomor telepon pelanggan manual">
+
+                                                <label class="block text-sm font-medium mb-1">
+                                                    Kategori Pelanggan <span class="text-rose-500">*</span>
+                                                </label>
+                                                <select id="kategori" name="customers_kategori_manual" class="form-select text-sm py-1 w-full">
+                                                    <option value="" selected disabled>{{ __('Pilih kategori') }}</option>
+                                                    <option value="User">User</option>
+                                                    <option value="Toko">Toko</option>
+                                                </select>
+
+                                                <label class="block text-sm font-medium mb-1">
+                                                    Alamat Pelanggan <span class="text-rose-500">*</span>
+                                                </label>
+                                                <input type="text" name="customers_alamat_manual"
+                                                    class="form-input text-sm py-1 w-full"
+                                                    placeholder="Isi alamat pelanggan manual">
+                                            </div>
 
                                             <label class="inline-flex items-center mt-1 text-sm">
                                                 <input type="checkbox" class="form-checkbox manual-toggle">
@@ -1052,41 +1101,74 @@
 <script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.min.js"></script>
 <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 <script>
-    function toggleManual(checkbox, selectId, inputId) {
+    // FUNGSI UNTUK TAB 1 (ID Based)
+    function toggleManual(checkbox, selectId, containerId) {
         const select = document.getElementById(selectId);
-        const input  = document.getElementById(inputId);
-
+        const container = document.getElementById(containerId);
         const select2Container = select.nextElementSibling; // .select2-container
 
         if (checkbox.checked) {
-            // hide select2 UI
-            select2Container.classList.add('hidden');
+            // Sembunyikan Select2 / Select Biasa
+            if(select2Container && select2Container.classList.contains('select2-container')) {
+                select2Container.classList.add('hidden');
+            } else {
+                select.classList.add('hidden');
+            }
             select.required = false;
             select.disabled = true;
 
-            // show manual input
-            input.classList.remove('hidden');
-            input.required = true;
-            input.value = '';
+            // Tampilkan Container Manual
+            container.classList.remove('hidden');
+
+            // Cari semua input/select di dalam container manual & set required
+            const inputs = container.querySelectorAll('input, select');
+            inputs.forEach(el => {
+                el.required = true;
+                el.value = ''; // Reset value saat dibuka
+            });
+
+            // Fallback jika container itu sendiri adalah input (untuk Merek/Tipe lama)
+            if(container.tagName === 'INPUT') {
+                container.required = true;
+                container.value = '';
+            }
+
         } else {
-            // show select2 UI
-            select2Container.classList.remove('hidden');
+            // Tampilkan Select2 / Select Biasa
+            if(select2Container && select2Container.classList.contains('select2-container')) {
+                select2Container.classList.remove('hidden');
+            } else {
+                select.classList.remove('hidden');
+            }
             select.required = true;
             select.disabled = false;
 
-            // hide manual input
-            input.classList.add('hidden');
-            input.required = false;
-            input.value = '';
+            // Sembunyikan Container Manual
+            container.classList.add('hidden');
+
+            // Matikan required di input manual
+            const inputs = container.querySelectorAll('input, select');
+            inputs.forEach(el => {
+                el.required = false;
+                el.value = '';
+            });
+
+             // Fallback jika container itu sendiri adalah input
+             if(container.tagName === 'INPUT') {
+                container.required = false;
+                container.value = '';
+            }
         }
     }
 
+    // FUNGSI UNTUK TAB 2 (Class Based)
     document.addEventListener('change', function (e) {
         if (!e.target.classList.contains('manual-toggle')) return;
 
         const wrapper = e.target.closest('.manual-wrapper');
         const select  = wrapper.querySelector('.manual-select');
-        const input   = wrapper.querySelector('.manual-input');
+        // manual-input sekarang bisa berupa DIV pembungkus atau INPUT langsung
+        const manualContainer = wrapper.querySelector('.manual-input');
 
         const select2Container =
             select.nextElementSibling &&
@@ -1095,215 +1177,52 @@
                 : null;
 
         if (e.target.checked) {
-            // hide select / select2
+            // HIDE Select
             if (select2Container) {
                 select2Container.classList.add('hidden');
                 $(select).val(null).trigger('change');
             } else {
                 select.classList.add('hidden');
             }
-
             select.disabled = true;
             select.required = false;
 
-            // show manual input
-            input.classList.remove('hidden');
-            input.required = true;
-            input.value = '';
+            // SHOW Manual Container
+            manualContainer.classList.remove('hidden');
+
+            // Set Required untuk semua input didalamnya
+            const inputs = manualContainer.querySelectorAll('input, select');
+            if(inputs.length > 0) {
+                 inputs.forEach(el => { el.required = true; el.value = ''; });
+            } else {
+                 // Jika manualContainer itu sendiri adalah input (kasus lama)
+                 manualContainer.required = true;
+                 manualContainer.value = '';
+            }
+
         } else {
-            // show select / select2
+            // SHOW Select
             if (select2Container) {
                 select2Container.classList.remove('hidden');
             } else {
                 select.classList.remove('hidden');
             }
-
             select.disabled = false;
             select.required = true;
 
-            // hide manual input
-            input.classList.add('hidden');
-            input.required = false;
-            input.value = '';
+            // HIDE Manual Container
+            manualContainer.classList.add('hidden');
+
+            // Unset Required
+            const inputs = manualContainer.querySelectorAll('input, select');
+            if(inputs.length > 0) {
+                 inputs.forEach(el => { el.required = false; el.value = ''; });
+            } else {
+                 manualContainer.required = false;
+                 manualContainer.value = '';
+            }
         }
     });
-    // 1. Register Plugin
-    FilePond.registerPlugin(
-        FilePondPluginFileValidateType,
-        FilePondPluginImageResize,
-        FilePondPluginImageTransform,
-        FilePondPluginImagePreview
-    );
-
-    let pondMasuk, pondSelesai;
-    // Variabel untuk menyimpan instance Viewer.js (untuk zoom)
-    let viewer;
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // 2. Config Dasar FilePond
-        const baseConfig = {
-            allowMultiple: true,
-            acceptedFileTypes: ['image/jpeg', 'image/png', 'image/webp'], // Batasi tipe file agar transform jalan
-            labelIdle: 'Drag & Drop gambar atau <span class="filepond--label-action">Cari</span>',
-            credits: false,
-
-            // --- KONFIGURASI RESIZE (DIMENSI) ---
-            allowImageResize: true,
-            imageResizeTargetWidth: 1280,
-            imageResizeTargetHeight: 1280,
-            imageResizeMode: 'contain',
-            imageResizeUpscale: false,
-
-            // --- KONFIGURASI TRANSFORM (KOMPRESI) ---
-            allowImageTransform: true,
-            imageTransformOutputQuality: 70, // Turunkan sedikit ke 70 agar size lebih kecil
-            imageTransformOutputMimeType: 'image/jpeg', // Paksa convert ke JPEG (lebih kecil dari PNG)
-
-            // Fix untuk orientasi foto HP (EXIF data)
-            imageTransformOutputStripImageHead: false,
-
-            // Preview
-            imagePreviewHeight: 150,
-
-            // Event Zoom Viewer
-            onactivatefile: (file) => {
-                let imageUrl = file.getMetadata('url');
-                if (!imageUrl && file.file) {
-                    imageUrl = URL.createObjectURL(file.file);
-                }
-                if (imageUrl) showImagePopup(imageUrl);
-            }
-        };
-
-        // 3. Create Instance
-        const inputMasuk = document.querySelector('.filepond-masuk');
-        const inputSelesai = document.querySelector('.filepond-selesai');
-
-        pondMasuk = FilePond.create(inputMasuk, baseConfig);
-        pondSelesai = FilePond.create(inputSelesai, baseConfig);
-
-        // 4. Event Listener Tombol Buka Modal
-        $(document).on('click', '.btn-upload-foto', function() {
-            let id = $(this).data('id');
-            $('#current-servis-id').val(id);
-            $('#modal-upload-foto').removeClass('hidden');
-
-            // Reset FilePond
-            pondMasuk.removeFiles();
-            pondSelesai.removeFiles();
-
-            // Setup Server Config (Dynamic URL based on ID)
-            setupPondServer(pondMasuk, id, 'masuk');
-            setupPondServer(pondSelesai, id, 'selesai');
-
-            // Load Existing Images
-            loadExistingImages(id);
-        });
-    });
-
-    // --- Config AJAX Server (Upload, Delete, & LOAD Preview) ---
-    function setupPondServer(pondInstance, id, type) {
-        pondInstance.setOptions({
-            server: {
-                // 1. Upload File Baru
-                process: {
-                    url: `/servis/transaksi-servis/${id}/upload-foto`,
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                    ondata: (formData) => {
-                        formData.append('type', type);
-                        return formData;
-                    }
-                },
-
-                // 2. Hapus File yang BARU di-upload (belum direfresh page)
-                revert: {
-                    url: `/servis/transaksi-servis/${id}/delete-foto?type=${type}`,
-                    method: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-                },
-
-                // 3. Hapus File LAMA (yang diload dari database)
-                remove: (source, load, error) => {
-                    // source adalah nama file
-                    fetch(`/servis/transaksi-servis/${id}/delete-foto?type=${type}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'text/plain'
-                        },
-                        body: source
-                    }).then(() => {
-                        load(); // Beritahu FilePond penghapusan sukses
-                    }).catch((err) => {
-                        error('Gagal menghapus');
-                    });
-                },
-
-                // 4. LOAD PREVIEW (Kunci agar gambar muncul, bukan cuma nama)
-                load: (source, load, error, progress, abort, headers) => {
-                    // source disini adalah nama file dari database.
-                    // Kita fetch blob dari url public storage
-                    let myRequest = new Request(`/storage/servis/${source}`);
-
-                    fetch(myRequest).then(function(response) {
-                        response.blob().then(function(myBlob) {
-                            load(myBlob); // Masukkan blob gambar ke FilePond
-                        });
-                    }).catch((err) => {
-                        error('Gagal load gambar');
-                    });
-                }
-            }
-        });
-    }
-
-    // --- Load Existing Images ---
-    function loadExistingImages(id) {
-        fetch(`/servis/transaksi-servis/${id}/get-foto`)
-            .then(res => res.json())
-            .then(data => {
-                if(data.masuk) {
-                    pondMasuk.files = data.masuk;
-                }
-                if(data.selesai) {
-                    pondSelesai.files = data.selesai;
-                }
-            })
-            .catch(err => console.error("Gagal load foto", err));
-    }
-
-    // --- Fungsi Zoom Gambar (Viewer.js) ---
-    function showImagePopup(imageUrl) {
-        // Buat elemen gambar temporary hidden
-        const image = new Image();
-        image.src = imageUrl;
-
-        // Inisialisasi Viewer.js
-        const viewer = new Viewer(image, {
-            hidden: function () {
-                viewer.destroy(); // Hapus instance setelah ditutup
-            },
-            toolbar: {
-                zoomIn: 1,
-                zoomOut: 1,
-                oneToOne: 1,
-                reset: 1,
-                rotateLeft: 1,
-                rotateRight: 1,
-                flipHorizontal: 1,
-                flipVertical: 1,
-            },
-        });
-
-        // Tampilkan
-        viewer.show();
-    }
-
-    // --- Tutup Modal ---
-    function closeModalFoto() {
-        $('#modal-upload-foto').addClass('hidden');
-    }
 </script>
 <script>
     // --- DATA ITEM STANDAR (Berlaku untuk Tab 1 & Tab 2) ---

@@ -684,7 +684,7 @@ class TransaksiServisController extends Controller
         // dd($qc_masuk_final);
 
         if (empty($request->customers_id)) {
-            $insertCustomer = insertManualPelanggan($request->customers_manual);
+            $insertCustomer = insertManualPelanggan($request->customers_manual,$request->customers_tlp_manual,$request->customers_kategori_manual,$request->customers_alamat_manual);
             if ($insertCustomer) {
                 $request->customers_id = $insertCustomer;
             }
