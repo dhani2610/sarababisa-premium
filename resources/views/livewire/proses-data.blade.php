@@ -237,7 +237,7 @@
                                             <label class="inline-flex items-center mt-1 text-sm">
                                                 <input type="checkbox" class="form-checkbox"
                                                     onchange="toggleManual(this, 'customers_select', 'customers_manual')">
-                                                <span class="ml-2">Isi manual</span>
+                                                <span class="ml-2">Isi manual <small class="text-rose-500">*data akan auto masuk ke master data</small></span>
                                             </label>
                                         </div>
 
@@ -261,7 +261,7 @@
                                             <label class="inline-flex items-center mt-1 text-sm">
                                                 <input type="checkbox" class="form-checkbox"
                                                     onchange="toggleManual(this, 'types_id', 'types_manual')">
-                                                <span class="ml-2">Isi manual</span>
+                                                <span class="ml-2">Isi manual <small class="text-rose-500">*data akan auto masuk ke master data</small></span>
                                             </label>
                                         </div>
 
@@ -286,7 +286,7 @@
                                             <label class="inline-flex items-center mt-1 text-sm">
                                                 <input type="checkbox" class="form-checkbox"
                                                     onchange="toggleManual(this, 'brands_id', 'brands_manual')">
-                                                <span class="ml-2">Isi manual</span>
+                                                <span class="ml-2">Isi manual <small class="text-rose-500">*data akan auto masuk ke master data</small></span>
                                             </label>
                                         </div>
 
@@ -308,7 +308,7 @@
                                             <label class="inline-flex items-center mt-1 text-sm">
                                                 <input type="checkbox" class="form-checkbox"
                                                     onchange="toggleManual(this, 'model_series_id', 'model_series_manual')">
-                                                <span class="ml-2">Isi manual</span>
+                                                <span class="ml-2">Isi manual <small class="text-rose-500">*data akan auto masuk ke master data</small></span>
                                             </label>
                                         </div>
 
@@ -482,7 +482,7 @@
 
                                             <label class="inline-flex items-center mt-1 text-sm">
                                                 <input type="checkbox" class="form-checkbox manual-toggle">
-                                                <span class="ml-2">Isi manual</span>
+                                                <span class="ml-2">Isi manual <small class="text-rose-500">*data akan auto masuk ke master data</small></span>
                                             </label>
                                         </div>
 
@@ -506,7 +506,7 @@
 
                                             <label class="inline-flex items-center mt-1 text-sm">
                                                 <input type="checkbox" class="form-checkbox manual-toggle">
-                                                <span class="ml-2">Isi manual</span>
+                                                <span class="ml-2">Isi manual <small class="text-rose-500">*data akan auto masuk ke master data</small></span>
                                             </label>
                                         </div>
 
@@ -531,7 +531,7 @@
 
                                             <label class="inline-flex items-center mt-1 text-sm">
                                                 <input type="checkbox" class="form-checkbox manual-toggle">
-                                                <span class="ml-2">Isi manual</span>
+                                                <span class="ml-2">Isi manual <small class="text-rose-500">*data akan auto masuk ke master data</small></span>
                                             </label>
                                         </div>
 
@@ -553,7 +553,7 @@
 
                                             <label class="inline-flex items-center mt-1 text-sm">
                                                 <input type="checkbox" class="form-checkbox manual-toggle">
-                                                <span class="ml-2">Isi manual</span>
+                                                <span class="ml-2">Isi manual <small class="text-rose-500">*data akan auto masuk ke master data</small></span>
                                             </label>
                                         </div>
 
