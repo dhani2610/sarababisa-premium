@@ -1,7 +1,7 @@
 @section('title')
     Keranjang Sampah
 @endsection
- <style>
+    <style>
         .dataTables_wrapper .dataTables_length select{
             width: 68px!important;
         }
