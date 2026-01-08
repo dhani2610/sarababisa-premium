@@ -5,17 +5,30 @@ namespace App\Http\Controllers\KepalaToko;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables; // Tambahkan import ini
 
 class KategoriController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
-        return view('pages/kepalatoko/kategori/index');
+        // Jika request adalah Ajax (dari DataTables)
+        if ($request->ajax()) {
+            $data = Category::query();
+
+            return DataTables::of($data)
+                ->addIndexColumn() // Untuk nomor urut (DT_RowIndex)
+                ->editColumn('show_portal', function($row){
+                    return $row->show_portal == 1 ? 'Active' : 'Non Active';
+                })
+                ->addColumn('action', function($row){
+                    // Kita render view partial agar HTML popup sama persis & rapi
+                    return view('pages.kepalatoko.kategori.action', compact('row'))->render();
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        return view('pages.kepalatoko.kategori.index');
     }
 
     public function store(Request $request)
