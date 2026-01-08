@@ -82,7 +82,7 @@
                 </div>
             </div>
         </div>
-     
+
         <!-- Table -->
         <livewire:laporan-servis-pajak-data></livewire:laporan-servis-pajak-data>
 

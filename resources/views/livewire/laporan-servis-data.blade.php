@@ -1,13 +1,18 @@
+<style>
+    .dataTables_wrapper .dataTables_length select{
+        width: 68px!important;
+    }
+</style>
 <div>
     <div class="sm:flex sm:justify-between sm:items-center mt-5">
-        <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+        {{-- <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
             <select wire:model="paginate" id="" class="form-select mb-2 md:mb-0">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
             </select>
-        </div>
+        </div> --}}
 
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
@@ -104,7 +109,7 @@
                 </div>
             </div>
             <!-- Search form -->
-            <x-search-form placeholder="YYYY-MM-DD" />
+            {{-- <x-search-form placeholder="YYYY-MM-DD" /> --}}
 
         </div>
     </div>
@@ -115,10 +120,13 @@
         </header>
         <!-- Table -->
         <div class="overflow-x-auto">
-            <table class="table-auto w-full">
+            <table id="laporanServisTable" class="table-auto w-full">
                 <!-- Table header -->
                 <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                     <tr>
+                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            <div class="font-semibold text-left">No</div>
+                        </th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Tanggal Disetujui</div>
                         </th>
@@ -154,7 +162,7 @@
                 <!-- Table body -->
                 <tbody class="text-sm divide-y divide-slate-200">
                     <!-- Row -->
-                    @foreach($services as $item)
+                    {{-- @foreach($services as $item)
                         <tr>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ \Carbon\Carbon::parse($item->tgl_disetujui)->translatedFormat('d F Y') }}</div>
@@ -199,15 +207,80 @@
                                 </div>
                             </td>
                         </tr>
-                    @endforeach
+                    @endforeach --}}
                 </tbody>
             </table>
 
         </div>
     </div>
     <!-- Pagination -->
-    <div class="mt-8">
+    {{-- <div class="mt-8">
         {{ $services->links() }}
-    </div>
+    </div> --}}
 
 </div>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#laporanServisTable').DataTable({
+                processing: false,
+                serverSide: false,
+                columns: [
+                     {
+                        data: null,
+                        sortable: false,
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    { data: 'tgl_disetujui', name: 'tgl_disetujui' },
+                    { data: 'tgl_ambil', name: 'tgl_ambil' },
+                    { data: 'teknisi', name: 'user.name' },
+                    { data: 'kondisi_servis', name: 'kondisi_servis' },
+                    { data: 'tindakan_servis', name: 'tindakan_servis' },
+                    { data: 'modal_sparepart', name: 'modal_sparepart' },
+                    { data: 'biaya', name: 'biaya' },
+                    { data: 'diskon', name: 'diskon' },
+                    { data: 'cara_pembayaran', name: 'cara_pembayaran' },
+                    { data: 'profittoko', name: 'profittoko' },
+                ],
+                order: [[0, 'asc']],
+                language: {
+                    search: "Cari :",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                }
+            });
+            let batchSize = 200;
+            let offset = 0;
+            let loading = false;
+
+            function loadBatch() {
+                if (loading) return;
+                loading = true;
+
+                $.ajax({
+                    url: '{{ route('laporan-servis') }}?offset=' + offset + '&limit=' + batchSize,
+                    success: function(response) {
+                        if (response.data.length > 0) {
+                            table.rows.add(response.data).draw(false); // tambahkan data batch
+                            offset += batchSize;
+                            loading = false;
+                            setTimeout(loadBatch, 200); // lanjut batch berikutnya
+                        } else {
+                            console.log('Semua data sudah dimuat');
+                        }
+                    }
+                });
+            }
+            loadBatch();
+        });
+
+
+    </script>

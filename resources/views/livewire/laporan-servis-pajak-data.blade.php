@@ -1,3 +1,8 @@
+<style>
+    .dataTables_wrapper .dataTables_length select{
+        width: 68px!important;
+    }
+</style>
 <div>
     <div class="sm:flex sm:justify-between sm:items-center mt-5">
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
@@ -100,12 +105,15 @@
         </header>
         <!-- Table -->
         <div class="overflow-x-auto">
-            <table class="table-auto w-full">
+            <table id="pajakServisTable" class="table-auto w-full">
 
                 <!-- Table header -->
                 <thead
                     class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                     <tr>
+                        <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            <div class="font-semibold text-left">No</div>
+                        </th>
                         <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-semibold text-left">Tanggal Disetujui</div>
                         </th>
@@ -144,7 +152,7 @@
                 <!-- Table body -->
                 <tbody class="text-sm divide-y divide-slate-200">
                     <!-- Row -->
-                    @foreach ($services as $item)
+                    {{-- @foreach ($services as $item)
                         @php
                             $ppnRate = !empty($item->ppn) ? $item->ppn : 0;
                             $pajak = $item->biaya * ($ppnRate / 100);
@@ -209,15 +217,81 @@
                                 </div>
                             </td>
                         </tr>
-                    @endforeach
+                    @endforeach --}}
                 </tbody>
             </table>
 
         </div>
     </div>
     <!-- Pagination -->
-    <div class="mt-8">
+    {{-- <div class="mt-8">
         {{ $services->links() }}
-    </div>
+    </div> --}}
+
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#pajakServisTable').DataTable({
+                processing: false,
+                serverSide: false,
+                columns: [
+                    {
+                        data: null,
+                        sortable: false,
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    { data: 'tgl_disetujui', name: 'tgl_disetujui' },
+                    { data: 'tgl_ambil', name: 'tgl_ambil' },
+                    { data: 'teknisi', name: 'user.name' },
+                    { data: 'kondisi_servis', name: 'kondisi_servis' },
+                    { data: 'tindakan_servis', name: 'tindakan_servis' },
+                    { data: 'modal_sparepart', name: 'modal_sparepart' },
+                    { data: 'biaya', name: 'biaya' },
+                    { data: 'diskon', name: 'diskon' },
+                    { data: 'cara_pembayaran', name: 'cara_pembayaran' },
+                    { data: 'pajak_display', name: 'ppn', searchable: false },
+                    { data: 'grand_total_display', name: 'id', searchable: false }
+                ],
+                order: [[0, 'asc']],
+                language: {
+                    search: "Cari :",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                }
+            });
+
+            let batchSize = 200;
+            let offset = 0;
+            let loading = false;
+
+            function loadBatch() {
+                if (loading) return;
+                loading = true;
+
+                $.ajax({
+                    url: '{{ route('laporan-pajak-servis') }}?offset=' + offset + '&limit=' + batchSize,
+                    success: function(response) {
+                        if (response.data.length > 0) {
+                            table.rows.add(response.data).draw(false); // tambahkan data batch
+                            offset += batchSize;
+                            loading = false;
+                            setTimeout(loadBatch, 200); // lanjut batch berikutnya
+                        } else {
+                            console.log('Semua data sudah dimuat');
+                        }
+                    }
+                });
+            }
+            loadBatch();
+        });
+    </script>
 
 </div>

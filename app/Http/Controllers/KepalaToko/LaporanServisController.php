@@ -10,142 +10,156 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Expense;
 use App\Models\Incident;
+use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 class LaporanServisController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $currentMonth = now()->month;
         $currentYear = now()->year;
 
-        $omzethari = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('cabang_id', getCabangId())
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->whereDate('tgl_disetujui', today())
-            ->get()
-            ->sum('omzet');
-        $profithari = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('cabang_id', getCabangId())
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->whereDate('tgl_disetujui', today())
-            ->get()
-            ->sum('profittoko');
-        $total_hari = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('cabang_id', getCabangId())
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->whereDate('tgl_disetujui', today())
-            ->get()
-            ->count();
-        $omzetbulan = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('cabang_id', getCabangId())
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->get()
-            ->sum('omzet');
-        $profitbulan = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('cabang_id', getCabangId())
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->get()
-            ->sum('profittoko');
-        $total_bulan = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('cabang_id', getCabangId())
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->get()
-            ->count();
-        $omzettahun = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('cabang_id', getCabangId())
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->get()
-            ->sum('omzet');
-        $profittahun = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('cabang_id', getCabangId())
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->get()
-            ->sum('profittoko');
-        $total_tahun = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('cabang_id', getCabangId())
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->get()
-            ->count();
-        return view('pages/kepalatoko/laporan-servis', compact('omzethari', 'profithari', 'omzetbulan', 'profitbulan', 'omzettahun', 'profittahun','total_hari','total_bulan','total_tahun'));
+        // --- Logika AJAX DataTables ---
+        if ($request->ajax()) {
+
+            $limit = $request->get('limit', 200);
+            $offset = $request->get('offset', 0);
+            $data = ServiceTransaction::with('user')
+                ->where('cabang_id', getCabangId())
+                ->where('is_approve', 'Setuju')
+                ->whereIn('kondisi_servis', ['Sudah jadi', 'Tidak bisa', 'Dibatalkan'])
+                ->orderBy('tgl_disetujui', 'desc')
+                ->latest()
+                ->skip($offset)
+                ->take($limit)
+                ->get();
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->editColumn('tgl_disetujui', function($row) {
+                    return $row->tgl_disetujui ? Carbon::parse($row->tgl_disetujui)->translatedFormat('d F Y') : '-';
+                })
+                ->editColumn('tgl_ambil', function($row) {
+                    return $row->tgl_ambil ? Carbon::parse($row->tgl_ambil)->translatedFormat('d F Y') : '-';
+                })
+                ->addColumn('teknisi', function($row) {
+                    return $row->user ? $row->user->name : '<span class="text-red-600">Akun dihapus</span>';
+                })
+                ->editColumn('tindakan_servis', function($row) {
+                    if ($row->tindakan_servis) {
+                        $tindakan = json_decode($row->tindakan_servis);
+                        return is_array($tindakan) ? implode(', ', $tindakan) : $row->tindakan_servis;
+                    }
+                    return '-';
+                })
+                ->editColumn('modal_sparepart', fn($row) => number_format($row->modal_sparepart))
+                ->editColumn('biaya', fn($row) => number_format($row->biaya))
+                ->editColumn('diskon', fn($row) => number_format($row->diskon))
+                ->editColumn('profittoko', fn($row) => number_format($row->profittoko))
+                ->rawColumns(['teknisi'])
+                ->make(true);
+        }
+
+        // --- Logika Ringkasan Card (Tetap Sama) ---
+        $omzethari = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereDate('tgl_disetujui', today())->sum('omzet');
+        $profithari = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereDate('tgl_disetujui', today())->sum('profittoko');
+        $total_hari = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereDate('tgl_disetujui', today())->count();
+
+        $omzetbulan = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->sum('omzet');
+        $profitbulan = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->sum('profittoko');
+        $total_bulan = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->count();
+
+        $omzettahun = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->sum('omzet');
+        $profittahun = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->sum('profittoko');
+        $total_tahun = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->count();
+
+        $jumlah_total = ServiceTransaction::where('cabang_id', getCabangId())->where('is_approve', 'Setuju')->where('kondisi_servis', "Sudah jadi")->count();
+
+        return view('pages/kepalatoko/laporan-servis', compact(
+            'omzethari', 'profithari', 'total_hari',
+            'omzetbulan', 'profitbulan', 'total_bulan',
+            'omzettahun', 'profittahun', 'total_tahun',
+            'jumlah_total'
+        ));
     }
-    public function indexPajak()
+
+    public function indexPajak(Request $request)
     {
         $currentMonth = now()->month;
         $currentYear = now()->year;
+        $cabang_id = getCabangId();
 
-        $omzethari = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->where('cabang_id',getCabangId())
-            ->whereDate('tgl_disetujui', today())
-            ->where('ppn','>',0)
-            ->get()
-            ->sum('omzet');
-        $pajakhari = ServiceTransaction::with('serviceaction')
-        ->where('is_approve', 'Setuju')
-        ->whereYear('tgl_disetujui', $currentYear)
-        ->whereMonth('tgl_disetujui', $currentMonth)
-            ->where('cabang_id',getCabangId())
-        ->whereDate('tgl_disetujui', today())
-        ->get()
-        ->sum(function ($trx) {
-            $ppn = !empty($trx->ppn) ? $trx->ppn : 0;
-            return $trx->biaya * $ppn / 100; // hanya ambil nilai PPN
+        // === LOGIKA AJAX DATATABLES ===
+        if ($request->ajax()) {
+            $data = ServiceTransaction::with('user')
+                ->where('cabang_id', $cabang_id)
+                ->where('ppn', '>', 0)
+                ->where('is_approve', 'Setuju')
+                ->whereIn('kondisi_servis', ['Sudah jadi', 'Tidak bisa', 'Dibatalkan'])
+                ->orderBy('tgl_disetujui', 'desc');
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->editColumn('tgl_disetujui', function($row) {
+                    return $row->tgl_disetujui ? Carbon::parse($row->tgl_disetujui)->translatedFormat('d F Y') : '-';
+                })
+                ->editColumn('tgl_ambil', function($row) {
+                    return $row->tgl_ambil ? Carbon::parse($row->tgl_ambil)->translatedFormat('d F Y') : '-';
+                })
+                ->addColumn('teknisi', function($row) {
+                    if ($row->user) {
+                        return '<div class="font-medium">' . $row->user->name . '</div>';
+                    }
+                    return '<div class="font-medium text-red-600">Akun sudah dihapus</div>';
+                })
+                ->editColumn('tindakan_servis', function($row) {
+                    if ($row->tindakan_servis) {
+                        $tindakan = json_decode($row->tindakan_servis);
+                        return is_array($tindakan) ? implode(', ', $tindakan) : $row->tindakan_servis;
+                    }
+                    return '-';
+                })
+                ->editColumn('modal_sparepart', fn($row) => number_format($row->modal_sparepart))
+                ->editColumn('biaya', fn($row) => number_format($row->biaya))
+                ->editColumn('diskon', fn($row) => number_format($row->diskon))
+                ->addColumn('pajak_display', function($row) {
+                    $ppnRate = !empty($row->ppn) ? $row->ppn : 0;
+                    $pajak = $row->biaya * ($ppnRate / 100);
+                    return number_format($pajak);
+                })
+                ->addColumn('grand_total_display', function($row) {
+                    $ppnRate = !empty($row->ppn) ? $row->ppn : 0;
+                    $pajak = $row->biaya * ($ppnRate / 100);
+                    return number_format($row->biaya + $pajak);
+                })
+                ->rawColumns(['teknisi'])
+                ->make(true);
+        }
+
+        // === LOGIKA RINGKASAN CARD (SESUAI FLOW ASLI ANDA) ===
+        $omzethari = ServiceTransaction::where('is_approve', 'Setuju')->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->where('cabang_id', $cabang_id)->whereDate('tgl_disetujui', today())->where('ppn', '>', 0)->sum('omzet');
+
+        $pajakhari = ServiceTransaction::where('is_approve', 'Setuju')->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->where('cabang_id', $cabang_id)->whereDate('tgl_disetujui', today())->get()->sum(function ($trx) {
+            return $trx->biaya * (!empty($trx->ppn) ? $trx->ppn : 0) / 100;
         });
 
-        $omzetbulan = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->where('cabang_id',getCabangId())
-            ->where('ppn','>',0)
-            ->get()
-            ->sum('omzet');
-        $pajakbulan = ServiceTransaction::with('serviceaction')
-        ->where('is_approve', 'Setuju')
-        ->whereYear('tgl_disetujui', $currentYear)
-        ->whereMonth('tgl_disetujui', $currentMonth)
-            ->where('cabang_id',getCabangId())
-        ->get()
-        ->sum(function ($trx) {
-            $ppn = !empty($trx->ppn) ? $trx->ppn : 0;
-            return $trx->biaya * $ppn / 100;
+        $omzetbulan = ServiceTransaction::where('is_approve', 'Setuju')->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->where('cabang_id', $cabang_id)->where('ppn', '>', 0)->sum('omzet');
+
+        $pajakbulan = ServiceTransaction::where('is_approve', 'Setuju')->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->where('cabang_id', $cabang_id)->get()->sum(function ($trx) {
+            return $trx->biaya * (!empty($trx->ppn) ? $trx->ppn : 0) / 100;
         });
 
-        $omzettahun = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->where('cabang_id',getCabangId())
-            ->where('ppn','>',0)
-            ->get()
-            ->sum('omzet');
-        $pajaktahun = ServiceTransaction::with('serviceaction')
-        ->where('is_approve', 'Setuju')
-        ->whereYear('tgl_disetujui', $currentYear)
-        ->where('cabang_id',getCabangId())
-        ->get()
-        ->sum(function ($trx) {
-            $ppn = !empty($trx->ppn) ? $trx->ppn : 0;
-            return $trx->biaya * $ppn / 100;
+        $omzettahun = ServiceTransaction::where('is_approve', 'Setuju')->whereYear('tgl_disetujui', $currentYear)->where('cabang_id', $cabang_id)->where('ppn', '>', 0)->sum('omzet');
+
+        $pajaktahun = ServiceTransaction::where('is_approve', 'Setuju')->whereYear('tgl_disetujui', $currentYear)->where('cabang_id', $cabang_id)->get()->sum(function ($trx) {
+            return $trx->biaya * (!empty($trx->ppn) ? $trx->ppn : 0) / 100;
         });
 
-        return view('pages/kepalatoko/laporan-pajak-servis', compact('omzethari', 'pajakhari', 'omzetbulan', 'pajakbulan', 'omzettahun', 'pajaktahun'));
+        // Menghitung jumlah untuk header tabel (Sudah jadi & PPN > 0)
+        $jumlah_total = ServiceTransaction::where('cabang_id', $cabang_id)->where('ppn', '>', 0)->where('is_approve', 'Setuju')->where('kondisi_servis', "Sudah jadi")->count();
+
+        return view('pages/kepalatoko/laporan-pajak-servis', compact('omzethari', 'pajakhari', 'omzetbulan', 'pajakbulan', 'omzettahun', 'pajaktahun', 'jumlah_total'));
     }
 
     // public function cetak(Request $request)

@@ -108,11 +108,11 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
 
         </div>
-     
+
         <!-- Table -->
         <x-servis.laporan-teknisi-table :users="$users" />
 

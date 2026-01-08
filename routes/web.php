@@ -619,6 +619,7 @@ Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisControll
     Route::get('cetak-laporan-pajak-servis', [KepalaTokoLaporanServisController::class, 'cetakPajak'])->name('cetak-laporan-pajak-servis');
     Route::get('cetak-laporan-teknisi', [KepalaTokoLaporanTeknisiController::class, 'cetak'])->name('cetak-laporan-teknisi');
     Route::get('cetak-laporan-pengeluaran', [KepalaTokoExpenseController::class, 'cetak'])->name('cetak-laporan-pengeluaran');
+    Route::get('laporan/laporan-teknisi/data', [KepalaTokoLaporanTeknisiController::class, 'getData'])->name('laporan-teknisi-data');
     Route::get('laporan/laporan-teknisi', [KepalaTokoLaporanTeknisiController::class, 'index'])->name('laporan-teknisi');
     Route::get('laporan/laporan-penjualan', [KepalaTokoLaporanPenjualanController::class, 'index'])->name('laporan-penjualan');
     Route::get('laporan/laporan-pajak-penjualan', [KepalaTokoLaporanPenjualanController::class, 'indexPajak'])->name('laporan-pajak-penjualan');

@@ -7,126 +7,71 @@ use App\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\OrderDetail;
 use App\Models\Expense;
+use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 class LaporanPenjualanController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
         $cabang_id = getCabangId();
-        $product_transactions = OrderDetail::where('cabang_id',$cabang_id)->with('product', 'user')->get();
-        $count = OrderDetail::where('cabang_id',$cabang_id)->get()->count();
+        $toko = StoreSetting::where('cabang_id', $cabang_id)->first();
 
-        $rumusomzethari = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
-            $currentMonth = now()->month;
-            $currentYear = now()->year;
-            $query->where('is_approve', 'Setuju')
-                ->whereYear('tgl_disetujui', $currentYear)
-                ->whereMonth('tgl_disetujui', $currentMonth)
-                ->whereDate('tgl_disetujui', today())
-                ->where('cabang_id',$cabang_id);
-        })
-            ->with(['detailOrders' => function ($query) use ($cabang_id) {
-                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(total) as total_omzet'))
-                    ->groupBy('orders_id');
-            }])
-            ->select('id')
-            ->get();
+        // === LOGIC DATATABLES (AJAX) ===
+        if ($request->ajax()) {
+            $data = OrderDetail::where('order_details.cabang_id', $cabang_id)
+                ->whereHas('order', function ($query) {
+                    $query->where('is_approve', 'Setuju');
+                })
+                ->with(['product.capacity', 'user', 'order'])
+                ->select('order_details.*')
+                ->latest();
 
-        $omzethari = $rumusomzethari->sum(function ($order) {
-            return $order->detailOrders->sum('total_omzet');
-        });
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->editColumn('created_at', function($row) {
+                    return Carbon::parse($row->created_at)->translatedFormat('d F Y');
+                })
+                ->addColumn('sales_name', function($row) {
+                    return $row->user ? $row->user->name : '<span class="text-red-600">Akun dihapus</span>';
+                })
+                ->addColumn('product_display_name', function($row) {
+                    if (!$row->product) return '<span class="text-red-600">Produk dihapus</span>';
 
-        $rumusprofithari = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
-            $currentMonth = now()->month;
-            $currentYear = now()->year;
+                    if ($row->product->categories_id == 1) {
+                        $capacity = $row->product->capacity ? $row->product->capacity->name : '-';
+                        return "{$row->product->product_name} {$row->product->kondisi} {$row->product->warna} {$row->product->ram}/{$capacity} {$row->product->keterangan} (IMEI {$row->product->nomor_seri})";
+                    }
+                    return "{$row->product->product_name} {$row->product->keterangan}";
+                })
+                ->editColumn('modal', fn($row) => 'Rp. ' . number_format($row->modal))
+                ->editColumn('total', fn($row) => 'Rp. ' . number_format($row->total))
+                ->editColumn('profit_toko', fn($row) => 'Rp. ' . number_format($row->profit_toko))
+                ->editColumn('ppn', fn($row) => 'Rp. ' . number_format($row->ppn))
+                ->rawColumns(['sales_name', 'product_display_name'])
+                ->make(true);
+        }
 
-            $query->where('is_approve', 'Setuju')
-                ->whereYear('tgl_disetujui', $currentYear)
-                ->whereMonth('tgl_disetujui', $currentMonth)
-                ->whereDate('tgl_disetujui', today())
-                ->where('cabang_id',$cabang_id);
-        })
-            ->with(['detailOrders' => function ($query) use ($cabang_id) {
-                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
-                    ->groupBy('orders_id');
-            }])
-            ->select('id')
-            ->get();
+        // === RINGKASAN DATA CARD (Simplified) ===
+        $now = now();
 
-        $profithari = $rumusprofithari->sum(function ($order) {
-            return $order->detailOrders->sum('total_profit');
-        });
+        $omzethari = OrderDetail::where('cabang_id', $cabang_id)->whereHas('order', fn($q) => $q->where('is_approve', 'Setuju')->whereDate('tgl_disetujui', today()))->sum('total');
+        $profithari = OrderDetail::where('cabang_id', $cabang_id)->whereHas('order', fn($q) => $q->where('is_approve', 'Setuju')->whereDate('tgl_disetujui', today()))->sum('profit_toko');
 
-        $rumusomzetbulan = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
-            $query->where('is_approve', 'Setuju')
-                ->whereYear('tgl_disetujui', now()->year)
-                ->whereMonth('tgl_disetujui', now()->month)
-                ->where('cabang_id',$cabang_id);
-        })
-            ->with(['detailOrders' => function ($query) use ($cabang_id) {
-                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(total) as total_omzet'))
-                    ->groupBy('orders_id');
-            }])
-            ->select('id')
-            ->get();
+        $omzetbulan = OrderDetail::where('cabang_id', $cabang_id)->whereHas('order', fn($q) => $q->where('is_approve', 'Setuju')->whereMonth('tgl_disetujui', $now->month)->whereYear('tgl_disetujui', $now->year))->sum('total');
+        $profitbulan = OrderDetail::where('cabang_id', $cabang_id)->whereHas('order', fn($q) => $q->where('is_approve', 'Setuju')->whereMonth('tgl_disetujui', $now->month)->whereYear('tgl_disetujui', $now->year))->sum('profit_toko');
 
-        $omzetbulan = $rumusomzetbulan->sum(function ($order) {
-            return $order->detailOrders->sum('total_omzet');
-        });
+        $omzettahun = OrderDetail::where('cabang_id', $cabang_id)->whereHas('order', fn($q) => $q->where('is_approve', 'Setuju')->whereYear('tgl_disetujui', $now->year))->sum('total');
+        $profittahun = OrderDetail::where('cabang_id', $cabang_id)->whereHas('order', fn($q) => $q->where('is_approve', 'Setuju')->whereYear('tgl_disetujui', $now->year))->sum('profit_toko');
 
-        $rumusprofitbulan = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
-            $query->where('is_approve', 'Setuju')
-                ->whereYear('tgl_disetujui', now()->year)
-                ->whereMonth('tgl_disetujui', now()->month)
-                ->where('cabang_id',$cabang_id);
-        })
-            ->with(['detailOrders' => function ($query) use ($cabang_id) {
-                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
-                    ->groupBy('orders_id');
-            }])
-            ->select('id')
-            ->get();
+        $jumlah_terjual = OrderDetail::where('cabang_id', $cabang_id)->whereHas('order', fn($q) => $q->where('is_approve', 'Setuju'))->sum('quantity');
 
-        $profitbulan = $rumusprofitbulan->sum(function ($order) {
-            return $order->detailOrders->sum('total_profit');
-        });
-
-        $rumusomzettahun = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
-            $query->where('is_approve', 'Setuju')
-                ->whereYear('tgl_disetujui', now()->year)
-                ->where('cabang_id',$cabang_id);
-        })
-            ->with(['detailOrders' => function ($query) use ($cabang_id) {
-                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(total) as total_omzet'))
-                    ->groupBy('orders_id');
-            }])
-            ->select('id')
-            ->get();
-
-        $omzettahun = $rumusomzettahun->sum(function ($order) {
-            return $order->detailOrders->sum('total_omzet');
-        });
-
-        $rumusprofittahun = Order::whereHas('detailOrders', function ($query) use ($cabang_id) {
-            $query->where('is_approve', 'Setuju')
-                ->whereYear('tgl_disetujui', now()->year)
-                ->where('cabang_id',$cabang_id);
-        })
-            ->with(['detailOrders' => function ($query) use ($cabang_id) {
-                $query->where('cabang_id',$cabang_id)->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
-                    ->groupBy('orders_id');
-            }])
-            ->select('id')
-            ->get();
-
-        $profittahun = $rumusprofittahun->sum(function ($order) {
-            return $order->detailOrders->sum('total_profit');
-        });
-
-        return view('pages/kepalatoko/laporan-penjualan', compact('product_transactions', 'count', 'omzethari', 'profithari', 'omzetbulan', 'profitbulan', 'omzettahun', 'profittahun'));
+        return view('pages/kepalatoko/laporan-penjualan', compact('toko', 'jumlah_terjual', 'omzethari', 'profithari', 'omzetbulan', 'profitbulan', 'omzettahun', 'profittahun'));
     }
     public function indexPajak()
     {
