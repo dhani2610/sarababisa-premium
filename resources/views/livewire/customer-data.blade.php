@@ -613,7 +613,6 @@
             var table = $('#pelanggan-table').DataTable({
                 processing: false,
                 serverSide: false, // Mengaktifkan Server Side Pagination & Search
-                ajax: "{{ route('pelanggan.data') }}",
                 columns: [
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
                     {
@@ -649,6 +648,33 @@
                     attachCheckboxHandlers();
                 }
             });
+
+
+            let batchSize = 100;
+            let offset = 0;
+            let loading = false;
+
+            function loadBatch() {
+                if (loading) return;
+                loading = true;
+
+                $.ajax({
+                    url: '{{ route('pelanggan.data') }}?offset=' + offset + '&limit=' + batchSize,
+                    success: function(response) {
+                        if (response.data.length > 0) {
+                            table.rows.add(response.data).draw(false); // tambahkan data batch
+                            offset += batchSize;
+                            loading = false;
+                            setTimeout(loadBatch, 100); // lanjut batch berikutnya
+                        } else {
+                            console.log('Semua data sudah dimuat');
+                        }
+                    }
+                });
+            }
+
+            // mulai load pertama
+            loadBatch();
 
             // --- Logic Bulk Action Checkbox ---
             function attachCheckboxHandlers() {

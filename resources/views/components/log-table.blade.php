@@ -2,28 +2,10 @@
     <header class="px-5 py-4">
         <h2 class="font-semibold text-slate-800">Semua Riwayat Aktivitas</h2>
     </header>
-    <!-- Filter -->
-    <div class="mb-4 ml-4">
-        <form method="GET" action="{{ route('log-servis') }}" class="flex items-center space-x-2">
-            <input type="text" name="nomor_servis" value="{{ request('nomor_servis') }}"
-                placeholder="Cari Nomor Servis..."
-                class="form-input rounded border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
-
-            <button type="submit" class="btn bg-indigo-500 hover:bg-indigo-600 text-white">
-                Filter
-            </button>
-
-            @if (request('nomor_servis'))
-                <a href="{{ route('log-servis') }}" class="btn bg-slate-200 hover:bg-slate-300 text-slate-700">
-                    Reset
-                </a>
-            @endif
-        </form>
-    </div>
 
     <!-- Table -->
     <div class="overflow-x-auto">
-        <table class="table-auto w-full">
+        <table id="log-servis-table" class="table-auto w-full">
             <!-- Table header -->
             <thead
                 class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
@@ -60,7 +42,7 @@
             <!-- Table body -->
             <tbody class="text-sm divide-y divide-slate-200">
                 <!-- Row -->
-                @php
+                {{-- @php
                     $i = 1;
                 @endphp
                 @foreach ($activities as $item)
@@ -150,9 +132,54 @@
                             </div>
                         </td>
                     </tr>
-                @endforeach
+                @endforeach --}}
             </tbody>
         </table>
 
     </div>
 </div>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <style>
+        /* Styling tambahan agar sesuai tema toko layout */
+        .dataTables_wrapper .dataTables_length select { padding-right: 30px; width: auto; }
+        table.dataTable tbody td { vertical-align: top; } /* Agar teks perubahan panjang tetap rapi di atas */
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#log-servis-table').DataTable({
+                processing: false,
+                serverSide: false,
+                ajax: "{{ route('log-servis.data') }}",
+                columns: [
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                    { data: 'created_at', name: 'created_at' },
+                    { data: 'causer_name', name: 'causer_name' },
+                    { data: 'description', name: 'description' },
+                    { data: 'nomor_servis', name: 'nomor_servis' },
+                    { data: 'pelanggan', name: 'pelanggan' },
+                    { data: 'nama_barang', name: 'nama_barang' },
+                    { data: 'sebelum', name: 'sebelum', orderable: false, searchable: false },
+                    { data: 'sesudah', name: 'sesudah', orderable: false, searchable: false },
+                ],
+                order: [[0, 'asc']], // Default urut waktu terbaru
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    paginate: {
+                        first: "Awal",
+                        last: "Akhir",
+                        next: "Lanjut",
+                        previous: "Kembali"
+                    }
+                },
+            });
+        });
+    </script>

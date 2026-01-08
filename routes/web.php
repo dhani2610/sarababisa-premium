@@ -280,6 +280,7 @@ Route::get('/history-garansi/cetak', [HistoryGaransiController::class, 'cetak'])
     ->name('history-garansi.cetak');
 Route::get('/history-garansi/cetak-inject/{id}', [HistoryGaransiController::class, 'cetakinkjet'])
     ->name('history-garansi.cetak-inject');
+Route::get('history-garansi/data', [HistoryGaransiController::class, 'getData'])->name('history-garansi.data');
 Route::resource('history-garansi', HistoryGaransiController::class);
 Route::patch('/history-garansi/{id}/toggle-status', [HistoryGaransiController::class, 'toggleStatus'])
     ->name('history-garansi.toggleStatus');
@@ -329,6 +330,7 @@ Route::post('/change-cabang', function () {
 // Route::get('master/master-absensi', MasterAbsensi::class)->name('master-absensi.index');
 
 // Controller endpoints for store & deletes (Livewire only displays)
+Route::get('master/master-absensi/data', [AttendanceController::class, 'getData'])->name('master-absensi.data');
 Route::get('master/master-absensi', [AttendanceController::class, 'index'])->name('master-absensi.index');
 Route::post('master/master-absensi/store', [AttendanceController::class, 'store'])->name('master-absensi.store');
 Route::delete('master/master-absensi/delete-selected', [AttendanceController::class, 'deleteSelected'])->name('master-absensi.deleteSelected');
@@ -428,6 +430,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
     Route::get('servis/transaksi-servis-belum-disetujui/data', [KepalaTokoServisBelumDisetujuiController::class,'getData'])->name('transaksi-servis-belum-disetujui.data');
     Route::resource('servis/transaksi-servis-belum-disetujui', KepalaTokoServisBelumDisetujuiController::class);
+    Route::get('servis/log-servis/data', [KepalaTokoLogServisController::class, 'getData'])->name('log-servis.data');
     Route::get('servis/log-servis', [KepalaTokoLogServisController::class, 'index'])->name('log-servis');
     Route::post('servis/log-servis-destroy/{model}', [KepalaTokoLogServisController::class, 'destroy'])->name('log-servis-destroy');
 

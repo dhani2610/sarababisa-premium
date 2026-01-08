@@ -16,7 +16,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
-
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Auth;
 class HistoryGaransiController extends Controller
 {
     public function index()
@@ -25,6 +26,144 @@ class HistoryGaransiController extends Controller
         return view('pages.kepalatoko.history.garansi', compact(
             'users'
         ));
+    }
+
+    public function getData(Request $request)
+    {
+        $user = Auth::user();
+        $cabang = getCabangId();
+
+        $query = HistoryGaransi::with(['service', 'teknisi', 'penerima', 'pelanggan'])
+            ->where('cabang_id', $cabang)
+            ->latest();
+
+        // Filter Role Teknisi
+        if ($user->role === 'Teknisi') {
+            $query->where('teknisi_id', $user->id);
+        }
+
+        // Filter Status dari Tab
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        return DataTables::of($query)
+            ->addColumn('checkbox', function ($row) {
+                return '<input type="checkbox" class="table-item form-checkbox" value="' . $row->id . '" />';
+            })
+            ->addIndexColumn() // No.
+            ->addColumn('nomor_servis', function($row){
+                return $row->service->nomor_servis ?? '';
+            })
+            ->addColumn('pelanggan_nama', function($row){
+                return $row->pelanggan->nama ?? '-';
+            })
+            ->addColumn('penerima_nama', function($row){
+                return $row->penerima->name ?? '-';
+            })
+            ->addColumn('teknisi_nama', function($row){
+                return $row->teknisi->name ?? '-';
+            })
+            ->addColumn('qc_button', function($row){
+                return '<a href="'.route('kepalatoko-cetak-qc-garansi',$row->id).'" target="_blank" class="btn bg-indigo-500 hover:bg-indigo-600 text-white btn-sm">Lihat QC</a>';
+            })
+            ->addColumn('tindakan_list', function($row){
+                if (empty($row->tindakan)) return '-';
+
+                $tindakans = json_decode($row->tindakan, true) ?? [];
+                if(empty($tindakans)) return '-';
+
+                $html = '<ul class="list-disc ml-4">';
+                foreach ($tindakans as $t) {
+                    $action = ServiceAction::find($t['id']);
+                    $nama = $action ? $action->nama_tindakan : ($t['id_manual'] ?? '-');
+                    $html .= '<li>'.$nama.' - Rp'.number_format($t['harga'], 0, ',', '.').'</li>';
+                }
+                $html .= '</ul>';
+                return $html;
+            })
+            ->addColumn('sparepart_list', function($row){
+                if (empty($row->sparepart)) return '-';
+
+                $spareparts = json_decode($row->sparepart, true);
+                if (!$spareparts) return '-';
+
+                $html = '<ul class="list-disc ml-4">';
+                foreach ($spareparts as $sp) {
+                    $prd = Product::find($sp['id']);
+                    $nama = $prd->product_name ?? 'Produk ID ' . $sp['id'];
+                    $html .= '<li>'.$nama.' (x'.$sp['qty'].') - Rp'.number_format($sp['harga'], 0, ',', '.').'</li>';
+                }
+                $html .= '</ul>';
+                return $html;
+            })
+            ->editColumn('total_biaya', function($row){
+                return 'Rp' . number_format($row->total_biaya, 0, ',', '.');
+            })
+            ->addColumn('status_badge', function($row){
+                $class = $row->status == 1 ? 'status-menunggu' : ($row->status == 2 ? 'status-selesai' : 'status-batal');
+                $label = $row->status == 1 ? 'Diproses' : ($row->status == 2 ? 'Sudah Selesai' : 'Dibatalkan');
+
+                // Button ini akan ditangkap oleh JS toggle-status yang sudah ada
+                return '<center><button class="btn-status '.$class.' toggle-status" data-id="'.$row->id.'">'.$label.'</button></center>';
+            })
+            ->addColumn('aksi', function ($row) {
+                // Edit Button
+                $editUrl = route('history-garansi.edit', $row->id);
+                $editBtn = '
+                    <a href="' . $editUrl . '">
+                        <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+                                <rect x="9" y="3" width="6" height="4" rx="2" />
+                                <path d="M9 14l2 2l4 -4" />
+                            </svg>
+                        </button>
+                    </a>';
+
+                // Print Button
+                $printBtn = '';
+                if (!empty($row->service)) {
+                    $printUrl = route('history-garansi.cetak-inject', $row->id);
+                    $printBtn = '
+                    <a href="' . $printUrl . '" target="_blank">
+                        <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Cetak">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+                                <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+                                <rect x="7" y="13" width="10" height="8" rx="2" />
+                            </svg>
+                        </button>
+                    </a>';
+                }
+
+                // Delete Button (Trigger Custom Modal)
+                $deleteBtn = '
+                    <button class="text-rose-500 hover:text-rose-600 rounded-full" onclick="confirmDelete('.$row->id.')">
+                        <span class="sr-only">Delete</span>
+                        <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                            <path d="M13 15h2v6h-2zM17 15h2v6h-2z" />
+                            <path d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z" />
+                        </svg>
+                    </button>';
+
+                return '<div class="space-x-1 flex items-center">' . $editBtn . $printBtn . $deleteBtn . '</div>';
+            })
+            // Filter Global Search (Manual override agar mencari ke relasi)
+            ->filterColumn('nomor_servis', function($query, $keyword) {
+                 $query->whereHas('service', function($q) use($keyword) {
+                    $q->where('nomor_servis', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('pelanggan_nama', function($query, $keyword) {
+                 $query->whereHas('pelanggan', function($q) use($keyword) {
+                    $q->where('nama', 'like', "%{$keyword}%");
+                });
+            })
+            ->rawColumns(['checkbox', 'qc_button', 'tindakan_list', 'sparepart_list', 'status_badge', 'aksi'])
+            ->make(true);
     }
 
     public function cetak(Request $request)

@@ -1,107 +1,63 @@
-<style>
-.btn-status {
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-}
+@section('title')
+    Riwayat Garansi
+@endsection
 
-/* Menunggu Konfirmasi (Kuning) */
-.status-menunggu {
-    background-color: #FFF7D1;
-    color: #B58105;
-}
+{{-- <x-toko-layout> --}}
+    <style>
+        .btn-status {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
 
-/* Sudah Selesai (Hijau) */
-.status-selesai {
-    background-color: #D1FADF;
-    color: #027A48;
-}
+        /* Menunggu Konfirmasi (Kuning) */
+        .status-menunggu { background-color: #FFF7D1; color: #B58105; }
+        /* Sudah Selesai (Hijau) */
+        .status-selesai { background-color: #D1FADF; color: #027A48; }
+        /* Dibatalkan (Merah) */
+        .status-batal { background-color: #FEE2E2; color: #B91C1C; }
 
-/* Dibatalkan (Merah) */
-.status-batal {
-    background-color: #FEE2E2;
-    color: #B91C1C;
-}
+        /* Select2 Fix for Modal */
+        .select2-container { z-index: 999999 !important; }
 
-</style>
-<div>
-    <!-- Page header -->
-    <div class="sm:flex sm:justify-between sm:items-center mb-3">
+        .dataTables_wrapper .dataTables_length select {
+            padding-right: 30px;
+            width: auto;
+        }
+    </style>
 
-        <!-- Left: Title -->
-        <div class="mb-4 sm:mb-0">
-            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Riwayat Garansi ✨</h1>
-        </div>
+    <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
-        <!-- Right: Actions -->
-        <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+        <div class="sm:flex sm:justify-between sm:items-center mb-3">
 
-            <!-- Search form -->
-            <x-search-form placeholder="Cari berdasarkan nama Nomor Servia" />
+            <div class="mb-4 sm:mb-0">
+                <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Riwayat Garansi ✨</h1>
+            </div>
 
-            <!-- Print button -->
-            @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
-            <div class="relative inline-flex" x-data="{ modalOpen: false }">
-                <button
-                    class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600 mb-2 md:mb-0"
-                    @click.prevent="modalOpen = true" aria-controls="tambah-modal"
-                >
-                    <span class="sr-only">Print</span><wbr>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                        <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
-                        <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
-                        <rect x="7" y="13" width="10" height="8" rx="2" />
-                    </svg>
-                </button>
-                <!-- Modal backdrop -->
-                <div
-                    class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
-                    x-show="modalOpen"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="opacity-100"
-                    x-transition:leave="transition ease-out duration-100"
-                    x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0"
-                    aria-hidden="true"
-                    x-cloak
-                ></div>
-                <!-- Modal dialog -->
-                <div
-                    id="tambah-modal"
-                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                    role="dialog"
-                    aria-modal="true"
-                    x-show="modalOpen"
-                    x-transition:enter="transition ease-in-out duration-200"
-                    x-transition:enter-start="opacity-0 translate-y-4"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    x-transition:leave="transition ease-in-out duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0"
-                    x-transition:leave-end="opacity-0 translate-y-4"
-                    x-cloak
-                >
-                    <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
-                        <!-- Modal header -->
-                        <div class="px-5 py-3 border-b border-slate-200">
-                            <div class="flex justify-between items-center">
+            <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+
+                @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
+                <div class="relative inline-flex" x-data="{ modalOpen: false }">
+                    <button class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600 mb-2 md:mb-0" @click.prevent="modalOpen = true" aria-controls="tambah-modal">
+                        <span class="sr-only">Print</span><wbr>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+                            <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+                            <rect x="7" y="13" width="10" height="8" rx="2" />
+                        </svg>
+                    </button>
+                    <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-out duration-100" x-cloak></div>
+                    <div id="tambah-modal" class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="modalOpen" x-transition:enter="transition ease-in-out duration-200" x-cloak>
+                        <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalOpen = false">
+                            <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center">
                                 <div class="font-semibold text-slate-800">Atur Pencetakan Riwayat Garansi</div>
-                                <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false">
-                                    <div class="sr-only">Close</div>
-                                    <svg class="w-4 h-4 fill-current">
-                                        <path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
-                                    </svg>
-                                </button>
+                                <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false">&times;</button>
                             </div>
-                        </div>
-                        <!-- Modal content -->
-                        <form action="{{ route('history-garansi.cetak') }}" method="get" target="_blank">
-
-                            @csrf
-                            <div class="px-5 py-4">
-                                <div class="space-y-3">
+                            <form action="{{ route('history-garansi.cetak') }}" method="get" target="_blank">
+                                @csrf
+                                <div class="px-5 py-4 space-y-3">
                                     <div>
                                         <label class="block text-sm font-medium mb-1">Mulai tanggal <span class="text-rose-500">*</span></label>
                                         <input id="start_date" name="start_date" class="form-input w-full py-2" type="date" required />
@@ -111,299 +67,169 @@
                                         <input id="end_date" name="end_date" class="form-input w-full py-2" type="date" required />
                                     </div>
                                 </div>
-                            </div>
-                            <!-- Modal footer -->
-                            <div class="px-5 py-4 border-t border-slate-200">
-                                <div class="flex flex-wrap justify-end space-x-2">
+                                <div class="px-5 py-4 border-t border-slate-200 flex justify-end space-x-2">
                                     <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Cetak</button>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-            @endif
+                @endif
 
-            <!-- Create invoice button -->
-            <div x-data="{ modalOpen: false }">
-                <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
-                    + Tambah Riwayat Garansi
-                </button>
-
-                <!-- Modal backdrop -->
-                <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen"
-                    x-transition aria-hidden="true" x-cloak></div>
-
-                <!-- Modal dialog -->
-                <div id="tambah-modal-data"
-                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                    role="dialog" aria-modal="true" x-show="modalOpen" x-transition x-cloak>
-                    <div class="bg-white rounded shadow-lg overflow-auto max-w-2xl w-full max-h-full"
-                        @click.outside="if(!$event.target.closest('.select2-container')) modalOpen = false"
-                        @keydown.escape.window="modalOpen = false">
-
-                        <form action="{{ route('history-garansi.store') }}" method="POST" id="formGaransi">
-                            @csrf
-                            <div class="px-5 py-4 space-y-4">
-
-
-                                <!-- Penerima -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Tanggal <span
-                                            class="text-rose-500">*</span></label>
-                                    <input type="date" name="date" id="date" class="form-input w-full"
-                                        required>
-                                </div>
-
-                                <!-- Pilih Service -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Nomor Servis <span
-                                            class="text-rose-500">*</span></label>
-                                    <select name="service_id" id="service_id" class="form-select select2  w-full"
-                                        required>
-                                        <option value="">-- Pilih Nomor Service --</option>
-                                        @foreach ($serviceTransactions as $st)
-                                            <option value="{{ $st->id }}"
-                                                data-teknisi="{{ $st->user->name ?? '' }}"
-                                                data-expired="{{ $st->exp_garansi }}"
-                                                data-nota="{{ route('kepalatoko-pengambilan-cetak-inkjet', $st->id) }}">
-                                                {{ $st->nomor_servis }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <small class="text-slate-500">Teknisi sebelumnya: <span
-                                            id="prev_teknisi"></span></small><br>
-                                    <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small> <br>
-                                    <small class="text-slate-500">Link Nota: <span id="link_nota"></span></small> <br>
-                                    <div id="history_garansi" class="mt-2 text-sm text-slate-700"></div>
-
-                                </div>
-
-                                <!-- Penerima -->
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Pelanggan <span
-                                            class="text-rose-500">*</span></label>
-                                    <select name="id_customer" class="form-select select2 w-full " required>
-                                        <option value="">-- Pilih Pelanggan --</option>
-                                        @foreach ($customer as $cs)
-                                            <option value="{{ $cs->id }}">{{ $cs->nama }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Penerima <span
-                                            class="text-rose-500">*</span></label>
-                                    <select name="penerima_id" class="form-select w-full " required>
-                                        <option value="">-- Pilih Penerima --</option>
-                                        @foreach ($users as $u)
-                                            <option value="{{ $u->id }}">{{ $u->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Keluhan <span
-                                            class="text-rose-500">*</span></label>
-                                    <input type="text" name="keluhan" class="form-input w-full"
-                                        required>
-                                </div>
-
-                                {{-- <div>
-                                    <label class="block text-sm font-medium mb-1" for="fungsi masuk">Pengecekan
-                                        Fungsi Masuk<span class="text-rose-500">*</span></label>
-                                    <input id="fungsi masuk" name="fungsi masuk" class="form-input w-full px-2 py-1"
-                                        type="text" required
-                                        placeholder="Contoh: Tombol, Kamera, Speaker, dll" />
-                                </div> --}}
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (Masuk) <span class="text-rose-500">*</span></label>
-                                    <small class="text-rose-500">*Jika ingin cepat silahkan isi kolom other.</small>
-                                    <div class="overflow-x-auto border rounded-sm">
-                                        <table class="w-full text-xs text-left border-collapse" id="table-qc-tab1">
-                                            <thead class="bg-slate-100 uppercase text-slate-500 font-semibold">
-                                                <tr>
-                                                    <th class="border border-slate-300 p-2 w-8 text-center">No</th>
-                                                    <th class="border border-slate-300 p-2 w-1/2">ITEM</th>
-                                                    <th class="border border-slate-300 p-2 bg-blue-50 text-center">REMARK IN</th>
-                                                    <th class="border border-slate-300 p-2 w-8 text-center"></th> </tr>
-                                            </thead>
-                                            <tbody id="checklist-tbody-tab1" class="text-slate-700">
-                                                </tbody>
-                                        </table>
-                                    </div>
-                                    <button type="button" onclick="addCustomRowTab1()" class="mt-2 text-xs flex items-center text-indigo-600 font-bold hover:text-indigo-800">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                                        Tambah Baris Custom
-                                    </button>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-1"
-                                        for="estimasi_pengerjaan">Estimasi Pengerjaan</label>
-                                    <select id="estimasi_pengerjaan" name="estimasi_pengerjaan"
-                                        class="form-select text-sm py-2 w-full">
-                                        <option selected value="">Pilih Estimasi Pengerjaan</option>
-                                        <option value="1 Hari">1 Hari</option>
-                                        <option value="2 Hari">2 Hari</option>
-                                        <option value="3 Hari">3 Hari</option>
-                                        <option value="4 Hari">4 Hari</option>
-                                        <option value="5 Hari">5 Hari</option>
-                                        <option value="6 Hari">6 Hari</option>
-                                        <option value="1 Minggu">1 Minggu</option>
-                                        <option value="2 Minggu">2 Minggu</option>
-                                        <option value="3 Minggu">3 Minggu</option>
-                                        <option value="1 Bulan">1 Bulan</option>
-                                        <option value="2 Bulan">2 Bulan</option>
-                                        <option value="3 Bulan">3 Bulan</option>
-                                    </select>
-                                </div>
-
-                            </div>
-                            <div class="px-5 py-4 border-t flex justify-end space-x-2">
-                                <button type="button" class="btn-sm border-slate-200"
-                                    @click="modalOpen=false">Batal</button>
-                                <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Simpan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-            </div>
-
-
-        </div>
-
-    </div>
-
-    <!-- More actions -->
-    <div class="sm:flex sm:justify-between sm:items-center mb-5">
-           <!-- Left side -->
-        <div class="mb-4 sm:mb-0">
-            <ul class="flex flex-wrap -m-1">
-
-                {{-- SEMUA --}}
-                <li class="m-1">
-                    <a href="{{ url('history-garansi?status=') }}">
-                        <button
-                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
-                            border shadow-sm
-                            {{ request('status') == '' ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
-                            Semua
-                            <span class="ml-1 text-slate-400">{{ $count }}</span>
-                        </button>
-                    </a>
-                </li>
-
-                {{-- PROSES (status = 1) --}}
-                <li class="m-1">
-                    <a href="{{ url('history-garansi?status=1') }}">
-                        <button
-                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
-                            border shadow-sm
-                            {{ request('status') == 1 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
-                            Proses
-                            <span class="ml-1 text-slate-400">{{ $prosesCount }}</span>
-                        </button>
-                    </a>
-                </li>
-
-                {{-- SELESAI (status = 2) --}}
-                <li class="m-1">
-                    <a href="{{ url('history-garansi?status=2') }}">
-                        <button
-                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
-                            border shadow-sm
-                            {{ request('status') == 2 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
-                            Selesai
-                            <span class="ml-1 text-slate-400">{{ $selesaiCount }}</span>
-                        </button>
-                    </a>
-                </li>
-
-                {{-- DIBATALKAN (status = 3) bila ada --}}
-                <li class="m-1">
-                    <a href="{{ url('history-garansi?status=3') }}">
-                        <button
-                            class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1
-                            border shadow-sm
-                            {{ request('status') == 3 ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border-slate-200' }}">
-                            Dibatalkan / Pengembalian Dana
-                            <span class="ml-1 text-slate-400">{{ $dibatalkanCount ?? 0 }}</span>
-                        </button>
-                    </a>
-                </li>
-
-            </ul>
-
-        </div>
-        <!-- Left side -->
-        <div class="mb-0">
-            <select wire:model="paginate" id="" class="form-select">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-        </div>
-    </div>
-
-    @if ($errors->any())
-        <div x-show="open" x-data="{ open: true }">
-            <div class="px-4 py-2 rounded-sm text-sm bg-rose-500 text-white">
-                <div class="flex w-full justify-between items-start">
-                    <div class="flex">
-                        <svg class="w-4 h-4 shrink-0 fill-current opacity-80 mt-[3px] mr-3" viewBox="0 0 16 16">
-                            <path
-                                d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm1 12H7V7h2v5zM8 6c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z" />
-                        </svg>
-                        @foreach ($errors->all() as $error)
-                            <div class="font-medium">{{ $error }}</div>
-                        @endforeach
-                    </div>
-                    <button class="opacity-70 hover:opacity-80 ml-3 mt-[3px]" @click="open = false">
-                        <div class="sr-only">Close</div>
-                        <svg class="w-4 h-4 fill-current">
-                            <path
-                                d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
-                        </svg>
+                <div x-data="{ modalOpen: false }">
+                    <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
+                        + Tambah Riwayat Garansi
                     </button>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
-
-        <div x-data="handleSelect">
-            <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
-                {{-- Left side --}}
-                <h2 class="font-semibold text-slate-800">Semua Riwayat Garansi <span
-                        class="text-slate-400 font-medium">{{ $count }}</span></h2>
-                <div class="relative inline-flex">
-                    <div class="table-items-action hidden">
-                        <div class="flex items-center">
-                            <div class="text-sm italic mr-2 whitespace-nowrap"><span class="table-items-count"></span>
-                                item yang dipilih</div>
-                            <button
-                                class="btn bg-white border-slate-200 hover:border-slate-300 text-rose-500 hover:text-rose-600"
-                                @click="deleteSelected">Hapus</button>
+                    <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalOpen" x-transition x-cloak></div>
+                    <div id="tambah-modal-data" class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="modalOpen" x-transition x-cloak>
+                        <div class="bg-white rounded shadow-lg overflow-auto max-w-2xl w-full max-h-full" @click.outside="if(!$event.target.closest('.select2-container')) modalOpen = false" @keydown.escape.window="modalOpen = false">
+                            <form action="{{ route('history-garansi.store') }}" method="POST" id="formGaransi">
+                                @csrf
+                                <div class="px-5 py-4 space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Tanggal <span class="text-rose-500">*</span></label>
+                                        <input type="date" name="date" id="date" class="form-input w-full" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Nomor Servis <span class="text-rose-500">*</span></label>
+                                        <select name="service_id" id="service_id" class="form-select select2 w-full" required>
+                                            <option value="">-- Pilih Nomor Service --</option>
+                                            @foreach ($serviceTransactions as $st)
+                                                <option value="{{ $st->id }}" data-teknisi="{{ $st->user->name ?? '' }}" data-expired="{{ $st->exp_garansi }}" data-nota="{{ route('kepalatoko-pengambilan-cetak-inkjet', $st->id) }}">
+                                                    {{ $st->nomor_servis }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <small class="text-slate-500">Teknisi sebelumnya: <span id="prev_teknisi"></span></small><br>
+                                        <small class="text-slate-500">Exp Garansi: <span id="exp_garansi"></span></small><br>
+                                        <small class="text-slate-500">Link Nota: <span id="link_nota"></span></small>
+                                        <div id="history_garansi" class="mt-2 text-sm text-slate-700"></div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Pelanggan <span class="text-rose-500">*</span></label>
+                                        <select name="id_customer" class="form-select select2 w-full" required>
+                                            <option value="">-- Pilih Pelanggan --</option>
+                                            @foreach ($customer as $cs)
+                                                <option value="{{ $cs->id }}">{{ $cs->nama }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Penerima <span class="text-rose-500">*</span></label>
+                                        <select name="penerima_id" class="form-select w-full" required>
+                                            <option value="">-- Pilih Penerima --</option>
+                                            @foreach ($users as $u)
+                                                <option value="{{ $u->id }}">{{ $u->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Keluhan <span class="text-rose-500">*</span></label>
+                                        <input type="text" name="keluhan" class="form-input w-full" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">List Pengecekan Fungsi (Masuk) <span class="text-rose-500">*</span></label>
+                                        <small class="text-rose-500">*Jika ingin cepat silahkan isi kolom other.</small>
+                                        <div class="overflow-x-auto border rounded-sm">
+                                            <table class="w-full text-xs text-left border-collapse" id="table-qc-tab1">
+                                                <thead class="bg-slate-100 uppercase text-slate-500 font-semibold">
+                                                    <tr>
+                                                        <th class="border border-slate-300 p-2 w-8 text-center">No</th>
+                                                        <th class="border border-slate-300 p-2 w-1/2">ITEM</th>
+                                                        <th class="border border-slate-300 p-2 bg-blue-50 text-center">REMARK IN</th>
+                                                        <th class="border border-slate-300 p-2 w-8 text-center"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="checklist-tbody-tab1" class="text-slate-700"></tbody>
+                                            </table>
+                                        </div>
+                                        <button type="button" onclick="addCustomRowTab1()" class="mt-2 text-xs flex items-center text-indigo-600 font-bold hover:text-indigo-800">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                                            Tambah Baris Custom
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1" for="estimasi_pengerjaan">Estimasi Pengerjaan</label>
+                                        <select id="estimasi_pengerjaan" name="estimasi_pengerjaan" class="form-select text-sm py-2 w-full">
+                                            <option selected value="">Pilih Estimasi Pengerjaan</option>
+                                            <option value="1 Hari">1 Hari</option>
+                                            <option value="2 Hari">2 Hari</option>
+                                            <option value="3 Hari">3 Hari</option>
+                                            <option value="1 Minggu">1 Minggu</option>
+                                            <option value="1 Bulan">1 Bulan</option>
+                                            </select>
+                                    </div>
+                                </div>
+                                <div class="px-5 py-4 border-t flex justify-end space-x-2">
+                                    <button type="button" class="btn-sm border-slate-200" @click="modalOpen=false">Batal</button>
+                                    <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Simpan</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
-            {{-- @dd($data); --}}
-            <!-- Table -->
-            <div class="overflow-x-auto">
-                <table class="table-auto w-full">
-                    <thead
-                        class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
+        </div>
+
+        <div class="sm:flex sm:justify-between sm:items-center mb-5">
+            <div class="mb-4 sm:mb-0">
+                <ul class="flex flex-wrap -m-1" id="status-filters">
+                    <li class="m-1">
+                        <button class="filter-btn inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border shadow-sm bg-indigo-500 text-white" data-status="">
+                            Semua <span class="ml-1 text-slate-200">{{ $count }}</span>
+                        </button>
+                    </li>
+                    <li class="m-1">
+                        <button class="filter-btn inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border shadow-sm bg-white text-slate-500 border-slate-200" data-status="1">
+                            Proses <span class="ml-1 text-slate-400">{{ $prosesCount }}</span>
+                        </button>
+                    </li>
+                    <li class="m-1">
+                        <button class="filter-btn inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border shadow-sm bg-white text-slate-500 border-slate-200" data-status="2">
+                            Selesai <span class="ml-1 text-slate-400">{{ $selesaiCount }}</span>
+                        </button>
+                    </li>
+                    <li class="m-1">
+                        <button class="filter-btn inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border shadow-sm bg-white text-slate-500 border-slate-200" data-status="3">
+                            Dibatalkan <span class="ml-1 text-slate-400">{{ $dibatalkanCount }}</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        @if ($errors->any())
+            <div class="mb-4 px-4 py-2 rounded-sm text-sm bg-rose-500 text-white">
+                <ul class="list-disc pl-4">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
+            <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
+                <h2 class="font-semibold text-slate-800">Semua Riwayat Garansi</h2>
+                <div class="relative inline-flex">
+                    <div class="table-items-action hidden">
+                        <div class="flex items-center">
+                            <div class="text-sm italic mr-2 whitespace-nowrap"><span class="table-items-count">0</span> item yang dipilih</div>
+                            <button class="btn bg-white border-slate-200 hover:border-slate-300 text-rose-500 hover:text-rose-600" onclick="deleteSelected()">Hapus</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto p-4">
+                <table id="history-garansi-table" class="table-auto w-full">
+                    <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
                             <th class="px-2 py-3 w-px">
                                 <div class="flex items-center">
                                     <label class="inline-flex">
                                         <span class="sr-only">Select all</span>
-                                        <input id="parent-checkbox" class="form-checkbox" type="checkbox"
-                                            @click="toggleAll">
+                                        <input id="parent-checkbox" class="form-checkbox" type="checkbox" />
                                     </label>
                                 </div>
                             </th>
@@ -426,225 +252,174 @@
                             @endif
                         </tr>
                     </thead>
-                    <tbody class="text-sm divide-y divide-slate-200">
-                        @php $i = 1; @endphp
-                        @foreach ($data as $item)
-                            <tr>
-                                <td class="px-2 py-3 w-px">
-                                    <div class="flex items-center">
-                                        <label class="inline-flex">
-                                            <input class="table-item form-checkbox" type="checkbox"
-                                                value="{{ $item->id }}" @click="uncheckParent">
-                                        </label>
-                                    </div>
-                                </td>
-
-                                <td class="px-2 py-3">{{ $i++ }}</td>
-                                <td class="px-2 py-3">{{ $item->date }}</td>
-                                <td class="px-2 py-3">{{ $item->tgl_selesai }}</td>
-                                <td class="px-2 py-3">{{ $item->service->nomor_servis ?? '' }}</td>
-                                <td class="px-2 py-3">{{ $item->pelanggan->nama ?? '-' }}</td>
-                                <td class="px-2 py-3">{{ $item->penerima->name ?? '-' }}</td>
-                                <td class="px-2 py-3">{{ $item->keluhan ?? '-' }}</td>
-                                <td class="px-2 py-3">
-                                    <a href="{{  route('kepalatoko-cetak-qc-garansi',$item->id)  }}" target="_blank" class="btn bg-indigo-500 hover:bg-indigo-600 text-white " title="Lihat PDF QC">
-                                        Lihat QC
-                                    </a>
-                                </td>
-                                <td class="px-2 py-3">{{ $item->teknisi->name ?? '-' }}</td>
-
-                                {{-- Tindakan --}}
-                                <td class="px-2 py-3">
-                                    @if (!empty($item->tindakan))
-                                    @php
-                                        $tindakans = json_decode( $item->tindakan, true) ?? [];
-                                    @endphp
-
-                                    <ul class="list-disc ml-4">
-                                        @foreach ($tindakans as $t)
-                                            @php
-                                                $action = \App\Models\ServiceAction::find($t['id']);
-                                            @endphp
-                                            <li>{{ $action ? $action->nama_tindakan : $t['id_manual'] }}
-                                                - Rp{{ number_format($t['harga'], 0, ',', '.') }}
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-
-                                {{-- Sparepart --}}
-                                <td class="px-2 py-3">
-                                    @if (!empty($item->sparepart))
-                                        @php $spareparts = json_decode($item->sparepart, true); @endphp
-                                        @if ($spareparts)
-                                            <ul class="list-disc ml-4">
-                                                @foreach ($spareparts as $sp)
-                                                    @php $prd = \App\Models\Product::find($sp['id']); @endphp
-                                                    <li>
-                                                        {{ $prd->product_name ?? 'Produk ID ' . $sp['id'] }}
-                                                        (x{{ $sp['qty'] }})
-                                                        - Rp{{ number_format($sp['harga'], 0, ',', '.') }}
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-                                        @else
-                                            -
-                                        @endif
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-
-                                <td class="px-2 py-3">Rp{{ number_format($item->total_biaya, 0, ',', '.') }}</td>
-                                <td class="px-2 py-3">{{ $item->catatan }}</td>
-                                <td class="px-2 py-3">
-                                    <center>
-                                        <button
-                                                class="btn-status
-                                                {{ $item->status == 1 ? 'status-menunggu' : ($item->status == 2 ? 'status-selesai' : 'status-batal') }}"
-                                                data-id="{{ $item->id }}">
-
-                                                @if ($item->status == 1)
-                                                    Diproses
-                                                @elseif ($item->status == 2)
-                                                    Sudah Selesai
-                                                @elseif ($item->status == 3)
-                                                    Dibatalkan / Pengembalian Dana
-                                                @endif
-
-                                            </button>
-                                    </center>
-
-
-                                </td>
-
-
-                                @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
-                                {{-- Aksi (popup hapus tetap) --}}
-                                <td class="px-2 py-3">
-                                    <div class="space-x-1 flex">
-                                        <div class="flex space-x-2">
-                                            <a href="{{ route('history-garansi.edit', $item->id) }}">
-                                                <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                        <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-                                                        <rect x="9" y="3" width="6" height="4" rx="2" />
-                                                        <path d="M9 14l2 2l4 -4" />
-                                                    </svg>
-                                                </button>
-                                            </a>
-                                            @if (!empty($item->service))
-                                            <a href="{{ route('history-garansi.cetak-inject', $item->id) }}" target="_blank">
-                                                <button class="text-slate-400 hover:text-slate-500 rounded-full" title="Ubah">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00abfb" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                        <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
-                                                        <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
-                                                        <rect x="7" y="13" width="10" height="8" rx="2" />
-                                                    </svg>
-                                                </button>
-                                            </a>
-                                            @endif
-                                        </div>
-                                            <div x-data="{ modalOpen: false }">
-                                                <button class="text-rose-500 hover:text-rose-600 rounded-full"
-                                                    @click.prevent="modalOpen = true" aria-controls="danger-modal">
-                                                    <span class="sr-only">Delete</span>
-                                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                                        <path d="M13 15h2v6h-2zM17 15h2v6h-2z" />
-                                                        <path
-                                                            d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z" />
-                                                    </svg>
-                                                </button>
-                                                <!-- Modal backdrop -->
-                                                <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
-                                                    x-show="modalOpen"
-                                                    x-transition:enter="transition ease-out duration-200"
-                                                    x-transition:enter-start="opacity-0"
-                                                    x-transition:enter-end="opacity-100"
-                                                    x-transition:leave="transition ease-out duration-100"
-                                                    x-transition:leave-start="opacity-100"
-                                                    x-transition:leave-end="opacity-0" aria-hidden="true" x-cloak></div>
-                                                <!-- Modal dialog -->
-                                                <div id="danger-modal"
-                                                    class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                                                    role="dialog" aria-modal="true" x-show="modalOpen"
-                                                    x-transition:enter="transition ease-in-out duration-200"
-                                                    x-transition:enter-start="opacity-0 translate-y-4"
-                                                    x-transition:enter-end="opacity-100 translate-y-0"
-                                                    x-transition:leave="transition ease-in-out duration-200"
-                                                    x-transition:leave-start="opacity-100 translate-y-0"
-                                                    x-transition:leave-end="opacity-0 translate-y-4" x-cloak>
-                                                    <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full"
-                                                        @keydown.escape.window="modalOpen = false">
-                                                        <div class="p-5 flex space-x-4">
-                                                            <!-- Icon -->
-                                                            <div
-                                                                class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
-                                                                <svg class="w-4 h-4 shrink-0 fill-current text-rose-500"
-                                                                    viewBox="0 0 16 16">
-                                                                    <path
-                                                                        d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
-                                                                </svg>
-                                                            </div>
-                                                            <!-- Content -->
-                                                            <div>
-                                                                <!-- Modal header -->
-                                                                <div class="mb-2">
-                                                                    <div class="text-lg font-semibold text-slate-800">
-                                                                        Apakah anda sudah yakin ?</div>
-                                                                </div>
-                                                                <!-- Modal content -->
-                                                                <div class="text-sm mb-10">
-                                                                    <div class="space-y-2">
-                                                                        <p>Jika sudah terhapus, maka tidak bisa dikembalikan
-                                                                            lagi.</p>
-                                                                    </div>
-                                                                </div>
-                                                                <!-- Modal footer -->
-                                                                <div class="flex flex-wrap justify-end space-x-2">
-                                                                    <button
-                                                                        class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600"
-                                                                        @click="modalOpen = false">Batal</button>
-                                                                    <form
-                                                                        action="{{ route('history-garansi.destroy', $item->id) }}"
-                                                                        method="post">
-                                                                        @method('delete')
-                                                                        @csrf
-                                                                        <button
-                                                                            class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya,
-                                                                            Hapus</button>
-                                                                    </form>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                @endif
-                            </tr>
-                        @endforeach
-                    </tbody>
+                    <tbody class="text-sm divide-y divide-slate-200"></tbody>
                 </table>
+            </div>
+        </div>
 
+    </div>
 
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6">
+        <div class="fixed inset-0 bg-slate-900 bg-opacity-30 transition-opacity" onclick="closeDeleteModal()"></div>
+        <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full relative z-10">
+            <div class="p-5 flex space-x-4">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
+                    <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16"><path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" /></svg>
+                </div>
+                <div>
+                    <div class="mb-2"><div class="text-lg font-semibold text-slate-800">Apakah anda sudah yakin?</div></div>
+                    <div class="text-sm mb-10"><p>Jika sudah terhapus, maka data tidak bisa dikembalikan lagi.</p></div>
+                    <div class="flex flex-wrap justify-end space-x-2">
+                        <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" onclick="closeDeleteModal()">Batal</button>
+                        <form id="delete-form" action="" method="post">
+                            @method('delete')
+                            @csrf
+                            <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <!-- Select2 CSS -->
+
+{{-- </x-toko-layout> --}}
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Select2 JS -->
+@endpush
+
+{{-- @push('scripts') --}}
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var currentStatus = '';
+
+            var table = $('#history-garansi-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('history-garansi.data') }}",
+                    data: function (d) {
+                        d.status = currentStatus;
+                    }
+                },
+                columns: [
+                    { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                    { data: 'date', name: 'date' },
+                    { data: 'tgl_selesai', name: 'tgl_selesai' },
+                    { data: 'nomor_servis', name: 'nomor_servis' },
+                    { data: 'pelanggan_nama', name: 'pelanggan_nama' },
+                    { data: 'penerima_nama', name: 'penerima_nama' },
+                    { data: 'keluhan', name: 'keluhan' },
+                    { data: 'qc_button', name: 'qc_button', orderable: false, searchable: false },
+                    { data: 'teknisi_nama', name: 'teknisi_nama' },
+                    { data: 'tindakan_list', name: 'tindakan_list', orderable: false, searchable: false },
+                    { data: 'sparepart_list', name: 'sparepart_list', orderable: false, searchable: false },
+                    { data: 'total_biaya', name: 'total_biaya' },
+                    { data: 'catatan', name: 'catatan' },
+                    { data: 'status_badge', name: 'status_badge', orderable: false, searchable: false },
+                    @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
+                    { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
+                    @endif
+                ],
+                order: [[2, 'desc']],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    paginate: { first: "Awal", last: "Akhir", next: "Lanjut", previous: "Kembali" }
+                },
+                drawCallback: function() {
+                    attachCheckboxHandlers();
+                }
+            });
+
+            // Filter Status Button Click Logic
+            $('.filter-btn').on('click', function() {
+                // Update styling
+                $('.filter-btn').removeClass('bg-indigo-500 text-white').addClass('bg-white text-slate-500 border-slate-200');
+                $(this).removeClass('bg-white text-slate-500 border-slate-200').addClass('bg-indigo-500 text-white');
+                $(this).find('span').removeClass('text-slate-400').addClass('text-slate-200');
+
+                // Reload Table
+                currentStatus = $(this).data('status');
+                table.draw();
+            });
+
+            // --- CHECKBOX & BULK DELETE LOGIC ---
+            function attachCheckboxHandlers() {
+                $('#parent-checkbox').prop('checked', false);
+                toggleBulkAction();
+
+                $('#parent-checkbox').off('click').on('click', function() {
+                    var checked = $(this).is(':checked');
+                    $('input.table-item').prop('checked', checked);
+                    toggleBulkAction();
+                });
+
+                $('#history-garansi-table').off('change', '.table-item').on('change', '.table-item', function() {
+                    var all = $('input.table-item').length;
+                    var checked = $('input.table-item:checked').length;
+                    $('#parent-checkbox').prop('checked', all === checked && all > 0);
+                    toggleBulkAction();
+                });
+            }
+
+            function toggleBulkAction() {
+                var checkedCount = $('input.table-item:checked').length;
+                $('.table-items-count').text(checkedCount);
+                if (checkedCount > 0) {
+                    $('.table-items-action').removeClass('hidden');
+                } else {
+                    $('.table-items-action').addClass('hidden');
+                }
+            }
+
+            window.deleteSelected = function() {
+                var selectedIds = $('input.table-item:checked').map(function() {
+                    return $(this).val();
+                }).get();
+
+                if (selectedIds.length === 0) return alert('Pilih data terlebih dahulu.');
+                if (!confirm('Yakin ingin menghapus ' + selectedIds.length + ' data ini?')) return;
+
+                $.ajax({
+                    url: "{{ route('history-garansi.bulkDelete') }}",
+                    method: 'POST',
+                    data: {
+                        ids: selectedIds,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        alert(response.message);
+                        table.ajax.reload();
+                        $('.table-items-action').addClass('hidden');
+                    },
+                    error: function(xhr) {
+                        alert('Gagal menghapus data.');
+                    }
+                });
+            };
+        });
+
+        // SINGLE DELETE MODAL LOGIC
+        function confirmDelete(id) {
+            var url = "{{ url('history-garansi') }}/" + id;
+            $('#delete-form').attr('action', url);
+            $('#delete-modal').removeClass('hidden').addClass('flex');
+        }
+
+        function closeDeleteModal() {
+            $('#delete-modal').addClass('hidden').removeClass('flex');
+        }
+    </script>
 
     <script>
     // --- DATA ITEM STANDAR (Berlaku untuk Tab 1 & Tab 2) ---
@@ -662,14 +437,11 @@
         renderAllChecklists();
     });
 
-    // --- FUNGSI RENDER UTAMA ---
     function renderAllChecklists() {
         const tbodyTab1 = document.getElementById('checklist-tbody-tab1');
-
         tbodyTab1.innerHTML = '';
 
         defaultChecklist.forEach((item, index) => {
-            // === RENDER TAB 1 (Hanya IN) ===
             const tr1 = document.createElement('tr');
             tr1.className = "border-b border-slate-200 hover:bg-slate-50";
             tr1.innerHTML = `
@@ -685,7 +457,6 @@
                 </td>
             `;
             tbodyTab1.appendChild(tr1);
-
         });
     }
 
@@ -694,7 +465,6 @@
         const rowCount = tbody.rows.length + 1;
         const tr = document.createElement('tr');
         tr.className = "border-b border-slate-200 hover:bg-yellow-50";
-
         tr.innerHTML = `
             <td class="border border-slate-300 p-1 text-center font-bold row-num">${rowCount}</td>
             <td class="border border-slate-300 p-0">
@@ -712,54 +482,24 @@
         tbody.appendChild(tr);
     }
 
-    function addCustomRowTab2() {
-        const tbody = document.getElementById('checklist-tbody-tab2');
-        const rowCount = tbody.rows.length + 1;
-        const tr = document.createElement('tr');
-        tr.className = "border-b border-slate-200 hover:bg-yellow-50";
-
-        tr.innerHTML = `
-            <td class="border border-slate-300 p-1 text-center font-bold row-num">${rowCount}</td>
-            <td class="border border-slate-300 p-0">
-                <input type="text" name="custom_item_name[]" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent font-medium text-indigo-600" placeholder="Ketik Nama Item..." required>
-            </td>
-            <td class="border border-slate-300 p-0">
-                <input type="text" name="custom_qc_masuk[]" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent text-center" placeholder="-">
-            </td>
-            <td class="border border-slate-300 p-0">
-                <input type="text" name="custom_qc_keluar[]" class="w-full h-full p-1 border-0 focus:ring-0 bg-transparent text-center" placeholder="-">
-            </td>
-            <td class="border border-slate-300 p-1 text-center">
-                <button type="button" class="text-rose-500 hover:text-rose-700" onclick="deleteRow(this)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="7" x2="20" y2="7" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    }
-
-    // --- FUNGSI HAPUS BARIS ---
     function deleteRow(btn) {
         const row = btn.closest('tr');
         const tbody = row.parentNode;
         row.remove();
-
-        // Update nomor urut
         Array.from(tbody.rows).forEach((r, index) => {
             const numCell = r.querySelector('.row-num');
             if(numCell) numCell.innerText = index + 1;
         });
     }
-</script>
+    </script>
+
     <script>
         $(document).ready(function() {
-            // aktifkan select2
             $('.select2').select2({
-                width: '100%', // biar full width
-                dropdownParent: $('#tambah-modal-data') // penting supaya muncul di dalam modal
+                width: '100%',
+                dropdownParent: $('#tambah-modal-data')
             });
 
-            // update teknisi + garansi saat service_id berubah
             $('#service_id').on('change', function() {
                 let selected = $(this).find(':selected');
                 $('#prev_teknisi').text(selected.data('teknisi'));
@@ -767,39 +507,28 @@
 
                 let notaUrl = selected.data('nota');
                 if (notaUrl) {
-                    $('#link_nota').html(
-                        `<a href="${notaUrl}" target="_blank" class="text-blue-600 underline">Lihat Nota</a>`
-                    );
+                    $('#link_nota').html(`<a href="${notaUrl}" target="_blank" class="text-blue-600 underline">Lihat Nota</a>`);
                 } else {
                     $('#link_nota').html('');
                 }
 
-                // =======================
-                // AMBIL HISTORY GARANSI
-                // =======================
                 let service_id = $(this).val();
                 let historyBox = $('#history_garansi');
                 historyBox.html('<span class="text-gray-500">Memuat...</span>');
+
+                if(!service_id) { historyBox.html(''); return; }
 
                 let url = `/history-garansi/list-data/${service_id}`
                 $.ajax({
                     url: url,
                     method: 'GET',
                     success: function(response) {
-
-
-                        console.log(url);
-                        console.log(service_id);
-                        console.log(response);
-
                         if (response.length === 0) {
                             historyBox.html('<span class="text-gray-500">Tidak ada riwayat garansi.</span>');
                             return;
                         }
-
                         let html = '';
                         response.forEach((item, index) => {
-
                             let tindakanHTML = '-';
                             if (item.tindakan_list && item.tindakan_list.length > 0) {
                                 tindakanHTML = '<ul class="list-disc ml-4">';
@@ -808,7 +537,6 @@
                                 });
                                 tindakanHTML += '</ul>';
                             }
-
                             html += `
                                 <div class="mb-2 p-2 border rounded bg-slate-50">
                                     <div class="font-semibold">Klaim Garansi ${index + 1}</div>
@@ -820,8 +548,6 @@
                                 </div>
                             `;
                         });
-
-
                         historyBox.html(html);
                     },
                     error: function() {
@@ -829,67 +555,8 @@
                     }
                 });
             });
-
         });
     </script>
-
-  <script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('handleSelect', () => ({
-        selected: [],
-        deleteUrl: '{{ route("history-garansi.bulkDelete") }}', // kita buat route ini
-        toggleAll(e) {
-            const checked = e.target.checked;
-            this.selected = [];
-            document.querySelectorAll('.table-item').forEach(el => {
-                el.checked = checked;
-                if (checked) this.selected.push(el.value);
-            });
-            this.toggleAction();
-        },
-        uncheckParent() {
-            const all = document.querySelectorAll('.table-item');
-            const selected = Array.from(all).filter(x => x.checked).map(x => x.value);
-            this.selected = selected;
-            document.getElementById('parent-checkbox').checked = selected.length === all.length;
-            this.toggleAction();
-        },
-        toggleAction() {
-            const action = document.querySelector('.table-items-action');
-            const countEl = document.querySelector('.table-items-count');
-            if (this.selected.length > 0) {
-                action.classList.remove('hidden');
-                countEl.textContent = this.selected.length;
-            } else {
-                action.classList.add('hidden');
-            }
-        },
-        deleteSelected() {
-            if (this.selected.length === 0) return;
-
-            if (!confirm('Yakin ingin menghapus data terpilih?')) return;
-
-            fetch(this.deleteUrl, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ ids: this.selected })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    window.location.reload();
-                }
-            })
-            .catch(err => console.error(err));
-        }
-    }))
-});
-</script>
-
 
     <script>
         $(document).on('click', '.toggle-status', function() {
@@ -899,249 +566,23 @@ document.addEventListener('alpine:init', () => {
             $.ajax({
                 url: `/history-garansi/${id}/toggle-status`,
                 method: "PATCH",
-                data: {
-                    _token: "{{ csrf_token() }}"
-                },
+                data: { _token: "{{ csrf_token() }}" },
                 success: function(res) {
                     if (res.success) {
                         btn.text(res.label);
-
-                        btn.removeClass(
-                            'bg-yellow-100 text-yellow-700 bg-green-100 text-green-700 bg-red-100 text-red-700'
-                        );
-
+                        btn.removeClass('status-menunggu status-selesai status-batal');
                         if (res.status == 1) {
-                            btn.addClass('bg-yellow-100 text-yellow-700');
+                            btn.addClass('status-menunggu');
                         } else if (res.status == 2) {
-                            btn.addClass('bg-green-100 text-green-700');
+                            btn.addClass('status-selesai');
                         } else {
-                            btn.addClass('bg-red-100 text-red-700');
+                            btn.addClass('status-batal');
                         }
                     }
                 },
-                error: function() {
-                    alert('Gagal update status!');
-                }
+                error: function() { alert('Gagal update status!'); }
             });
         });
     </script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            let products = @json($products);
-            let rowId = 0;
-
-            document.getElementById("addSparepartRow").addEventListener("click", function() {
-                rowId++;
-                let container = document.getElementById("rowContainer");
-
-                let div = document.createElement("div");
-                div.classList.add(
-                    "grid",
-                    "grid-cols-1", // default 1 kolom (mobile)
-                    "md:grid-cols-4", // di desktop jadi 4 kolom
-                    "gap-2",
-                    "items-center",
-                    "mb-2"
-                );
-
-                div.innerHTML = `
-                        <select name="sparepart[${rowId}][id]"
-                                class="form-select sparepartSelect select2 w-full" required>
-                            <option value="">-- Pilih Sparepart --</option>
-                            ${products.map(p => `<option value="${p.id}" data-harga="${p.harga_modal}">${p.product_name}</option>`).join("")}
-                        </select>
-
-                        <input type="number" name="sparepart[${rowId}][harga]"
-                            class="form-input harga w-full" placeholder="Harga" required>
-
-                        <input type="number" name="sparepart[${rowId}][qty]"
-                            class="form-input qty w-full" placeholder="Qty" value="1" min="1" required>
-
-                        <button type="button"
-                                class="btn-sm bg-rose-500 text-white w-full md:w-auto removeRow">
-                            ✕
-                        </button>
-                    `;
-
-                container.appendChild(div);
-
-                // update harga otomatis
-                div.querySelector(".sparepartSelect").addEventListener("change", function() {
-                    let harga = this.options[this.selectedIndex].dataset.harga || 0;
-                    div.querySelector(".harga").value = harga;
-                    calculateTotal();
-                });
-
-                div.querySelector(".harga").addEventListener("input", calculateTotal);
-                div.querySelector(".qty").addEventListener("input", calculateTotal);
-                div.querySelector(".tindakanHarga").addEventListener("input", calculateTotal);
-
-                div.querySelector(".removeRow").addEventListener("click", function() {
-                    div.remove();
-                    calculateTotal();
-                });
-            });
-
-            function calculateTotal() {
-                let total = 0;
-                document.querySelectorAll("#rowContainer > div").forEach(row => {
-                    let harga = parseFloat(row.querySelector(".harga").value || 0);
-                    let qty = parseInt(row.querySelector(".qty").value || 0);
-
-                    total += harga * qty;
-                    console.log(total);
-
-                });
-                // ubah ke angka biar gak digabung string
-                let total_biaya_tindakan = parseFloat($('#total_biaya_tindakan').val() || 0);
-
-                // hitung total keseluruhan
-                let totalKeseluruhan = total + total_biaya_tindakan;
-
-                $('#total_biaya').val(totalKeseluruhan);
-                document.getElementById("modal_sparepart").value = total;
-            }
-        });
-        document.addEventListener("DOMContentLoaded", function() {
-            const sparepartCheckbox = document.getElementById("useSparepartCheckbox");
-            const sparepartWrapper = document.getElementById("sparepart_wrapper");
-            const modalSparepartWrapper = document.getElementById("modal_sparepart_wrapper");
-            const rowContainer = document.getElementById("rowContainer");
-
-            sparepartCheckbox.addEventListener("change", function() {
-                if (this.checked) {
-                    sparepartWrapper.style.display = "block";
-                    modalSparepartWrapper.style.display = "block";
-                    // semua input sparepart wajib diisi (required)
-                    rowContainer.querySelectorAll("select, input").forEach(el => el.required = true);
-                } else {
-                    sparepartWrapper.style.display = "none";
-                    modalSparepartWrapper.style.display = "none";
-                    // reset value dan hilangkan semua row sparepart
-                    rowContainer.innerHTML = "";
-                    // hilangkan required
-                    rowContainer.querySelectorAll("select, input").forEach(el => el.required = false);
-                    // reset total biaya sparepart (biar ga ikut ngitung)
-                    calculateTotal();
-
-                }
-            });
-
-            // fungsi hitung total (sama kayak sebelumnya)
-            function calculateTotal() {
-                let total = 0;
-                document.querySelectorAll("#rowContainer > div").forEach(row => {
-                    let harga = parseFloat(row.querySelector(".harga")?.value || 0);
-                    let qty = parseInt(row.querySelector(".qty")?.value || 0);
-                    total += harga * qty;
-                });
-                document.getElementById("modal_sparepart").value = total;
-            }
-        });
-    </script>
-    <script>
-        function updateTotalModal() {
-            const tindakan = parseFloat(document.getElementById('total_biaya_tindakan').value) || 0;
-            document.getElementById('total_biaya').value = tindakan;
-        }
-        document.addEventListener("DOMContentLoaded", function() {
-            let tindakanList = @json($serviceActions); // pastikan kamu kirim $serviceActions dari controller
-            let tindakanContainer = document.getElementById("tindakanContainer");
-            let totalBiayaInput = document.getElementById("total_biaya_tindakan");
-            let totalBiayaFinal = document.getElementById("total_biaya");
-            let addTindakanBtn = document.getElementById("addTindakanRow");
-            let tindakanRowId = 0;
-
-            addTindakanBtn.addEventListener("click", function() {
-                tindakanRowId++;
-                let div = document.createElement("div");
-                div.classList.add("grid", "grid-cols-1", "md:grid-cols-3", "gap-2", "items-center", "mb-2");
-                div.innerHTML = `
-                <select name="tindakan[${tindakanRowId}][id]"
-                        class="form-select tindakanSelect w-full" required>
-                    <option value="">-- Pilih Tindakan --</option>
-                    ${tindakanList.map(t => `<option value="${t.id}" data-harga="${t.harga_pelanggan}">${t.nama_tindakan}</option>`).join("")}
-                </select>
-                <input type="text" name="tindakan[${tindakanRowId}][id_manual]" class="form-input tindakanManual w-full hidden" placeholder="Input manual tindakan">
-
-                 <div class="flex items-center space-x-2">
-                    <input type="checkbox" class="form-checkbox toggleManual" id="manual-${tindakanRowId}">
-                    <label for="manual-${tindakanRowId}" class="text-sm text-slate-600">Input manual</label>
-                </div>
-
-                <input type="number" name="tindakan[${tindakanRowId}][harga]"
-                       class="form-input tindakanHarga w-full" placeholder="Harga" value="0" required>
-                <button type="button" class="btn-sm bg-rose-500 text-white removeTindakan w-full md:w-auto">✕</button>
-            `;
-
-                tindakanContainer.appendChild(div);
-
-                // toggle manual input
-                div.querySelector(".toggleManual").addEventListener("change", function() {
-                    let manual = div.querySelector(".tindakanManual");
-                    let select = div.querySelector(".tindakanSelect");
-
-                    if (this.checked) {
-                        select.classList.add("hidden");
-                        select.removeAttribute("required");
-                        manual.classList.remove("hidden");
-                        manual.setAttribute("required", true);
-                        $(select).val('').trigger('change');
-                    } else {
-                        manual.classList.add("hidden");
-                        manual.removeAttribute("required");
-                        select.classList.remove("hidden");
-                        select.setAttribute("required", true);
-                        manual.value = '';
-                    }
-                });
-
-                let select = div.querySelector(".tindakanSelect");
-                let hargaInput = div.querySelector(".tindakanHarga");
-
-                div.querySelector(".tindakanHarga").addEventListener("input", calculateTindakanTotal);
-
-                // ketika pilih tindakan
-                select.addEventListener("change", function() {
-                    let harga = parseFloat(select.options[select.selectedIndex].dataset.harga || 0);
-                    hargaInput.value = harga;
-                    calculateTindakanTotal();
-                });
-
-                // hapus row tindakan
-                div.querySelector(".removeTindakan").addEventListener("click", function() {
-                    div.remove();
-                    calculateTindakanTotal();
-                });
-            });
-
-            function calculateTindakanTotal() {
-                let total = 0;
-                document.querySelectorAll("#tindakanContainer .tindakanHarga").forEach(input => {
-                    total += parseFloat(input.value || 0);
-                });
-                totalBiayaInput.value = total;
-                calculateFinalTotal();
-            }
-
-            function calculateFinalTotal() {
-                let totalTindakan = parseFloat(totalBiayaInput.value || 0);
-                let modalSparepart = parseFloat(document.getElementById("modal_sparepart").value || 0);
-                totalBiayaFinal.value = totalTindakan + modalSparepart;
-            }
-
-            // jika modal_sparepart berubah, update total akhir
-            document.getElementById("modal_sparepart").addEventListener("input", calculateFinalTotal);
-        });
-    </script>
-
-
-
-
-
-    <!-- Pagination -->
-    <div class="mt-8">
-        {{ $data->links() }}
-    </div>
-</div>
+{{-- @endpush --}}

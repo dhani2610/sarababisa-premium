@@ -89,21 +89,21 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                                            
+                    </div>
                 </div>
-                <!-- End Delete-->                          
-                
+                <!-- End Delete-->
+
             </div>
 
         </div>
-     
+
         <!-- Table -->
-        <x-log-table :activities="$activities"/>
-        
+        <x-log-table />
+
         <!-- Pagination -->
-        <div class="mt-8">
+        {{-- <div class="mt-8">
             {{$activities->links()}}
-        </div>
+        </div> --}}
 
     </div>
 </x-toko-layout>

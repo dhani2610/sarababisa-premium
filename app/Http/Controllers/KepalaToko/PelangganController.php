@@ -28,7 +28,13 @@ class PelangganController extends Controller
     public function getData(Request $request)
     {
         // Query Dasar
-        $query = Customer::where('cabang_id', getCabangId())->latest();
+        $limit = $request->get('limit', 200);
+        $offset = $request->get('offset', 0);
+        $query = Customer::where('cabang_id', getCabangId())
+        ->latest()
+        ->skip($offset)
+        ->take($limit)
+        ->get();
 
         return DataTables::of($query)
             ->addIndexColumn() // Untuk nomor urut (DT_RowIndex)
