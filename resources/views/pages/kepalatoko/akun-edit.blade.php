@@ -116,7 +116,7 @@
                                     <label class="block text-sm font-medium mb-1" for="persen_investor">Persentase Pembagian <span
                                             class="text-rose-500">*</span></label>
                                     <input id="persen_investor" name="persen_investor" value="{{ $item->persen_investor }}" class="form-input w-full px-2 py-1"
-                                        type="number" required />
+                                        type="number" />
                                 </div>
 
                                 <div id="shift_input" style="display: none">

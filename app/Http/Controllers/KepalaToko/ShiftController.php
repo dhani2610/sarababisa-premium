@@ -8,6 +8,7 @@ use App\Models\Worker;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables; // Pastikan ini diimport
+use Illuminate\Support\Facades\Auth;
 
 class ShiftController extends Controller
 {
@@ -15,7 +16,13 @@ class ShiftController extends Controller
     {
         // === LOGIC DATA TABLES ===
         if ($request->ajax()) {
-            $query = Shift::with('worker')->where('cabang_id', getCabangId())->latest();
+            $query = Shift::with('worker')->where('cabang_id', getCabangId());
+
+            if (Auth::user()->role !== 'Kepala Toko' && Auth::user()->workers_id) {
+                $query->where('worker_id', Auth::user()->workers_id);
+            }
+
+            $query->latest();
 
             return DataTables::of($query)
                 ->addIndexColumn()

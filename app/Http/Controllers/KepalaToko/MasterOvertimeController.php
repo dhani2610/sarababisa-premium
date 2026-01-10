@@ -17,7 +17,13 @@ class MasterOvertimeController extends Controller
         // === LOGIC YAJRA DATATABLES ===
         if ($request->ajax()) {
             $user = Auth::user();
-            $query = Overtime::where('cabang_id', getCabangId())->with('user')->latest();
+            $query = Overtime::where('cabang_id', getCabangId())->with('user');
+
+             if ($user->role !== 'Kepala Toko') {
+                $query->where('id_user', $user->id);
+            }
+
+            $query->latest();
 
             return DataTables::of($query)
                 ->addIndexColumn()
