@@ -365,6 +365,7 @@ class KaryawanController extends Controller
         $namaBulanFile = Carbon::now()->translatedFormat('F Y');
 
         $items = Worker::findOrFail($id);
+        // dd($items);
         $salaries = Salary::where('workers_id', $id)
             ->whereYear('created_at', $date->year)
             ->whereMonth('created_at', $date->month)

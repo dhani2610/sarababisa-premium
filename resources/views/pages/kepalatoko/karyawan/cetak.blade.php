@@ -85,7 +85,7 @@
 			</tr>
 			<tr>
 			<td></td>
-			<td class="text-right">Bulan Kerja : {{ \Carbon\Carbon::parse($items->bulankerja)->locale('id')->translatedFormat('F Y') }}</td>
+			<td class="text-right">Bulan Kerja : {{ \Carbon\Carbon::parse($items->bulankerja)->locale('id')->translatedFormat('d F Y') }}</td>
 			</tr>
 			<tr>
 			<td></td>

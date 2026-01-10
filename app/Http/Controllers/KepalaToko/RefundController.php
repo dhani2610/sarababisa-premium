@@ -148,6 +148,7 @@ class RefundController extends Controller
     public function store(Request $request)
     {
         $request->merge([
+            'nominal' => str_replace('.', '', $request->nominal),
             'nominal_servis' => str_replace('.', '', $request->nominal_servis),
         ]);
         $data = $request->all();
@@ -191,6 +192,7 @@ class RefundController extends Controller
     public function update(Request $request, $id)
     {
         $request->merge([
+            'nominal' => str_replace('.', '', $request->nominal),
             'nominal_servis' => str_replace('.', '', $request->nominal_servis),
         ]);
         $data = $request->all();

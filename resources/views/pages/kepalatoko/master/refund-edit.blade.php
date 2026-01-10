@@ -95,6 +95,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     teknisiInput.value = data.teknisi_name ?? '';
                     NominalInput.value = data.nominal ?? 0;
+                    console.log(data.nominal);
+
                     formatRupiahInput(NominalInput);
 
                     NominalInputServis.value = data.nominal_servis ?? 0;
