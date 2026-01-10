@@ -130,7 +130,12 @@ class AkunController extends Controller
                 return '<div class="font-medium">' . ($row->persen_investor ?? '0') . '%</div>';
             })
             ->addColumn('shift_name', function ($row) {
-                return '<div class="font-medium">' . ($row->shift ? e($row->shift->nama_shift) : '-') . '</div>';
+                if ($row->role == 'Investor') {
+                    return '<div class="font-medium">-</div>';
+                }else{
+                    return '<div class="font-medium">' . ($row->shift ? e($row->shift->nama_shift) : '-') . '</div>';
+
+                }
             })
 
             // --- TAMBAHAN KOLOM DATA BARU ---
