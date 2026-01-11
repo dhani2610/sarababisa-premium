@@ -357,7 +357,7 @@ class TransaksiServisController extends Controller
 
         // Uang muka
         ->addColumn('uang_muka', function ($row) {
-            return '<div class="font-medium">Rp. ' . number_format($row->uang_muka) . '</div>';
+            return '<div class="font-medium">Rp. ' . number_format($row->uang_muka ?? 0) . '</div>';
         })
 
         // Estimasi biaya
