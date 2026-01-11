@@ -1095,6 +1095,11 @@ class TransaksiServisController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        $request->merge([
+            'estimasi_biaya' => str_replace('.', '', $request->estimasi_biaya),
+            'uang_muka' => str_replace('.', '', $request->uang_muka),
+        ]);
         $item = ServiceTransaction::findOrFail($id);
         $nama_pelanggan = Customer::find($request->customers_id);
         $nama_tipe = Type::find($request->types_id);

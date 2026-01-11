@@ -47,7 +47,7 @@
                     serverSide: false,
                     // ajax: '{{ route('transaksi-servis-bisa-diambil.data') }}',
                     columns: [
-                        @if (Auth::user()->role == 'Investor')
+                        @if (Auth::user()->role != 'Investor')
                             {
                                 data: 'checkbox',
                                 name: 'checkbox',

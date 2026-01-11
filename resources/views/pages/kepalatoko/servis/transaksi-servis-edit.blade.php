@@ -190,7 +190,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="estimasi_biaya">Estimasi Biaya Servis</label>
                                     <div class="relative">
-                                        <input id="estimasi_biaya" name="estimasi_biaya" class="form-input w-full pl-10 px-2 py-1" type="number" value="{{ $item->estimasi_biaya }}"/>
+                                        <input id="estimasi_biaya" name="estimasi_biaya" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" value="{{ $item->estimasi_biaya }}"/>
                                         <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                             <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                         </div>
@@ -199,7 +199,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="uang_muka">DP/Uang Muka</label>
                                     <div class="relative">
-                                        <input id="uang_muka" name="uang_muka" class="form-input w-full pl-10 px-2 py-1" type="number" placeholder="Kosongkan jika tidak ada" value="{{ $item->uang_muka }}"/>
+                                        <input id="uang_muka" name="uang_muka" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" placeholder="Kosongkan jika tidak ada" value="{{ $item->uang_muka }}"/>
                                         <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                                             <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
                                         </div>
@@ -246,9 +246,33 @@
             });
         </script>
         <script>
+            function formatRupiahInput(el) {
+                let value = el.value || '';
+
+                // hapus semua selain angka
+                value = value.replace(/\D/g, '');
+
+                // format pakai titik
+                el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+
+            /* ON INPUT (REAL TIME) */
+            document.addEventListener('input', function (e) {
+                if (!e.target.classList.contains('input-currency')) return;
+                formatRupiahInput(e.target);
+            });
+
+            /* ON LOAD (FORM EDIT) */
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.input-currency').forEach(function (el) {
+                    formatRupiahInput(el);
+                });
+            });
+        </script>
+        <script>
     // Struktur: [ArrayStandar, ObjectMasuk, ObjectKeluar]
-    const fullData = @json([$qcItems, $qcMasuk, $qcKeluar]); 
-    
+    const fullData = @json([$qcItems, $qcMasuk, $qcKeluar]);
+
     // Pecah data ke variabel biar mudah dibaca
     const standardItems = fullData[0];       // List Nama Item
     const dataMasuk     = fullData[1] || {}; // Data Value Masuk
@@ -262,9 +286,9 @@
     function renderAllChecklists() {
         const tbodyTab2 = document.getElementById('checklist-tbody-tab2');
         tbodyTab2.innerHTML = '';
-        
+
         standardItems.forEach((item, index) => {
-            let valMasuk = dataMasuk[item] || ''; 
+            let valMasuk = dataMasuk[item] || '';
             let valKeluar = dataKeluar[item] || '';
 
             if(valMasuk === null) valMasuk = '';
@@ -272,7 +296,7 @@
 
             const tr = document.createElement('tr');
             tr.className = "border-b border-slate-200 hover:bg-slate-50";
-            
+
             tr.innerHTML = `
                 <td class="border border-slate-300 p-1 text-center font-bold row-num">${index + 1}</td>
                 <td class="border border-slate-300 p-1 font-medium bg-slate-50">${item}</td>
@@ -292,12 +316,12 @@
         });
 
         const allKeys = new Set([...Object.keys(dataMasuk), ...Object.keys(dataKeluar)]);
-        
+
         allKeys.forEach(key => {
             if (!standardItems.includes(key)) {
                 let valMasuk = dataMasuk[key] || '';
                 let valKeluar = dataKeluar[key] || '';
-                
+
                 addCustomRowTab2(key, valMasuk, valKeluar);
             }
         });

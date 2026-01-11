@@ -221,7 +221,7 @@
                                                         Nominal Bonus per Nota <span class="text-rose-500">*</span>
                                                     </label>
                                                     <input id="nominal_bonus_admin" name="nominal_bonus_admin"
-                                                        class="form-input w-full px-2 py-1" type="number"
+                                                        class="form-input w-full px-2 py-1 input-currency" type="text"
                                                         placeholder="Contoh: 5000" />
                                                 </div>
                                             </div>
@@ -433,6 +433,18 @@
     </div>
 
     <script>
+
+    document.addEventListener('input', function (e) {
+        if (!e.target.classList.contains('input-currency')) return;
+
+        let value = e.target.value;
+
+        // hapus semua selain angka
+        value = value.replace(/\D/g, '');
+
+        // format rupiah pakai titik
+        e.target.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    });
     function toggleInputs() {
         const role = document.getElementById('role').value;
         const extraFields = document.getElementById('extra-fields');

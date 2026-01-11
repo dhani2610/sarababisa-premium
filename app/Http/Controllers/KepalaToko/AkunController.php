@@ -429,6 +429,9 @@ class AkunController extends Controller
     public function store(UserRequest $request)
     {
         // dd($request->all());
+        $request->merge([
+            'nominal_bonus_admin' => str_replace('.', '', $request->nominal_bonus_admin),
+        ]);
         $langganan = Auth::user()->exp_date;
         $total_cabang = Auth::user()->total_cabang;
 
@@ -486,6 +489,9 @@ class AkunController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'nominal_bonus_admin' => str_replace('.', '', $request->nominal_bonus_admin),
+        ]);
         // dd($request->all());
         $item = User::findOrFail($id);
         $langganan = Auth::user()->exp_date;

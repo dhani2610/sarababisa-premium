@@ -232,7 +232,7 @@
                                                 Nominal Bonus per Nota <span class="text-rose-500">*</span>
                                             </label>
                                             <input id="nominal_bonus_admin" name="nominal_bonus_admin"
-                                                class="form-input w-full px-2 py-1" type="number" placeholder="Contoh: 5000"
+                                                class="form-input w-full px-2 py-1 input-currency" type="text" placeholder="Contoh: 5000"
                                                 value="{{ $item->nominal_bonus_admin }}" />
                                         </div>
                                     </div>
@@ -300,6 +300,31 @@
         </div>
 
     </div>
+
+     <script>
+        function formatRupiahInput(el) {
+            let value = el.value || '';
+
+            // hapus semua selain angka
+            value = value.replace(/\D/g, '');
+
+            // format pakai titik
+            el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        /* ON INPUT (REAL TIME) */
+        document.addEventListener('input', function (e) {
+            if (!e.target.classList.contains('input-currency')) return;
+            formatRupiahInput(e.target);
+        });
+
+        /* ON LOAD (FORM EDIT) */
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.input-currency').forEach(function (el) {
+                formatRupiahInput(el);
+            });
+        });
+    </script>
    <script>
 document.addEventListener('DOMContentLoaded', function() {
     const roleSelect = document.getElementById('role');

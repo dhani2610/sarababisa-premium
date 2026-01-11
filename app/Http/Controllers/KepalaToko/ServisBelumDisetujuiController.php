@@ -352,7 +352,7 @@ class ServisBelumDisetujuiController extends Controller
         $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
         $capacities = Capacity::where('cabang_id',getCabangId())->get();
         $users = User::where('role', 'Teknisi')->where('cabang_id',getCabangId())->get();
-        $workers = Worker::where('jabatan', 'like', '%' . 'teknisi')->where('cabang_id',getCabangId())->get();
+        $workers = Worker::whereIn('id', $users->pluck('workers_id'))->where('cabang_id',getCabangId())->get();
         $products = Product::whereHas('subCategory', function ($query) {
             $query->whereHas('category', function ($subQuery) {
                 $subQuery->where('category_name', 'Sparepart');

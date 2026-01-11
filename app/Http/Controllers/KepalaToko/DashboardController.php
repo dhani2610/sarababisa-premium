@@ -155,7 +155,23 @@ class DashboardController extends Controller
             ->whereDate('created_at', today())
             ->sum('total_price');
 
-        $haripengeluaran = Expense::where('cabang_id', $cabang)
+        $haripengeluaranToko = Expense::where('cabang_id', $cabang)
+            ->where('tipe', 0)
+            ->where('is_approve', 'Setuju')
+            ->whereYear('tgl_disetujui', now()->year)
+            ->whereMonth('tgl_disetujui', now()->month)
+            ->whereDate('tgl_disetujui', today())
+            ->sum('price');
+
+        $haripengeluaranServis = Expense::where('cabang_id', $cabang)
+            ->where('tipe', 1)
+            ->where('is_approve', 'Setuju')
+            ->whereYear('tgl_disetujui', now()->year)
+            ->whereMonth('tgl_disetujui', now()->month)
+            ->whereDate('tgl_disetujui', today())
+            ->sum('price');
+        $haripengeluaranPenjualan = Expense::where('cabang_id', $cabang)
+            ->where('tipe', 2)
             ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', now()->month)
@@ -212,7 +228,9 @@ class DashboardController extends Controller
             'approvekasbon',
             'approvepengeluaran',
             'totalbudgets',
-            'haripengeluaran',
+            'haripengeluaranToko',
+            'haripengeluaranServis',
+            'haripengeluaranPenjualan',
             'haripembelian',
             'haritotalomzet',
             'haritotalprofitkotor',

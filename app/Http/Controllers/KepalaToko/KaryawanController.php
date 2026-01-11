@@ -289,9 +289,9 @@ class KaryawanController extends Controller
             })
             ->exists();
 
-        if ($hasRelation) {
-            return response()->json(['message' => 'Gagal! Beberapa data Karyawan memiliki riwayat bonus/kasbon.'], 422);
-        }
+        // if ($hasRelation) {
+        //     return response()->json(['message' => 'Gagal! Beberapa data Karyawan memiliki riwayat bonus/kasbon.'], 422);
+        // }
 
         Worker::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data Karyawan berhasil dihapus.']);
@@ -308,9 +308,9 @@ class KaryawanController extends Controller
             })
             ->exists();
 
-        if ($hasRelation) {
-            return response()->json(['message' => 'Data Karyawan yang memiliki riwayat bonus/kasbon tidak bisa dihapus.']);
-        }
+        // if ($hasRelation) {
+        //     return response()->json(['message' => 'Data Karyawan yang memiliki riwayat bonus/kasbon tidak bisa dihapus.']);
+        // }
 
         Worker::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data Karyawan berhasil dihapus.']);
