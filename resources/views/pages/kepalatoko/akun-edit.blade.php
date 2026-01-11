@@ -113,11 +113,19 @@
                                 </div>
 
                                 <div id="persen_investor_input" style="display: none">
-                                    <label class="block text-sm font-medium mb-1" for="persen_investor">Persentase Pembagian <span
+                                    <label class="block text-sm font-medium mb-1" for="persen_investor">Persentase Pembagian Servis<span
                                             class="text-rose-500">*</span></label>
                                     <input id="persen_investor" name="persen_investor" value="{{ $item->persen_investor }}" class="form-input w-full px-2 py-1"
                                         type="number" />
                                 </div>
+
+                                <div id="persen_investor_produk-input" style="display: none">
+                                    <label class="block text-sm font-medium mb-1" for="persen_investor_produk">Persentase Pembagian Produk<span
+                                            class="text-rose-500">*</span></label>
+                                    <input id="persen_investor_produk" name="persen_investor_produk" value="{{ $item->persen_investor_produk }}" class="form-input w-full px-2 py-1"
+                                        type="number" />
+                                </div>
+
 
                                 <div id="shift_input" style="display: none">
                                     <label class="block text-sm font-medium mb-1" for="shift_id">Shift</label>
@@ -336,6 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const bonusInterfaceInput = document.getElementById('bonus-interface-input');
     const ShiftInput = document.getElementById('shift_input');
     const persenInvestorInput = document.getElementById('persen_investor_input');
+    const persenInvestorProdukInput = document.getElementById('persen_investor_produk_input');
 
     function toggleInputs() {
         const role = roleSelect.value;
@@ -348,6 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
             bonusInterfaceInput.style.display = 'none';
             ShiftInput.style.display = 'none';
             persenInvestorInput.style.display = 'block';
+            persenInvestorProdukInput.style.display = 'block';
         } else if (role === 'Kepala Toko') {
             extraFields.style.display = 'none';
             uploadInvestor.style.display = 'none';
@@ -356,6 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
             bonusInterfaceInput.style.display = 'none';
             ShiftInput.style.display = 'none';
             persenInvestorInput.style.display = 'none';
+            persenInvestorProdukInput.style.display = 'none';
         } else if (role === 'Admin Toko') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
@@ -364,6 +375,7 @@ document.addEventListener('DOMContentLoaded', function() {
             bonusInterfaceInput.style.display = 'none';
             ShiftInput.style.display = 'block';
             persenInvestorInput.style.display = 'none';
+            persenInvestorProdukInput.style.display = 'none';
         } else if (role === 'Teknisi') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
@@ -373,6 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
             bonusInterfaceInput.style.display = 'block';
             ShiftInput.style.display = 'block';
             persenInvestorInput.style.display = 'none';
+            persenInvestorProdukInput.style.display = 'none';
         } else if (role === 'Sales') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
@@ -382,6 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
             bonusInterfaceInput.style.display = 'none';
             ShiftInput.style.display = 'block';
             persenInvestorInput.style.display = 'none';
+            persenInvestorProdukInput.style.display = 'none';
         }
     }
 
