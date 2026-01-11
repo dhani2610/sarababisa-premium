@@ -463,21 +463,35 @@ class LaporanServisController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $expenses = Expense::with('user')
+        $expensesToko = Expense::with('user')
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
+            ->where('tipe', 0)
+            ->orderBy('created_at', 'asc')
+            ->get();
+        $expensesServis = Expense::with('user')
             ->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
             ->where('cabang_id', getCabangId())
             ->where('tipe', 1)
             ->orderBy('created_at', 'asc')
             ->get();
+        $expensesServisProduk = Expense::with('user')
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
+            ->where('tipe', 2)
+            ->orderBy('created_at', 'asc')
+            ->get();
 
         $total_insiden = $incidents->sum('biaya_toko');
-        $total_pengeluaran = $expenses->sum('price');
+        $total_pengeluaran_toko = $expensesToko->sum('price');
+        $total_pengeluaran_servis = $expensesServis->sum('price');
+        $total_pengeluaran_produk = $expensesServisProduk->sum('price');
 
         // Hitung Saldo Akhir
-        $saldo_akhir = $total_profit - $total_pengeluaran - $total_insiden;
-
-
+        $saldo_akhir = $total_profit - $total_pengeluaran_toko - $total_pengeluaran_servis - $total_pengeluaran_produk - $total_insiden;
         // --- RETURN PDF ---
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
             'users'             => $users,
@@ -485,7 +499,6 @@ class LaporanServisController extends Controller
             'services'          => $services,
             'servicesDP'        => $servicesDP,
             'incidents'         => $incidents,
-            'expenses'          => $expenses, // Kirim variabel expenses yg sudah di query
             'start_date'        => $start_date,
             'end_date'          => $end_date,
             'total_modal'       => $total_modal,
@@ -493,7 +506,9 @@ class LaporanServisController extends Controller
             'total_diskon'      => $total_diskon,
             'total_profit'      => $total_profit,
             'total_insiden'     => $total_insiden,
-            'total_pengeluaran' => $total_pengeluaran,
+            'total_pengeluaran_toko' => $total_pengeluaran_toko,
+            'total_pengeluaran_servis' => $total_pengeluaran_servis,
+            'total_pengeluaran_produk' => $total_pengeluaran_produk,
             // 'topbrands'         => $topbrands,
             // 'topmodelseries'    => $topmodelseries,
             // 'topactions'        => $topactions,
@@ -502,7 +517,9 @@ class LaporanServisController extends Controller
             'total_transfer'    => $total_transfer,
             'total_kredit'      => $total_kredit,
             'saldo_akhir'       => $saldo_akhir,
-            'pengeluaran_data'  => $expenses, // Bisa pakai variabel expenses yg sama
+            'pengeluaran_data_toko'  => $expensesToko, // Bisa pakai variabel expenses yg sama
+            'pengeluaran_data_servis'  => $expensesServis, // Bisa pakai variabel expenses yg sama
+            'pengeluaran_data_produk'  => $expensesServisProduk, // Bisa pakai variabel expenses yg sama
             'total_dp'          => $total_dp,
             'totalInsiden'      => $total_insiden,
             'insiden'           => $incidents,
