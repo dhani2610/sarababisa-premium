@@ -215,7 +215,7 @@ class DashboardController extends Controller
         $inventories = Inventory::where('cabang_id', $cabang)
             ->where('masa_penggantian', '<', $currentDate)
             ->count();
-                    dd($totalbudgets);
+                    // @dd($totalbudgets);
 
         return view('pages/kepalatoko/dashboard', compact(
             'types',
