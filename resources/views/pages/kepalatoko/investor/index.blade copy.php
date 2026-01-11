@@ -12,9 +12,9 @@
         </div>
 
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 mb-6 p-4">
-            <h3 class="font-semibold text-slate-800 mb-3">Filter Data</h3>
+            <h3 class="font-semibold text-slate-800 mb-3">Filter Periode</h3>
 
-            <div class="flex flex-wrap items-end gap-4">
+            <div class="flex items-end gap-4">
 
                 <div>
                     <label class="block text-sm font-medium mb-1" for="start_month">Dari Bulan</label>
@@ -26,18 +26,7 @@
                     <input id="end_month" type="month" class="form-input border-slate-300 rounded-md" />
                 </div>
 
-                {{-- Filter Kategori Baru --}}
-                <div>
-                    <label class="block text-sm font-medium mb-1" for="category_filter">Kategori</label>
-                    <select id="category_filter" class="form-select border-slate-300 rounded-md">
-                        {{-- <option value="all" selected>Semua (Servis & Produk)</option> --}}
-                        <option value="service"selected>Servis</option>
-                        <option value="product">Produk</option>
-                    </select>
-                </div>
-
-                <div class="mb-[2px]">
-                    <button id="btn-filter" class="btn bg-indigo-500 hover:bg-indigo-600 text-white whitespace-nowrap">
+                <div class="mb-[2px]"> <button id="btn-filter" class="btn bg-indigo-500 hover:bg-indigo-600 text-white whitespace-nowrap">
                         <svg class="w-4 h-4 fill-current opacity-50 shrink-0 mr-2" viewBox="0 0 16 16">
                             <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                         </svg>
@@ -56,9 +45,9 @@
                             <th class="px-2 py-3 border border-slate-300 text-center">Bulan</th>
                             <th class="px-2 py-3 border border-slate-300 text-center">Jumlah<br>Transaksi</th>
                             <th class="px-2 py-3 border border-slate-300 text-right">Omset</th>
-                            <th class="px-2 py-3 border border-slate-300 text-right">Pengeluaran<br>Modal</th>
+                            <th class="px-2 py-3 border border-slate-300 text-right">Pengeluaran<br>Modal Sparepart</th>
                             <th class="px-2 py-3 border border-slate-300 text-right">Profit</th>
-                            <th class="px-2 py-3 border border-slate-300 text-right">Pengeluaran<br>Ops Toko</th>
+                            <th class="px-2 py-3 border border-slate-300 text-right">Pengeluaran<br>Ops Toko & Refund</th>
                             <th class="px-2 py-3 border border-slate-300 text-right">Insiden</th>
                             <th class="px-2 py-3 border border-slate-300 text-right">Sisa Profit</th>
                             <th class="px-2 py-3 border border-slate-300 text-right">Target</th>
@@ -90,8 +79,8 @@
                         </tr>
                         <tr>
                             <td colspan="2" class="border-none"></td>
-                            <td class="px-2 py-1 border border-slate-300 text-center bg-white font-normal persen-toko">-</td>
-                            <td class="px-2 py-1 border border-slate-300 text-center bg-white font-normal persen-investor">-</td>
+                            <td class="px-2 py-1 border border-slate-300 text-center bg-white font-normal persen-toko">60%</td>
+                            <td class="px-2 py-1 border border-slate-300 text-center bg-white font-normal persen-investor">40%</td>
                             <td colspan="6" class="border-none"></td>
                         </tr>
                         <tr>
@@ -124,16 +113,14 @@
             var table = $('#investor-table').DataTable({
                 processing: true,
                 serverSide: true,
-                searching: false,
-                paging: false,
+                searching: false, // Matikan search box standar jika hanya ingin filter tanggal
+                paging: false,    // Matikan paging agar terlihat seperti sheet Excel penuh
                 info: false,
                 ajax: {
                     url: "{{ route('investor.data') }}",
                     data: function (d) {
                         d.start_month = $('#start_month').val();
                         d.end_month = $('#end_month').val();
-                        // Kirim data kategori yang dipilih
-                        d.category = $('#category_filter').val();
                     }
                 },
                 columns: [
@@ -148,7 +135,7 @@
                     { data: 'target', name: 'target', className: 'text-right' },
                     { data: 'result', name: 'result', className: 'text-center' },
                 ],
-                order: [],
+                order: [], // Disable default sort
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
                     emptyTable: "Tidak ada data transaksi pada periode ini"
@@ -172,7 +159,6 @@
                         $('#val-hf').text('Rp ' + json.share_hf);
                         $('#val-investor').text('Rp ' + json.share_investor);
 
-                        // Update tampilan Persentase (karena bisa berubah jika pilih Produk)
                         $('.persen-toko').text(json.pembagiPersen+'%');
                         $('.persen-investor').text(json.persenInvestor+'%');
                     }

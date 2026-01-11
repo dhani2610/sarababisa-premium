@@ -34,7 +34,8 @@ class UserRequest extends FormRequest
             'persen' => 'max:50',
             'exp_date' => 'max:100',
             'workers_id' => 'exists:workers,id|nullable',
-            'persen_investor' => 'nullable'
+            'persen_investor' => 'nullable',
+            'persen_investor_produk' => 'nullable'
         ];
     }
 

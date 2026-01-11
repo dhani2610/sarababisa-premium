@@ -27,7 +27,6 @@ class InvestorController extends Controller
     {
         $start = $request->start_month ? Carbon::parse($request->start_month . '-01') : Carbon::now()->startOfYear();
         $end = $request->end_month ? Carbon::parse($request->end_month . '-01')->endOfMonth() : Carbon::now()->endOfMonth();
-        $filterCategory = $request->category ?? 'all'; // all, service, product
 
         // Buat periode bulanan untuk looping
         $period = CarbonPeriod::create($start, '1 month', $end);
@@ -39,48 +38,36 @@ class InvestorController extends Controller
             $monthEnd = $date->copy()->endOfMonth();
             $cabangId = getCabangId(); // Helper function
 
-            // Inisialisasi variabel agar tidak error jika di-skip
-            $serviceCount = 0; $serviceOmset = 0; $serviceModal = 0; $serviceProfit = 0;
-            $productCount = 0; $productOmset = 0; $productModal = 0; $productProfit = 0;
-
             // --- A. DATA SERVIS (Status: Setuju) ---
-            // Jalankan hanya jika Kategori = 'all' ATAU 'service'
-            if ($filterCategory == 'all' || $filterCategory == 'service') {
-                $serviceQuery = ServiceTransaction::where('cabang_id', $cabangId)
-                    ->where('is_approve', 'Setuju')
-                    ->whereBetween('tgl_disetujui', [$monthStart, $monthEnd]);
+            $serviceQuery = ServiceTransaction::where('cabang_id', $cabangId)
+                ->where('is_approve', 'Setuju')
+                ->whereBetween('tgl_disetujui', [$monthStart, $monthEnd]);
 
-                $serviceCount  = (clone $serviceQuery)->count();
-                $serviceOmset  = (clone $serviceQuery)->sum('biaya');
-                $serviceModal  = (clone $serviceQuery)->sum('modal_sparepart');
-                $serviceProfit = (clone $serviceQuery)->sum('profittoko');
-            }
+            $serviceCount  = (clone $serviceQuery)->count();
+            $serviceOmset  = (clone $serviceQuery)->sum('biaya');
+            $serviceModal  = (clone $serviceQuery)->sum('modal_sparepart');
+            $serviceProfit = (clone $serviceQuery)->sum('profittoko');
 
             // --- B. DATA PENJUALAN PRODUK (Status: Setuju) ---
-            // Jalankan hanya jika Kategori = 'all' ATAU 'product'
-            if ($filterCategory == 'all' || $filterCategory == 'product') {
-                // 1. Hitung Transaksi (Jumlah Order)
-                $productCount = Order::where('cabang_id', $cabangId)
-                    ->where('is_approve', 'Setuju')
-                    ->whereBetween('tgl_disetujui', [$monthStart, $monthEnd])
-                    ->count();
+            // 1. Hitung Transaksi (Jumlah Order)
+            $productCount = Order::where('cabang_id', $cabangId)
+                ->where('is_approve', 'Setuju')
+                ->whereBetween('tgl_disetujui', [$monthStart, $monthEnd])
+                ->count();
 
-                // 2. Hitung Nominal (Dari Order Detail)
-                $productDetailsQuery = OrderDetail::where('cabang_id', $cabangId)
-                    ->whereHas('order', function ($q) use ($monthStart, $monthEnd) {
-                        $q->where('is_approve', 'Setuju')
-                        ->whereBetween('tgl_disetujui', [$monthStart, $monthEnd]);
-                    });
+            // 2. Hitung Nominal (Dari Order Detail)
+            $productDetailsQuery = OrderDetail::where('cabang_id', $cabangId)
+                ->whereHas('order', function ($q) use ($monthStart, $monthEnd) {
+                    $q->where('is_approve', 'Setuju')
+                    ->whereBetween('tgl_disetujui', [$monthStart, $monthEnd]);
+                });
 
-                $productOmset  = (clone $productDetailsQuery)->sum('total');
-                $productModal  = (clone $productDetailsQuery)->sum('modal');
-                $productProfit = (clone $productDetailsQuery)->sum('profit');
-            }
+            $productOmset  = (clone $productDetailsQuery)->sum('total');
+            $productModal  = (clone $productDetailsQuery)->sum('modal');
+            $productProfit = (clone $productDetailsQuery)->sum('profit');
 
             // --- C. PENGELUARAN (Expense & Insiden) ---
             // Menggunakan created_at sesuai referensi cetak
-            // Note: Pengeluaran operasional toko biasanya tetap dihitung full mengurangi profit
-            // kecuali ada request khusus untuk memisahkan expense per kategori.
             $operasional = Expense::where('cabang_id', $cabangId)
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
                 ->sum('price');
@@ -97,14 +84,9 @@ class InvestorController extends Controller
             // Sisa Profit (Net Profit) = Profit Kotor - Operasional - Insiden
             $sisaProfit   = $grossProfit - $operasional - $insiden;
 
-            // Target (Dummy 10jt) - Ambil dari Budget
-            // $target = Budget::all()->sum('total');
-            // $target = DB::table('targets')
-            //     ->where('cabang_id', $cabangId)
-            //     ->whereMonth('created_at', $date->month)
-            //     ->whereYear('created_at', $date->year)
-            //     ->sum('nilai');
-            $target = Budget::where('cabang_id', $cabangId)->sum('total');
+            // Target (Dummy 10jt)
+
+            $target = Budget::all()->sum('total');
 
             // Hitung Result Persentase
             $resultPercentage = $target > 0 ? ($sisaProfit / $target) * 100 : 0;
@@ -129,17 +111,10 @@ class InvestorController extends Controller
         $totalSisaProfit = $dataCollection->sum('sisa_profit');
 
         $userInvestor = User::where('cabang_id', getCabangId())->where('role', 'Investor')->first();
-
-        $persenInvestor = 0;
         if ($userInvestor) {
-            // LOGIKA PERSENTASE KHUSUS PRODUK
-            if ($filterCategory == 'product') {
-                // Ambil kolom persen_investor_produk
-                $persenInvestor = $userInvestor->persen_investor_produk ?? 0;
-            } else {
-                // Ambil kolom default (persen_investor) untuk 'all' atau 'service'
-                $persenInvestor = $userInvestor->persen_investor ?? 0;
-            }
+            $persenInvestor = $userInvestor->persen_investor ?? 0;
+        } else {
+            $persenInvestor = 0;
         }
 
         $pembagiPersen = 100 - $persenInvestor;
@@ -160,6 +135,8 @@ class InvestorController extends Controller
             ->editColumn('result', fn($row) => $row['result'] . '%')
 
             // Kirim data totalan ke JSON response agar bisa diambil JS Footer
+
+
             ->with([
                 'total_transaksi'   => $dataCollection->sum('transaksi'),
                 'total_omset'       => number_format($dataCollection->sum('omset'), 0, ',', '.'),
@@ -169,11 +146,13 @@ class InvestorController extends Controller
                 'total_insiden'     => number_format($dataCollection->sum('insiden'), 0, ',', '.'),
                 'total_sisa_profit' => number_format($totalSisaProfit, 0, ',', '.'),
                 // Hitung bagi hasil
-                'share_hf'          => number_format($shareHF, 0, ',', '.'),
-                'share_investor'    => number_format($shareInvestor, 0, ',', '.'),
-                'pembagiPersen'     => $pembagiPersen,
-                'persenInvestor'    => $persenInvestor,
+                'share_hf'          => number_format($shareHF, 0, ',', '.'), // 60%
+                'share_investor'    => number_format($shareInvestor, 0, ',', '.'), // 40%
+                'pembagiPersen'     => $pembagiPersen, // 40%
+                'persenInvestor'     => $persenInvestor, // 40%
             ])
             ->make(true);
     }
+
+
 }
