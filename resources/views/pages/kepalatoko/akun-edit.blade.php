@@ -119,7 +119,7 @@
                                         type="number" />
                                 </div>
 
-                                <div id="persen_investor_produk-input" style="display: none">
+                                <div id="persen_investor_produk_input" style="display: none">
                                     <label class="block text-sm font-medium mb-1" for="persen_investor_produk">Persentase Pembagian Produk<span
                                             class="text-rose-500">*</span></label>
                                     <input id="persen_investor_produk" name="persen_investor_produk" value="{{ $item->persen_investor_produk }}" class="form-input w-full px-2 py-1"
