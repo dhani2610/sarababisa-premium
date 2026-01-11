@@ -362,7 +362,7 @@ class TransaksiServisController extends Controller
 
         // Estimasi biaya
         ->addColumn('estimasi_biaya', function ($row) {
-            return '<div class="font-medium">Rp. ' . number_format($row->estimasi_biaya) . '</div>';
+            return '<div class="font-medium">Rp. ' . number_format((int)$row->estimasi_biaya ?? 0) . '</div>';
         })
 
         // Estimasi pengerjaan
