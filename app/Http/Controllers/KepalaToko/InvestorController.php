@@ -81,9 +81,24 @@ class InvestorController extends Controller
             // Menggunakan created_at sesuai referensi cetak
             // Note: Pengeluaran operasional toko biasanya tetap dihitung full mengurangi profit
             // kecuali ada request khusus untuk memisahkan expense per kategori.
-            $operasional = Expense::where('cabang_id', $cabangId)
+
+            $operasionalToko = Expense::where('cabang_id', $cabangId)
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
                 ->sum('price');
+            if ($filterCategory == 'service') {
+                $operasionalServis = Expense::where('cabang_id', $cabangId)
+                    ->where('tipe',1)
+                    ->whereBetween('created_at', [$monthStart, $monthEnd])
+                    ->sum('price');
+
+                $operasional = $operasionalToko + $operasionalServis;
+            }else{
+                $operasionalProduk = Expense::where('cabang_id', $cabangId)
+                    ->where('tipe',2)
+                    ->whereBetween('created_at', [$monthStart, $monthEnd])
+                    ->sum('price');
+                $operasional = $operasionalToko + $operasionalProduk;
+            }
 
             $insiden = Incident::where('cabang_id', $cabangId)
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
