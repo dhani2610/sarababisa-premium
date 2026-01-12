@@ -105,48 +105,62 @@
     <table id="ringkasan">
         <tbody>
             <tr>
-                <th>Total Item Servis</th>
-                <th>: {{ $total_servis }} Item</th>
-                <th>Total Pembayaran Tunai</th>
-                <th>: Rp. {{ number_format($total_tunai) }}</th>
-                <th>Saldo Akhir</th>
-                <th>: Rp. {{ number_format($saldo_akhir) }}</th>
-            </tr>
-            <tr>
-                <th>Total Biaya Servis</th>
-                <th>: Rp. {{ number_format($total_biaya) }}</th>
-                <th>Total Pembayaran Transfer</th>
-                <th>: Rp. {{ number_format($total_transfer) }}</th>
+        <th>Total Item Servis</th>
+        <th >: {{ $total_servis }} Item</th>
 
-            </tr>
-            <tr>
-                <th>Total Diskon</th>
-                <th>: Rp. {{ number_format($total_diskon) }}</th>
-                <th>Total Pembayaran Tempo</th>
-                <th>: Rp. {{ number_format($total_kredit) }}</th>
-            </tr>
-            <tr>
-                <th>Total Modal Sparepart</th>
-                <th>: Rp. {{ number_format($total_modal) }}</th>
-                <th>Total Pengeluaran Toko</th>
-                <th>: Rp. {{ number_format($total_pengeluaran_toko) }}</th>
+        <th>Total Pembayaran Tunai</th>
+        <th >: Rp. {{ number_format($total_tunai) }}</th>
 
-            </tr>
-            <tr>
-                <th>Total Uang Muka</th>
-                <th>: Rp. {{ number_format($total_dp) }}</th>
-                <th>Total Pengeluaran Servis</th>
-                <th>: Rp. {{ number_format($total_pengeluaran_servis) }}</th>
+        <th>Total Pengeluaran Toko</th>
+        <th>: Rp. {{ number_format($total_pengeluaran_toko) }}</th>
+    </tr>
 
-            </tr>
-            <tr>
-                <th>Total Insiden</th>
-                <th>: Rp. {{ number_format($total_insiden) }}</th>
-                 <th>Total Profit</th>
-                <th>: Rp. {{ number_format($total_profit) }}</th>
+    <tr>
+        <th>Total Biaya Servis</th>
+        <th >: Rp. {{ number_format($total_biaya) }}</th>
 
+        <th>Total Pembayaran Transfer</th>
+        <th >: Rp. {{ number_format($total_transfer) }}</th>
 
-            </tr>
+        <th>Total Pengeluaran Servis</th>
+        <th>: Rp. {{ number_format($total_pengeluaran_servis) }}</th>
+    </tr>
+
+    <tr>
+        <th>Total Diskon</th>
+        <th >: Rp. {{ number_format($total_diskon) }}</th>
+
+        <th>Total Pembayaran Tempo</th>
+        <th >: Rp. {{ number_format($total_kredit) }}</th>
+
+        <th>Total Profit</th>
+        <th>: Rp. {{ number_format($total_profit) }}</th>
+    </tr>
+
+    <tr>
+        <th>Total Modal Sparepart</th>
+        <th >: Rp. {{ number_format($total_modal) }}</th>
+
+        <th></th>
+        <th ></th>
+
+        <th ">Saldo Akhir</th>
+        <th ">: Rp. {{ number_format($saldo_akhir) }}</th>
+    </tr>
+
+    <tr>
+        <th>Total Uang Muka (DP)</th>
+        <th >: Rp. {{ number_format($total_dp) }}</th>
+
+        <td colspan="4"></td>
+    </tr>
+
+    <tr>
+        <th>Total Insiden</th>
+        <th >: Rp. {{ number_format($total_insiden) }}</th>
+
+        <td colspan="4"></td>
+    </tr>
         </tbody>
     </table>
 
@@ -497,7 +511,7 @@
         </tbody>
     </table>
     <hr>
-  
+
     <h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
         Insiden
     </h4>
