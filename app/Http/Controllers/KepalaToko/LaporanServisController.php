@@ -477,21 +477,14 @@ class LaporanServisController extends Controller
             ->where('tipe', 1)
             ->orderBy('created_at', 'asc')
             ->get();
-        $expensesServisProduk = Expense::with('user')
-            ->whereDate('created_at', '>=', $start_date)
-            ->whereDate('created_at', '<=', $end_date)
-            ->where('cabang_id', getCabangId())
-            ->where('tipe', 2)
-            ->orderBy('created_at', 'asc')
-            ->get();
+      
 
         $total_insiden = $incidents->sum('biaya_toko');
         $total_pengeluaran_toko = $expensesToko->sum('price');
         $total_pengeluaran_servis = $expensesServis->sum('price');
-        $total_pengeluaran_produk = $expensesServisProduk->sum('price');
 
         // Hitung Saldo Akhir
-        $saldo_akhir = $total_profit - $total_pengeluaran_toko - $total_pengeluaran_servis - $total_pengeluaran_produk - $total_insiden;
+        $saldo_akhir = $total_profit - $total_pengeluaran_toko - $total_pengeluaran_servis - $total_insiden;
         // --- RETURN PDF ---
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-servis', [
             'users'             => $users,
@@ -508,7 +501,6 @@ class LaporanServisController extends Controller
             'total_insiden'     => $total_insiden,
             'total_pengeluaran_toko' => $total_pengeluaran_toko,
             'total_pengeluaran_servis' => $total_pengeluaran_servis,
-            'total_pengeluaran_produk' => $total_pengeluaran_produk,
             // 'topbrands'         => $topbrands,
             // 'topmodelseries'    => $topmodelseries,
             // 'topactions'        => $topactions,
@@ -519,7 +511,6 @@ class LaporanServisController extends Controller
             'saldo_akhir'       => $saldo_akhir,
             'pengeluaran_data_toko'  => $expensesToko, // Bisa pakai variabel expenses yg sama
             'pengeluaran_data_servis'  => $expensesServis, // Bisa pakai variabel expenses yg sama
-            'pengeluaran_data_produk'  => $expensesServisProduk, // Bisa pakai variabel expenses yg sama
             'total_dp'          => $total_dp,
             'totalInsiden'      => $total_insiden,
             'insiden'           => $incidents,
