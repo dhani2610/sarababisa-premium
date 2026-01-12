@@ -236,10 +236,12 @@
                             <button type="submit"
                                 class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white w-full sm:w-auto">Cetak
                                 PDF</button>
-                            <button type="button" onclick="sendWAFromModal()"
-                                class="btn-sm bg-emerald-500 hover:bg-emerald-600 text-white w-full sm:w-auto flex justify-center gap-1">
-                                Kirim WA
-                            </button>
+                                @if (Auth::user()->role == 'Kepala Toko')
+                                <button type="button" onclick="sendWAFromModal()"
+                                    class="btn-sm bg-emerald-500 hover:bg-emerald-600 text-white w-full sm:w-auto flex justify-center gap-1">
+                                    Kirim WA
+                                </button>
+                                @endif
                             <button type="button" onclick="closePrintModal()"
                                 class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600 w-full sm:w-auto">Batal</button>
                         </div>
