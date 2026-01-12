@@ -220,8 +220,8 @@
                     </li>
                 </ul>
             </div>
-            <footer>
-                <div class="pl-3 text-xs text-slate-500 font-semibold fixed bottom-0 pb-5">
+            <footer class="shrink-0">
+                <div class="pl-3 pb-5 text-xs text-slate-500 font-semibold">
                     © 2023-{{ date('Y') }} Saraba Bisa
                 </div>
             </footer>

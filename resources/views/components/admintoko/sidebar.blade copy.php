@@ -1,4 +1,5 @@
 <div>
+    <!-- Sidebar backdrop (mobile only) -->
     <div
         class="fixed inset-0 bg-slate-900 bg-opacity-30 z-40 lg:hidden lg:z-auto transition-opacity duration-200"
         :class="sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'"
@@ -6,35 +7,41 @@
         x-cloak
     ></div>
 
+    <!-- Sidebar -->
     <div
         id="sidebar"
-        class="flex flex-col absolute z-40 left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-screen w-64 lg:w-20 lg:sidebar-expanded:!w-64 2xl:!w-64 shrink-0 bg-slate-800 py-4 px-1 transition-all duration-200 ease-in-out"
+        class="flex flex-col absolute z-40 left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-screen overflow-y-scroll lg:overflow-y-auto no-scrollbar w-64 lg:w-20 lg:sidebar-expanded:!w-64 2xl:!w-64 shrink-0 bg-slate-800 py-4 px-1 transition-all duration-200 ease-in-out"
         :class="sidebarOpen ? 'translate-x-0' : '-translate-x-64'"
         @click.outside="sidebarOpen = false"
         @keydown.escape.window="sidebarOpen = false"
         x-cloak="lg"
     >
 
-        <div class="flex justify-between mb-10 pr-3 sm:px-2 shrink-0">
+        <!-- Sidebar header -->
+        <div class="flex justify-between mb-10 pr-3 sm:px-2">
+            <!-- Close button -->
             <button class="lg:hidden text-slate-500 hover:text-slate-400" @click.stop="sidebarOpen = !sidebarOpen" aria-controls="sidebar" :aria-expanded="sidebarOpen">
                 <span class="sr-only">Close sidebar</span>
                 <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10.7 18.7l1.4-1.4L7.8 13H20v-2H7.8l4.3-4.3-1.4-1.4L4 12z" />
                 </svg>
             </button>
+            <!-- Logo -->
             <a class="block" href="#">
                 <img src="{{ asset('images/logo-saraba-bisa.png') }}" alt="Logo SarabaBisa" class="h-8">
             </a>
         </div>
 
-        <div class="flex-1 overflow-y-auto no-scrollbar space-y-8">
-
+        <!-- Links -->
+        <div class="space-y-8">
+            <!-- Pages group -->
             <div>
                 <h3 class="text-xs uppercase text-slate-500 font-semibold pl-3">
                     <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">•••</span>
                     <span class="lg:hidden lg:sidebar-expanded:block 2xl:block">Menu</span>
                 </h3>
                 <ul class="mt-3">
+                    <!-- Dashboard -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['admin-dashboard'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['admin-dashboard'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('admintoko-dashboard') }}">
                             <div class="flex items-center">
@@ -47,19 +54,31 @@
                             </div>
                         </a>
                     </li>
-
+                    {{-- <!-- Pelanggan -->
+                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'bg-slate-900' }}@endif">
+                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('master-absensi.index') }}">
+                            <div class="flex items-center">
+                                <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M18.974 8H22a2 2 0 012 2v6h-2v5a1 1 0 01-1 1h-2a1 1 0 01-1-1v-5h-2v-6a2 2 0 012-2h.974zM20 7a2 2 0 11-.001-3.999A2 2 0 0120 7zM2.974 8H6a2 2 0 012 2v6H6v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5H0v-6a2 2 0 012-2h.974zM4 7a2 2 0 11-.001-3.999A2 2 0 014 7z" />
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M12 6a3 3 0 110-6 3 3 0 010 6zm2 18h-4a1 1 0 01-1-1v-6H6v-6a3 3 0 013-3h6a3 3 0 013 3v6h-3v6a1 1 0 01-1 1z" />
+                                    </svg>
+                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Absensi</span>
+                            </div>
+                        </a>
+                    </li> --}}
+                    <!-- Pelanggan -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['pelanggan'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['pelanggan'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('pelanggan.index') }}">
                             <div class="flex items-center">
                                 <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['pelanggan'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M18.974 8H22a2 2 0 012 2v6h-2v5a1 1 0 01-1 1h-2a1 1 0 01-1-1v-5h-2v-6a2 2 0 012-2h.974zM20 7a2 2 0 11-.001-3.999A2 2 0 0120 7zM2.974 8H6a2 2 0 012 2v6H6v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5H0v-6a2 2 0 012-2h.974zM4 7a2 2 0 11-.001-3.999A2 2 0 014 7z" />
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['pelanggan'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M12 6a3 3 0 110-6 3 3 0 010 6zm2 18h-4a1 1 0 01-1-1v-6H6v-6a3 3 0 013-3h6a3 3 0 013 3v6h-3v6a1 1 0 01-1 1z" />
-                                </svg>
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['pelanggan'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M18.974 8H22a2 2 0 012 2v6h-2v5a1 1 0 01-1 1h-2a1 1 0 01-1-1v-5h-2v-6a2 2 0 012-2h.974zM20 7a2 2 0 11-.001-3.999A2 2 0 0120 7zM2.974 8H6a2 2 0 012 2v6H6v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5H0v-6a2 2 0 012-2h.974zM4 7a2 2 0 11-.001-3.999A2 2 0 014 7z" />
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['pelanggan'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M12 6a3 3 0 110-6 3 3 0 010 6zm2 18h-4a1 1 0 01-1-1v-6H6v-6a3 3 0 013-3h6a3 3 0 013 3v6h-3v6a1 1 0 01-1 1z" />
+                                    </svg>
                                 <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Pelanggan</span>
                             </div>
                         </a>
                     </li>
-
+                    <!-- Servis -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['servis'])){{ 'bg-slate-900' }}@endif" x-data="{ open: {{ in_array(Request::segment(1), ['servis']) ? 1 : 0 }} }">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['servis'])){{ 'hover:text-slate-200' }}@endif" href="#0" @click.prevent="sidebarExpanded ? open = !open : sidebarExpanded = true">
                             <div class="flex items-center justify-between">
@@ -71,6 +90,7 @@
                                     </svg>
                                     <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Servis</span>
                                 </div>
+                                <!-- Icon -->
                                 <div class="flex shrink-0 ml-2 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
                                     <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400 @if(in_array(Request::segment(1), ['servis'])){{ 'rotate-180' }}@endif" :class="open ? 'rotate-180' : 'rotate-0'" viewBox="0 0 12 12">
                                         <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
@@ -98,7 +118,7 @@
                             </ul>
                         </div>
                     </li>
-
+                    <!-- Produk -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['produk'])){{ 'bg-slate-900' }}@endif" x-data="{ open: {{ in_array(Request::segment(1), ['produk']) ? 1 : 0 }} }">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['sparepart'])){{ 'hover:text-slate-200' }}@endif" href="#0" @click.prevent="sidebarExpanded ? open = !open : sidebarExpanded = true">
                             <div class="flex items-center justify-between">
@@ -110,6 +130,7 @@
                                     </svg>
                                     <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Produk</span>
                                 </div>
+                                <!-- Icon -->
                                 <div class="flex shrink-0 ml-2 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
                                     <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400 @if(in_array(Request::segment(1), ['produk'])){{ 'rotate-180' }}@endif" :class="open ? 'rotate-180' : 'rotate-0'" viewBox="0 0 12 12">
                                         <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
@@ -119,6 +140,11 @@
                         </a>
                         <div class="lg:hidden lg:sidebar-expanded:block 2xl:block">
                             <ul class="pl-9 mt-1 @if(!in_array(Request::segment(1), ['produk'])){{ 'hidden' }}@endif" :class="open ? '!block' : 'hidden'">
+                                {{-- <li class="mb-1 last:mb-0">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-kategori.index', 'admin-kategori.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-kategori.index') }}">
+                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Kategori Produk</span>
+                                    </a>
+                                </li> --}}
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-sub-kategori.index', 'admin-sub-kategori.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-sub-kategori.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Sub Kategori Produk</span>
@@ -129,6 +155,11 @@
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Supplier</span>
                                     </a>
                                 </li>
+                                {{-- <li class="mb-1 last:mb-0">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-item.index', 'admin-item.edit', 'admin-handphone.index', 'admin-handphone.edit', 'admin-sparepart.index', 'admin-sparepart.edit', 'admin-aksesoris.index', 'admin-aksesoris.edit', 'admin-tool.index', 'admin-tool.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-item.index') }}">
+                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Item Produk</span>
+                                    </a>
+                                </li> --}}
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('item.index', 'item.edit', 'handphone.index', 'handphone.edit', 'sparepart.index', 'sparepart.edit', 'aksesoris.index', 'aksesoris.edit', 'tool.index', 'tool.edit')){{ '!text-indigo-500' }}@endif" href="{{ route('item.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Item Produk</span>
@@ -139,11 +170,16 @@
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Transfer Stok</span>
                                     </a>
                                 </li>
-                                <li class="mb-1 last:mb-0">
+                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('top-produk')){{ '!text-indigo-500' }}@endif" href="{{ route('top-produk') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Top Produk</span>
                                     </a>
                                 </li>
+                                {{-- <li class="mb-1 last:mb-0">
+                                    <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('admin-purchase.index', 'admin-purchase.create', 'admin-retur.index', 'admin-tukar-tambah.index', 'admin-tukar-tambah.create')){{ '!text-indigo-500' }}@endif" href="{{ route('admin-purchase.index') }}">
+                                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Pembelian Produk</span>
+                                    </a>
+                                </li> --}}
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('purchase.index', 'purchase.create', 'retur.index', 'tukar-tambah.index', 'tukar-tambah.create')){{ '!text-indigo-500' }}@endif" href="{{ route('purchase.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Pembelian Produk</span>
@@ -162,7 +198,7 @@
                             </ul>
                         </div>
                     </li>
-
+                    <!-- Master Data -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['master'])){{ 'bg-slate-900' }}@endif" x-data="{ open: {{ in_array(Request::segment(1), ['master']) ? 1 : 0 }} }">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['master'])){{ 'hover:text-slate-200' }}@endif" href="#0" @click.prevent="sidebarExpanded ? open = !open : sidebarExpanded = true">
                             <div class="flex items-center justify-between">
@@ -175,6 +211,7 @@
                                     </svg>
                                     <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Master Data</span>
                                 </div>
+                                <!-- Icon -->
                                 <div class="flex shrink-0 ml-2 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
                                     <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400 @if(in_array(Request::segment(1), ['master'])){{ 'rotate-180' }}@endif" :class="open ? 'rotate-180' : 'rotate-0'" viewBox="0 0 12 12">
                                         <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
@@ -184,7 +221,7 @@
                         </a>
                         <div class="lg:hidden lg:sidebar-expanded:block 2xl:block">
                             <ul class="pl-9 mt-1 @if(!in_array(Request::segment(1), ['master'])){{ 'hidden' }}@endif" :class="open ? '!block' : 'hidden'">
-                                <li class="mb-1 last:mb-0">
+                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate @if(Route::is('master-jenis-barang.index')){{ '!text-indigo-500' }}@endif" href="{{ route('master-jenis-barang.index') }}">
                                         <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Jenis Barang</span>
                                     </a>
@@ -217,7 +254,7 @@
                             </ul>
                         </div>
                     </li>
-
+                    <!-- Laporan -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['laporan'])){{ 'bg-slate-900' }}@endif" x-data="{ open: {{ in_array(Request::segment(1), ['laporan']) ? 1 : 0 }} }">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['laporan'])){{ 'hover:text-slate-200' }}@endif" href="#0" @click.prevent="sidebarExpanded ? open = !open : sidebarExpanded = true">
                             <div class="flex items-center justify-between">
@@ -229,6 +266,7 @@
                                     </svg>
                                     <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Laporan</span>
                                 </div>
+                                <!-- Icon -->
                                 <div class="flex shrink-0 ml-2 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
                                     <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400 @if(in_array(Request::segment(1), ['laporan'])){{ 'rotate-180' }}@endif" :class="open ? 'rotate-180' : 'rotate-0'" viewBox="0 0 12 12">
                                         <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
@@ -251,7 +289,7 @@
                             </ul>
                         </div>
                     </li>
-
+                    {{-- Insiden --}}
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['admin-insiden'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['admin-insiden'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('admin-insiden.index') }}">
                             <div class="flex items-center">
@@ -263,7 +301,7 @@
                             </div>
                         </a>
                     </li>
-
+                    {{-- Kasbon --}}
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['admin-kasbon'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['admin-kasbon'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('admin-kasbon.index') }}">
                             <div class="flex items-center">
@@ -275,7 +313,7 @@
                             </div>
                         </a>
                     </li>
-
+                    {{-- Pengeluaran --}}
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['pengeluaran.index'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['pengeluaran.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('pengeluaran.index') }}">
                             <div class="flex items-center">
@@ -287,7 +325,7 @@
                             </div>
                         </a>
                     </li>
-
+                    {{-- Inventaris --}}
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['admin-inventaris'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['admin-inventaris'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('admin-inventaris.index') }}">
                             <div class="flex items-center">
@@ -299,6 +337,7 @@
                             </div>
                         </a>
                     </li>
+
 
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['karyawan.index'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['karyawan.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('karyawan.index') }}">
@@ -312,83 +351,95 @@
                         </a>
                     </li>
 
-                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['refund.index'])){{ 'bg-slate-900' }}@endif">
-                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['refund.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('refund.index') }}">
-                            <div class="flex items-center">
-                                <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['refund.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M13 15l11-7L11.504.136a1 1 0 00-1.019.007L0 7l13 8z" />
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['refund.index'])){{ 'text-indigo-600' }}@else{{ 'text-slate-700' }}@endif" d="M13 15L0 7v9c0 .355.189.685.496.864L13 24v-9z" />
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['refund.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M13 15.047V24l10.573-7.181A.999.999 0 0024 16V8l-11 7.047z" />
-                                </svg>
-                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Pengembalian Dana</span>
-                            </div>
-                        </a>
-                    </li>
+                       <!-- Pengeluaran -->
+                        <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['refund.index'])){{ 'bg-slate-900' }}@endif">
+                            <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['refund.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('refund.index') }}">
+                                <div class="flex items-center">
+                                    <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['refund.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M13 15l11-7L11.504.136a1 1 0 00-1.019.007L0 7l13 8z" />
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['refund.index'])){{ 'text-indigo-600' }}@else{{ 'text-slate-700' }}@endif" d="M13 15L0 7v9c0 .355.189.685.496.864L13 24v-9z" />
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['refund.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M13 15.047V24l10.573-7.181A.999.999 0 0024 16V8l-11 7.047z" />
+                                    </svg>
+                                    <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Pengembalian Dana</span>
+                                </div>
+                            </a>
+                        </li>
+
+
+                     <div>
+                        <h3 class="text-xs uppercase text-slate-500 font-semibold pl-3">
+                            <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">•••</span>
+                            <span class="lg:hidden lg:sidebar-expanded:block 2xl:block">Kehadiran</span>
+                        </h3>
+                        <ul class="mt-3">
+                            <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'bg-slate-900' }}@endif">
+                                <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('master-absensi.index') }}">
+                                    <div class="flex items-center">
+                                        <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                            <path class="fill-current @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M20 7a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 0120 7zM4 23a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 014 23z" />
+                                            <path class="fill-current @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M17 23a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 010-2 4 4 0 004-4 1 1 0 012 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1zM7 13a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 110-2 4 4 0 004-4 1 1 0 112 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1z" />
+                                        </svg>
+                                        <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Absensi</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'bg-slate-900' }}@endif">
+                                <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['master-izin.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('master-izin.index') }}">
+                                    <div class="flex items-center">
+                                        <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                            <path class="fill-current @if(in_array(Request::segment(1), ['master-izin.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M20 7a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 0120 7zM4 23a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 014 23z" />
+                                            <path class="fill-current @if(in_array(Request::segment(1), ['master-izin.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M17 23a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 010-2 4 4 0 004-4 1 1 0 012 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1zM7 13a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 110-2 4 4 0 004-4 1 1 0 112 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1z" />
+                                        </svg>
+                                        <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Izin</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['master-overtime.index'])){{ 'bg-slate-900' }}@endif">
+                                <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['master-overtime.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('master-overtime.index') }}">
+                                    <div class="flex items-center">
+                                        <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                            <path class="fill-current @if(in_array(Request::segment(1), ['master-overtime.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M20 7a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 0120 7zM4 23a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 014 23z" />
+                                            <path class="fill-current @if(in_array(Request::segment(1), ['master-overtime.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M17 23a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 010-2 4 4 0 004-4 1 1 0 012 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1zM7 13a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 110-2 4 4 0 004-4 1 1 0 112 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1z" />
+                                        </svg>
+                                        <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Lembur</span>
+                                    </div>
+                                </a>
+                            </li>
+                            {{-- <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['shift.index'])){{ 'bg-slate-900' }}@endif">
+                                <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['shift.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('shift.index') }}">
+                                    <div class="flex items-center">
+                                        <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                            <path class="fill-current @if(in_array(Request::segment(1), ['shift.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M20 7a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 0120 7zM4 23a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 014 23z" />
+                                            <path class="fill-current @if(in_array(Request::segment(1), ['shift.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M17 23a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 010-2 4 4 0 004-4 1 1 0 012 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1zM7 13a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 110-2 4 4 0 004-4 1 1 0 112 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1z" />
+                                        </svg>
+                                        <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Shift</span>
+                                    </div>
+                                </a>
+                            </li> --}}
+                        </ul>
+                    </div>
                 </ul>
             </div>
 
-            <div>
-                <h3 class="text-xs uppercase text-slate-500 font-semibold pl-3">
-                    <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">•••</span>
-                    <span class="lg:hidden lg:sidebar-expanded:block 2xl:block">Kehadiran</span>
-                </h3>
-                <ul class="mt-3">
-                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'bg-slate-900' }}@endif">
-                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('master-absensi.index') }}">
-                            <div class="flex items-center">
-                                <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M20 7a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 0120 7zM4 23a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 014 23z" />
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['master-absensi.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M17 23a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 010-2 4 4 0 004-4 1 1 0 012 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1zM7 13a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 110-2 4 4 0 004-4 1 1 0 112 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1z" />
-                                </svg>
-                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Absensi</span>
-                            </div>
-                        </a>
-                    </li>
+            <footer>
+                <div class="pl-3 text-xs text-slate-500 font-semibold fixed bottom-0 pb-5">
+                    © 2023-{{ date('Y') }} Saraba Bisa
+                </div>
+            </footer>
+        </div>
 
-                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['master-izin.index'])){{ 'bg-slate-900' }}@endif">
-                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['master-izin.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('master-izin.index') }}">
-                            <div class="flex items-center">
-                                <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['master-izin.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M20 7a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 0120 7zM4 23a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 014 23z" />
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['master-izin.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M17 23a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 010-2 4 4 0 004-4 1 1 0 012 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1zM7 13a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 110-2 4 4 0 004-4 1 1 0 112 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1z" />
-                                </svg>
-                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Izin</span>
-                            </div>
-                        </a>
-                    </li>
-
-                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['master-overtime.index'])){{ 'bg-slate-900' }}@endif">
-                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['master-overtime.index'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('master-overtime.index') }}">
-                            <div class="flex items-center">
-                                <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['master-overtime.index'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M20 7a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 0120 7zM4 23a.75.75 0 01-.75-.75 1.5 1.5 0 00-1.5-1.5.75.75 0 110-1.5 1.5 1.5 0 001.5-1.5.75.75 0 111.5 0 1.5 1.5 0 001.5 1.5.75.75 0 110 1.5 1.5 1.5 0 00-1.5 1.5A.75.75 0 014 23z" />
-                                    <path class="fill-current @if(in_array(Request::segment(1), ['master-overtime.index'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M17 23a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 010-2 4 4 0 004-4 1 1 0 012 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1zM7 13a1 1 0 01-1-1 4 4 0 00-4-4 1 1 0 110-2 4 4 0 004-4 1 1 0 112 0 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-1 1z" />
-                                </svg>
-                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Lembur</span>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
+        <!-- Expand / collapse button -->
+        <div class="pt-3 hidden lg:inline-flex 2xl:hidden justify-end mt-auto">
+            <div class="px-3 py-2">
+                <button @click="sidebarExpanded = !sidebarExpanded">
+                    <span class="sr-only">Expand / collapse sidebar</span>
+                    <svg class="w-6 h-6 fill-current sidebar-expanded:rotate-180" viewBox="0 0 24 24">
+                        <path class="text-slate-400" d="M19.586 11l-5-5L16 4.586 23.414 12 16 19.414 14.586 18l5-5H7v-2z" />
+                        <path class="text-slate-600" d="M3 23H1V1h2z" />
+                    </svg>
+                </button>
             </div>
         </div>
 
-        <footer class="shrink-0">
-            <div class="pl-3 pb-5 text-xs text-slate-500 font-semibold">
-                © 2023-{{ date('Y') }} Saraba Bisa
-            </div>
-        </footer>
-
-    </div>
-
-    <div class="pt-3 hidden lg:inline-flex 2xl:hidden justify-end mt-auto">
-        <div class="px-3 py-2">
-            <button @click="sidebarExpanded = !sidebarExpanded">
-                <span class="sr-only">Expand / collapse sidebar</span>
-                <svg class="w-6 h-6 fill-current sidebar-expanded:rotate-180" viewBox="0 0 24 24">
-                    <path class="text-slate-400" d="M19.586 11l-5-5L16 4.586 23.414 12 16 19.414 14.586 18l5-5H7v-2z" />
-                    <path class="text-slate-600" d="M3 23H1V1h2z" />
-                </svg>
-            </button>
-        </div>
     </div>
 </div>
