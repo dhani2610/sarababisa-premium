@@ -141,16 +141,15 @@
         <th>Total Modal Sparepart</th>
         <th >: Rp. {{ number_format($total_modal) }}</th>
 
-        <th></th>
-        <th ></th>
+        <th>Total Uang Muka (DP)</th>
+        <th >: Rp. {{ number_format($total_dp) }}</th>
+
 
         <th ">Saldo Akhir</th>
         <th ">: Rp. {{ number_format($saldo_akhir) }}</th>
     </tr>
 
     <tr>
-        <th>Total Uang Muka (DP)</th>
-        <th >: Rp. {{ number_format($total_dp) }}</th>
 
         <td colspan="4"></td>
     </tr>
