@@ -29,14 +29,28 @@ class ExpenseController extends Controller
     {
         $limit = $request->get('limit', 200);
         $offset = $request->get('offset', 0);
-        $query = Expense::with('user')
-            ->where('cabang_id', getCabangId())
-            ->orderByRaw('is_approve IS NULL DESC') // Pending di atas
-            // ->orderBy('created_at', 'desc')
-            ->orderByDesc('updated_at')
-            ->latest()
-            ->skip($offset)
-            ->take($limit);
+
+        if (auth()->user()->role != 'Kepala Toko') {
+            # code...
+            $query = Expense::with('user')
+                ->where('cabang_id', getCabangId())
+                ->orderByRaw('is_approve IS NULL DESC') // Pending di atas
+                ->where('users_id', auth()->user()->id)
+                ->orderByDesc('updated_at')
+                ->latest()
+                ->skip($offset)
+                ->take($limit);
+        }else{
+
+            $query = Expense::with('user')
+                ->where('cabang_id', getCabangId())
+                ->orderByRaw('is_approve IS NULL DESC') // Pending di atas
+                // ->orderBy('created_at', 'desc')
+                ->orderByDesc('updated_at')
+                ->latest()
+                ->skip($offset)
+                ->take($limit);
+        }
 
         if ($request->filled('tipe')) {
             $query->where('tipe', $request->tipe);
@@ -56,7 +70,7 @@ class ExpenseController extends Controller
                     return 'Servis';
                 } else if($row->tipe == 2){
                     return 'Penjualan';
-                } 
+                }
             })
             ->addColumn('user_name', function ($row) {
                 return $row->user->name ?? '<span class="text-rose-600">Akun Terhapus</span>';

@@ -29,7 +29,11 @@ class PengeluaranData extends Component
     public function render()
     {
         $users = User::where('cabang_id',getCabangId())->get();
-        $expenses_count = Expense::where('cabang_id',getCabangId())->get()->count();
+        if (auth()->user()->role == 'Kepala Toko') {
+            $expenses_count = Expense::where('cabang_id',getCabangId())->get()->count();
+        }else{
+            $expenses_count = Expense::where('cabang_id',getCabangId())->where('users_id',auth()->user()->id)->get()->count();
+        }
         return view('livewire.pengeluaran-data', [
             'users' => $users,
             'expenses_count' => $expenses_count,
