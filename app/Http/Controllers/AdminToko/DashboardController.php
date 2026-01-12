@@ -81,13 +81,15 @@ class DashboardController extends Controller
         // dd(($adminbiayaservis / 100 + $adminprofitpenjualan / 100),$adminbiayaservis,$adminprofitpenjualan,$totalbonus);
 
         $totalbudgets = Budget::where('cabang_id',getCabangId())->get()->sum('total');
+
         $totalbiayaservis = ServiceTransaction::where('is_approve', 'Setuju')
+            ->where('cabang_id', getCabangId())
             ->whereYear('tgl_disetujui', $currentYear)
             ->whereMonth('tgl_disetujui', $currentMonth)
             ->get()
             ->sum('profittoko');
-
-        $rumustotalpenjualan = Order::whereHas('detailOrders', function ($query) {
+        // dd($totalbiayaservis,$currentYear,$currentMonth);
+        $rumustotalpenjualan = Order::where('cabang_id', getCabangId())->whereHas('detailOrders', function ($query) {
             $query->where('is_approve', 'Setuju')
                 ->whereYear('tgl_disetujui', now()->year)
                 ->whereMonth('tgl_disetujui', now()->month);
