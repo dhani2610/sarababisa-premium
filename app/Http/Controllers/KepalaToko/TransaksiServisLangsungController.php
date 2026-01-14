@@ -622,6 +622,7 @@ class TransaksiServisLangsungController extends Controller
         $order->nama_pelanggan = $nama_pelanggan;
         $order->payment_method = "Tunai";
         $order->pay = $sparepart->harga_modal;
+        $order->cabang_id = getCabangId();
         $order->due = 0;
         $order->save();
 
@@ -643,6 +644,7 @@ class TransaksiServisLangsungController extends Controller
         $orderDetail->persen_sales = 0;
         $orderDetail->profit_toko = 0;
         $orderDetail->garansi = $expired;
+        $orderDetail->cabang_id = getCabangId();
         $orderDetail->product_discount_amount = 0;
         $orderDetail->save();
     }

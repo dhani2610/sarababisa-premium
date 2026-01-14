@@ -395,7 +395,8 @@ class UbahBisaDiambilController extends Controller
                                     $sparepart = Product::find($prod_id);
                                     if ($sparepart) {
                                         $sparepart->decrement('stok', 1);
-                                        $this->createSparepartOrder($itemOrigin->customers_id, $sales_id, $sparepart);
+                                        $order = $this->createSparepartOrder($itemOrigin->customers_id, $sales_id, $sparepart);
+                                        // dd($order);
                                     }
                                 }
                             }
@@ -514,12 +515,15 @@ class UbahBisaDiambilController extends Controller
         $order->users_id = $salesId;
         $order->order_date = Carbon::today()->locale('id')->translatedFormat('d F Y');
         $order->total_products = 1;
-        $order->sub_total = $sparepart->harga_modal;
+        // $order->sub_total = $sparepart->harga_modal;
+        $order->sub_total = 0;
         $order->invoice_no = '' . mt_rand(date('Ymd00'), date('Ymd99'));
         $order->nama_pelanggan = $nama_pelanggan;
         $order->payment_method = "Tunai";
-        $order->pay = $sparepart->harga_modal;
+        // $order->pay = $sparepart->harga_modal;
+        $order->pay = 0;
         $order->due = 0;
+        $order->cabang_id = getCabangId();
         $order->save();
 
         // Detail Order
@@ -532,14 +536,17 @@ class UbahBisaDiambilController extends Controller
         $orderDetail->products_id = $sparepart->id;
         $orderDetail->product_name = $sparepart->product_name;
         $orderDetail->quantity = 1;
-        $orderDetail->price = $sparepart->harga_modal;
+        $orderDetail->price = 0;
         $orderDetail->total = 0;
-        $orderDetail->sub_total = $sparepart->harga_modal;
-        $orderDetail->modal = $sparepart->harga_modal;
+        // $orderDetail->sub_total = $sparepart->harga_modal;
+        // $orderDetail->modal = $sparepart->harga_modal;
+        $orderDetail->sub_total = 0;
+        $orderDetail->modal = 0;
         $orderDetail->profit = 0;
         $orderDetail->persen_sales = 0;
         $orderDetail->profit_toko = 0;
         $orderDetail->garansi = $expired;
+        $orderDetail->cabang_id = getCabangId();
         $orderDetail->product_discount_amount = 0;
         $orderDetail->save();
     }

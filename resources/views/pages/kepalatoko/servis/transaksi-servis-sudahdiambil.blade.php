@@ -105,14 +105,14 @@
                                     <label class="block text-sm font-medium mb-1">Kondisi Servis</label>
                                     <input class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" type="text" value="{{ $item->kondisi_servis }}" disabled />
                                 </div>
-                                <div>
+                                {{-- <div>
                                     <label class="block text-sm font-medium mb-1">Tindakan</label>
                                     <input
                                         class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                                         type="text"
                                         value="{{ !empty($viewTindakan) ? implode(', ', $viewTindakan) : '-' }}"
                                         disabled />
-                                </div>
+                                </div> --}}
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Biaya</label>
                                     <input
