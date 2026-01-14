@@ -1149,9 +1149,9 @@ class TransaksiProdukController extends Controller
     public function edit($id)
     {
         $item = Order::with('detailOrders')->findOrFail($id);
-        $customers = Customer::all();
-        $products = Product::all();
-        $users = User::where('role', 'Sales')->get();
+        $customers = Customer::where('cabang_id',getCabangId())->get();
+        $products = Product::where('cabang_id',getCabangId())->get();
+        $users = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
 
         return view('pages.kepalatoko.produk.transaksi-edit', [
             'item' => $item,
@@ -1170,6 +1170,31 @@ class TransaksiProdukController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $orderDetails = $request->order_details;
+
+        if ($orderDetails && is_array($orderDetails)) {
+            foreach ($orderDetails as $key => $detail) {
+                // Hapus titik pada field spesifik di dalam detail
+                if (isset($detail['modal'])) {
+                    $orderDetails[$key]['modal'] = (int) str_replace('.', '', $detail['modal']);
+                }
+                if (isset($detail['total'])) {
+                    $orderDetails[$key]['total'] = (int) str_replace('.', '', $detail['total']);
+                }
+                if (isset($detail['persen_sales'])) {
+                    $orderDetails[$key]['persen_sales'] = (int) str_replace('.', '', $detail['persen_sales']);
+                }
+            }
+        }
+
+        // 2. Merge (timpa) request dengan data yang sudah bersih
+        $request->merge([
+            'pay' => (int) str_replace('.', '', $request->pay),
+            'due' => (int) str_replace('.', '', $request->due),
+            'order_details' => $orderDetails, // Masukkan array yang sudah di-loop di atas
+        ]);
+        // dd($request->all());
+
         $item = Order::findOrFail($id);
         $nama_pelanggan = Customer::find($request->customers_id);
 

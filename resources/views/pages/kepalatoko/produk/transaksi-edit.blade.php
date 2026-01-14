@@ -18,7 +18,7 @@
 
                 <!-- Search form -->
                 <x-search-form placeholder="Masukkan nama pelanggan" />
-                
+
             </div>
 
         </div>
@@ -123,11 +123,11 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="pay">Pembayaran</label>
-                                        <input id="pay" name="pay" class="form-input w-full px-2 py-1" type="number" value="{{ $item->pay }}"/>
+                                        <input id="pay" name="pay" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ $item->pay }}"/>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="due">Hutang</label>
-                                        <input id="due" name="due" class="form-input w-full px-2 py-1" type="number" value="{{ $item->due }}"/>
+                                        <input id="due" name="due" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ $item->due }}"/>
                                     </div>
                                 </div>
                                 <!-- Modal footer -->
@@ -151,11 +151,11 @@
                                     <div class="space-y-3 mb-3">
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="modal">Total Modal</label>
-                                            <input id="modal" name="order_details[{{ $orderDetail->id }}][modal]" class="form-input w-full px-2 py-1" type="number" value="{{ $orderDetail->modal }}"/>
+                                            <input id="modal" name="order_details[{{ $orderDetail->id }}][modal]" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ $orderDetail->modal }}"/>
                                         </div>
                                         <div class="mb-4">
                                             <label class="block text-sm font-medium mb-1" for="total">Total Harga Jual</label>
-                                            <input id="total" name="order_details[{{ $orderDetail->id }}][total]" class="form-input w-full px-2 py-1" type="number" value="{{ $orderDetail->total }}"/>
+                                            <input id="total" name="order_details[{{ $orderDetail->id }}][total]" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ $orderDetail->total }}"/>
                                         </div>
                                     </div>
                                 @endforeach
@@ -174,6 +174,31 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
+
+    <script>
+        function formatRupiahInput(el) {
+            let value = el.value || '';
+
+            // hapus semua selain angka
+            value = value.replace(/\D/g, '');
+
+            // format pakai titik
+            el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        /* ON INPUT (REAL TIME) */
+        document.addEventListener('input', function (e) {
+            if (!e.target.classList.contains('input-currency')) return;
+            formatRupiahInput(e.target);
+        });
+
+        /* ON LOAD (FORM EDIT) */
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.input-currency').forEach(function (el) {
+                formatRupiahInput(el);
+            });
+        });
+    </script>
 </x-toko-layout>
