@@ -185,7 +185,7 @@
 		<table class="table table-sm table-borderless">
 			<thead>
 				<tr>
-				<th scope="col">Refund Invoice {{  $pt->ServiceTransaction->nomor_servis  }}</th>
+				<th scope="col">Refund Invoice {{  $pt->ServiceTransaction->nomor_servis ?? '-' }}</th>
 				<th scope="col" class="text-right text-danger">Rp. {{ number_format($pt->nominal) }}</th>
 				</tr>
 			</thead>
