@@ -308,11 +308,36 @@ if (!function_exists('calculateBonus')) {
         $start_date = Carbon::now()->startOfMonth()->toDateString();
         $end_date = Carbon::now()->endOfMonth()->toDateString();
         if ($user->role === 'Teknisi') {
-            $bonus_cek = ($user->servicetransaction->where('tipe','Hardware')->sum('profit') / 100) * $user->persen;
-            $bonus = $bonus_cek + $user->servicetransaction->where('tipe','Interface')->sum('bonus_interface');
+            $total_profit_interface = ServiceTransaction::where('users_id', $user->id)->where('status_servis', 'Sudah Diambil')
+                    ->whereDate('tgl_ambil', '>=', $start_date)
+                    ->whereDate('tgl_ambil', '<=', $end_date)
+                ->where('cabang_id',getCabangId())
+                    ->where('tipe', 'Interface')
+                    ->where('is_approve', 'Setuju')
+                    ->sum('bonus_interface');
+                // Menghitung total profit
+                $total_profit = ServiceTransaction::where('users_id', $user->id)->where('status_servis', 'Sudah Diambil')
+                    ->whereDate('tgl_ambil', '>=', $start_date)
+                    ->whereDate('tgl_ambil', '<=', $end_date)
+                ->where('cabang_id',getCabangId())
+                    ->where('is_approve', 'Setuju')
+                    ->where('tipe', 'Hardware')
+                    ->sum('profit');
 
+            $total_bonus_prof = $total_profit / 100 * $user->persen;
+            $bonus = $total_bonus_prof + $total_profit_interface;
         } elseif ($user->role === 'Sales') {
-            $bonus = $user->sale->sum('profit') / 100;
+            // $bonus = $user->sale->sum('profit') / 100;
+            // $bonus *= $user->persen;
+            $data = OrderDetail::where('users_id', $user->id)
+            ->whereHas('order', function ($query) use ($start_date, $end_date) {
+                $query->where('is_approve', 'Setuju')
+                    ->where('cabang_id', getCabangId())
+                    ->whereDate('tgl_disetujui', '>=', $start_date)
+                    ->whereDate('tgl_disetujui', '<=', $end_date);
+            })->get();
+
+            $bonus = $data->sum('profit') / 100;
             $bonus *= $user->persen;
 
         } else {
@@ -320,10 +345,27 @@ if (!function_exists('calculateBonus')) {
             $persen = $user->persen ?? 0;
             $nominalBonus = $user->nominal_bonus_admin ?? 0;
 
-            $totalProfitService = $user->adminservice->sum('profit');
-            $totalProfitSale = $user->adminsale->sum('profit');
-            $totalNotaService = $user->adminservice->count();
-            $totalNotaSale = $user->adminsale->count();
+
+            $service = ServiceTransaction::where('admin_id', $user->id)
+            ->where('status_servis', 'Sudah Diambil')
+            ->where('is_approve', 'Setuju')
+            ->where('cabang_id', getCabangId())
+            ->whereDate('tgl_disetujui', '>=', $start_date)
+            ->whereDate('tgl_disetujui', '<=', $end_date)
+            ->get();
+
+            $sale = OrderDetail::where('admin_id', $user->id)
+            ->whereHas('order', function ($query) use ($start_date, $end_date) {
+                $query->where('is_approve', 'Setuju')
+                    ->where('cabang_id', getCabangId())
+                    ->whereDate('tgl_disetujui', '>=', $start_date)
+                    ->whereDate('tgl_disetujui', '<=', $end_date);
+            })->get();
+
+            $totalProfitService = $service->sum('profit');
+            $totalProfitSale = $sale->sum('profit');
+            $totalNotaService = $service->count();
+            $totalNotaSale = $sale->count();
 
             if ($tipeBonusNota === 'Persen') {
                 $bonus = (($totalProfitService + $totalProfitSale) / 100) * $persen;

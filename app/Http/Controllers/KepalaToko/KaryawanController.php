@@ -454,52 +454,24 @@ class KaryawanController extends Controller
         $bonus = 0;
 
         if ($user->role === 'Teknisi') {
-            $total_bonus = ServiceTransaction::where('users_id', $user->id)
-                ->where('is_approve', 'Setuju')
-                ->where('cabang_id', getCabangId())
-                ->whereDate('tgl_disetujui', '>=', $start_date)
-                ->whereDate('tgl_disetujui', '<=', $end_date)
-                ->get();
+            $total_profit_interface = ServiceTransaction::where('users_id', $user->id)->where('status_servis', 'Sudah Diambil')
+                    ->whereDate('tgl_ambil', '>=', $start_date)
+                    ->whereDate('tgl_ambil', '<=', $end_date)
+                ->where('cabang_id',getCabangId())
+                    ->where('tipe', 'Interface')
+                    ->where('is_approve', 'Setuju')
+                    ->sum('bonus_interface');
+                // Menghitung total profit
+                $total_profit = ServiceTransaction::where('users_id', $user->id)->where('status_servis', 'Sudah Diambil')
+                    ->whereDate('tgl_ambil', '>=', $start_date)
+                    ->whereDate('tgl_ambil', '<=', $end_date)
+                ->where('cabang_id',getCabangId())
+                    ->where('is_approve', 'Setuju')
+                    ->where('tipe', 'Hardware')
+                    ->sum('profit');
 
-            // $total_profit_hardware_main = ServiceTransaction::where('users_id', $user->id)
-            //     ->where('status_servis', 'Sudah Diambil')
-            //     ->where('is_approve', 'Setuju')
-            //     ->where('cabang_id', getCabangId())
-            //     ->where('tipe', 'Hardware')
-            //     ->whereDate('tgl_ambil', '>=', $start_date)
-            //     ->whereDate('tgl_ambil', '<=', $end_date)
-            //     ->sum('profit');
-
-            // $bonus_hardware_main = ($total_profit_hardware_main / 100) * $user->persen;
-
-            // $total_bonus_interface_detail = TeknisiServis::where('users_id', $user->id)
-            //     ->where('tipe', 'Interface')
-            //     ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
-            //         $query->where('is_approve', 'Setuju')
-            //             ->where('status_servis', 'Sudah Diambil')
-            //             ->whereDate('tgl_ambil', '>=', $start_date)
-            //             ->whereDate('tgl_ambil', '<=', $end_date);
-            //     })
-            //     ->sum('bonus_interface');
-
-            // $total_bonus_hardware_detail = TeknisiServis::where('users_id', $user->id)
-            //     ->where('tipe', 'Hardware')
-            //     ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
-            //         $query->where('is_approve', 'Setuju')
-            //             ->where('status_servis', 'Sudah Diambil')
-            //             ->whereDate('tgl_ambil', '>=', $start_date)
-            //             ->whereDate('tgl_ambil', '<=', $end_date);
-            //     })
-            //     ->get()
-            //     ->sum(function ($item) {
-            //         return $item->profit * ($item->persen_teknisi / 100);
-            //     });
-
-            // $bonus = $total_bonus_interface_main + $bonus_hardware_main + $total_bonus_interface_detail + $total_bonus_hardware_detail;
-
-            $bonus_cek = ($total_bonus->where('tipe','Hardware')->sum('profit') / 100) * $user->persen;
-            $bonus = $bonus_cek + $total_bonus->where('tipe','Interface')->sum('bonus_interface');
-
+            $total_bonus_prof = $total_profit / 100 * $user->persen;
+            $bonus = $total_bonus_prof + $total_profit_interface;
         } elseif ($user->role === 'Sales') {
             // $bonus = $user->sale->sum('profit') / 100;
             // $bonus *= $user->persen;
