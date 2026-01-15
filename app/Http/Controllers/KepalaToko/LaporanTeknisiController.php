@@ -191,8 +191,10 @@ class LaporanTeknisiController extends Controller
                 return $item->profit * ($item->persen_teknisi / 100);
             });
 
-        $total_bonus_prof = $total_profit / 100 * $teknisi->persen +$bonusTeknisiServisHardware;
-        $total_bonus = $total_bonus_prof + $total_profit_interface + $bonusTeknisiServisInterface ;
+        // $total_bonus_prof = $total_profit / 100 * $teknisi->persen +$bonusTeknisiServisHardware;
+        // $total_bonus = $total_bonus_prof + $total_profit_interface + $bonusTeknisiServisInterface ;
+        $total_bonus_prof = $total_profit / 100 * $teknisi->persen ;
+        $total_bonus = $total_bonus_prof + $total_profit_interface ;
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-teknisi', [
         // return View('pages.kepalatoko.cetak-laporan-teknisi', [
             'users' => $users,
