@@ -227,10 +227,13 @@ class DashboardController extends Controller
 
             $start_date = Carbon::now()->startOfMonth()->toDateString();
             $end_date = Carbon::now()->endOfMonth()->toDateString();
-            $bonus = $this->calculateBonus($user->id, $start_date, $end_date);
+            $bonusKryawan = 0;
+            if (!empty($user)) {
+                $bonusKryawan = $this->calculateBonus($user->id, $start_date, $end_date);
+            }
             // dd($bonus);
 
-            $total_bonus_karyawan += $bonus;
+            $total_bonus_karyawan += $bonusKryawan;
         }
 
         // dd($total_bonus_karyawan);
