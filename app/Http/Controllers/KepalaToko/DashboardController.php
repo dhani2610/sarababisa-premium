@@ -7,6 +7,9 @@ use App\Models\Debt;
 use App\Models\Type;
 use App\Models\Order;
 use App\Models\Budget;
+use App\Models\Worker;
+use App\Models\User;
+use App\Models\TeknisiServis;
 use App\Models\Target;
 use App\Models\Expense;
 use App\Models\Product;
@@ -217,8 +220,23 @@ class DashboardController extends Controller
             ->count();
                     // @dd($totalbudgets);
 
+        $worker = Worker::where('cabang_id', $cabang)->get();
+        $total_bonus_karyawan = 0;
+        foreach ($worker as $w) {
+            $user = User::where('workers_id', $w->id)->first();
+
+            $start_date = Carbon::now()->startOfMonth()->toDateString();
+            $end_date = Carbon::now()->endOfMonth()->toDateString();
+            $bonus = $this->calculateBonus($user->id, $start_date, $end_date);
+            // dd($bonus);
+
+            $total_bonus_karyawan += $bonus;
+        }
+
+        // dd($total_bonus_karyawan);
         return view('pages/kepalatoko/dashboard', compact(
             'types',
+            'total_bonus_karyawan',
             'categories',
             'categorySales',
             'totalpengeluaran',
@@ -245,6 +263,93 @@ class DashboardController extends Controller
             'hasData',
             'inventories'
         ));
+    }
+
+    public function calculateBonus($id, $start_date, $end_date)
+    {
+        $user = User::find($id);
+        $bonus = 0;
+
+        if ($user->role === 'Teknisi') {
+            $total_bonus_interface_main = ServiceTransaction::where('users_id', $user->id)
+                ->where('status_servis', 'Sudah Diambil')
+                ->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
+                ->where('tipe', 'Interface')
+                ->whereDate('tgl_ambil', '>=', $start_date)
+                ->whereDate('tgl_ambil', '<=', $end_date)
+                ->sum('bonus_interface');
+
+            $total_profit_hardware_main = ServiceTransaction::where('users_id', $user->id)
+                ->where('status_servis', 'Sudah Diambil')
+                ->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
+                ->where('tipe', 'Hardware')
+                ->whereDate('tgl_ambil', '>=', $start_date)
+                ->whereDate('tgl_ambil', '<=', $end_date)
+                ->sum('profit');
+
+            $bonus_hardware_main = ($total_profit_hardware_main / 100) * $user->persen;
+
+            $total_bonus_interface_detail = TeknisiServis::where('users_id', $user->id)
+                ->where('tipe', 'Interface')
+                ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
+                    $query->where('is_approve', 'Setuju')
+                        ->where('status_servis', 'Sudah Diambil')
+                        ->whereDate('tgl_ambil', '>=', $start_date)
+                        ->whereDate('tgl_ambil', '<=', $end_date);
+                })
+                ->sum('bonus_interface');
+
+            $total_bonus_hardware_detail = TeknisiServis::where('users_id', $user->id)
+                ->where('tipe', 'Hardware')
+                ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
+                    $query->where('is_approve', 'Setuju')
+                        ->where('status_servis', 'Sudah Diambil')
+                        ->whereDate('tgl_ambil', '>=', $start_date)
+                        ->whereDate('tgl_ambil', '<=', $end_date);
+                })
+                ->get()
+                ->sum(function ($item) {
+                    return $item->profit * ($item->persen_teknisi / 100);
+                });
+
+            $bonus = $total_bonus_interface_main + $bonus_hardware_main + $total_bonus_interface_detail + $total_bonus_hardware_detail;
+
+        } elseif ($user->role === 'Sales') {
+            $bonus = $user->sale->sum('profit') / 100;
+            $bonus *= $user->persen;
+
+        } else {
+            // $bonusadminservis = $user->adminservice->sum('profit') / 100;
+            // $bonusadminservis *= $user->persen;
+
+            // $bonusadminsale = $user->adminsale->sum('profit') / 100;
+            // $bonus = ($bonusadminservis + $bonusadminsale) * $user->persen;
+
+
+            $tipeBonusNota = $user->tipe_bonus_admin ?? 'Persen'; // default biar aman
+            $persen = $user->persen ?? 0;
+            $nominalBonus = $user->nominal_bonus_admin ?? 0;
+
+            $totalProfitService = $user->adminservice->sum('profit');
+            $totalProfitSale = $user->adminsale->sum('profit');
+            $totalNotaService = $user->adminservice->count();
+            $totalNotaSale = $user->adminsale->count();
+
+            if ($tipeBonusNota === 'Persen') {
+                $bonus = (($totalProfitService + $totalProfitSale) / 100) * $persen;
+            } elseif ($tipeBonusNota === 'Tetap') {
+                $totalNota = $totalNotaService + $totalNotaSale;
+                $bonus = $totalNota * $nominalBonus;
+            } else {
+                $bonus = 0;
+            }
+            // return $user->adminservice;
+
+        }
+
+        return $bonus;
     }
 
     // public function index()

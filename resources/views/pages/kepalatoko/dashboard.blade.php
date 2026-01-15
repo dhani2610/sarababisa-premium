@@ -122,7 +122,8 @@
 
         <div class="grid grid-cols-12 gap-6">
             <!-- Card Keuangan -->
-            <x-kepalatoko.keuangan-card :bulantotalprofitbersih="$bulantotalprofitbersih" :bulantotalprofitkotor="$bulantotalprofitkotor" :totalpengeluaran="$totalpengeluaran" :totalinsiden="$totalinsiden" :totalpembelian="$totalpembelian"/>
+            {{-- @dd('total_bonus_karyawan',$total_bonus_karyawan) --}}
+            <x-kepalatoko.keuangan-card :bulantotalprofitbersih="$bulantotalprofitbersih" :bulantotalprofitkotor="$bulantotalprofitkotor" :totalpengeluaran="$totalpengeluaran" :totalinsiden="$totalinsiden" :totalpembelian="$totalpembelian" :total_bonus_karyawan="$total_bonus_karyawan"/>
 
             {{-- Progres --}}
             <div class="flex flex-col col-span-full xl:col-span-3 bg-white shadow-lg rounded-sm border border-slate-200">

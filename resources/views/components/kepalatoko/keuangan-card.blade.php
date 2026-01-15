@@ -1,3 +1,11 @@
+@props([
+    'bulantotalprofitbersih',
+    'bulantotalprofitkotor',
+    'totalpengeluaran',
+    'totalinsiden',
+    'totalpembelian',
+    'total_bonus_karyawan' => 0 // Set default 0 agar tidak error
+])
 <div class="flex flex-col col-span-full xl:col-span-3 bg-gradient-to-b from-slate-700 to-slate-800 shadow-lg rounded-sm border border-slate-800">
     <header class="px-5 py-4 border-b border-slate-600 flex items-center">
         <h2 class="font-semibold text-slate-200">Keuangan Bulan Ini</h2>
@@ -49,7 +57,8 @@
                 <div>
                     <div class="flex justify-between text-sm mb-2">
                         <div class="text-slate-300">Bonus Karyawan</div>
-                        <div class="text-slate-400 italic">Rp. {{ number_format($bulantotalprofitbersih - $bulantotalprofitkotor ) }}</div>
+                        {{-- <div class="text-slate-400 italic">Rp. {{ number_format($bulantotalprofitkotor  - $bulantotalprofitbersih) }}</div> --}}
+                        <div class="text-slate-400 italic">Rp. {{ number_format($total_bonus_karyawan) }}</div>
                     </div>
                 </div>
                 <div>
