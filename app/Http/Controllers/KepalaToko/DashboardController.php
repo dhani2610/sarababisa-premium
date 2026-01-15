@@ -207,7 +207,7 @@ class DashboardController extends Controller
             ->sum('profit');
 
         $haritotalprofitkotor = $hariprofitkotorservis + $hariprofitkotorpenjualan;
-
+        // dd($bulantotalprofitkotor, $bulantotalprofitbersih);
         // TARGET & INVENTORY
         $targets = Target::where('cabang_id', $cabang)->get();
         $hasData = $targets->isNotEmpty();

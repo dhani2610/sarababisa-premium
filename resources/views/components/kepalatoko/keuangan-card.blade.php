@@ -49,7 +49,7 @@
                 <div>
                     <div class="flex justify-between text-sm mb-2">
                         <div class="text-slate-300">Bonus Karyawan</div>
-                        <div class="text-slate-400 italic">Rp. {{ number_format($bulantotalprofitkotor  - $bulantotalprofitbersih) }}</div>
+                        <div class="text-slate-400 italic">Rp. {{ number_format($bulantotalprofitbersih - $bulantotalprofitkotor ) }}</div>
                     </div>
                 </div>
                 <div>
