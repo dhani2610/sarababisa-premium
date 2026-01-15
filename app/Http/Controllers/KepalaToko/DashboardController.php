@@ -324,13 +324,6 @@ class DashboardController extends Controller
             $bonus *= $user->persen;
 
         } else {
-            // $bonusadminservis = $user->adminservice->sum('profit') / 100;
-            // $bonusadminservis *= $user->persen;
-
-            // $bonusadminsale = $user->adminsale->sum('profit') / 100;
-            // $bonus = ($bonusadminservis + $bonusadminsale) * $user->persen;
-
-
             $tipeBonusNota = $user->tipe_bonus_admin ?? 'Persen'; // default biar aman
             $persen = $user->persen ?? 0;
             $nominalBonus = $user->nominal_bonus_admin ?? 0;
@@ -348,8 +341,6 @@ class DashboardController extends Controller
             } else {
                 $bonus = 0;
             }
-            // return $user->adminservice;
-
         }
 
         return $bonus;

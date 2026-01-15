@@ -9,6 +9,8 @@ use App\Models\Customer;
 use App\Models\ModelSerie;
 use App\Models\TeknisiServis;
 use App\Models\ServiceTransaction;
+use Carbon\Carbon;
+use App\Models\User;
 
 if (!function_exists('getCabangId')) {
     function getCabangId()
@@ -296,6 +298,87 @@ if (!function_exists('insertManualModelSerie')) {
         } catch (\Throwable $th) {
             return 0;
         }
+    }
+}
+if (!function_exists('calculateBonus')) {
+    function calculateBonus($id)
+    {
+        $start_date = Carbon::now()->startOfMonth()->toDateString();
+        $end_date = Carbon::now()->endOfMonth()->toDateString();
+        $user = User::find($id);
+        $bonus = 0;
+
+        if ($user->role === 'Teknisi') {
+            $total_bonus_interface_main = ServiceTransaction::where('users_id', $user->id)
+                ->where('status_servis', 'Sudah Diambil')
+                ->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
+                ->where('tipe', 'Interface')
+                ->whereDate('tgl_ambil', '>=', $start_date)
+                ->whereDate('tgl_ambil', '<=', $end_date)
+                ->sum('bonus_interface');
+
+            $total_profit_hardware_main = ServiceTransaction::where('users_id', $user->id)
+                ->where('status_servis', 'Sudah Diambil')
+                ->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
+                ->where('tipe', 'Hardware')
+                ->whereDate('tgl_ambil', '>=', $start_date)
+                ->whereDate('tgl_ambil', '<=', $end_date)
+                ->sum('profit');
+
+            $bonus_hardware_main = ($total_profit_hardware_main / 100) * $user->persen;
+
+            $total_bonus_interface_detail = TeknisiServis::where('users_id', $user->id)
+                ->where('tipe', 'Interface')
+                ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
+                    $query->where('is_approve', 'Setuju')
+                        ->where('status_servis', 'Sudah Diambil')
+                        ->whereDate('tgl_ambil', '>=', $start_date)
+                        ->whereDate('tgl_ambil', '<=', $end_date);
+                })
+                ->sum('bonus_interface');
+
+            $total_bonus_hardware_detail = TeknisiServis::where('users_id', $user->id)
+                ->where('tipe', 'Hardware')
+                ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
+                    $query->where('is_approve', 'Setuju')
+                        ->where('status_servis', 'Sudah Diambil')
+                        ->whereDate('tgl_ambil', '>=', $start_date)
+                        ->whereDate('tgl_ambil', '<=', $end_date);
+                })
+                ->get()
+                ->sum(function ($item) {
+                    return $item->profit * ($item->persen_teknisi / 100);
+                });
+
+            $bonus = $total_bonus_interface_main + $bonus_hardware_main + $total_bonus_interface_detail + $total_bonus_hardware_detail;
+
+        } elseif ($user->role === 'Sales') {
+            $bonus = $user->sale->sum('profit') / 100;
+            $bonus *= $user->persen;
+
+        } else {
+            $tipeBonusNota = $user->tipe_bonus_admin ?? 'Persen'; // default biar aman
+            $persen = $user->persen ?? 0;
+            $nominalBonus = $user->nominal_bonus_admin ?? 0;
+
+            $totalProfitService = $user->adminservice->sum('profit');
+            $totalProfitSale = $user->adminsale->sum('profit');
+            $totalNotaService = $user->adminservice->count();
+            $totalNotaSale = $user->adminsale->count();
+
+            if ($tipeBonusNota === 'Persen') {
+                $bonus = (($totalProfitService + $totalProfitSale) / 100) * $persen;
+            } elseif ($tipeBonusNota === 'Tetap') {
+                $totalNota = $totalNotaService + $totalNotaSale;
+                $bonus = $totalNota * $nominalBonus;
+            } else {
+                $bonus = 0;
+            }
+        }
+
+        return $bonus;
     }
 }
 
