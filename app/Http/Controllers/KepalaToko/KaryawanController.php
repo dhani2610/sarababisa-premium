@@ -19,6 +19,7 @@ use App\Http\Requests\KepalaToko\WorkerRequest;
 use App\Models\Attendance;
 use App\Models\Incident;
 use App\Models\Overtime;
+use App\Models\OrderDetail;
 use App\Models\Shift;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -78,7 +79,7 @@ class KaryawanController extends Controller
                 // 4. Hitung Bonus
                 $bonus = 0;
                 $user = User::where('workers_id', $worker->id)->first();
-
+                // return response()->json([$startDate, $endDate]);
                 if ($user) {
                     $bonus = $this->calculateBonus($user->id, $startDate, $endDate);
                 }
@@ -452,17 +453,13 @@ class KaryawanController extends Controller
         $user = User::find($id);
         $bonus = 0;
 
-
-
         if ($user->role === 'Teknisi') {
-            // $total_bonus_interface_main = ServiceTransaction::where('users_id', $user->id)
-            //     ->where('status_servis', 'Sudah Diambil')
-            //     ->where('is_approve', 'Setuju')
-            //     ->where('cabang_id', getCabangId())
-            //     ->where('tipe', 'Interface')
-            //     ->whereDate('tgl_ambil', '>=', $start_date)
-            //     ->whereDate('tgl_ambil', '<=', $end_date)
-            //     ->sum('bonus_interface');
+            $total_bonus = ServiceTransaction::where('users_id', $user->id)
+                ->where('is_approve', 'Setuju')
+                ->where('cabang_id', getCabangId())
+                ->whereDate('tgl_disetujui', '>=', $start_date)
+                ->whereDate('tgl_disetujui', '<=', $end_date)
+                ->get();
 
             // $total_profit_hardware_main = ServiceTransaction::where('users_id', $user->id)
             //     ->where('status_servis', 'Sudah Diambil')
@@ -500,11 +497,21 @@ class KaryawanController extends Controller
 
             // $bonus = $total_bonus_interface_main + $bonus_hardware_main + $total_bonus_interface_detail + $total_bonus_hardware_detail;
 
-            $bonus_cek = ($user->servicetransaction->where('tipe','Hardware')->sum('profit') / 100) * $user->persen;
-            $bonus = $bonus_cek + $user->servicetransaction->where('tipe','Interface')->sum('bonus_interface');
+            $bonus_cek = ($total_bonus->where('tipe','Hardware')->sum('profit') / 100) * $user->persen;
+            $bonus = $bonus_cek + $total_bonus->where('tipe','Interface')->sum('bonus_interface');
 
         } elseif ($user->role === 'Sales') {
-            $bonus = $user->sale->sum('profit') / 100;
+            // $bonus = $user->sale->sum('profit') / 100;
+            // $bonus *= $user->persen;
+            $data = OrderDetail::where('users_id', $user->id)
+            ->whereHas('order', function ($query) use ($start_date, $end_date) {
+                $query->where('is_approve', 'Setuju')
+                    ->where('cabang_id', getCabangId())
+                    ->whereDate('tgl_disetujui', '>=', $start_date)
+                    ->whereDate('tgl_disetujui', '<=', $end_date);
+            })->get();
+
+            $bonus = $data->sum('profit') / 100;
             $bonus *= $user->persen;
 
         } else {
@@ -512,10 +519,27 @@ class KaryawanController extends Controller
             $persen = $user->persen ?? 0;
             $nominalBonus = $user->nominal_bonus_admin ?? 0;
 
-            $totalProfitService = $user->adminservice->sum('profit');
-            $totalProfitSale = $user->adminsale->sum('profit');
-            $totalNotaService = $user->adminservice->count();
-            $totalNotaSale = $user->adminsale->count();
+
+            $service = ServiceTransaction::where('admin_id', $user->id)
+            ->where('status_servis', 'Sudah Diambil')
+            ->where('is_approve', 'Setuju')
+            ->where('cabang_id', getCabangId())
+            ->whereDate('tgl_disetujui', '>=', $start_date)
+            ->whereDate('tgl_disetujui', '<=', $end_date)
+            ->get();
+
+            $sale = OrderDetail::where('admin_id', $user->id)
+            ->whereHas('order', function ($query) use ($start_date, $end_date) {
+                $query->where('is_approve', 'Setuju')
+                    ->where('cabang_id', getCabangId())
+                    ->whereDate('tgl_disetujui', '>=', $start_date)
+                    ->whereDate('tgl_disetujui', '<=', $end_date);
+            })->get();
+
+            $totalProfitService = $service->sum('profit');
+            $totalProfitSale = $sale->sum('profit');
+            $totalNotaService = $service->count();
+            $totalNotaSale = $sale->count();
 
             if ($tipeBonusNota === 'Persen') {
                 $bonus = (($totalProfitService + $totalProfitSale) / 100) * $persen;
