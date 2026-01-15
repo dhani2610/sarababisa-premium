@@ -501,13 +501,27 @@ class KaryawanController extends Controller
             $bonus = $total_bonus_interface_main + $bonus_hardware_main + $total_bonus_interface_detail + $total_bonus_hardware_detail;
 
         } elseif ($user->role === 'Sales') {
-            $bonus = $user->prevsale->sum('profit') / 100;
+            $bonus = $user->sale->sum('profit') / 100;
             $bonus *= $user->persen;
 
         } else {
-            $bonusadminservis = $user->prevadminservice->sum('profit') / 100;
-            $bonusadminsale = $user->prevadminsale->sum('profit') / 100;
-            $bonus = ($bonusadminservis + $bonusadminsale) * $user->persen;
+            $tipeBonusNota = $user->tipe_bonus_admin ?? 'Persen'; // default biar aman
+            $persen = $user->persen ?? 0;
+            $nominalBonus = $user->nominal_bonus_admin ?? 0;
+
+            $totalProfitService = $user->adminservice->sum('profit');
+            $totalProfitSale = $user->adminsale->sum('profit');
+            $totalNotaService = $user->adminservice->count();
+            $totalNotaSale = $user->adminsale->count();
+
+            if ($tipeBonusNota === 'Persen') {
+                $bonus = (($totalProfitService + $totalProfitSale) / 100) * $persen;
+            } elseif ($tipeBonusNota === 'Tetap') {
+                $totalNota = $totalNotaService + $totalNotaSale;
+                $bonus = $totalNota * $nominalBonus;
+            } else {
+                $bonus = 0;
+            }
         }
 
         return $bonus;
