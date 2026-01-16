@@ -108,7 +108,7 @@ class DashboardController extends Controller
             ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', now()->month)
             ->where('is_approve', 'Setuju')
-            ->sum('profittoko');
+            ->sum('profit');
 
         // PROFIT PENJUALAN BULANAN
         $profitpenjualan = Order::where('cabang_id', $cabang)
@@ -201,7 +201,7 @@ class DashboardController extends Controller
             ->whereYear('tgl_ambil', now()->year)
             ->whereMonth('tgl_ambil', now()->month)
             ->whereDate('tgl_ambil', today())
-            ->sum('profittoko');
+            ->sum('profit');
 
         $hariprofitkotorpenjualan = OrderDetail::where('cabang_id', $cabang)
             ->whereYear('created_at', now()->year)
