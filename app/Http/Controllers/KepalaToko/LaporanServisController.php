@@ -56,7 +56,7 @@ class LaporanServisController extends Controller
                 ->editColumn('modal_sparepart', fn($row) => number_format($row->modal_sparepart))
                 ->editColumn('biaya', fn($row) => number_format($row->biaya))
                 ->editColumn('diskon', fn($row) => number_format($row->diskon))
-                ->editColumn('profittoko', fn($row) => number_format($row->profittoko))
+                ->editColumn('profittoko', fn($row) => number_format($row->profit))
                 ->rawColumns(['teknisi'])
                 ->make(true);
         }
@@ -477,7 +477,7 @@ class LaporanServisController extends Controller
             ->where('tipe', 1)
             ->orderBy('created_at', 'asc')
             ->get();
-      
+
 
         $total_insiden = $incidents->sum('biaya_toko');
         $total_pengeluaran_toko = $expensesToko->sum('price');
