@@ -488,7 +488,7 @@
                         <strong>Transfer:</strong><br>
                         Rp.' .
                                     number_format($item->transfer, 0, ',', '.') .
-                                    '
+                                    'x  
                      </div>';
                             }
                         @endphp

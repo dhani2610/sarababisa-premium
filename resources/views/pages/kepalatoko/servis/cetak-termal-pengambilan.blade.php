@@ -100,8 +100,8 @@
                 </tr>
                 <tr>
                     <td class="title">Nama Barang</td>
-                    <td class="value">: {{ $items->type->name }} {{ $items->brand->name }}
-                        {{ $items->modelserie->name ?? '-' }}</td>
+                    <td class="value">: {{ optional($items->type)->name }} {{ optional($items->brand)->name }}
+                        {{ optional($items->modelserie)->name ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td class="title">IMEI/SN</td>
@@ -226,7 +226,7 @@
                             // dd($tindakanList);
                         @endphp
                         {{ $tindakanList() }}
-                       
+
                     </td>
                 </tr>
                 {{-- @if (json_decode($items->biaya_j)) --}}
