@@ -63,15 +63,15 @@ class LaporanServisController extends Controller
 
         // --- Logika Ringkasan Card (Tetap Sama) ---
         $omzethari = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereDate('tgl_disetujui', today())->sum('omzet');
-        $profithari = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereDate('tgl_disetujui', today())->sum('profittoko');
+        $profithari = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereDate('tgl_disetujui', today())->sum('profit');
         $total_hari = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereDate('tgl_disetujui', today())->count();
 
         $omzetbulan = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->sum('omzet');
-        $profitbulan = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->sum('profittoko');
+        $profitbulan = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->sum('profit');
         $total_bulan = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->count();
 
         $omzettahun = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->sum('omzet');
-        $profittahun = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->sum('profittoko');
+        $profittahun = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->sum('profit');
         $total_tahun = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->count();
 
         $jumlah_total = ServiceTransaction::where('cabang_id', getCabangId())->where('is_approve', 'Setuju')->where('kondisi_servis', "Sudah jadi")->count();
@@ -439,7 +439,7 @@ class LaporanServisController extends Controller
         $total_modal    = (clone $serviceQuery)->sum('modal_sparepart');
         $total_biaya    = (clone $serviceQuery)->sum('biaya');
         $total_diskon   = (clone $serviceQuery)->sum('diskon');
-        $total_profit   = (clone $serviceQuery)->sum('profittoko');
+        $total_profit   = (clone $serviceQuery)->sum('profit');
 
 
         // 7. Data Services DP (Khusus yg ada DP)
