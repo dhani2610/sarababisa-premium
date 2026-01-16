@@ -95,7 +95,7 @@
                 <td class="b-left row-line">Nama</td>
                 <td class="capital row-line">: {{ $items->customer->nama }}</td>
                 <td class="b-left row-line">Jenis Barang</td>
-                <td class="capital row-line">: {{ $items->type->name }}</td>
+                <td class="capital row-line">: {{ optional($items->type)->name }}</td>
                 <td class="row-line">IMEI/SN</td>
                 <td class="row-line">: {{ $items->imei }}</td>
             </tr>
@@ -103,7 +103,7 @@
                 <td class="b-left row-line">Nomor HP</td>
                 <td class="row-line">: {{ $items->customer->nomor_hp }}</td>
                 <td class="b-left row-line">Merek</td>
-                <td class="capital row-line">: {{ $items->brand->name }}</td>
+                <td class="capital row-line">: {{ optional($items->brand)->name }}</td>
                 <td class="row-line">Kelengkapan</td>
                 <td class="capital row-line">: {{ $items->kelengkapan ?? 'Hanya Unit' }}</td>
             </tr>
@@ -111,9 +111,9 @@
                 <td class="b-left">Alamat</td>
                 <td class="capital">: {{ $items->customer->alamat }}</td>
                 <td class="b-left">Model Seri</td>
-                <td class="capital">: {{ $items->modelserie->name ?? '-' }}</td>
+                <td class="capital">: {{ optional($items->modelserie)->name ?? '-' }}</td>
                 <td>Warna/Kapasitas</td>
-                <td class="capital">: {{ $items->warna }} / {{ $items->capacity->name }}</td>
+                <td class="capital">: {{ $items->warna }} / {{ optional($items->capacity)->name }}</td>
             </tr>
         </tbody>
     </table>
