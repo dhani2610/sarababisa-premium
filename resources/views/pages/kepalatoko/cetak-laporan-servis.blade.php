@@ -408,8 +408,8 @@
                     <td>{{ $item->penerima }}</td>
                     <td>{{ $item->modelserie->name ?? '-' }}</td>
                     <td>{{ $item->kerusakan }}</td>
-                    <td>Rp. {{ number_format($item->estimasi_biaya) }}</td>
-                    <td>Rp. {{ number_format($item->uang_muka) }}</td>
+                    <td>Rp. {{ number_format((int)$item->estimasi_biaya ?? 0) }}</td>
+                    <td>Rp. {{ number_format((int)$item->uang_muka ?? 0) }}</td>
                 </tr>
             @endforeach
         </tbody>
