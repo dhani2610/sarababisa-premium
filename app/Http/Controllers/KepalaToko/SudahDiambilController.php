@@ -70,13 +70,18 @@ class SudahDiambilController extends Controller
             // ✅ Nomor Servis (link edit kalau bukan investor)
             ->addColumn('nomor_servis', function ($row) {
                 $url = route('transaksi-servis-sudah-diambil.edit', $row->id);
-                if (auth()->user()->role == 'Kepala Toko') {
-                    return '
-                        <a href="'.$url.'" class="text-blue-600 flex items-center">
-                            <svg class="w-5 h-5 mr-1 fill-current" viewBox="0 0 32 32"><path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4z"/></svg>
-                            '.$row->nomor_servis.'
-                        </a>
-                    ';
+                if (auth()->user()->role != 'Investor') {
+                    $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
+                    $hariIni = \Carbon\Carbon::today();
+                    $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
+                    if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
+                        return '
+                            <a href="'.$url.'" class="text-blue-600 flex items-center">
+                                <svg class="w-5 h-5 mr-1 fill-current" viewBox="0 0 32 32"><path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4z"/></svg>
+                                '.$row->nomor_servis.'
+                            </a>
+                        ';
+                    }
                 }
                 return '<div class="font-medium">'.$row->nomor_servis.'</div>';
             })
