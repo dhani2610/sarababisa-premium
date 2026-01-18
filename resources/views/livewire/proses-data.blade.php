@@ -1101,6 +1101,145 @@
 <script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.min.js"></script>
 <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 <script>
+    // 1. Register Plugin
+     FilePond.registerPlugin(
+        FilePondPluginFileValidateType,
+        FilePondPluginImageResize,
+        FilePondPluginImageTransform,
+        FilePondPluginImagePreview
+    );
+
+    let pondMasuk, pondSelesai;
+    let viewer;
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Cek apakah library kompresi sudah jalan
+        if (typeof imageCompression === 'undefined') {
+            console.error("ERROR: Library browser-image-compression belum terload! Cek koneksi internet atau script tag.");
+        }
+
+        // 2. Config Dasar FilePond
+        const baseConfig = {
+            allowMultiple: true,
+            acceptedFileTypes: ['image/jpeg', 'image/png', 'image/webp'], // Batasi tipe file agar transform jalan
+            labelIdle: 'Drag & Drop gambar atau <span class="filepond--label-action">Cari</span>',
+            credits: false,
+
+            // --- KONFIGURASI RESIZE (DIMENSI) ---
+            allowImageResize: true,
+            imageResizeTargetWidth: 1280,
+            imageResizeTargetHeight: 1280,
+            imageResizeMode: 'contain',
+            imageResizeUpscale: false,
+
+            // --- KONFIGURASI TRANSFORM (KOMPRESI) ---
+            allowImageTransform: true,
+            imageTransformOutputQuality: 70, // Turunkan sedikit ke 70 agar size lebih kecil
+            imageTransformOutputMimeType: 'image/jpeg', // Paksa convert ke JPEG (lebih kecil dari PNG)
+
+            // Fix untuk orientasi foto HP (EXIF data)
+            imageTransformOutputStripImageHead: false,
+
+            // Preview
+            imagePreviewHeight: 150,
+
+            // Event Zoom Viewer
+            onactivatefile: (file) => {
+                let imageUrl = file.getMetadata('url');
+                if (!imageUrl && file.file) {
+                    imageUrl = URL.createObjectURL(file.file);
+                }
+                if (imageUrl) showImagePopup(imageUrl);
+            }
+        };
+
+        // 3. Create Instance
+        const inputMasuk = document.querySelector('.filepond-masuk');
+        const inputSelesai = document.querySelector('.filepond-selesai');
+
+        // Cek element ada atau tidak sebelum create
+        if(inputMasuk) pondMasuk = FilePond.create(inputMasuk, baseConfig);
+        if(inputSelesai) pondSelesai = FilePond.create(inputSelesai, baseConfig);
+
+        // 4. Event Listener Tombol Modal
+        $(document).on('click', '.btn-upload-foto', function() {
+            let id = $(this).data('id');
+            $('#current-servis-id').val(id);
+            $('#modal-upload-foto').removeClass('hidden');
+
+            if(pondMasuk) pondMasuk.removeFiles();
+            if(pondSelesai) pondSelesai.removeFiles();
+
+            if(pondMasuk) setupPondServer(pondMasuk, id, 'masuk');
+            if(pondSelesai) setupPondServer(pondSelesai, id, 'selesai');
+
+            loadExistingImages(id);
+        });
+    });
+
+    // ... (Fungsi setupPondServer, loadExistingImages, showImagePopup sama seperti sebelumnya) ...
+    // ... Copy paste fungsi-fungsi helper di bawah sini ...
+
+    function setupPondServer(pondInstance, id, type) {
+       // (Paste kode setupPondServer sebelumnya disini)
+       // Pastikan kode server process/revert/remove/load ada disini
+        pondInstance.setOptions({
+            server: {
+                process: {
+                    url: `/servis/transaksi-servis/${id}/upload-foto`,
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    ondata: (formData) => {
+                        formData.append('type', type);
+                        return formData;
+                    }
+                },
+                revert: {
+                    url: `/servis/transaksi-servis/${id}/delete-foto?type=${type}`,
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                },
+                remove: (source, load, error) => {
+                    fetch(`/servis/transaksi-servis/${id}/delete-foto?type=${type}`, {
+                        method: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'text/plain' },
+                        body: source
+                    }).then(() => load()).catch((err) => error('Gagal menghapus'));
+                },
+                load: (source, load, error) => {
+                    let myRequest = new Request(`/storage/servis/${source}`);
+                    fetch(myRequest).then(res => res.blob()).then(blob => load(blob)).catch(err => error('Gagal load'));
+                }
+            }
+        });
+    }
+
+    function loadExistingImages(id) {
+        fetch(`/servis/transaksi-servis/${id}/get-foto`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.masuk && pondMasuk) pondMasuk.files = data.masuk;
+                if(data.selesai && pondSelesai) pondSelesai.files = data.selesai;
+            })
+            .catch(err => console.error("Gagal load foto", err));
+    }
+
+    function showImagePopup(imageUrl) {
+        const image = new Image();
+        image.src = imageUrl;
+        const viewer = new Viewer(image, {
+            hidden: function () { viewer.destroy(); },
+            toolbar: { zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1, rotateLeft: 1, rotateRight: 1, flipHorizontal: 1, flipVertical: 1 },
+        });
+        viewer.show();
+    }
+
+    function closeModalFoto() {
+        $('#modal-upload-foto').addClass('hidden');
+    }
+</script>
+<script>
     // FUNGSI UNTUK TAB 1 (ID Based)
     function toggleManual(checkbox, selectId, containerId) {
         const select = document.getElementById(selectId);
