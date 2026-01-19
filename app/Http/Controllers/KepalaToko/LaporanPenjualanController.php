@@ -209,6 +209,7 @@ class LaporanPenjualanController extends Controller
         $start_date = $request->start_date;
         $end_date   = $request->end_date;
         $tipe       = $request->tipe; // Ambil input tipe (Sudah Disetujui / Belum Disetujui)
+        $kategori   = $request->kategori; // Ambil input kategori
 
         // 3. SIAPKAN QUERY BUILDER DASAR
         // $detailQuery: Untuk tabel order_details (Data Barang, Profit, Modal)
@@ -253,6 +254,13 @@ class LaporanPenjualanController extends Controller
                        ->whereNull('tgl_disetujui')
                        ->whereDate('created_at', '>=', $start_date)
                        ->whereDate('created_at', '<=', $end_date);
+        }
+
+        if (!empty($kategori)) {
+            // Filter berdasarkan kategori produk
+            $detailQuery->whereHas('product', function ($q) use ($kategori) {
+                $q->where('categories_id', $kategori);
+            });
         }
 
         // 5. EKSEKUSI DATA (Gunakan CLONE agar query dasar tetap bersih)

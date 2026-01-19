@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use App\Models\OrderDetail;
 use App\Models\StoreSetting;
+use App\Models\Category;
 use Livewire\WithPagination;
 
 class LaporanPenjualanData extends Component
@@ -33,9 +34,12 @@ class LaporanPenjualanData extends Component
         })->sum('quantity');
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         // dd($toko);
+        $category = Category::get();
+
         return view('livewire.laporan-penjualan-data', [
             'toko' => $toko,
             'jumlah' => $jumlah,
+            'category' => $category,
             'product_transactions' => $this->search === null ?
                 OrderDetail::where('cabang_id',getCabangId())->whereHas('order', function ($query) {
                     $query->where('is_approve', 'Setuju');
