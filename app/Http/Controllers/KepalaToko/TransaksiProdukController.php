@@ -892,7 +892,7 @@ class TransaksiProdukController extends Controller
             // JIKA DATA BELUM ADA (Baru) -> Load Template Default dari DB atau Array
             // Contoh ambil dari tabel master: $templates = \App\Models\QcTemplate::pluck('nama_item')->toArray();
             $templates = [
-                "CHECK FACE ID/FINGER", "CHECK FRONT CAM", "CHECK BACK CAM 1/2/3",
+                "CHECK FACE ID/FINGER", "CHECK FRONT CAM 1/2", "CHECK BACK CAM 1/2/3",
                 "CHECK CAM 30PFS,60PFS", "TOP SPEAKER", "BOTTOM SPEAKER",
                 "BODY HOUSING", "LCD (Truetone,Ts)", "NETWORK", "CALLING PHONE",
                 "BATTERY", "WIFI/BLUETOOTH", "ALL BUTTON", "CHARGING", "OTHER"

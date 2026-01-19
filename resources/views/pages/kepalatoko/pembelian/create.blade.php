@@ -628,7 +628,7 @@
         <script>
             // --- KONFIGURASI QC ---
             const defaultChecklist = [
-                "CHECK FACE ID/FINGER", "CHECK FRONT CAM", "CHECK BACK CAM 1/2/3",
+                "CHECK FACE ID/FINGER", "CHECK FRONT CAM 1/2", "CHECK BACK CAM 1/2/3",
                 "CHECK CAM 30PFS,60PFS", "TOP SPEAKER", "BOTTOM SPEAKER",
                 "BODY HOUSING", "LCD (Truetone,Ts)", "NETWORK", "CALLING PHONE",
                 "BATTERY", "BACK MIC", "BOTTOM MIC", "FRONT MIC",
