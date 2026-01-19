@@ -63,6 +63,13 @@ class ExpenseController extends Controller
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->format('d/m/Y');
             })
+            ->addColumn('foto', function ($row) {
+                if ($row->foto) {
+                    $url = asset('storage/' . $row->foto);
+                    return '<img src="' . $url . '" class="w-16 h-16 object-cover rounded shadow-sm cursor-pointer" onclick="window.open(\''.$url.'\')">';
+                }
+                return '<span class="text-slate-400 italic">No Photo</span>';
+            })
             ->editColumn('tipe', function ($row) {
                 if($row->tipe == 0){
                     return 'Operasional';
@@ -134,7 +141,7 @@ class ExpenseController extends Controller
                     </div>
                 ';
             })
-            ->rawColumns(['checkbox', 'aksi', 'is_approve', 'user_name'])
+            ->rawColumns(['checkbox', 'aksi', 'is_approve', 'user_name','foto'])
             ->make(true);
     }
 
@@ -213,25 +220,57 @@ class ExpenseController extends Controller
      */
     public function store(Request $request)
     {
-        if (Auth::user()->role == 'Kepala Toko') {
-            $is_approve = 'Setuju';
-            $tanggal_approve = date('Y-m-d');
-        }else{
-            $is_approve = null;
-            $tanggal_approve = null;
-        }
-        // Transaction create
-        Expense::create([
-            'name' => $request->name,
-            'price' => $request->price,
-            'users_id' => $request->users_id,
-            'tipe' => $request->tipe,
-            'is_approve' => $is_approve,
-            'tgl_disetujui' => $tanggal_approve,
-            'cabang_id' => getCabangId(),
+        $request->merge([
+            'price' => str_replace('.', '', $request->price),
         ]);
 
-        return redirect()->route('pengeluaran.index');
+        $validator = \Validator::make($request->all(), [
+            'foto'      => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+        ], [
+            'foto.image'        => 'File harus berupa gambar.',
+            'foto.mimes'        => 'Format gambar harus jpeg, png, atau jpg.',
+            'foto.max'          => 'Ukuran gambar maksimal adalah 1 MB.',
+        ]);
+        if ($validator->fails()) {
+            toast($validator->errors()->first(), 'error');
+            return back();
+        }
+
+        try {
+            // Logika Approval
+            $is_approve = Auth::user()->role == 'Kepala Toko' ? 'Setuju' : null;
+            $tanggal_approve = Auth::user()->role == 'Kepala Toko' ? now()->toDateString() : null;
+
+            // Handling Upload Foto
+            $fotoPath = null;
+            if ($request->hasFile('foto')) {
+                $fotoPath = $request->file('foto')->store('expenses', 'public');
+            }
+
+            // Create Data
+            Expense::create([
+                'name'          => $request->name,
+                'price'         => $request->price,
+                'users_id'      => $request->users_id,
+                'tipe'          => $request->tipe,
+                'is_approve'    => $is_approve,
+                'tgl_disetujui' => $tanggal_approve,
+                'cabang_id'     => getCabangId(),
+                'foto'          => $fotoPath,
+            ]);
+
+            toast('Data berhasil disimpan.', 'success');
+            return redirect()->route('pengeluaran.index');
+
+        } catch (\Exception $e) {
+            // Jika gagal, hapus foto yang baru saja diupload (opsional/cleanup)
+            if ($fotoPath) {
+                Storage::disk('public')->delete($fotoPath);
+            }
+
+            toast('Terjadi kesalahan sistem: ' . $e->getMessage(), 'error');
+            return back();
+        }
     }
 
     /**
@@ -340,20 +379,51 @@ class ExpenseController extends Controller
      */
     public function update(Request $request, $id)
     {
+        try {
+            //code...
+            $request->merge([
+                'price' => str_replace('.', '', $request->price),
+            ]);
 
-        $request->merge([
-            'price' => str_replace('.', '', $request->price),
-        ]);
-        $item = Expense::findOrFail($id);
-        // Transaction update
-        $item->update([
-            'name' => $request->name,
-            'price' => $request->price,
-            'tipe' => $request->tipe,
-            'users_id' => $request->users_id,
-            'created_at' => $request->created_at,
-            'tgl_disetujui' => $request->tgl_disetujui,
-        ]);
+            $validator = \Validator::make($request->all(), [
+                'foto'      => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+            ], [
+                'foto.image'        => 'File harus berupa gambar.',
+                'foto.mimes'        => 'Format gambar harus jpeg, png, atau jpg.',
+                'foto.max'          => 'Ukuran gambar maksimal adalah 1 MB.',
+            ]);
+            if ($validator->fails()) {
+                toast($validator->errors()->first(), 'error');
+                return back();
+            }
+
+            $fotoPath = null;
+            if ($request->hasFile('foto')) {
+                $fotoPath = $request->file('foto')->store('expenses', 'public');
+            }
+
+            $item = Expense::findOrFail($id);
+            // Transaction update
+            $item->update([
+                'name' => $request->name,
+                'price' => $request->price,
+                'tipe' => $request->tipe,
+                'users_id' => $request->users_id,
+                'created_at' => $request->created_at,
+                'tgl_disetujui' => $request->tgl_disetujui,
+                'foto' => $fotoPath,
+            ]);
+
+            toast('Data berhasil disimpan.', 'success');
+            return redirect()->route('pengeluaran.index');
+        } catch (\Exception $e) {
+            if ($fotoPath) {
+                Storage::disk('public')->delete($fotoPath);
+            }
+
+            toast('Terjadi kesalahan sistem: ' . $e->getMessage(), 'error');
+            return back();
+        }
 
         return redirect()->route('pengeluaran.index');
     }

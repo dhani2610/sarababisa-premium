@@ -29,7 +29,7 @@
                                 <div class="font-semibold text-slate-800">Tambah Pengeluaran</div>
                                 <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false">&times;</button>
                             </div>
-                            <form action="{{ route('pengeluaran.store') }}" method="post">
+                            <form action="{{ route('pengeluaran.store') }}" method="post" enctype="multipart/form-data">
                                 @csrf
                                 <div class="px-5 py-4">
                                     <div class="space-y-3">
@@ -63,6 +63,31 @@
                                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                                 @endforeach
                                             </select>
+                                        </div>
+                                        <div x-data="{ photoPreview: null }">
+                                            <label class="block text-sm font-medium mb-1" for="foto">Foto Bukti (Opsional - Max 1MB)</label>
+                                            <input id="foto" name="foto" type="file" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                                                accept="image/*"
+                                                @change="
+                                                    const file = $event.target.files[0];
+                                                    if (file) {
+                                                        if (file.size > 1024 * 1024) {
+                                                            alert('File terlalu besar! Maksimal 1MB');
+                                                            $event.target.value = '';
+                                                            photoPreview = null;
+                                                        } else {
+                                                            const reader = new FileReader();
+                                                            reader.onload = (e) => { photoPreview = e.target.result; };
+                                                            reader.readAsDataURL(file);
+                                                        }
+                                                    }
+                                                " />
+
+                                            <template x-if="photoPreview">
+                                                <div class="mt-2">
+                                                    <img :src="photoPreview" class="w-32 h-32 object-cover rounded border">
+                                                </div>
+                                            </template>
                                         </div>
                                     </div>
                                 </div>
@@ -187,6 +212,7 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Nama Akun</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Item Pengeluaran</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Tipe Pengeluaran</th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Foto</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Biaya</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Status</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Aksi</th>
@@ -260,6 +286,7 @@
                     { data: 'user_name', name: 'user.name' },
                     { data: 'name', name: 'name' },
                     { data: 'tipe', name: 'tipe' },
+                    { data: 'foto', name: 'foto' },
                     { data: 'price', name: 'price' },
                     { data: 'is_approve', name: 'is_approve' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },

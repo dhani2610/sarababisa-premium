@@ -20,6 +20,7 @@ class Expense extends Model
         'created_at',
         'cabang_id',
         'tipe',
+        'foto',
     ];
 
     public function user()

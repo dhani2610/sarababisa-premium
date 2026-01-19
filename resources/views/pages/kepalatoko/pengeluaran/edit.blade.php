@@ -73,7 +73,7 @@
                         </div>
                     </div>
                     <!-- Modal content -->
-                    <form action="{{ route('pengeluaran.update', $item->id) }}" method="post">
+                    <form action="{{ route('pengeluaran.update', $item->id) }}" method="post" enctype="multipart/form-data">
                         @method('PUT')
                         @csrf
                         <div class="px-5 py-4">
@@ -113,6 +113,31 @@
                                             <option value="{{ $user->id }}">{{ $user->name }}</option>
                                         @endforeach
                                     </select>
+                                </div>
+                                <div x-data="{ photoPreview: null }">
+                                    <label class="block text-sm font-medium mb-1" for="foto">Foto Bukti (Opsional - Max 1MB)</label>
+                                    <input id="foto" name="foto" type="file" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                                        accept="image/*"
+                                        @change="
+                                            const file = $event.target.files[0];
+                                            if (file) {
+                                                if (file.size > 1024 * 1024) {
+                                                    alert('File terlalu besar! Maksimal 1MB');
+                                                    $event.target.value = '';
+                                                    photoPreview = null;
+                                                } else {
+                                                    const reader = new FileReader();
+                                                    reader.onload = (e) => { photoPreview = e.target.result; };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }
+                                        " />
+
+                                    <template x-if="photoPreview">
+                                        <div class="mt-2">
+                                            <img :src="photoPreview" class="w-32 h-32 object-cover rounded border">
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </div>
