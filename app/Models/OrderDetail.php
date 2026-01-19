@@ -64,6 +64,6 @@ class OrderDetail extends Model
                 ->whereMonth('created_at', now()->month)
                 ->whereNot('is_approve', 'Ditolak');
         })
-            ->sum('profit_toko');
+            ->sum('total_profit');
     }
 }

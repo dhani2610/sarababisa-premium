@@ -40,14 +40,24 @@ class DashboardController extends Controller
         $types = Type::with('service')
             ->where('cabang_id', $cabang)
             ->get();
+        // return response()->json($types);
 
         $categories = Category::where('cabang_id', $cabang)->get();
 
         // CATEGORY SALES
         $categorySales = [];
-        foreach ($categories as $category) {
-            $totalSales = OrderDetail::where('cabang_id', $cabang)
-                ->totalSales($category->id);
+       foreach ($categories as $category) {
+            $totalSales = OrderDetail::query()
+                ->whereHas('product', function ($q) use ($category) {
+                    $q->where('categories_id', $category->id);
+                })
+                ->whereHas('order', function ($q) use ($cabang) {
+                    $q->where('cabang_id', $cabang)
+                      ->whereYear('tgl_disetujui', now()->year)
+                      ->whereMonth('tgl_disetujui', now()->month)
+                      ->where('is_approve', 'Setuju');
+                })
+                ->sum('profit_toko');
 
             $categorySales[] = [
                 'category' => $category->category_name,
@@ -126,6 +136,8 @@ class DashboardController extends Controller
         $bulanprofitbersihpenjualan = $profitpenjualan->sum(
             fn($order) => $order->detailOrders->sum('total_profit')
         );
+
+        // return response()->json([$categorySales,$bulanprofitbersihpenjualan]);
 
         $bulantotalprofitbersih = $bulanprofitbersihservis + $bulanprofitbersihpenjualan;
 

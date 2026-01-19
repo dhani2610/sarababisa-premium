@@ -4,6 +4,8 @@ namespace App\Http\Controllers\KepalaToko;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\OrderDetail;
+use App\Models\Order;
 
 class DataPenjualanController extends ApiController
 {
@@ -33,9 +35,41 @@ class DataPenjualanController extends ApiController
         foreach ($monthlyData as $data) {
             $month = date('Y-m-d', mktime(0, 0, 0, $data->month, 1, $data->year));
             $labels[] = $month;
+
+            $bulanprofitkotorpenjualan = Order::where('cabang_id', getCabangId())
+            ->whereHas('detailOrders', function ($q) use ($data) {
+                $q->whereYear('tgl_disetujui', $data->year)
+                ->whereMonth('tgl_disetujui', $data->month);
+            })
+            ->with(['detailOrders' => function ($q) {
+                $q->select('orders_id', DB::raw('SUM(profit) as total_profit'))
+                ->groupBy('orders_id');
+            }])
+            ->get()
+            ->sum(fn($order) => $order->detailOrders->sum('total_profit'));
+
+
+            // PROFIT PENJUALAN BULANAN
+            $profitpenjualan = Order::where('cabang_id', getCabangId())
+                ->whereHas('detailOrders', function ($q) use ($data)  {
+                    $q->whereYear('tgl_disetujui', $data->year)
+                    ->whereMonth('tgl_disetujui', $data->month)
+                    ->where('is_approve', 'Setuju');
+                })
+                ->with(['detailOrders' => function ($q) {
+                    $q->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
+                    ->groupBy('orders_id');
+                }])
+                ->get();
+
+            $bulanprofitbersihpenjualan = $profitpenjualan->sum(
+                fn($order) => $order->detailOrders->sum('total_profit')
+            );
+
+
             $omzet[] = $data->total_omzet;
-            $profitkotor[] = $data->total_profit_kotor;
-            $profitbersih[] = $data->total_profit_bersih;
+            $profitkotor[] = $bulanprofitkotorpenjualan;
+            $profitbersih[] = $bulanprofitbersihpenjualan;
         }
 
         $data = [

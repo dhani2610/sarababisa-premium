@@ -4,6 +4,7 @@ namespace App\Http\Controllers\KepalaToko;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\ServiceTransaction;
 
 class DataServisController extends ApiController
 {
@@ -32,9 +33,29 @@ class DataServisController extends ApiController
         foreach ($monthlyData as $data) {
             $month = date('Y-m-d', mktime(0, 0, 0, $data->month, 1, $data->year));
             $labels[] = $month;
-            $omzet[] = $data->total_omzet;
-            $profitkotor[] = $data->total_profit_kotor;
-            $profitbersih[] = $data->total_profit_bersih;
+
+            $bulanprofitbersihservis = ServiceTransaction::where('cabang_id', getCabangId())
+            ->whereYear('tgl_disetujui', $data->year)
+            ->whereMonth('tgl_disetujui', $data->month)
+            ->where('is_approve', 'Setuju')
+            ->sum('profit');
+
+             $bulanprofitkotorservis = ServiceTransaction::where('cabang_id', getCabangId())
+            ->whereYear('tgl_disetujui', $data->year)
+            ->whereMonth('tgl_disetujui', $data->month)
+            ->where('is_approve', 'Setuju')
+            ->sum('profit');
+
+            $omzetservis = ServiceTransaction::where('cabang_id', getCabangId())
+            ->where('status_servis', 'Sudah Diambil')
+            ->whereYear('tgl_disetujui', $data->year)
+            ->whereMonth('tgl_disetujui', $data->month)
+            ->sum('omzet');
+
+
+            $omzet[] = $omzetservis;
+            $profitkotor[] = $bulanprofitkotorservis;
+            $profitbersih[] = $bulanprofitbersihservis;
         }
 
         $data = [
