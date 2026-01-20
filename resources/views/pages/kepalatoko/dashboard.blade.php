@@ -120,7 +120,34 @@
         </div>
         @endif
 
+        <div>
+            <div class="px-4 py-2 rounded-sm text-sm  text-white" style="background-color: silver">
+                <div class="mb-4 sm:mb-0 px-5">
+                    <form action="{{ url('/dashboard') }}" method="GET" class="flex items-center gap-2">
+                        {{-- <label for="filter_month" class="text-sm font-medium text-slate-600">Periode:</label> --}}
+                        <input
+                            type="month"
+                            name="filter_month"
+                            id="filter_month"
+                            value="{{ request('filter_month', date('Y-m')) }}"
+                            class="form-input text-sm border-slate-200 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        >
+                        <button type="submit" class="btn-sm bg-blue-500 hover:bg-blue-600 text-white">
+                            Filter
+                        </button>
+
+                        @if(request('filter_month'))
+                            <a href="{{ url('/dashboard') }}" class="btn-sm bg-white border-slate-200 text-slate-500 hover:text-slate-600">
+                                Reset
+                            </a>
+                        @endif
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-12 gap-6">
+
             <!-- Card Keuangan -->
             {{-- @dd('total_bonus_karyawan',$total_bonus_karyawan) --}}
             <x-kepalatoko.keuangan-card :bulantotalprofitbersih="$bulantotalprofitbersih" :bulantotalprofitkotor="$bulantotalprofitkotor" :totalpengeluaran="$totalpengeluaran" :totalinsiden="$totalinsiden" :totalpembelian="$totalpembelian" :total_bonus_karyawan="$total_bonus_karyawan"/>

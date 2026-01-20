@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Inventory;
 use App\Models\Purchase;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -30,12 +31,20 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
         $currentMonth = now()->month;
         $cabang = getCabangId();
         $currentDate = Carbon::now();
 
+        if ($request->has('filter_month') && $request->filter_month != '') {
+            $date = Carbon::parse($request->filter_month);
+        } else {
+            $date = Carbon::now();
+        }
+
+        $year = $date->year;
+        $month = $date->month;
         // TYPES & CATEGORIES
         $types = Type::with('service')
             ->where('cabang_id', $cabang)
@@ -51,10 +60,10 @@ class DashboardController extends Controller
                 ->whereHas('product', function ($q) use ($category) {
                     $q->where('categories_id', $category->id);
                 })
-                ->whereHas('order', function ($q) use ($cabang) {
+                ->whereHas('order', function ($q) use ($cabang, $year, $month) {
                     $q->where('cabang_id', $cabang)
-                      ->whereYear('tgl_disetujui', now()->year)
-                      ->whereMonth('tgl_disetujui', now()->month)
+                      ->whereYear('tgl_disetujui', $year)
+                      ->whereMonth('tgl_disetujui', $month)
                       ->where('is_approve', 'Setuju');
                 })
                 ->sum('profit_toko');
@@ -67,19 +76,19 @@ class DashboardController extends Controller
 
         // PENGELUARAN
         $totalpengeluaran = Expense::where('cabang_id', $cabang)
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
             ->where('is_approve', 'Setuju')
             ->sum('price');
 
         $totalinsiden = Incident::where('cabang_id', $cabang)
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
             ->sum('biaya_toko');
 
         $totalpembelian = Purchase::where('cabang_id', $cabang)
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
             ->sum('total_price');
 
         // REMINDER SERVIS
@@ -115,16 +124,16 @@ class DashboardController extends Controller
 
         // PROFIT SERVIS BULANAN
         $bulanprofitbersihservis = ServiceTransaction::where('cabang_id', $cabang)
-            ->whereYear('tgl_disetujui', now()->year)
-            ->whereMonth('tgl_disetujui', now()->month)
+            ->whereYear('tgl_disetujui', $year)
+            ->whereMonth('tgl_disetujui', $month)
             ->where('is_approve', 'Setuju')
             ->sum('profit');
 
         // PROFIT PENJUALAN BULANAN
         $profitpenjualan = Order::where('cabang_id', $cabang)
-            ->whereHas('detailOrders', function ($q) {
-                $q->whereYear('tgl_disetujui', now()->year)
-                ->whereMonth('tgl_disetujui', now()->month)
+            ->whereHas('detailOrders', function ($q) use ($year, $month) {
+                $q->whereYear('tgl_disetujui', $year)
+                ->whereMonth('tgl_disetujui', $month)
                 ->where('is_approve', 'Setuju');
             })
             ->with(['detailOrders' => function ($q) {
@@ -143,16 +152,16 @@ class DashboardController extends Controller
 
         // PROFIT KOTOR SERVIS
         $bulanprofitkotorservis = ServiceTransaction::where('cabang_id', $cabang)
-            ->whereYear('tgl_disetujui', now()->year)
-            ->whereMonth('tgl_disetujui', now()->month)
+            ->whereYear('tgl_disetujui', $year)
+            ->whereMonth('tgl_disetujui', $month)
             ->where('is_approve', 'Setuju')
             ->sum('profit');
 
         // PROFIT KOTOR PENJUALAN
         $bulanprofitkotorpenjualan = Order::where('cabang_id', $cabang)
-            ->whereHas('detailOrders', function ($q) {
-                $q->whereYear('tgl_disetujui', now()->year)
-                ->whereMonth('tgl_disetujui', now()->month);
+            ->whereHas('detailOrders', function ($q) use ($year, $month) {
+                $q->whereYear('tgl_disetujui', $year)
+                ->whereMonth('tgl_disetujui', $month);
             })
             ->with(['detailOrders' => function ($q) {
                 $q->select('orders_id', DB::raw('SUM(profit) as total_profit'))
@@ -237,8 +246,8 @@ class DashboardController extends Controller
         foreach ($worker as $w) {
             $user = User::where('workers_id', $w->id)->first();
 
-            $start_date = Carbon::now()->startOfMonth()->toDateString();
-            $end_date = Carbon::now()->endOfMonth()->toDateString();
+            $start_date = $date->startOfMonth()->toDateString();
+            $end_date = $date->endOfMonth()->toDateString();
             $bonusKryawan = 0;
             if (!empty($user)) {
                 $bonusKryawan = $this->calculateBonus($user->id, $start_date, $end_date);
