@@ -16,50 +16,6 @@ class LaporanTeknisiController extends Controller
     {
         $cabang_id = getCabangId();
 
-        // --- Logika AJAX DataTables ---
-        if ($request->ajax()) {
-            $users = User::where('cabang_id', $cabang_id)
-                ->where('role', 'Teknisi')
-                ->with(['servicetransaction', 'targetServis']);
-
-            return DataTables::of($users)
-                ->addIndexColumn()
-                ->addColumn('servis_ditangani', function($row) {
-                    return $row->servicetransaction->count();
-                })
-                ->addColumn('bonus', function($row) {
-                    $bonus_cek = ($row->servicetransaction->where('tipe', 'Hardware')->sum('profit') / 100) * $row->persen;
-                    $bonus = $bonus_cek + $row->servicetransaction->where('tipe', 'Interface')->sum('bonus_interface');
-                    return 'Rp. ' . number_format($bonus);
-                })
-                ->addColumn('target_servis', function($row) {
-                    $target = $row->targetServis->sum('item');
-                    return $target != 0 ? $target : '-';
-                })
-                ->addColumn('progres', function($row) {
-                    $target = $row->targetServis->sum('item');
-                    if ($target != 0) {
-                        $progres = ($row->servicetransaction->count() / $target) * 100;
-                        return round($progres, 2) . '%';
-                    }
-                    return '-';
-                })
-                ->addColumn('bonus_pencapaian', function($row) {
-                    $target = $row->targetServis->sum('item');
-                    if ($target != 0) {
-                        $bonus_cek = ($row->servicetransaction->where('tipe', 'Hardware')->sum('profit') / 100) * $row->persen;
-                        $bonus = $bonus_cek + $row->servicetransaction->where('tipe', 'Interface')->sum('bonus_interface');
-
-                        $count = $row->servicetransaction->count();
-                        $reward = $bonus * (($count / $target) * 100) / 100;
-
-                        return $count < $target ? 'Rp. ' . number_format($reward) : 'Rp. ' . number_format($bonus);
-                    }
-                    return '-';
-                })
-                ->make(true);
-        }
-
         // Untuk Modal Cetak Laporan
         $users = User::where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
 

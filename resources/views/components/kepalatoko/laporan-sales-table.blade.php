@@ -1,4 +1,25 @@
 <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
+    <div class="mb-4 sm:mb-0 px-5">
+        <form action="{{ route('laporan-sales') }}" method="GET" class="flex items-center gap-2">
+            <label for="filter_month" class="text-sm font-medium text-slate-600">Periode:</label>
+            <input
+                type="month"
+                name="filter_month"
+                id="filter_month"
+                value="{{ request('filter_month', date('Y-m')) }}"
+                class="form-input text-sm border-slate-200 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            >
+            <button type="submit" class="btn-sm bg-blue-500 hover:bg-blue-600 text-white">
+                Filter
+            </button>
+
+            @if(request('filter_month'))
+                <a href="{{ route('laporan-sales') }}" class="btn-sm bg-white border-slate-200 text-slate-500 hover:text-slate-600">
+                    Reset
+                </a>
+            @endif
+        </form>
+    </div>
     <!-- Table -->
     <div class="overflow-x-auto">
         <table class="table-auto w-full">
@@ -30,9 +51,9 @@
                 <!-- Row -->
                 @foreach($users as $item)
                     @php
-                        $bonus = $item->sale->sum('profit')/100;
+                        $bonus = $item->filteredSale->sum('profit')/100;
                         $bonus *= $item->persen;
-                    @endphp                  
+                    @endphp
                     <tr>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-medium">{{ $item->name }}</div>
@@ -47,8 +68,8 @@
                         </td>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-medium">
-                                @if ($item->targetSale->sum('item') != 0)
-                                    {{ $item->targetSale->sum('item') }}
+                                @if ($item->filteredTargetSale->sum('item') != 0)
+                                    {{ $item->filteredTargetSale->sum('item') }}
                                 @else
                                     -
                                 @endif
@@ -56,8 +77,8 @@
                         </td>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-medium">
-                                @if ($item->targetSale->sum('item') != 0)
-                                    {{ ($item->sale->sum('quantity') / $item->targetSale->sum('item')) * 100 }}%
+                                @if ($item->filteredTargetSale->sum('item') != 0)
+                                    {{ ($item->filteredSale->sum('quantity') / $item->filteredTargetSale->sum('item')) * 100 }}%
                                 @else
                                     -
                                 @endif
@@ -65,11 +86,11 @@
                         </td>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-medium">
-                                @if ($item->targetSale->sum('item') != 0)
+                                @if ($item->filteredTargetSale->sum('item') != 0)
                                     @php
-                                        $reward = $bonus * (($item->sale->sum('quantity') / $item->targetSale->sum('item')) * 100) / 100;
+                                        $reward = $bonus * (($item->filteredSale->sum('quantity') / $item->filteredTargetSale->sum('item')) * 100) / 100;
                                     @endphp
-                                    @if ($item->sale->sum('quantity') < $item->targetSale->sum('item'))
+                                    @if ($item->filteredSale->sum('quantity') < $item->filteredTargetSale->sum('item'))
                                     Rp. {{ number_format($reward) }}
                                     @else
                                     Rp. {{ number_format($bonus) }}

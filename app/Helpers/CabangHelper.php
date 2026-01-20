@@ -305,8 +305,15 @@ if (!function_exists('calculateBonus')) {
         $user = User::find($id);
         $bonus = 0;
 
-        $start_date = Carbon::now()->startOfMonth()->toDateString();
-        $end_date = Carbon::now()->endOfMonth()->toDateString();
+        if (request('filter_month')) {
+            $date = \Carbon\Carbon::parse(request('filter_month'));
+        } else {
+            $date = \Carbon\Carbon::now();
+        }
+
+        $start_date = $date->copy()->startOfMonth()->toDateString();
+        $end_date = $date->copy()->endOfMonth()->toDateString();
+        
         if ($user->role === 'Teknisi') {
             $total_profit_interface = ServiceTransaction::where('users_id', $user->id)->where('status_servis', 'Sudah Diambil')
                     ->whereDate('tgl_ambil', '>=', $start_date)

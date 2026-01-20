@@ -258,4 +258,82 @@ class User extends Authenticatable
             ->where('cabang_id', getCabangId())
             ->whereMonth('created_at', $currentMonth);
     }
+
+    // ... import yang mungkin dibutuhkan
+    // use Carbon\Carbon;
+
+    // 1. Fungsi Filter Transaksi Service
+    public function filteredServiceTransaction()
+    {
+        // Ambil bulan dari request, jika tidak ada pakai bulan sekarang
+        $date = request('filter_month') ? \Carbon\Carbon::parse(request('filter_month')) : now();
+
+        return $this->hasMany(ServiceTransaction::class, 'users_id', 'id')
+            ->where('cabang_id', getCabangId())
+            ->where('is_approve', 'Setuju')
+            ->whereYear('tgl_disetujui', $date->year)
+            ->whereMonth('tgl_disetujui', $date->month);
+    }
+
+    // 2. Fungsi Filter Penjualan (Sale)
+    public function filteredSale()
+    {
+        $date = request('filter_month') ? \Carbon\Carbon::parse(request('filter_month')) : now();
+
+        return $this->hasMany(OrderDetail::class, 'users_id', 'id')
+            ->whereHas('order', function ($query) use ($date) {
+                $query->where('is_approve', 'Setuju')
+                    ->where('cabang_id', getCabangId())
+                    ->whereYear('tgl_disetujui', $date->year)
+                    ->whereMonth('tgl_disetujui', $date->month);
+            });
+    }
+
+    // 3. Fungsi Filter Admin Service (Opsional, jika admin juga ditampilkan)
+    public function filteredAdminService()
+    {
+        $date = request('filter_month') ? \Carbon\Carbon::parse(request('filter_month')) : now();
+
+        return $this->hasMany(ServiceTransaction::class, 'admin_id', 'id')
+            ->where('status_servis', 'Sudah Diambil')
+            ->where('is_approve', 'Setuju')
+            ->where('cabang_id', getCabangId())
+            ->whereYear('tgl_disetujui', $date->year)
+            ->whereMonth('tgl_disetujui', $date->month);
+    }
+
+    // 4. Fungsi Filter Admin Sale (Opsional)
+    public function filteredAdminSale()
+    {
+        $date = request('filter_month') ? \Carbon\Carbon::parse(request('filter_month')) : now();
+
+        return $this->hasMany(OrderDetail::class, 'admin_id', 'id')
+            ->whereHas('order', function ($query) use ($date) {
+                $query->where('is_approve', 'Setuju')
+                    ->where('cabang_id', getCabangId())
+                    ->whereYear('tgl_disetujui', $date->year)
+                    ->whereMonth('tgl_disetujui', $date->month);
+            });
+    }
+
+    public function filteredTargetServis()
+    {
+        $date = request('filter_month') ? \Carbon\Carbon::parse(request('filter_month')) : now();
+
+        return $this->hasMany(TeknisiTarget::class, 'users_id', 'id')
+            ->whereYear('created_at', $date->year)
+            ->where('cabang_id', getCabangId())
+            ->whereMonth('created_at', $date->month);
+    }
+
+    public function filteredTargetSale()
+    {
+        $date = request('filter_month') ? \Carbon\Carbon::parse(request('filter_month')) : now();
+
+        return $this->hasMany(SalesTarget::class, 'users_id', 'id')
+            ->whereYear('created_at', $date->year)
+            ->where('cabang_id', getCabangId())
+            ->whereMonth('created_at', $date->month);
+    }
+
 }
