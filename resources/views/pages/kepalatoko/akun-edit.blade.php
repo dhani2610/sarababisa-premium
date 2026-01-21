@@ -170,13 +170,15 @@
 
                                     {{-- CONTAINER BONUS LEVELING EDIT --}}
                                     <div id="bonus-leveling-container" class="mt-4 border border-slate-200 rounded p-3 bg-slate-50" style="display: none;">
+                                        <small for="">
+                                            <a href="{{  asset('import/Format Leveling.xlsx')  }}" download="" style="color:blue">Download Format</a>
+                                        </small>
                                         <div class="flex justify-between items-center mb-2">
                                             <label class="block text-sm font-bold text-slate-800">Setting Bonus Leveling Interface</label>
                                             <div class="flex space-x-2">
                                                 <input type="file" id="excel_file" accept=".xlsx, .xls" style="display: none;" onchange="processExcel(this)">
                                                 
                                                 <button type="button" class="btn-xs bg-indigo-500 hover:bg-indigo-600 text-white" onclick="document.getElementById('excel_file').click()">
-                                                    <svg class="w-3 h-3 fill-current mr-1" viewBox="0 0 16 16"><path d="M15 15H1V1h14v14zM2 2v12h12V2H2z"/></svg> 
                                                     Import
                                                 </button>
 
