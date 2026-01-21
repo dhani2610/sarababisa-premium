@@ -458,7 +458,7 @@ class KaryawanController extends Controller
                     ->whereDate('tgl_ambil', '>=', $start_date)
                     ->whereDate('tgl_ambil', '<=', $end_date)
                 ->where('cabang_id',getCabangId())
-                    ->where('tipe', 'Interface')
+                    ->whereIn('tipe', ['Interface','Interface Leveling'])
                     ->where('is_approve', 'Setuju')
                     ->sum('bonus_interface');
                 // Menghitung total profit

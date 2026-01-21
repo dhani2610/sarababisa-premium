@@ -39,7 +39,7 @@ class DashboardController extends Controller
             ->get();
 
         $bonusServisInterface = ServiceTransaction::with('serviceaction')
-            ->where('tipe', 'Interface')
+            ->whereIn('tipe', ['Interface','Interface Leveling'])
             ->where('is_approve', 'Setuju')
             ->where('users_id', Auth::user()->id)
             ->whereYear('tgl_disetujui', $currentYear)
@@ -49,7 +49,7 @@ class DashboardController extends Controller
 
         // 1. Hitung Bonus Interface (Multi Teknisi)
         $teknisiServisInterface = TeknisiServis::where('users_id', Auth::user()->id)
-            ->where('tipe', 'Interface')
+            ->whereIn('tipe', ['Interface','Interface Leveling'])
             ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
                 $query->where('is_approve', 'Setuju') // Pastikan status sudah disetujui
                     ->whereYear('tgl_disetujui', $currentYear)
@@ -78,7 +78,7 @@ class DashboardController extends Controller
         //     Auth::user()->id
         // );
         $bonusServisInterface = ServiceTransaction::with('serviceaction')
-            ->where('tipe', 'Interface')
+            ->whereIn('tipe', ['Interface','Interface Leveling'])
             ->where('is_approve', 'Setuju')
             ->where('users_id', Auth::user()->id)
             ->whereYear('tgl_disetujui', $currentYear)
@@ -97,6 +97,7 @@ class DashboardController extends Controller
 
         $totalbonusHardware = $bonusservis + $teknisiServisHardware;
         $totalbonusInterface = $bonusServisInterface + $teknisiServisInterface;
+        // dd($totalbonusInterface);
         $totalbonus = $bonusservis + $bonusServisInterface;
 
         // Ambil data transaksi servis yang memiliki status "Belum cek"

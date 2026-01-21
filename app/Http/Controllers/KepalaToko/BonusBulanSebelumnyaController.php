@@ -63,7 +63,7 @@ class BonusBulanSebelumnyaController extends Controller
                 ->where('status_servis', 'Sudah Diambil')
                 ->where('is_approve', 'Setuju')
                 ->where('cabang_id', getCabangId())
-                ->where('tipe', 'Interface')
+                ->whereIn('tipe', ['Interface','Interface Leveling'])
                 ->whereDate('tgl_ambil', '>=', $start_date)
                 ->whereDate('tgl_ambil', '<=', $end_date)
                 ->sum('bonus_interface');
@@ -81,7 +81,7 @@ class BonusBulanSebelumnyaController extends Controller
 
 
             $total_bonus_interface_detail = TeknisiServis::where('users_id', $user->id)
-                ->where('tipe', 'Interface')
+                ->whereIn('tipe', ['Interface','Interface Leveling'])
                 ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
                     $query->where('is_approve', 'Setuju')
                         ->where('status_servis', 'Sudah Diambil')

@@ -299,7 +299,7 @@ class DashboardController extends Controller
             //     ->where('status_servis', 'Sudah Diambil')
             //     ->where('is_approve', 'Setuju')
             //     ->where('cabang_id', getCabangId())
-            //     ->where('tipe', 'Interface')
+            //     ->whereIn('tipe', ['Interface','Interface Leveling'])
             //     ->whereDate('tgl_ambil', '>=', $start_date)
             //     ->whereDate('tgl_ambil', '<=', $end_date)
             //     ->sum('bonus_interface');
@@ -316,7 +316,7 @@ class DashboardController extends Controller
             // $bonus_hardware_main = ($total_profit_hardware_main / 100) * $user->persen;
 
             // $total_bonus_interface_detail = TeknisiServis::where('users_id', $user->id)
-            //     ->where('tipe', 'Interface')
+            //     ->whereIn('tipe', ['Interface','Interface Leveling'])
             //     ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
             //         $query->where('is_approve', 'Setuju')
             //             ->where('status_servis', 'Sudah Diambil')

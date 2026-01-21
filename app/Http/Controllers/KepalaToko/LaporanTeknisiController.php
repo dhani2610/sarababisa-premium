@@ -37,7 +37,7 @@ class LaporanTeknisiController extends Controller
                 })
                 ->addColumn('bonus', function($row) {
                     $bonus_cek = ($row->servicetransaction->where('tipe', 'Hardware')->sum('profit') / 100) * $row->persen;
-                    $bonus = $bonus_cek + $row->servicetransaction->where('tipe', 'Interface')->sum('bonus_interface');
+                    $bonus = $bonus_cek + $row->servicetransaction->whereIn('tipe', ['Interface','Interface Leveling'])->sum('bonus_interface');
                     return 'Rp. ' . number_format($bonus);
                 })
                 ->addColumn('target_servis', function($row) {
@@ -56,7 +56,7 @@ class LaporanTeknisiController extends Controller
                     $target = $row->targetServis->sum('item');
                     if ($target != 0) {
                         $bonus_cek = ($row->servicetransaction->where('tipe', 'Hardware')->sum('profit') / 100) * $row->persen;
-                        $bonus = $bonus_cek + $row->servicetransaction->where('tipe', 'Interface')->sum('bonus_interface');
+                        $bonus = $bonus_cek + $row->servicetransaction->whereIn('tipe', ['Interface','Interface Leveling'])->sum('bonus_interface');
 
                         $count = $row->servicetransaction->count();
                         $reward = $bonus * (($count / $target) * 100) / 100;
@@ -111,7 +111,7 @@ class LaporanTeknisiController extends Controller
                 ->whereDate('tgl_ambil', '>=', $start_date)
                 ->whereDate('tgl_ambil', '<=', $end_date)
             ->where('cabang_id',getCabangId())
-                ->where('tipe', 'Interface')
+                ->whereIn('tipe', ['Interface','Interface Leveling'])
                 ->where('is_approve', 'Setuju')
                 ->sum('bonus_interface');
             // Menghitung total profit
@@ -125,7 +125,7 @@ class LaporanTeknisiController extends Controller
 
 
         $bonusTeknisiServisInterface = TeknisiServis::where('users_id', $request->users_id)
-            ->where('tipe', 'Interface')
+            ->whereIn('tipe', ['Interface','Interface Leveling'])
             ->whereHas('transaction', function ($query) use ($start_date, $end_date) {
                 $query->where('is_approve', 'Setuju')
                 ->whereDate('tgl_ambil', '>=', $start_date)

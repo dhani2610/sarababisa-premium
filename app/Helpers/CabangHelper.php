@@ -140,7 +140,7 @@ if (!function_exists('bonusTeknisiMultiInterface')) {
         $currentMonth = now()->month;
 
         $teknisiServisInterface = TeknisiServis::where('users_id', Auth::user()->id)
-            ->where('tipe', 'Interface')
+            ->whereIn('tipe', ['Interface','Interface Leveling'])
             ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
                 $query->where('is_approve', 'Setuju') // Pastikan status sudah disetujui
                     ->whereYear('tgl_disetujui', $currentYear)
@@ -184,7 +184,7 @@ if (!function_exists('bonusTeknisiMultiInterfaceByTransactionId')) {
         $currentMonth = now()->month;
 
         $teknisiServisInterface = TeknisiServis::where('service_transactions_id', $transactionId)->where('users_id', $userId)
-            ->where('tipe', 'Interface')
+            ->whereIn('tipe', ['Interface','Interface Leveling'])
 
             ->sum('bonus_interface');
 
@@ -313,13 +313,13 @@ if (!function_exists('calculateBonus')) {
 
         $start_date = $date->copy()->startOfMonth()->toDateString();
         $end_date = $date->copy()->endOfMonth()->toDateString();
-        
+
         if ($user->role === 'Teknisi') {
             $total_profit_interface = ServiceTransaction::where('users_id', $user->id)->where('status_servis', 'Sudah Diambil')
                     ->whereDate('tgl_ambil', '>=', $start_date)
                     ->whereDate('tgl_ambil', '<=', $end_date)
                 ->where('cabang_id',getCabangId())
-                    ->where('tipe', 'Interface')
+                    ->whereIn('tipe', ['Interface','Interface Leveling'])
                     ->where('is_approve', 'Setuju')
                     ->sum('bonus_interface');
                 // Menghitung total profit
