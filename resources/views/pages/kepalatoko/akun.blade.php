@@ -159,7 +159,16 @@
                                             <div id="bonus-leveling-container" class="mt-4 border border-slate-200 rounded p-3 bg-slate-50" style="display: none;">
                                                 <div class="flex justify-between items-center mb-2">
                                                     <label class="block text-sm font-bold text-slate-800">Setting Bonus Leveling Interface</label>
-                                                    <button type="button" class="btn-xs bg-emerald-500 hover:bg-emerald-600 text-white" onclick="addLevelingRow()">+ Tambah Baris</button>
+                                                    <div class="flex space-x-2">
+                                                        <input type="file" id="excel_file" accept=".xlsx, .xls" style="display: none;" onchange="processExcel(this)">
+                                                        
+                                                        <button type="button" class="btn-xs bg-indigo-500 hover:bg-indigo-600 text-white" onclick="document.getElementById('excel_file').click()">
+                                                            <svg class="w-3 h-3 fill-current mr-1" viewBox="0 0 16 16"><path d="M15 15H1V1h14v14zM2 2v12h12V2H2z"/></svg> 
+                                                            Import
+                                                        </button>
+
+                                                        <button type="button" class="btn-xs bg-emerald-500 hover:bg-emerald-600 text-white" onclick="addLevelingRow()">+ Tambah</button>
+                                                    </div>
                                                 </div>
                                                 
                                                 <div id="leveling-rows-wrapper" class="space-y-2">
@@ -513,7 +522,8 @@
         </div>
 
     </div>
-<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
 
     document.addEventListener('input', function (e) {
@@ -605,20 +615,80 @@
     document.getElementById('role').addEventListener('change', toggleInputs);
 
 
-    function addLevelingRow() {
-        const wrapper = document.getElementById('leveling-rows-wrapper');
-        // Clone row pertama
-        const firstRow = wrapper.querySelector('.leveling-row');
-        const newRow = firstRow.cloneNode(true);
-        
-        // Reset nilai input di row baru
-        const inputs = newRow.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.value = '';
-        });
+    function processExcel(input) {
+        if(!input.files || !input.files[0]) return;
 
-        // Append ke wrapper
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            
+            // Ambil sheet pertama
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            // Konversi ke JSON
+            // Header Excel harus: id_jenis_barang, id_tipe_os, dari_rate, sampai_rate, nominal_bonus
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+            if(jsonData.length > 0) {
+                // Loop data excel dan buat row
+                jsonData.forEach(row => {
+                    appendExcelRow(row);
+                });
+                
+                // Reset input file agar bisa upload file yang sama jika perlu revisi
+                input.value = '';
+                alert('Berhasil import ' + jsonData.length + ' baris data!');
+            } else {
+                alert('Data Excel kosong atau format salah.');
+            }
+        };
+
+        reader.readAsArrayBuffer(file);
+    }
+
+    function appendExcelRow(data) {
+        const wrapper = document.getElementById('leveling-rows-wrapper');
+        // Kita clone dari row pertama yang sudah ada di HTML (Template)
+        const templateRow = wrapper.querySelector('.leveling-row');
+        
+        if(!templateRow) {
+            alert('Tidak ada template baris. Pastikan minimal ada 1 baris input.');
+            return;
+        }
+
+        const newRow = templateRow.cloneNode(true);
+        
+        // Mapping data excel ke input
+        // Pastikan nama kolom di Excel sesuai (case sensitive biasanya, tapi kita handle basic)
+        
+        const selJenis = newRow.querySelector('select[name="lvl_id_jenis_barang[]"]');
+        const selOs = newRow.querySelector('select[name="lvl_id_tipe_os[]"]');
+        const inpStart = newRow.querySelector('input[name="lvl_start_rate[]"]');
+        const inpEnd = newRow.querySelector('input[name="lvl_end_rate[]"]');
+        const inpBonus = newRow.querySelector('input[name="lvl_nominal_bonus[]"]');
+
+        // Set Value dari Excel
+        // Menggunakan optional chaining (?.) dan fallback || ''
+        if(selJenis) selJenis.value = data['id_jenis_barang'] || data['ID Jenis Barang']; 
+        if(selOs) selOs.value = data['id_tipe_os'] || data['ID Tipe OS'];
+        
+        // Format Rupiah untuk inputan angka
+        // Fungsi helper formatRupiahManual ada di bawah
+        if(inpStart) inpStart.value = formatRupiahManual(data['dari_rate'] || data['Dari Rate']);
+        if(inpEnd) inpEnd.value = formatRupiahManual(data['sampai_rate'] || data['Sampai Rate']);
+        if(inpBonus) inpBonus.value = formatRupiahManual(data['nominal_bonus'] || data['Nominal Bonus']);
+
         wrapper.appendChild(newRow);
+    }
+
+    // Helper untuk memformat angka dari Excel (misal: 50000) menjadi format input (50.000)
+    function formatRupiahManual(angka) {
+        if(!angka) return '';
+        return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
     function removeLevelingRow(btn) {
