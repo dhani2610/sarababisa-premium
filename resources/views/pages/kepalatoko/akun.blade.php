@@ -158,7 +158,7 @@
                                             <br>
                                             <div id="bonus-leveling-container" class="mt-3 border border-slate-200 rounded p-3 bg-slate-50" style="display: none;">
                                                 <small for="">
-                                                    <a href="{{  asset('import/Format Leveling.xlsx')  }}" download="" style="color:blue">Download Format</a>
+                                                    <a href="{{  asset('storage/assets/Format Leveling.xlsx')  }}" download="" style="color:blue">Download Format</a>
                                                 </small>
                                                 <div class="flex justify-between items-center mb-2">
                                                     <label class="block text-sm font-bold text-slate-800">Setting Bonus Leveling Interface</label>
