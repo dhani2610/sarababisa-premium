@@ -837,6 +837,20 @@ class BisaDiambilController extends Controller
                         if ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface') {
                             $nama_model = ModelSerie::find($itemOrigin->model_series_id);
                             $bonus_interface = $nama_model->nominal_bonus ?? 0;
+                        }elseif ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface Leveling') {
+                            $biayaPerAction = (int)filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+                            $bonus_leveling = \App\Models\BonusLeveling::where('id_user',$cekTeknisi->id)
+                            ->where('id_jenis_barang',$request->types_id)
+                            ->where('id_tipe_os',$nama_model->id_tipe_os)
+                            ->where('start_rate','<=',(int)$biayaPerAction)
+                            ->where('end_rate','>=',(int)$biayaPerAction)
+                            ->first();
+                            if (!empty($bonus_leveling)) {
+                                $bonus_interface = $bonus_leveling->nominal_bonus ?? 0;
+                            }else{
+                                $nama_model = ModelSerie::find($request->model_series_id);
+                                $bonus_interface = $nama_model->nominal_bonus ?? 0;
+                            }
                         }
                     }
 
