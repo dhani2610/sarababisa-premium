@@ -604,7 +604,7 @@
                     <h3 class="font-bold text-indigo-800 mb-2">Data Teknisi</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div><label class="block text-sm font-medium mb-1">Nama Teknisi <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][user_id]" class="form-select text-sm py-1 w-full selectUser" >${teknisiOptions}</select></div>
-                        <div><label class="block text-sm font-medium mb-1">Tipe Bagi Hasil <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][tipe]" class="form-select text-sm py-1 w-full selectType" ><option selected value="">Pilih Tipe</option><option value="Interface">Interface (bonus pertipe)</option><option value="Hardware">Hardware & interface (bonus persen)</option></select></div>
+                        <div><label class="block text-sm font-medium mb-1">Tipe Bagi Hasil <span class="text-rose-500">*</span></label><select name="teknisi[${currentGroupIndex}][tipe]" class="form-select text-sm py-1 w-full selectType" ><option selected value="">Pilih Tipe</option><option value="Interface">Interface (bonus pertipe tetap)</option><option value="Interface Leveling">Interface (bonus pertipe leveling)</option><option value="Hardware">Hardware & interface (bonus persen)</option></select></div>
                     </div>
                 </div>
                 <div class="actions-list-container space-y-3"></div>
