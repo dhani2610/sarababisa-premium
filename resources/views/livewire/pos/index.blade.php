@@ -1,19 +1,67 @@
 <div>
     <div class="w-full px-2" dir="ltr">
         <x-validation-errors class="mb-4" :errors="$errors" />
+        <div class="flex flex-col gap-2 mt-4">
+<div class="flex flex-col gap-2 mt-4">
 
-        <div class="flex gap-4">
-            <div class="w-full relative inline-flex">
-                <select id="customer_id" name="customer_id" wire:model="customer_id"
-                     class="form-select text-sm block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md">
-                    <option value="">Pilih Pelanggan</option>
-                    @foreach ($customers as $customer)
-                        <option value="{{ $customer->id }}">{{ $customer->nama }} ({{ $customer->nomor_hp }})</option>
-                    @endforeach
-                </select>
+            <div class="flex items-center mb-2">
+                <input wire:model="is_manual_customer" id="manual_checkbox" type="checkbox" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">
+                <label for="manual_checkbox" class="ml-2 block text-sm leading-5 text-gray-900 font-bold">
+                    Input Pelanggan Manual (Pelanggan Baru)
+                </label>
             </div>
-        </div>
 
+            @if($is_manual_customer)
+                <div class="p-4 border border-indigo-200 rounded-md bg-indigo-50" wire:key="manual-input-section">
+                    <div class="grid grid-cols-1 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1" for="manual_nama">Nama Pelanggan <span class="text-rose-500">*</span></label>
+                            <input wire:model.defer="manual_nama" id="manual_nama" class="form-input w-full px-2 py-1 text-sm border-gray-300 rounded-md" type="text" placeholder="Nama Lengkap"/>
+                            @error('manual_nama') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1" for="manual_kategori">Kategori <span class="text-rose-500">*</span></label>
+
+                            <select wire:model="manual_kategori" id="manual_kategori" class="form-select w-full px-2 py-1 text-sm border-gray-300 rounded-md"
+                            x-on:change="Livewire.emit('updateCustomerType', $event.target.value)">
+                                <option value="">Pilih Kategori</option>
+                                <option value="User">User</option>
+                                <option value="Toko">Toko</option>
+                            </select>
+
+                            <div class="text-xs text-slate-500">Pilih kategori untuk menampilkan harga produk yg sesuai.</div>
+                            @error('manual_kategori') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1" for="manual_nomor_hp">No. HP <span class="text-rose-500">*</span></label>
+                            <input wire:model.defer="manual_nomor_hp" id="manual_nomor_hp" class="form-input w-full px-2 py-1 text-sm border-gray-300 rounded-md" type="number" placeholder="08..."/>
+                            @error('manual_nomor_hp') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1" for="manual_alamat">Alamat <span class="text-rose-500">*</span></label>
+                            <textarea wire:model.defer="manual_alamat" id="manual_alamat" rows="2" class="form-textarea w-full px-2 py-1 text-sm border-gray-300 rounded-md" placeholder="Alamat Lengkap"></textarea>
+                            @error('manual_alamat') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+                </div>
+
+            @else
+                <div class="w-full relative inline-flex" wire:key="select-customer-section">
+                    <div class="w-full" wire:ignore> <select id="customer_id" name="customer_id"
+                                class="form-select text-sm block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md">
+                            <option value="">Pilih Pelanggan</option>
+                            @foreach ($customers as $customer)
+                                <option value="{{ $customer->id }}">{{ $customer->nama }} ({{ $customer->nomor_hp }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                @error('customer_id') <span class="text-xs text-rose-500 mt-1">{{ $message }}</span> @enderror
+            @endif
+        </div>
         <livewire:product-cart :cartInstance="'sale'" />
 
         @if (allowTransaksiCabang() == 1)
@@ -165,6 +213,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
 
+        // --- Fungsi Rupiah Helper ---
         function formatRupiah(angka) {
             return new Intl.NumberFormat('id-ID').format(angka);
         }
@@ -173,7 +222,6 @@
             return parseInt(value.replace(/\D/g, '')) || 0;
         }
 
-        // Fungsi inisialisasi input rupiah
         function initRupiahInputs() {
             const inputs = document.querySelectorAll('.rupiah-input');
             const totalElement = document.getElementById('total_amount');
@@ -182,74 +230,69 @@
                 if (input.dataset.hasRupiahListener) return;
                 input.dataset.hasRupiahListener = true;
 
-                // 1. Event Input: Format Visual Saat Mengetik
                 input.addEventListener('input', function(e) {
                     let rawValue = cleanRupiah(this.value);
                     this.value = rawValue ? formatRupiah(rawValue) : '';
                 });
 
-                // 2. Event Change: Update Livewire & Kalkulasi Split Payment
                 input.addEventListener('change', function(e) {
-                     let rawValue = cleanRupiah(this.value);
-                     let modelName = this.getAttribute('data-model');
+                    let rawValue = cleanRupiah(this.value);
+                    let modelName = this.getAttribute('data-model');
+                    @this.set(modelName, rawValue);
 
-                     // Update model diri sendiri ke Livewire
-                     @this.set(modelName, rawValue);
-
-                     // === LOGIKA BARU: Kalkulasi Otomatis Tunai & Transfer ===
-                     // Cek apakah input yang berubah adalah 'tunai' atau 'transfer'
-                     if ((modelName === 'tunai' || modelName === 'transfer') && totalElement) {
-
+                    // Kalkulasi Split Payment
+                    if ((modelName === 'tunai' || modelName === 'transfer') && totalElement) {
                         let totalBayar = cleanRupiah(totalElement.value);
                         let sisa = totalBayar - rawValue;
+                        if(sisa < 0) sisa = 0;
 
-                        if(sisa < 0) sisa = 0; // Cegah minus
-
-                        // Tentukan target yang harus diupdate
                         let targetModel = (modelName === 'tunai') ? 'transfer' : 'tunai';
                         let targetInput = document.querySelector(`.rupiah-input[data-model="${targetModel}"]`);
 
                         if(targetInput) {
-                            // Update tampilan input target
                             targetInput.value = formatRupiah(sisa);
-
-                            // Update Livewire target agar data tersimpan
                             @this.set(targetModel, sisa);
                         }
-                     }
-                     // ========================================================
+                    }
                 });
             });
         }
 
-        // Jalankan saat pertama kali load
-        initRupiahInputs();
+        // --- Fungsi Select2 Helper ---
+        function initSelect2() {
+            // Cek apakah elemen select ada di DOM (karena bisa hilang kalau mode manual)
+            var selectEl = $('#customer_id');
 
-        // Jalankan setiap kali Livewire selesai update DOM (saat ganti metode pembayaran)
+            if (selectEl.length) {
+                // Hancurkan instance lama jika ada (untuk mencegah duplikasi)
+                if (selectEl.hasClass("select2-hidden-accessible")) {
+                    selectEl.select2('destroy');
+                }
+
+                // Init Baru
+                selectEl.select2({
+                    placeholder: "Pilih Pelanggan",
+                    allowClear: true,
+                    width: '100%' // Pastikan lebar sesuai
+                });
+
+                // Event Listener Livewire
+                selectEl.on('change', function (e) {
+                    var data = $(this).val();
+                    @this.set('customer_id', data);
+                });
+            }
+        }
+
+        // --- Eksekusi Pertama Kali ---
+        initRupiahInputs();
+        initSelect2();
+
+        // --- Hook Livewire ---
+        // Dijalankan setiap kali Livewire selesai memproses request (termasuk toggle checkbox)
         Livewire.hook('message.processed', (message, component) => {
             initRupiahInputs();
-            $('#customer_id').select2();
+            initSelect2(); // Re-init Select2 jika elemennya muncul lagi
         });
-
-        // Select2 Logic
-        $('#customer_id').select2();
-        $('#customer_id').on('change', function (e) {
-            var data = $('#customer_id').select2("val");
-            @this.set('customer_id', data);
-        });
-    });
-</script>
-
-<script>
-    document.addEventListener('livewire:load', function () {
-        $('#customer_id').select2();
-        $('#customer_id').on('change', function (e) {
-            var data = $('#customer_id').select2("val");
-            @this.set('customer_id', data);
-        });
-    });
-
-    document.addEventListener('livewire:update', function () {
-        $('#customer_id').select2();
     });
 </script>

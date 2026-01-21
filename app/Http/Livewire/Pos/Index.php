@@ -85,26 +85,63 @@ class Index extends Component
 
     public $customer_tipe;
 
+    public $is_manual_customer = false; // Checkbox toggle
+    public $manual_nama;
+    public $manual_kategori;
+    public $manual_nomor_hp;
+    public $manual_alamat;
+
+    // Saat ID Customer (Select2) berubah
     public function updatedCustomerId($value)
     {
-        $customer = Customer::find($value);
-
-        if ($customer) {
-            $this->customer_tipe = $customer->kategori;
-
-            // kirim event ke SearchProduct
-            $this->emit('updateCustomerType', $customer->kategori);
+        if(!$this->is_manual_customer){
+            $customer = Customer::find($value);
+            if ($customer) {
+                $this->customer_tipe = $customer->kategori;
+                $this->emit('updateCustomerType', $customer->kategori);
+            }
         }
+    }
+
+    // === LOGIKA BARU: Saat Checkbox Manual diklik ===
+    public function updatedIsManualCustomer($value)
+    {
+        // Reset semua field terkait customer
+        $this->reset(['customer_id', 'manual_nama', 'manual_kategori', 'manual_nomor_hp', 'manual_alamat', 'customer_tipe']);
+
+        // Emit null ke search product biar ke-reset
+        $this->emit('updateCustomerType', null);
+    }
+
+    // === LOGIKA BARU: Saat Kategori Manual Dipilih ===
+    // Ini PENTING agar SearchProduct tetap jalan sesuai kategori yg dipilih manual
+    public function updatedManualKategori($value)
+    {
+        $this->customer_tipe = $value;
+        $this->emit('updateCustomerType', $value);
     }
     public function rules(): array
     {
-        return [
-            'customer_id'         => 'required|numeric',
-            'total_amount'        => 'required|numeric',
-            'paid_amount'         => 'nullable|numeric',
-            'price'               => 'nullable|numeric',
-            'note'                => 'nullable|string|max:1000',
-        ];
+        // Validasi Dinamis
+        if ($this->is_manual_customer) {
+            return [
+                'manual_nama'     => 'required|string|max:255',
+                'manual_kategori' => 'required|in:User,Toko',
+                'manual_nomor_hp' => 'required|numeric',
+                'manual_alamat'   => 'required|string',
+                'total_amount'    => 'required|numeric',
+                'paid_amount'     => 'nullable|numeric',
+                'note'            => 'nullable|string|max:1000',
+            ];
+        } else {
+            return [
+                'customer_id'     => 'required|numeric',
+                'total_amount'    => 'required|numeric',
+                'paid_amount'     => 'nullable|numeric',
+                'price'           => 'nullable|numeric',
+                'note'            => 'nullable|string|max:1000',
+            ];
+        }
     }
 
     public function mount($cartInstance): void
@@ -171,6 +208,25 @@ class Index extends Component
     {
         DB::transaction(function () {
             $this->validate();
+
+            // dd($this->is_manual_customer);
+
+            if ($this->is_manual_customer) {
+                $newCustomer = Customer::create([
+                    'nama'       => $this->manual_nama,
+                    'kategori'   => $this->manual_kategori,
+                    'nomor_hp'   => $this->manual_nomor_hp,
+                    'alamat'     => $this->manual_alamat,
+                    'cabang_id'  => getCabangId(),
+                    // Tambahkan field default lain jika perlu (misal: code)
+                ]);
+
+                // Set ID customer baru ke variabel utama agar logika di bawah tetap jalan
+                $this->customer_id = $newCustomer->id;
+
+                // Refresh list customer lokal agar kalau balik ke menu select, user baru ada
+                $this->customers = Customer::where('cabang_id',getCabangId())->get();
+            }
 
             // Determine payment status
             $due_amount = $this->total_amount - $this->paid_amount;
@@ -354,11 +410,13 @@ class Index extends Component
     // customer should provoke checkout
     public function proceed(): void
     {
-        if ($this->customer_id !== null) {
+        // PERBAIKAN DISINI:
+        // Izinkan lanjut jika customer_id ada ATAU jika sedang input manual dan datanya lengkap
+        if ($this->customer_id !== null || ($this->is_manual_customer && $this->manual_nama && $this->manual_kategori)) {
             $this->checkoutModal = true;
             $this->cart_instance = 'sale';
         } else {
-            $this->alert('error', 'Pilih pelanggan terlebih dahulu!');
+            $this->alert('error', 'Pilih pelanggan atau lengkapi data pelanggan manual!');
         }
     }
 
