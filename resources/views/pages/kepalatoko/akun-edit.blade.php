@@ -157,7 +157,7 @@
                                         <label class="block text-sm font-medium mb-1" for="role">Bonus
                                             Interface?</label>
                                         <select id="bagian_teknisi" name="bagian_teknisi"
-                                            class="form-select text-sm py-1 w-full">
+                                            class="form-select text-sm py-1 w-full" onchange="toggleInputs()">
                                             <option value="">Pilih</option>
                                             <option value="Teknisi Interface"
                                                 {{ $item->bagian_teknisi == 'Teknisi Interface' ? 'selected' : '' }}>Nominal Pertipe
@@ -166,6 +166,94 @@
                                                 {{ $item->bagian_teknisi == 'Teknisi Hardware' ? 'selected' : '' }}>
                                                 Persentase</option>
                                         </select>
+                                    </div>
+
+                                    {{-- CONTAINER BONUS LEVELING EDIT --}}
+                                    <div id="bonus-leveling-container" class="mt-4 border border-slate-200 rounded p-3 bg-slate-50" style="display: none;">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <label class="block text-sm font-bold text-slate-800">Setting Bonus Leveling Interface</label>
+                                            <button type="button" class="btn-xs bg-emerald-500 hover:bg-emerald-600 text-white" onclick="addLevelingRow()">+ Tambah Baris</button>
+                                        </div>
+                                        
+                                        <div id="leveling-rows-wrapper" class="space-y-2">
+                                            @if($bonusLeveling->count() > 0)
+                                                {{-- Jika data ada, loop data --}}
+                                                @foreach($bonusLeveling as $lvl)
+                                                <div class="leveling-row grid grid-cols-1 md:grid-cols-12 gap-2 items-end border-b pb-2">
+                                                    <div class="md:col-span-3">
+                                                        <label class="block text-xs font-medium mb-1">Jenis Barang</label>
+                                                        <select name="lvl_id_jenis_barang[]" class="form-select text-xs w-full py-1">
+                                                            @foreach($types as $cat)
+                                                                <option value="{{ $cat->id }}" {{ $lvl->id_jenis_barang == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="md:col-span-2">
+                                                        <label class="block text-xs font-medium mb-1">Tipe OS</label>
+                                                        <select name="lvl_id_tipe_os[]" class="form-select text-xs w-full py-1">
+                                                            @foreach($tipe_os as $os)
+                                                                <option value="{{ $os->id }}" {{ $lvl->id_tipe_os == $os->id ? 'selected' : '' }}>{{ $os->nama }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="md:col-span-2">
+                                                        <label class="block text-xs font-medium mb-1">Dari Rate</label>
+                                                        <input type="text" name="lvl_start_rate[]" value="{{ number_format($lvl->start_rate,0,',','.') }}" class="form-input text-xs w-full py-1 input-currency">
+                                                    </div>
+                                                    <div class="md:col-span-2">
+                                                        <label class="block text-xs font-medium mb-1">Sampai Rate</label>
+                                                        <input type="text" name="lvl_end_rate[]" value="{{ number_format($lvl->end_rate,0,',','.') }}" class="form-input text-xs w-full py-1 input-currency">
+                                                    </div>
+                                                    <div class="md:col-span-2">
+                                                        <label class="block text-xs font-medium mb-1">Bonus</label>
+                                                        <input type="text" name="lvl_nominal_bonus[]" value="{{ number_format($lvl->nominal_bonus,0,',','.') }}" class="form-input text-xs w-full py-1 input-currency">
+                                                    </div>
+                                                    <div class="md:col-span-1 text-center">
+                                                        <button type="button" class="text-rose-500 hover:text-rose-700" onclick="removeLevelingRow(this)">
+                                                            <svg class="w-4 h-4 fill-current" viewBox="0 0 16 16"><path d="M5 7h2v6H5V7zm4 0h2v6H9V7zm3-6v2h4v2h-1v10c0 .6-.4 1-1 1H2c-.6 0-1-.4-1-1V5H0V3h4V1c0-.6.4-1 1-1h6c.6 0 1 .4 1 1z"/></svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            @else
+                                                {{-- Jika data kosong, tampilkan 1 baris kosong --}}
+                                                <div class="leveling-row grid grid-cols-1 md:grid-cols-12 gap-2 items-end border-b pb-2">
+                                                    <div class="md:col-span-3">
+                                                        <label class="block text-xs font-medium mb-1">Jenis Barang</label>
+                                                        <select name="lvl_id_jenis_barang[]" class="form-select text-xs w-full py-1">
+                                                            @foreach($types as $cat)
+                                                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="md:col-span-2">
+                                                        <label class="block text-xs font-medium mb-1">Tipe OS</label>
+                                                        <select name="lvl_id_tipe_os[]" class="form-select text-xs w-full py-1">
+                                                            @foreach($tipe_os as $os)
+                                                                <option value="{{ $os->id }}">{{ $os->nama }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="md:col-span-2">
+                                                        <label class="block text-xs font-medium mb-1">Dari Rate</label>
+                                                        <input type="text" name="lvl_start_rate[]" class="form-input text-xs w-full py-1 input-currency" placeholder="Rp 0">
+                                                    </div>
+                                                    <div class="md:col-span-2">
+                                                        <label class="block text-xs font-medium mb-1">Sampai Rate</label>
+                                                        <input type="text" name="lvl_end_rate[]" class="form-input text-xs w-full py-1 input-currency" placeholder="Rp 0">
+                                                    </div>
+                                                    <div class="md:col-span-2">
+                                                        <label class="block text-xs font-medium mb-1">Bonus</label>
+                                                        <input type="text" name="lvl_nominal_bonus[]" class="form-input text-xs w-full py-1 input-currency" placeholder="Rp Bonus">
+                                                    </div>
+                                                    <div class="md:col-span-1 text-center">
+                                                        <button type="button" class="text-rose-500 hover:text-rose-700" onclick="removeLevelingRow(this)">
+                                                            <svg class="w-4 h-4 fill-current" viewBox="0 0 16 16"><path d="M5 7h2v6H5V7zm4 0h2v6H9V7zm3-6v2h4v2h-1v10c0 .6-.4 1-1 1H2c-.6 0-1-.4-1-1V5H0V3h4V1c0-.6.4-1 1-1h6c.6 0 1 .4 1 1z"/></svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
 
                                     <div x-data="{ showDetails: false }" id="spesialis-input">
@@ -309,47 +397,42 @@
 
     </div>
 
-     <script>
-        function formatRupiahInput(el) {
-            let value = el.value || '';
+     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 
-            // hapus semua selain angka
-            value = value.replace(/\D/g, '');
+<script>
+    // 1. Script Format Rupiah (Jalankan Global)
+    function formatRupiahInput(el) {
+        let value = el.value || '';
+        value = value.replace(/\D/g, '');
+        el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
 
-            // format pakai titik
-            el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        }
-
-        /* ON INPUT (REAL TIME) */
-        document.addEventListener('input', function (e) {
-            if (!e.target.classList.contains('input-currency')) return;
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('input-currency')) {
             formatRupiahInput(e.target);
-        });
+        }
+    });
 
-        /* ON LOAD (FORM EDIT) */
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.input-currency').forEach(function (el) {
-                formatRupiahInput(el);
-            });
-        });
-    </script>
-   <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const roleSelect = document.getElementById('role');
-    const extraFields = document.getElementById('extra-fields');
-    const uploadInvestor = document.getElementById('upload-investor');
-    const bonusAdmin = document.getElementById('bonus-admin');
-    const spesialisInput = document.getElementById('spesialis-input');
-    const bonusPersen = document.getElementById('bonus-persen');
-    const bonusInterfaceInput = document.getElementById('bonus-interface-input');
-    const ShiftInput = document.getElementById('shift_input');
-    const persenInvestorInput = document.getElementById('persen_investor_input');
-    const persenInvestorProdukInput = document.getElementById('persen_investor_produk_input');
-
+    // 2. Fungsi toggleInputs (Dibuat Global agar bisa dipanggil HTML onchange)
     function toggleInputs() {
-        const role = roleSelect.value;
+        // Ambil elemen berdasarkan ID saat fungsi dijalankan
+        const role = document.getElementById('role').value;
+        // Gunakan optional chaining (?.) untuk menghindari error jika elemen tidak ada
+        const bagianTeknisi = document.getElementById('bagian_teknisi')?.value; 
+        
+        const extraFields = document.getElementById('extra-fields');
+        const uploadInvestor = document.getElementById('upload-investor');
+        const bonusAdmin = document.getElementById('bonus-admin');
+        const spesialisInput = document.getElementById('spesialis-input');
+        const bonusPersen = document.getElementById('bonus-persen');
+        const bonusInterfaceInput = document.getElementById('bonus-interface-input');
+        const ShiftInput = document.getElementById('shift_input');
+        const persenInvestorInput = document.getElementById('persen_investor_input');
+        const persenInvestorProdukInput = document.getElementById('persen_investor_produk_input');
+        const bonusLevelingContainer = document.getElementById('bonus-leveling-container');
 
-         if (role === 'Investor') {
+        // Logic display
+        if (role === 'Investor') {
             extraFields.style.display = 'none';
             uploadInvestor.style.display = 'block';
             bonusAdmin.style.display = 'none';
@@ -376,60 +459,110 @@ document.addEventListener('DOMContentLoaded', function() {
             ShiftInput.style.display = 'block';
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
+            if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
         } else if (role === 'Teknisi') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
             bonusAdmin.style.display = 'none';
             spesialisInput.style.display = 'block';
-            bonusPersen.style.display = 'block';
-            bonusInterfaceInput.style.display = 'block';
             ShiftInput.style.display = 'block';
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
+            
+            bonusInterfaceInput.style.display = 'block';
+
+            if (bagianTeknisi === 'Teknisi Interface') {
+                if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'block';
+                if(bonusPersen) bonusPersen.style.display = 'none';
+            } else {
+                if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
+                if(bonusPersen) bonusPersen.style.display = 'block';
+            }
+
         } else if (role === 'Sales') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
             bonusAdmin.style.display = 'none';
             spesialisInput.style.display = 'none';
-            bonusPersen.style.display = 'block';
+            if(bonusPersen) bonusPersen.style.display = 'block';
             bonusInterfaceInput.style.display = 'none';
             ShiftInput.style.display = 'block';
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
+            if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
         }
     }
 
-    toggleInputs();
-    roleSelect.addEventListener('change', toggleInputs);
-});
-</script>
+    // 3. Fungsi Tambah/Hapus Baris (Global) agar onclick di HTML bekerja
+    function addLevelingRow() {
+        const wrapper = document.getElementById('leveling-rows-wrapper');
+        const firstRow = wrapper.querySelector('.leveling-row');
+        
+        if(firstRow) {
+            const newRow = firstRow.cloneNode(true);
+            const inputs = newRow.querySelectorAll('input');
+            inputs.forEach(input => input.value = ''); // Reset value
+            
+            // Format ulang rupiah untuk row baru jika ada class input-currency
+            inputs.forEach(input => {
+                 if(input.classList.contains('input-currency')) {
+                     formatRupiahInput(input);
+                 }
+            });
+            
+            wrapper.appendChild(newRow);
+        }
+    }
 
-<script>
-function toggleBonusType() {
-    const tipe = document.getElementById('tipe_bonus_admin').value;
-    const roleAkun = document.getElementById('role').value;
-    console.log(roleAkun);
+    function removeLevelingRow(btn) {
+        const wrapper = document.getElementById('leveling-rows-wrapper');
+        const rows = wrapper.querySelectorAll('.leveling-row');
+        if (rows.length > 1) {
+            btn.closest('.leveling-row').remove();
+        } else {
+            alert("Minimal satu baris data diperlukan.");
+        }
+    }
 
-    if (roleAkun == 'Admin Toko') {
-        console.log('====================================');
-        console.log(tipe);
-        console.log('====================================');
-        const bonusTetap = document.getElementById('bonus-tetap');
+    // 4. Fungsi Toggle Bonus Tipe (Global)
+    function toggleBonusType() {
+        const tipeElement = document.getElementById('tipe_bonus_admin');
+        const roleElement = document.getElementById('role');
+        
+        if(!tipeElement || !roleElement) return;
+
+        const tipe = tipeElement.value;
+        const roleAkun = roleElement.value;
+        const containerBonusTetap = document.querySelector('div#bonus-tetap'); 
         const bonusPersen = document.getElementById('bonus-persen');
 
-        bonusTetap.style.display = 'none';
-        bonusPersen.style.display = 'none';
+        if(containerBonusTetap) containerBonusTetap.style.display = 'none';
+        if(bonusPersen) bonusPersen.style.display = 'none';
 
-        if (tipe === 'Tetap') {
-            bonusTetap.style.display = 'block';
-        } else if (tipe === 'Persen') {
-            bonusPersen.style.display = 'block';
+        if (roleAkun == 'Admin Toko') {
+            if (tipe === 'Tetap') {
+                if(containerBonusTetap) containerBonusTetap.style.display = 'block';
+            } else if (tipe === 'Persen') {
+                if(bonusPersen) bonusPersen.style.display = 'block';
+            }
         }
     }
-}
 
-document.addEventListener('DOMContentLoaded', toggleBonusType);
+    // 5. Inisialisasi saat load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Format rupiah awal
+        document.querySelectorAll('.input-currency').forEach(function (el) {
+            formatRupiahInput(el);
+        });
+
+        // Jalankan toggleInputs pertama kali
+        toggleInputs();
+        toggleBonusType();
+
+        // Listener tambahan (opsional, karena sudah ada onchange di HTML)
+        const roleSelect = document.getElementById('role');
+        if(roleSelect) roleSelect.addEventListener('change', toggleInputs);
+    });
 </script>
-
 
 </x-toko-layout>

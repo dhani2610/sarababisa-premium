@@ -342,7 +342,6 @@ Route::get('master/master-absensi/export', [AttendanceController::class, 'export
     Route::get('/update-expired', [KepalaTokoAkunController::class, 'updateExpDateJson'])->name('update-expired');
     Route::get('/get-total-cabang', [KepalaTokoAkunController::class, 'getDataTotalCabang'])->name('get-total-cabang');
     Route::get('/update-total-cabang', [KepalaTokoAkunController::class, 'updateTotalCabang'])->name('update-total-cabang');
-
 // 1. Halaman Input Email (Awal)
     Route::get('/lupa-password', [DirectPasswordResetController::class, 'showRequestForm'])->name('direct.reset.request');
 
@@ -374,6 +373,8 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     // Route Bulk Delete
     Route::post('/akun/delete-batch', [KepalaTokoAkunController::class, 'deleteBatch'])->name('akun.delete-batch');
     Route::get('/akun', [KepalaTokoAkunController::class, 'index'])->name('akun');
+    Route::get('/akun/bonus-detail/{id}', [KepalaTokoAkunController::class, 'getBonusLevelingDetail'])->name('akun.bonus-detail');
+
     Route::get('/akun/setting', [KepalaTokoAkunController::class, 'setting'])->name('setting');
     Route::post('/akun/setting/update-exp-date', [KepalaTokoAkunController::class, 'updateExpDate'])
     ->name('akun.update-exp-date');

@@ -149,11 +149,56 @@
                                                 <label class="block text-sm font-medium mb-1"
                                                     for="bagian_teknisi">Bonus Interface?</label>
                                                 <select id="bagian_teknisi" name="bagian_teknisi"
-                                                    class="form-select text-sm py-1 w-full">
+                                                    class="form-select text-sm py-1 w-full" onchange="toggleInputs()">
                                                     <option value="">Pilih</option>
-                                                    <option value="Teknisi Interface">Nominal Pertipe</option>
+                                                    <option value="Teknisi Interface">Nominal Leveling Pertipe </option>
                                                     <option value="Teknisi Hardware">Persentase</option>
                                                 </select>
+                                            </div>
+                                            <br>
+                                            <div id="bonus-leveling-container" class="mt-4 border border-slate-200 rounded p-3 bg-slate-50" style="display: none;">
+                                                <div class="flex justify-between items-center mb-2">
+                                                    <label class="block text-sm font-bold text-slate-800">Setting Bonus Leveling Interface</label>
+                                                    <button type="button" class="btn-xs bg-emerald-500 hover:bg-emerald-600 text-white" onclick="addLevelingRow()">+ Tambah Baris</button>
+                                                </div>
+                                                
+                                                <div id="leveling-rows-wrapper" class="space-y-2">
+                                                    <div class="leveling-row grid grid-cols-1 md:grid-cols-12 gap-2 items-end border-b pb-2">
+                                                        <div class="md:col-span-3">
+                                                            <label class="block text-xs font-medium mb-1">Jenis Barang</label>
+                                                            <select name="lvl_id_jenis_barang[]" class="form-select text-xs w-full py-1">
+                                                                @foreach($categories as $cat)
+                                                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="md:col-span-2">
+                                                            <label class="block text-xs font-medium mb-1">Tipe OS</label>
+                                                            <select name="lvl_id_tipe_os[]" class="form-select text-xs w-full py-1">
+                                                                @foreach($tipe_os as $os)
+                                                                    <option value="{{ $os->id }}">{{ $os->nama }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="md:col-span-2">
+                                                            <label class="block text-xs font-medium mb-1">Dari Rate</label>
+                                                            <input type="text" name="lvl_start_rate[]" class="form-input text-xs w-full py-1 input-currency" placeholder="Rp 0">
+                                                        </div>
+                                                        <div class="md:col-span-2">
+                                                            <label class="block text-xs font-medium mb-1">Sampai Rate</label>
+                                                            <input type="text" name="lvl_end_rate[]" class="form-input text-xs w-full py-1 input-currency" placeholder="Rp 0">
+                                                        </div>
+                                                        <div class="md:col-span-2">
+                                                            <label class="block text-xs font-medium mb-1">Bonus</label>
+                                                            <input type="text" name="lvl_nominal_bonus[]" class="form-input text-xs w-full py-1 input-currency" placeholder="Rp Bonus">
+                                                        </div>
+                                                        <div class="md:col-span-1 text-center">
+                                                            <button type="button" class="text-rose-500 hover:text-rose-700" onclick="removeLevelingRow(this)">
+                                                                <svg class="w-4 h-4 fill-current" viewBox="0 0 16 16"><path d="M5 7h2v6H5V7zm4 0h2v6H9V7zm3-6v2h4v2h-1v10c0 .6-.4 1-1 1H2c-.6 0-1-.4-1-1V5H0V3h4V1c0-.6.4-1 1-1h6c.6 0 1 .4 1 1z"/></svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <br>
 
@@ -345,6 +390,34 @@
             </div>
         @endif
 
+        <div x-data="{ detailModalOpen: false }" @open-detail-modal.window="detailModalOpen = true">
+            <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="detailModalOpen" x-cloak></div>
+            <div class="fixed inset-0 z-50 overflow-hidden flex items-center justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="detailModalOpen" x-cloak>
+                <div class="bg-white rounded shadow-lg overflow-auto max-w-2xl w-full max-h-full" @click.outside="detailModalOpen = false">
+                    <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center">
+                        <div class="font-semibold text-slate-800">Detail Bonus Leveling Interface</div>
+                        <button class="text-slate-400 hover:text-slate-500" @click="detailModalOpen = false">
+                            <svg class="w-4 h-4 fill-current"><path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" /></svg>
+                        </button>
+                    </div>
+                    <div class="px-5 py-4">
+                        <table class="w-full text-sm text-left text-gray-500">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th class="px-2 py-2">Jenis Barang</th>
+                                    <th class="px-2 py-2">OS</th>
+                                    <th class="px-2 py-2">Rate (Start - End)</th>
+                                    <th class="px-2 py-2">Bonus</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-bonus-body">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 mt-5 mb-8">
             <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                 {{-- Left side --}}
@@ -440,7 +513,7 @@
         </div>
 
     </div>
-
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script>
 
     document.addEventListener('input', function (e) {
@@ -456,6 +529,7 @@
     });
     function toggleInputs() {
         const role = document.getElementById('role').value;
+        const bagianTeknisi = document.getElementById('bagian_teknisi').value;
         const extraFields = document.getElementById('extra-fields');
         const uploadInvestor = document.getElementById('upload-investor');
         const bonusAdmin = document.getElementById('bonus-admin');
@@ -465,7 +539,7 @@
         const ShiftInput = document.getElementById('shift_input');
         const persenInvestorInput = document.getElementById('persen_investor_input');
         const persenInvestorProdukInput = document.getElementById('persen_investor_input_produk');
-
+        const bonusLevelingContainer = document.getElementById('bonus-leveling-container');
         if (role === 'Investor') {
             extraFields.style.display = 'none';
             uploadInvestor.style.display = 'block';
@@ -503,6 +577,16 @@
             ShiftInput.style.display = 'block';
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
+
+            if (bagianTeknisi === 'Teknisi Interface') {
+                bonusLevelingContainer.style.display = 'block'; // Munculkan Div Leveling
+                bonusPersen.style.display = 'none'; // Sembunyikan persen hardware
+            } else if (bagianTeknisi === 'Teknisi Hardware') {
+                bonusLevelingContainer.style.display = 'none';
+                bonusPersen.style.display = 'block';
+            } else {
+                bonusPersen.style.display = 'block'; 
+            }
         } else if (role === 'Sales') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
@@ -519,6 +603,82 @@
     // Jalankan saat pertama kali halaman dimuat
     document.addEventListener('DOMContentLoaded', toggleInputs);
     document.getElementById('role').addEventListener('change', toggleInputs);
+
+
+    function addLevelingRow() {
+        const wrapper = document.getElementById('leveling-rows-wrapper');
+        // Clone row pertama
+        const firstRow = wrapper.querySelector('.leveling-row');
+        const newRow = firstRow.cloneNode(true);
+        
+        // Reset nilai input di row baru
+        const inputs = newRow.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.value = '';
+        });
+
+        // Append ke wrapper
+        wrapper.appendChild(newRow);
+    }
+
+    function removeLevelingRow(btn) {
+        const wrapper = document.getElementById('leveling-rows-wrapper');
+        const rows = wrapper.querySelectorAll('.leveling-row');
+        
+        // Sisakan minimal 1 baris
+        if (rows.length > 1) {
+            btn.closest('.leveling-row').remove();
+        } else {
+            alert("Minimal satu baris data diperlukan.");
+        }
+    }
+
+    // 3. Logic Format Rupiah (Event Delegation agar jalan di elemen dinamis)
+    document.addEventListener('input', function (e) {
+        if (e.target.classList.contains('input-currency')) {
+            let value = e.target.value;
+            value = value.replace(/\D/g, ''); // Hapus non-digit
+            e.target.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Tambah titik
+        }
+    });
+
+    // 4. Logic Tombol Detail (DataTable Click)
+    $(document).on('click', '.btn-detail-bonus', function() {
+        var userId = $(this).data('id');
+        var url = "{{ url('akun/bonus-detail') }}/" + userId; // Pastikan rute ini dibuat
+
+        // Bersihkan table body
+        $('#detail-bonus-body').html('<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>');
+        
+        // Buka Modal (menggunakan AlpineJS dispatch)
+        window.dispatchEvent(new CustomEvent('open-detail-modal'));
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(response) {
+                var rows = '';
+                if(response.length > 0) {
+                    response.forEach(function(item) {
+                        rows += `
+                            <tr class="bg-white border-b">
+                                <td class="px-2 py-2">${item.category_name ?? '-'}</td>
+                                <td class="px-2 py-2">${item.nama ?? '-'}</td>
+                                <td class="px-2 py-2">Rp ${parseInt(item.start_rate).toLocaleString('id-ID')} - Rp ${parseInt(item.end_rate).toLocaleString('id-ID')}</td>
+                                <td class="px-2 py-2 font-bold text-emerald-600">Rp ${parseInt(item.nominal_bonus).toLocaleString('id-ID')}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    rows = '<tr><td colspan="4" class="text-center py-4 text-slate-400">Tidak ada data leveling.</td></tr>';
+                }
+                $('#detail-bonus-body').html(rows);
+            },
+            error: function() {
+                $('#detail-bonus-body').html('<tr><td colspan="4" class="text-center py-4 text-rose-500">Gagal memuat data.</td></tr>');
+            }
+        });
+    });
     </script>
 
     <script>

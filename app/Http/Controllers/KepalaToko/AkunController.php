@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\KepalaToko\UserRequest;
 use App\Models\Shift;
 use Yajra\DataTables\Facades\DataTables;
+use App\Models\TipeOs; 
+use App\Models\BonusLeveling;
+
 class AkunController extends Controller
 {
     public function index()
@@ -55,13 +58,18 @@ class AkunController extends Controller
 
         }
 
+        $categories = Type::where('cabang_id',getCabangId())->get();
+        $tipe_os = TipeOs::where('cabang_id',getCabangId())->get();
+
         return view('pages/kepalatoko/akun', compact(
             'users',
             'users_count',
             'count',
             'types',
             'workers',
-            'shift'
+            'shift',
+            'categories',
+            'tipe_os',
         ));
     }
 
@@ -115,6 +123,15 @@ class AkunController extends Controller
                     $text .= ' ' . e($row->type->name);
                 }
                 return '<div class="font-medium text-slate-800">' . $text . '</div>';
+            })
+            ->editColumn('bagian_teknisi', function ($row) {
+                $html = '<div class="font-medium">' . ($row->bagian_teknisi ?? '-') . '</div>';
+                
+                if ($row->role == 'Teknisi' && $row->bagian_teknisi == 'Teknisi Interface') {
+                    // Tombol trigger modal detail
+                    $html .= '<button type="button" class="btn-xs bg-indigo-500 text-white rounded mt-1 btn-detail-bonus" data-id="'.$row->id.'">Lihat Leveling</button>';
+                }
+                return $html;
             })
             ->addColumn('persen', function ($row) {
                 return '<div class="font-medium text-slate-800">' . e($row->persen) . '</div>';
@@ -313,6 +330,9 @@ class AkunController extends Controller
 
         $types = Type::where('cabang_id', $cabangId)->get();
 
+        // TAMBAHAN: Ambil data Tipe OS dan Data Leveling user tersebut
+        $tipe_os = TipeOs::where('cabang_id', $cabangId)->get();
+        $bonusLeveling = BonusLeveling::where('id_user', $id)->get();
         $users = User::where('cabang_id', $cabangId)
             ->paginate(10);
 
@@ -329,7 +349,9 @@ class AkunController extends Controller
             'users' => $users,
             'workers' => $workers,
             'users_count' => $users_count,
-            'shift' => $shift
+            'shift' => $shift,
+            'bonusLeveling' => $bonusLeveling,
+            'tipe_os' => $tipe_os,
         ]);
     }
 
@@ -449,6 +471,8 @@ class AkunController extends Controller
             }
         }
 
+        
+
         $data = [
             'name' => $request->name,
             'email' => $request->email,
@@ -486,9 +510,43 @@ class AkunController extends Controller
             $data['pdf_investor'] = $pdfPath;
         }
 
-        User::create($data);
+        $user = User::create($data);
+
+        if ($request->role == 'Teknisi' && $request->bagian_teknisi == 'Teknisi Interface') {
+            if ($request->has('lvl_start_rate')) {
+                foreach ($request->lvl_start_rate as $key => $start_rate) {
+                    // Cek kelengkapan data row
+                    if (!empty($start_rate) && !empty($request->lvl_nominal_bonus[$key])) {
+                        BonusLeveling::create([
+                            'id_user'         => $user->id,
+                            'start_rate'      => str_replace('.', '', $start_rate),
+                            'end_rate'        => str_replace('.', '', $request->lvl_end_rate[$key]),
+                            'nominal_bonus'   => str_replace('.', '', $request->lvl_nominal_bonus[$key]),
+                            'id_jenis_barang' => $request->lvl_id_jenis_barang[$key],
+                            'id_tipe_os'      => $request->lvl_id_tipe_os[$key],
+                            'cabang_id'       => getCabangId(),
+                        ]);
+                    }
+                }
+            }
+        }
 
         return redirect()->route('akun');
+    }
+
+    public function getBonusLevelingDetail($id)
+    {
+        $data = BonusLeveling::where('id_user', $id)
+            ->leftJoin('types', 'bonus_levelings.id_jenis_barang', '=', 'types.id') // Adjust nama table types
+            ->leftJoin('tipe_os', 'bonus_levelings.id_tipe_os', '=', 'tipe_os.id') // Adjust nama table tipe_os
+            ->select(
+                'bonus_levelings.*', 
+                'types.name as category_name', 
+                'tipe_os.nama as nama'
+            )
+            ->get();
+
+        return response()->json($data);
     }
 
     public function update(Request $request, $id)
@@ -554,6 +612,28 @@ class AkunController extends Controller
         }
 
         $item->update($data);
+
+        BonusLeveling::where('id_user', $id)->delete();
+
+        // 2. Insert ulang data baru jika role sesuai
+        if ($request->role == 'Teknisi' && $request->bagian_teknisi == 'Teknisi Interface') {
+            if ($request->has('lvl_start_rate')) {
+                foreach ($request->lvl_start_rate as $key => $start_rate) {
+                    // Pastikan data tidak kosong
+                    if (!empty($start_rate) && !empty($request->lvl_nominal_bonus[$key])) {
+                        BonusLeveling::create([
+                            'id_user'       => $item->id,
+                            'start_rate'    => str_replace('.', '', $start_rate),
+                            'end_rate'      => str_replace('.', '', $request->lvl_end_rate[$key]),
+                            'nominal_bonus' => str_replace('.', '', $request->lvl_nominal_bonus[$key]),
+                            'id_jenis_barang' => $request->lvl_id_jenis_barang[$key],
+                            'id_tipe_os'    => $request->lvl_id_tipe_os[$key],
+                            'cabang_id'     => getCabangId(),
+                        ]);
+                    }
+                }
+            }
+        }
 
         return redirect()->route('akun');
     }
