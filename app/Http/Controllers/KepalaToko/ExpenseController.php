@@ -22,6 +22,7 @@ class ExpenseController extends Controller
         $expenses = Expense::latest()->paginate(10);
         $expenses_count = Expense::all()->count();
         $users = User::all();
+        // dd(auth()->user()->role != 'Kepala Toko' && auth()->user()->role != 'Admin Toko');
         return view('pages/kepalatoko/pengeluaran/index', compact('expenses', 'expenses_count', 'users'));
     }
 
@@ -30,7 +31,7 @@ class ExpenseController extends Controller
         $limit = $request->get('limit', 200);
         $offset = $request->get('offset', 0);
 
-        if (auth()->user()->role != 'Kepala Toko' || auth()->user()->role != 'Admin Toko') {
+        if (auth()->user()->role != 'Kepala Toko' && auth()->user()->role != 'Admin Toko') {
             # code...
             $query = Expense::with('user')
                 ->where('cabang_id', getCabangId())
