@@ -29,7 +29,7 @@ class PengeluaranData extends Component
     public function render()
     {
         $users = User::where('cabang_id',getCabangId())->get();
-        if (auth()->user()->role == 'Kepala Toko') {
+        if (auth()->user()->role == 'Kepala Toko' || auth()->user()->role == 'Admin Toko') {
             $expenses_count = Expense::where('cabang_id',getCabangId())->get()->count();
         }else{
             $expenses_count = Expense::where('cabang_id',getCabangId())->where('users_id',auth()->user()->id)->get()->count();
