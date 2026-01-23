@@ -87,7 +87,7 @@ class DashboardController extends Controller
             ->whereYear('tgl_disetujui', $currentYear)
             ->whereMonth('tgl_disetujui', $currentMonth)
             ->get()
-            ->sum('profittoko');
+            ->sum('profit');
         // dd($totalbiayaservis,$currentYear,$currentMonth);
         $rumustotalpenjualan = Order::where('cabang_id', getCabangId())->whereHas('detailOrders', function ($query) {
             $query->where('is_approve', 'Setuju')
