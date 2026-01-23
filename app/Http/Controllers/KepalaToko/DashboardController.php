@@ -341,11 +341,11 @@ class DashboardController extends Controller
 
             // $bonus = $total_bonus_interface_main + $bonus_hardware_main + $total_bonus_interface_detail + $total_bonus_hardware_detail;
 
-            $bonus_cek = ($user->servicetransaction->where('tipe','Hardware')->sum('profit') / 100) * $user->persen;
-            $bonus = $bonus_cek + $user->servicetransaction->where('tipe','Interface')->sum('bonus_interface');
+            $bonus_cek = ($user->filteredServiceTransaction->where('tipe','Hardware')->sum('profit') / 100) * $user->persen;
+            $bonus = $bonus_cek + $user->filteredServiceTransaction->where('tipe','Interface')->sum('bonus_interface');
 
         } elseif ($user->role === 'Sales') {
-            $bonus = $user->sale->sum('profit') / 100;
+            $bonus = $user->filteredSale->sum('profit') / 100;
             $bonus *= $user->persen;
 
         } else {
@@ -353,10 +353,10 @@ class DashboardController extends Controller
             $persen = $user->persen ?? 0;
             $nominalBonus = $user->nominal_bonus_admin ?? 0;
 
-            $totalProfitService = $user->adminservice->sum('profit');
-            $totalProfitSale = $user->adminsale->sum('profit');
-            $totalNotaService = $user->adminservice->count();
-            $totalNotaSale = $user->adminsale->count();
+            $totalProfitService = $user->filteredAdminService->sum('profit');
+            $totalProfitSale = $user->filteredAdminSale->sum('profit');
+            $totalNotaService = $user->filteredAdminService->count();
+            $totalNotaSale = $user->filteredAdminSale->count();
 
             if ($tipeBonusNota === 'Persen') {
                 $bonus = (($totalProfitService + $totalProfitSale) / 100) * $persen;
