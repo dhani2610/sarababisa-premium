@@ -51,7 +51,8 @@ class DashboardController extends Controller
             ->get();
         // return response()->json($types);
 
-        $categories = Category::where('cabang_id', $cabang)->get();
+        // $categories = Category::where('cabang_id', $cabang)->get();
+        $categories = Category::get();
 
         // CATEGORY SALES
         $categorySales = [];
