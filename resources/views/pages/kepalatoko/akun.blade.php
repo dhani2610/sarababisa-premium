@@ -165,7 +165,7 @@
 
                                                     <div class="flex space-x-2">
                                                         <input type="file" id="excel_file" accept=".xlsx, .xls" style="display: none;" onchange="processExcel(this)">
-                                                        
+
                                                         <button type="button" class="btn-xs bg-indigo-500 hover:bg-indigo-600 text-white" onclick="document.getElementById('excel_file').click()">
                                                             Import
                                                         </button>
@@ -174,7 +174,7 @@
                                                         <button type="button" class="btn-xs bg-emerald-500 hover:bg-emerald-600 text-white" onclick="addLevelingRow()">+ Tambah</button>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div id="leveling-rows-wrapper" class="space-y-2">
                                                     <div class="leveling-row grid grid-cols-1 md:grid-cols-12 gap-2 items-end border-b pb-2">
                                                         <div class="md:col-span-3">
@@ -599,7 +599,7 @@
                 bonusLevelingContainer.style.display = 'none';
                 bonusPersen.style.display = 'block';
             } else {
-                bonusPersen.style.display = 'block'; 
+                bonusPersen.style.display = 'block';
             }
         } else if (role === 'Sales') {
             extraFields.style.display = 'block';
@@ -628,11 +628,11 @@
         reader.onload = function(e) {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, {type: 'array'});
-            
+
             // Ambil sheet pertama
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
-            
+
             // Konversi ke JSON
             // Header Excel harus: id_jenis_barang, id_tipe_os, dari_rate, sampai_rate, nominal_bonus
             const jsonData = XLSX.utils.sheet_to_json(worksheet);
@@ -642,7 +642,7 @@
                 jsonData.forEach(row => {
                     appendExcelRow(row);
                 });
-                
+
                 // Reset input file agar bisa upload file yang sama jika perlu revisi
                 input.value = '';
                 alert('Berhasil import ' + jsonData.length + ' baris data!');
@@ -658,17 +658,17 @@
         const wrapper = document.getElementById('leveling-rows-wrapper');
         // Kita clone dari row pertama yang sudah ada di HTML (Template)
         const templateRow = wrapper.querySelector('.leveling-row');
-        
+
         if(!templateRow) {
             alert('Tidak ada template baris. Pastikan minimal ada 1 baris input.');
             return;
         }
 
         const newRow = templateRow.cloneNode(true);
-        
+
         // Mapping data excel ke input
         // Pastikan nama kolom di Excel sesuai (case sensitive biasanya, tapi kita handle basic)
-        
+
         const selJenis = newRow.querySelector('select[name="lvl_id_jenis_barang[]"]');
         const selOs = newRow.querySelector('select[name="lvl_id_tipe_os[]"]');
         const inpStart = newRow.querySelector('input[name="lvl_start_rate[]"]');
@@ -677,9 +677,9 @@
 
         // Set Value dari Excel
         // Menggunakan optional chaining (?.) dan fallback || ''
-        if(selJenis) selJenis.value = data['id_jenis_barang'] || data['ID Jenis Barang']; 
+        if(selJenis) selJenis.value = data['id_jenis_barang'] || data['ID Jenis Barang'];
         if(selOs) selOs.value = data['id_tipe_os'] || data['ID Tipe OS'];
-        
+
         // Format Rupiah untuk inputan angka
         // Fungsi helper formatRupiahManual ada di bawah
         if(inpStart) inpStart.value = formatRupiahManual(data['dari_rate'] || data['Dari Rate']);
@@ -689,6 +689,21 @@
         wrapper.appendChild(newRow);
     }
 
+    function addLevelingRow() {
+        const wrapper = document.getElementById('leveling-rows-wrapper');
+        // Clone row pertama
+        const firstRow = wrapper.querySelector('.leveling-row');
+        const newRow = firstRow.cloneNode(true);
+
+        // Reset nilai input di row baru
+        const inputs = newRow.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.value = '';
+        });
+
+        // Append ke wrapper
+        wrapper.appendChild(newRow);
+    }
     // Helper untuk memformat angka dari Excel (misal: 50000) menjadi format input (50.000)
     function formatRupiahManual(angka) {
         if(!angka) return '';
@@ -698,7 +713,7 @@
     function removeLevelingRow(btn) {
         const wrapper = document.getElementById('leveling-rows-wrapper');
         const rows = wrapper.querySelectorAll('.leveling-row');
-        
+
         // Sisakan minimal 1 baris
         if (rows.length > 1) {
             btn.closest('.leveling-row').remove();
@@ -723,7 +738,7 @@
 
         // Bersihkan table body
         $('#detail-bonus-body').html('<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>');
-        
+
         // Buka Modal (menggunakan AlpineJS dispatch)
         window.dispatchEvent(new CustomEvent('open-detail-modal'));
 
