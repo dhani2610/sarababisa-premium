@@ -224,17 +224,17 @@ class ExpenseController extends Controller
             'price' => str_replace('.', '', $request->price),
         ]);
 
-        $validator = \Validator::make($request->all(), [
-            'foto'      => 'nullable|image|mimes:jpeg,png,jpg',
-        ], [
-            'foto.image'        => 'File harus berupa gambar.',
-            'foto.mimes'        => 'Format gambar harus jpeg, png, atau jpg.',
-            // 'foto.max'          => 'Ukuran gambar maksimal adalah 1 MB.',
-        ]);
-        if ($validator->fails()) {
-            toast($validator->errors()->first(), 'error');
-            return back();
-        }
+        // $validator = \Validator::make($request->all(), [
+        //     'foto'      => 'nullable|image|mimes:jpeg,png,jpg',
+        // ], [
+        //     'foto.image'        => 'File harus berupa gambar.',
+        //     'foto.mimes'        => 'Format gambar harus jpeg, png, atau jpg.',
+        //     // 'foto.max'          => 'Ukuran gambar maksimal adalah 1 MB.',
+        // ]);
+        // if ($validator->fails()) {
+        //     toast($validator->errors()->first(), 'error');
+        //     return back();
+        // }
 
         try {
             // Logika Approval
@@ -385,17 +385,17 @@ class ExpenseController extends Controller
                 'price' => str_replace('.', '', $request->price),
             ]);
 
-            $validator = \Validator::make($request->all(), [
-                'foto'      => 'nullable|image|mimes:jpeg,png,jpg',
-            ], [
-                'foto.image'        => 'File harus berupa gambar.',
-                'foto.mimes'        => 'Format gambar harus jpeg, png, atau jpg.',
-                // 'foto.max'          => 'Ukuran gambar maksimal adalah 1 MB.',
-            ]);
-            if ($validator->fails()) {
-                toast($validator->errors()->first(), 'error');
-                return back();
-            }
+            // $validator = \Validator::make($request->all(), [
+            //     'foto'      => 'nullable|image|mimes:jpeg,png,jpg',
+            // ], [
+            //     'foto.image'        => 'File harus berupa gambar.',
+            //     'foto.mimes'        => 'Format gambar harus jpeg, png, atau jpg.',
+            //     // 'foto.max'          => 'Ukuran gambar maksimal adalah 1 MB.',
+            // ]);
+            // if ($validator->fails()) {
+            //     toast($validator->errors()->first(), 'error');
+            //     return back();
+            // }
 
             $fotoPath = null;
             if ($request->hasFile('foto')) {
