@@ -95,7 +95,7 @@ class DashboardCabangController extends Controller
                     ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$ym])
                     ->sum('target');
                 // $targets_count = Tar get::where('cabang_id',getCabangId())->get()->count();
-                
+
 
                 // push ke JSON:
                 $dataAnggaran[$cab->nama_cabang][$ym] = $total;
@@ -123,7 +123,7 @@ class DashboardCabangController extends Controller
                     ->whereYear('tgl_disetujui', $year)
                     ->whereMonth('tgl_disetujui', $month)
                     ->where('is_approve', 'Setuju')
-                    ->sum('profittoko');
+                    ->sum('profit');
 
                 // ======================
                 // PROFIT BERSIH PENJUALAN
