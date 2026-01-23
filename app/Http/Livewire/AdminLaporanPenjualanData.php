@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use App\Models\OrderDetail;
 use App\Models\StoreSetting;
+use App\Models\Category;
 use Livewire\WithPagination;
 
 class AdminLaporanPenjualanData extends Component
