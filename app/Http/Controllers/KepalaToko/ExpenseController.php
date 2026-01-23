@@ -36,7 +36,7 @@ class ExpenseController extends Controller
                 ->where('cabang_id', getCabangId())
                 ->orderByRaw('is_approve IS NULL DESC') // Pending di atas
                 ->where('users_id', auth()->user()->id)
-                ->orderByDesc('updated_at')
+                ->orderByDesc('created_at')
                 ->latest()
                 ->skip($offset)
                 ->take($limit);
@@ -46,7 +46,7 @@ class ExpenseController extends Controller
                 ->where('cabang_id', getCabangId())
                 ->orderByRaw('is_approve IS NULL DESC') // Pending di atas
                 // ->orderBy('created_at', 'desc')
-                ->orderByDesc('updated_at')
+                ->orderByDesc('created_at')
                 ->latest()
                 ->skip($offset)
                 ->take($limit);
