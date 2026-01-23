@@ -235,7 +235,7 @@
                                             <div class="text-left">{{ $item->name }}</div>
                                         </td>
                                         <td class="py-2">
-                                            <div class="font-medium text-right text-slate-800">Rp. {{ number_format($item->service->sum('profit')) }}</div>
+                                            <div class="font-medium text-right text-slate-800">Rp. {{ number_format($item->filteredService->sum('profit')) }}</div>
                                         </td>
                                     </tr>
                                 @endforeach
