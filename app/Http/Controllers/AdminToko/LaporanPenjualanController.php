@@ -156,6 +156,7 @@ class LaporanPenjualanController extends Controller
         $start_date = $request->start_date;
         $end_date   = $request->end_date;
         $tipe       = $request->tipe; // Ambil input tipe
+        $kategori   = $request->kategori; // Ambil input kategori
 
         // 3. SIAPKAN QUERY BUILDER (Agar tidak menulis ulang where berkal-kali)
 
@@ -202,6 +203,12 @@ class LaporanPenjualanController extends Controller
                        ->whereDate('created_at', '<=', $end_date);
         }
 
+         if (!empty($kategori)) {
+            // Filter berdasarkan kategori produk
+            $detailQuery->whereHas('product', function ($q) use ($kategori) {
+                $q->where('categories_id', $kategori);
+            });
+        }
 
         // 4. EKSEKUSI DATA (Menggunakan clone agar query dasar tidak berubah)
 

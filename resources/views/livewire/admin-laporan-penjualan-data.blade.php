@@ -83,6 +83,15 @@
                                     </div>
                                     @endif
                                     <div>
+                                        <label class="block text-sm font-medium mb-1">Kategori <span class="text-rose-500">*</span></label>
+                                        <select name="kategori" class="form-select text-sm py-1 w-full" id="kategori">
+                                            <option value="">Semua Kategori</option>
+                                            @foreach ($category as $itemc)
+                                                <option value="{{ $itemc->id }}">{{ $itemc->category_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
                                         <label class="block text-sm font-medium mb-1">Mulai tanggal <span class="text-rose-500">*</span></label>
                                         <input id="start_date" name="start_date" class="form-input w-full py-2" type="date" required />
                                     </div>

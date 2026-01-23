@@ -34,9 +34,12 @@ class AdminLaporanPenjualanData extends Component
 
         })->sum('quantity');
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $category = Category::get();
+
         return view('livewire.admin-laporan-penjualan-data', [
             'toko' => $toko,
             'jumlah' => $jumlah,
+            'category' => $category,
             'product_transactions' => $this->search === null ?
                 OrderDetail::where('cabang_id', getCabangId())->whereHas('order', function ($query) {
                     $query->where('is_approve', 'Setuju');
