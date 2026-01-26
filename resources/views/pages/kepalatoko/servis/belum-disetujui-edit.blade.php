@@ -190,11 +190,11 @@
 
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="uang_muka">Uang Muka </label>
-                                    <input id="uang_muka" name="uang_muka" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format($item->uang_muka ?? 0, 0, ',', '.') }}" />
+                                    <input id="uang_muka" name="uang_muka" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format((int)$item->uang_muka ?? 0, 0, ',', '.') }}" />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="diskon">Diskon </label>
-                                    <input id="diskon" name="diskon" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format($item->diskon ?? 0, 0, ',', '.') }}" />
+                                    <input id="diskon" name="diskon" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format((int)$item->diskon ?? 0, 0, ',', '.') }}" />
                                 </div>
 
                                 <div>

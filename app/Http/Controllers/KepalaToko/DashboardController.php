@@ -188,7 +188,7 @@ class DashboardController extends Controller
             ->whereDate('created_at', today())
             ->sum('price');
             // ->get();
-            // return response()->json($haripengeluaranToko);
+            // return response()->json($haripengeluaranToko);   
 
         $haripengeluaranServis = Expense::where('cabang_id', $cabang)
             ->where('tipe', 1)
