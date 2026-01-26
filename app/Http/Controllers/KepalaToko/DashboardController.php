@@ -182,28 +182,31 @@ class DashboardController extends Controller
 
         $haripengeluaranToko = Expense::where('cabang_id', $cabang)
             ->where('tipe', 0)
-            ->where('is_approve', 'Setuju')
+            // ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', now()->month)
             ->whereDate('tgl_disetujui', today())
             ->sum('price');
+            // ->get();
+            // return response()->json($haripengeluaranToko);
 
         $haripengeluaranServis = Expense::where('cabang_id', $cabang)
             ->where('tipe', 1)
-            ->where('is_approve', 'Setuju')
-            ->whereYear('tgl_disetujui', now()->year)
-            ->whereMonth('tgl_disetujui', now()->month)
-            ->whereDate('tgl_disetujui', today())
+            // ->where('is_approve', 'Setuju')
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->whereDate('created_at', today())
             ->sum('price');
         $haripengeluaranPenjualan = Expense::where('cabang_id', $cabang)
             ->where('tipe', 2)
             ->where('is_approve', 'Setuju')
-            ->whereYear('tgl_disetujui', now()->year)
-            ->whereMonth('tgl_disetujui', now()->month)
-            ->whereDate('tgl_disetujui', today())
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->whereDate('created_at', today())
             ->sum('price');
 
         $hariomzetservis = ServiceTransaction::where('cabang_id', $cabang)
+            ->where('is_approve', 'Setuju')
             ->where('status_servis', 'Sudah Diambil')
             ->whereYear('tgl_disetujui', now()->year)
             ->whereMonth('tgl_disetujui', now()->month)
@@ -216,13 +219,15 @@ class DashboardController extends Controller
             ->whereDate('created_at', today())
             ->sum('total');
 
+        // return response()->json([$hariomzetservis,$hariomzetpenjualan]);
         $haritotalomzet = $hariomzetservis + $hariomzetpenjualan;
 
         $hariprofitkotorservis = ServiceTransaction::where('cabang_id', $cabang)
-            // ->where('status_servis', 'Sudah Diambil')
-            ->whereYear('tgl_ambil', now()->year)
-            ->whereMonth('tgl_ambil', now()->month)
-            ->whereDate('tgl_ambil', today())
+            ->where('status_servis', 'Sudah Diambil')
+            ->where('is_approve', 'Setuju')
+            ->whereYear('tgl_disetujui', now()->year)
+            ->whereMonth('tgl_disetujui', now()->month)
+            ->whereDate('tgl_disetujui', today())
             ->sum('profit');
 
         $hariprofitkotorpenjualan = OrderDetail::where('cabang_id', $cabang)

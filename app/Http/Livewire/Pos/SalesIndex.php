@@ -213,6 +213,7 @@ class SalesIndex extends Component
                 'tunai'      => $this->tunai,
                 'transfer'      => $this->transfer,
                 'note'                => $this->note,
+                'cabang_id'  => getCabangId(),
             ]);
 
             // foreach ($this->cart_instance as cart_items) {}
@@ -257,6 +258,7 @@ class SalesIndex extends Component
                     'garansi'      => $expired,
                     'garansi_imei'      => $expired_imei,
                     'payment_method'      => $this->payment_method,
+                    'cabang_id'  => getCabangId(),
                 ]);
 
                 $product = Product::findOrFail($cart_item->id);
