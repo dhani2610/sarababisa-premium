@@ -188,7 +188,7 @@ class DashboardController extends Controller
             ->whereDate('created_at', today())
             ->sum('price');
             // ->get();
-            // return response()->json($haripengeluaranToko);   
+            // return response()->json($haripengeluaranToko);
 
         $haripengeluaranServis = Expense::where('cabang_id', $cabang)
             ->where('tipe', 1)
@@ -206,11 +206,11 @@ class DashboardController extends Controller
             ->sum('price');
 
         $hariomzetservis = ServiceTransaction::where('cabang_id', $cabang)
-            ->where('is_approve', 'Setuju')
+            // ->where('is_approve', 'Setuju')
             ->where('status_servis', 'Sudah Diambil')
-            ->whereYear('tgl_disetujui', now()->year)
-            ->whereMonth('tgl_disetujui', now()->month)
-            ->whereDate('tgl_disetujui', today())
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->whereDate('created_at', today())
             ->sum('omzet');
 
         $hariomzetpenjualan = OrderDetail::where('cabang_id', $cabang)
@@ -224,10 +224,10 @@ class DashboardController extends Controller
 
         $hariprofitkotorservis = ServiceTransaction::where('cabang_id', $cabang)
             ->where('status_servis', 'Sudah Diambil')
-            ->where('is_approve', 'Setuju')
-            ->whereYear('tgl_disetujui', now()->year)
-            ->whereMonth('tgl_disetujui', now()->month)
-            ->whereDate('tgl_disetujui', today())
+            // ->where('is_approve', 'Setuju')
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->whereDate('created_at', today())
             ->sum('profit');
 
         $hariprofitkotorpenjualan = OrderDetail::where('cabang_id', $cabang)
