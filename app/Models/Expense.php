@@ -21,10 +21,15 @@ class Expense extends Model
         'cabang_id',
         'tipe',
         'foto',
+        'created_by',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'users_id', 'id');
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 }

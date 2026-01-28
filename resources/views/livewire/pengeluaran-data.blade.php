@@ -209,6 +209,8 @@
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">No</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Tgl Pengeluaran</th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Tgl Disetujui</th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Pembuat</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Nama Akun</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Item Pengeluaran</th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">Tipe Pengeluaran</th>
@@ -283,6 +285,8 @@
                         }
                     },
                     { data: 'created_at', name: 'created_at' },
+                    { data: 'tgl_disetujui', name: 'tgl_disetujui' },
+                    { data: 'created_by', name: 'created_by' },
                     { data: 'user_name', name: 'user.name' },
                     { data: 'name', name: 'name' },
                     { data: 'tipe', name: 'tipe' },

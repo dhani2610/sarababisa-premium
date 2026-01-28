@@ -416,6 +416,7 @@ class HistoryGaransiController extends Controller
 
                 if ($servis->biaya > 0) {
                     Expense::create([
+                        'created_by'          => auth()->user()->id,
                         'tipe' => 1, // tipe servis
                         'name' => 'Refund #'. $servis->nomor_servis,
                         'price' => $servis->biaya,
@@ -467,6 +468,7 @@ class HistoryGaransiController extends Controller
 
         if ($request->total_biaya > 0) {
             Expense::create([
+                'created_by'          => auth()->user()->id,
                 'tipe' => 1, // tipe servis
                 'name' => 'Klaim Garansi #'. $servis2->nomor_servis,
                 'price' => $request->total_biaya,

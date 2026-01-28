@@ -166,6 +166,7 @@ class RefundController extends Controller
 
         if ($servis->biaya > 0) {
             Expense::create([
+                'created_by'          => auth()->user()->id,
                 'name' => 'Refund #'. $servis->nomor_servis,
                 'price' => $servis->biaya,
                 'tipe' => 1,

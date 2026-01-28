@@ -33,7 +33,7 @@ class ExpenseController extends Controller
 
         if (auth()->user()->role != 'Kepala Toko' && auth()->user()->role != 'Admin Toko') {
             # code...
-            $query = Expense::with('user')
+            $query = Expense::with(['user','createdBy'])
                 ->where('cabang_id', getCabangId())
                 ->orderByRaw('is_approve IS NULL DESC') // Pending di atas
                 ->where('users_id', auth()->user()->id)
@@ -43,7 +43,7 @@ class ExpenseController extends Controller
                 ->take($limit);
         }else{
 
-            $query = Expense::with('user')
+            $query = Expense::with(['user','createdBy'])
                 ->where('cabang_id', getCabangId())
                 ->orderByRaw('is_approve IS NULL DESC') // Pending di atas
                 // ->orderBy('created_at', 'desc')
@@ -63,6 +63,16 @@ class ExpenseController extends Controller
             })
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->format('d/m/Y');
+            })
+            ->editColumn('tgl_disetujui', function ($row) {
+                return Carbon::parse($row->tgl_disetujui)->format('d/m/Y');
+            })
+            ->editColumn('created_by', function ($row) {
+                if (!empty($row->createdBy)) {
+                    return $row->createdBy->name ?? '<span class="text-rose-600">Akun Terhapus</span>';
+                }else{
+                    return $row->user->name ?? '<span class="text-rose-600">Akun Terhapus</span>';
+                }
             })
             ->addColumn('foto', function ($row) {
                 if ($row->foto) {
@@ -142,7 +152,7 @@ class ExpenseController extends Controller
                     </div>
                 ';
             })
-            ->rawColumns(['checkbox', 'aksi', 'is_approve', 'user_name','foto'])
+            ->rawColumns(['checkbox', 'aksi', 'is_approve', 'user_name','foto','created_by'])
             ->make(true);
     }
 
@@ -250,6 +260,7 @@ class ExpenseController extends Controller
 
             // Create Data
             Expense::create([
+                'created_by'          => auth()->user()->id,
                 'name'          => $request->name,
                 'price'         => $request->price,
                 'users_id'      => $request->users_id,

@@ -435,6 +435,10 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::get('servis/log-servis', [KepalaTokoLogServisController::class, 'index'])->name('log-servis');
     Route::post('servis/log-servis-destroy/{model}', [KepalaTokoLogServisController::class, 'destroy'])->name('log-servis-destroy');
 
+    Route::get('servis/log-penjualan/data', [KepalaTokoLogServisController::class, 'getDataPenjualan'])->name('log-penjualan.data');
+    Route::get('servis/log-penjualan', [KepalaTokoLogServisController::class, 'indexPenjualan'])->name('log-penjualan');
+    Route::get('servis/log-penjualan-destroy', [KepalaTokoLogServisController::class, 'destroyPenjualan'])->name('log-penjualan-destroy');
+
     Route::get('master-jenis-barang/data', [KepalaTokoMasterJenisBarangController::class, 'getData'])->name('master-jenis-barang.data');
     Route::resource('master/master-jenis-barang', KepalaTokoMasterJenisBarangController::class);
 

@@ -579,7 +579,7 @@
                     </div>
                     <div x-show="useSparepart" style="display: none;" class="wrapper-sparepart-area">
                         <div class="mb-2"><label class="block text-sm font-medium mb-1">Sparepart</label><select name="teknisi[${groupIndex}][tindakan][${actionIndex}][products_id]" class="form-select text-sm py-1 w-full selectSparepart" style="width: 100%;">${sparepartOptions}</select></div>
-                        <div class="mb-2"><label class="block text-sm font-medium mb-1">Sales Sparepart</label><select name="teknisi[${groupIndex}][tindakan][${actionIndex}][sales_id]" class="form-select text-sm py-1 w-full selectSales">${salesOptions}</select></div>
+                        <input type="hidden" value="null" name="teknisi[${groupIndex}][tindakan][${actionIndex}][sales_id]">
                     </div>
                     <div class="grid grid-cols-2 gap-2 mt-2">
                         <div>

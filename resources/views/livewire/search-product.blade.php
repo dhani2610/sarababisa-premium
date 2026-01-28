@@ -63,9 +63,9 @@
                             </h6>
                             <p class="mb-0 text-center font-bold">
                                 @if ($customer_tipe === 'Toko')
-                                    Rp. {{ number_format($product->harga_jual_toko) }}
+                                    Rp. {{ number_format((int)$product->harga_jual_toko ?? 0) }}
                                 @else
-                                    Rp. {{ number_format($product->harga_jual) }}
+                                    Rp. {{ number_format((int)$product->harga_jual ?? 0) }}
                                 @endif
                             </p>
                         </div>

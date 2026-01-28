@@ -41,6 +41,7 @@ class ExpenseController extends Controller
     {
         // Transaction create
         Expense::create([
+            'created_by'          => auth()->user()->id,
             'tipe' => 0, // tipe operasional
             'name' => $request->name,
             'price' => $request->price,
