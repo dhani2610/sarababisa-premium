@@ -13,6 +13,7 @@ class LaporanAdminController extends Controller
 {
     public function index()
     {
+        // $users = User::where('id',49)->where('cabang_id',getCabangId())->with('adminservice', 'adminsale')->where('role', 'Admin Toko')
         $users = User::where('cabang_id',getCabangId())->with('adminservice', 'adminsale')->where('role', 'Admin Toko')
             ->get();
 

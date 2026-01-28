@@ -173,7 +173,7 @@ class TransaksiServisController extends Controller
         ->addIndexColumn()
 
         // Checkbox untuk bulk action
-        ->addColumn('checkbox', function ($row) {
+         ->addColumn('checkbox', function ($row) {
             // hanya tampilkan checkbox bila bukan investor (cek auth di blade juga)
             return '<input type="checkbox" class="table-item form-checkbox" value="' . $row->id . '" />';
         })

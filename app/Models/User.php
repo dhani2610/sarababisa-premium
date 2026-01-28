@@ -308,6 +308,7 @@ class User extends Authenticatable
         $date = request('filter_month') ? \Carbon\Carbon::parse(request('filter_month')) : now();
 
         return $this->hasMany(OrderDetail::class, 'admin_id', 'id')
+        ->where('total', '>',0)
             ->whereHas('order', function ($query) use ($date) {
                 $query->where('is_approve', 'Setuju')
                     ->where('cabang_id', getCabangId())
