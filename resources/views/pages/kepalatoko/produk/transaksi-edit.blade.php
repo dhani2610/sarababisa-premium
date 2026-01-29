@@ -107,9 +107,11 @@
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="payment_method">Metode Pembayaran</label>
                                         <select id="payment_method" name="payment_method" class="form-select text-sm py-1 w-full" >
-                                            <option selected value="{{ $item->payment_method }}">{{  $item->payment_method }}</option>
-                                            <option value="Tunai">Tunai</option>
-                                            <option value="Transfer">Transfer</option>
+                                            <option value="Tunai" {{ $item->payment_method == 'Tunai' ? 'selected' : '' }}>Tunai</option>
+                                            <option value="Transfer" {{ $item->payment_method == 'Transfer' ? 'selected' : '' }}>Transfer</option>
+                                            @foreach (getMetodePembayaran() as $mp)
+                                            <option value="{{ $mp->nama }}" {{ $item->payment_method == $mp->nama ? 'selected' : '' }}>{{  $mp->nama  }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div>

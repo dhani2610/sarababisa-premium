@@ -128,6 +128,22 @@
 		</tbody>
 	</table>
 
+    <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
+        Pembayaran Lain
+    </h4>
+    <table id="ringkasan">
+        <tbody>
+            @foreach(array_chunk($dataOtherMetodePembayaran, 3) as $row)
+                <tr>
+                    @foreach($row as $data)
+                        <th>{{ $data['metode'] }}</th>
+                        <th>: Rp. {{ number_format($data['total']) }}</th>
+                    @endforeach
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
 	<h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
 		Detail Penjualan
 	</h4>
@@ -149,6 +165,7 @@
 				@if ($toko->is_bonus_produk === 1)
 				<th>Profit</th>
 				@endif
+				<th>Pembayaran</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -193,6 +210,18 @@
 					@if ($toko->is_ === 1)
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
 					@endif
+                    <td style="width: 70px; text-align: left;">
+                        @if ($item->order->payment_method == 'Tunai')
+                            Tunai : Rp. {{ number_format($item->order->tunai) }}
+                        @elseif ($item->order->payment_method == 'Transfer')
+                            Transfer : Rp. {{ number_format($item->order->transfer) }}
+                        @elseif ($item->order->payment_method == 'Tunai & Transfer')
+                            Tunai : Rp. {{ number_format($item->order->tunai) }} <br> <hr>
+                            Transfer : Rp. {{ number_format($item->order->transfer) }}
+                        @else
+                            {{ $item->order->payment_method }} : Rp. {{ number_format($item->order->transfer) }}
+                        @endif
+                    </td>
 				</tr>
 			@endforeach
 		</tbody>

@@ -104,50 +104,51 @@
 
     <table id="ringkasan">
         <tbody>
-            <tr>
-        <th>Total Item Servis</th>
-        <th >: {{ $total_servis }} Item</th>
+        <tr>
+            <th>Total Item Servis</th>
+            <th >: {{ $total_servis }} Item</th>
 
-        <th>Total Pembayaran Tunai</th>
-        <th >: Rp. {{ number_format($total_tunai) }}</th>
+            <th>Total Pembayaran Tunai</th>
+            <th >: Rp. {{ number_format($total_tunai) }}</th>
 
-        <th>Total Pengeluaran Toko</th>
-        <th>: Rp. {{ number_format($total_pengeluaran_toko) }}</th>
-    </tr>
+            <th>Total Pengeluaran Toko</th>
+            <th>: Rp. {{ number_format($total_pengeluaran_toko) }}</th>
+        </tr>
 
-    <tr>
-        <th>Total Biaya Servis</th>
-        <th >: Rp. {{ number_format($total_biaya) }}</th>
+        <tr>
+            <th>Total Biaya Servis</th>
+            <th >: Rp. {{ number_format($total_biaya) }}</th>
 
-        <th>Total Pembayaran Transfer</th>
-        <th >: Rp. {{ number_format($total_transfer) }}</th>
+            <th>Total Pembayaran Transfer</th>
+            <th >: Rp. {{ number_format($total_transfer) }}</th>
 
-        <th>Total Pengeluaran Servis</th>
-        <th>: Rp. {{ number_format($total_pengeluaran_servis) }}</th>
-    </tr>
+            <th>Total Pengeluaran Servis</th>
+            <th>: Rp. {{ number_format($total_pengeluaran_servis) }}</th>
+        </tr>
 
-    <tr>
-        <th>Total Diskon</th>
-        <th >: Rp. {{ number_format($total_diskon) }}</th>
+        <tr>
+            <th>Total Diskon</th>
+            <th >: Rp. {{ number_format($total_diskon) }}</th>
 
-        <th>Total Pembayaran Tempo</th>
-        <th >: Rp. {{ number_format($total_kredit) }}</th>
+            <th>Total Pembayaran Tempo</th>
+            <th >: Rp. {{ number_format($total_kredit) }}</th>
 
-        <th>Total Profit</th>
-        <th>: Rp. {{ number_format($total_profit) }}</th>
-    </tr>
+            <th>Total Profit</th>
+            <th>: Rp. {{ number_format($total_profit) }}</th>
+        </tr>
 
-    <tr>
-        <th>Total Modal Sparepart</th>
-        <th >: Rp. {{ number_format($total_modal) }}</th>
+        <tr>
+            <th>Total Modal Sparepart</th>
+            <th >: Rp. {{ number_format($total_modal) }}</th>
 
-        <th>Total Uang Muka (DP)</th>
-        <th >: Rp. {{ number_format($total_dp) }}</th>
+            <th>Total Uang Muka (DP)</th>
+            <th >: Rp. {{ number_format($total_dp) }}</th>
 
 
-        <th ">Saldo Akhir</th>
-        <th ">: Rp. {{ number_format($saldo_akhir) }}</th>
-    </tr>
+            <th ">Saldo Akhir</th>
+            <th ">: Rp. {{ number_format($saldo_akhir) }}</th>
+        </tr>
+
 
     <tr>
 
@@ -160,6 +161,22 @@
 
         <td colspan="4"></td>
     </tr>
+
+        </tbody>
+    </table>
+    <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
+        Pembayaran Lain
+    </h4>
+    <table id="ringkasan">
+        <tbody>
+            @foreach(array_chunk($dataOtherMetodePembayaran, 3) as $row)
+                <tr>
+                    @foreach($row as $data)
+                        <th>{{ $data['metode'] }}</th>
+                        <th>: Rp. {{ number_format($data['total']) }}</th>
+                    @endforeach
+                </tr>
+            @endforeach
         </tbody>
     </table>
 
@@ -186,6 +203,7 @@
         <tbody>
             @php
                 $no = 1;
+                $listNamaMetode = array_column($dataOtherMetodePembayaran, 'metode');
             @endphp
             @foreach ($services as $item)
                 @php
@@ -336,12 +354,18 @@
                                 <td class="" rowspan="{{ $total_rows_transaksi }}" style="text-align: left; width: 80px;">
                                     @php
                                         $metode = [];
-                                        if ($item->tunai > 0) {
-                                            $metode[] = '<div><strong>Tunai:</strong><br>Rp.' . number_format($item->tunai, 0, ',', '.') . '</div>';
+                                        if (in_array($item->cara_pembayaran, $listNamaMetode)) {
+                                            $metode[] = '<div><strong>'.$item->cara_pembayaran.':</strong><br>Rp.' . number_format($item->transfer, 0, ',', '.') . '</div>';
+                                        } else {
+                                            # code...
+                                            if ($item->tunai > 0) {
+                                                $metode[] = '<div><strong>Tunai:</strong><br>Rp.' . number_format($item->tunai, 0, ',', '.') . '</div>';
+                                            }
+                                            if ($item->transfer > 0) {
+                                                $metode[] = '<div><strong>Transfer:</strong><br>Rp.' . number_format($item->transfer, 0, ',', '.') . '</div>';
+                                            }
                                         }
-                                        if ($item->transfer > 0) {
-                                            $metode[] = '<div><strong>Transfer:</strong><br>Rp.' . number_format($item->transfer, 0, ',', '.') . '</div>';
-                                        }
+
                                     @endphp
 
                                     @if ($item->kondisi_servis == 'Dibatalkan')

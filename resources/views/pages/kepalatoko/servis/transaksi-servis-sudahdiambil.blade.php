@@ -168,6 +168,9 @@
                                         <option value="Transfer">Transfer</option>
                                         <option value="Kredit">Kredit</option>
                                         <option value="Tunai & Transfer">Tunai & Transfer</option>
+                                        @foreach (getMetodePembayaran() as $mp)
+                                        <option value="{{ $mp->nama }}">{{  $mp->nama  }}</option>
+                                        @endforeach
                                     </select>
 
                                     <div x-show="caraPembayaran === 'Tunai & Transfer'" class="mt-3">

@@ -7,6 +7,7 @@ use App\Models\Type;
 use App\Models\Brand;
 use App\Models\Customer;
 use App\Models\ModelSerie;
+use App\Models\MetodePembayaran;
 use App\Models\User;
 use App\Models\TeknisiServis;
 use App\Models\ServiceTransaction;
@@ -385,6 +386,18 @@ if (!function_exists('calculateBonus')) {
         }
 
         return $bonus;
+    }
+
+    if (!function_exists('getMetodePembayaran')) {
+        function getMetodePembayaran(){
+            try {
+                $data = MetodePembayaran::where('cabang_id',getCabangId())->get();
+
+                return $data;
+            } catch (\Throwable $th) {
+                return 0;
+            }
+        }
     }
 }
 

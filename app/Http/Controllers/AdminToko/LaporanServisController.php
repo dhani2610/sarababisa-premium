@@ -352,7 +352,7 @@ class LaporanServisController extends Controller
 
         // Total Pembayaran
         $total_tunai    = (clone $serviceQuery)->sum('tunai');
-        $total_transfer = (clone $serviceQuery)->sum('transfer');
+        $total_transfer = (clone $serviceQuery)->whereNotIn('cara_pembayaran',getMetodePembayaran()->pluck('nama'))->sum('transfer');
         $total_kredit   = (clone $serviceQuery)->sum('due'); // due biasanya sisa tagihan/kredit
 
         // --- DATA PENGELUARAN & INSIDEN (Tetap created_at karena tidak ada status ambil/setuju) ---
@@ -380,6 +380,12 @@ class LaporanServisController extends Controller
         // Hitung Saldo Akhir
         $saldo_akhir = $total_profit - $total_pengeluaran - $totalInsiden;
 
+        $dataOtherMetodePembayaran = [];
+        foreach (getMetodePembayaran() as $key => $value) {
+            $dt['metode'] = $value->nama;
+            $dt['total']    = (clone $serviceQuery)->where('cara_pembayaran',$value->nama)->sum('transfer');
+            array_push($dataOtherMetodePembayaran,$dt);
+        }
         // Render PDF
         $pdf = PDF::loadView('pages.admintoko.cetak-laporan-servis', [
             'users'             => $users,
@@ -403,6 +409,7 @@ class LaporanServisController extends Controller
             'saldo_akhir'       => $saldo_akhir,
             'pengeluaran_data'  => $pengeluaran_data,
             'total_pengeluaran' => $total_pengeluaran,
+            'dataOtherMetodePembayaran' => $dataOtherMetodePembayaran,
             'total_kredit'      => $total_kredit,
             'insiden'           => $insiden,
             'total_insiden'     => $totalInsiden,

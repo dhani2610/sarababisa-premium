@@ -74,6 +74,9 @@ class ServiceTransaction extends Model
         "bonus_interface",
         "tipe",
         "cabang_id",
+        "status_pembayaran",
+        "external_id",
+        "paid_at",
     ];
 
     public function getActivitylogOptions(): LogOptions

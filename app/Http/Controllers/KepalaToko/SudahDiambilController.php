@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use App\Models\ServiceAction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ServiceTransaction;
+use App\Models\MetodePembayaran;
 use App\Models\TeknisiServis;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -109,6 +110,16 @@ class SudahDiambilController extends Controller
                     } else {
                         $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
                     }
+                    $metodePembayaranPaymentGateway = MetodePembayaran::where('is_payment_gateway',1)->first();
+                    if (!empty($metodePembayaranPaymentGateway)) {
+                        if($metodePembayaranPaymentGateway->nama == $row->cara_pembayaran){
+                            $is_pg = true;
+                        }else{
+                            $is_pg = false;
+                        }
+                    }else{
+                        $is_pg = false;
+                    }
 
                     $message = "*Notifikasi Service*\n{$kp->nama_toko}\n\n"
                         . "No. Service : {$row->nomor_servis}\n"
@@ -120,8 +131,14 @@ class SudahDiambilController extends Controller
                         . "Garansi sampai : " . ($row->exp_garansi ? Carbon::parse($row->exp_garansi)->translatedFormat('d F Y') : 'Tidak ada garansi') . "\n"
                         . "Pembayaran : {$row->cara_pembayaran}\n\n"
                         . "Link tracking : " . env('APP_URL') . "/tracking\n"
-                        . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $row->id)  . "\n"
-                        . "Link QC : " . route('kepalatoko-cetak-qc', $row->id)  . "\n\n";
+                        . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $row->id)  . "\n";
+                        if ($is_pg) {
+                            $message .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n";
+
+                            $message .= "Link Pembayaran : " . route('payment', $row->id) . "\n\n";
+                        } else {
+                            $message .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n\n";
+                        }
 
                     $banks = old('banks', json_decode($kp->banks ?? '[]', true));
 
@@ -939,7 +956,6 @@ class SudahDiambilController extends Controller
     // }
     public function update(Request $request, $id)
     {
-        // dd($request->all());
        $itemOrigin = ServiceTransaction::findOrFail($id);
         DB::beginTransaction();
 
@@ -1065,6 +1081,8 @@ class SudahDiambilController extends Controller
                             $nama_model = ModelSerie::find($itemOrigin->model_series_id);
                             $bonus_interface = $nama_model->nominal_bonus ?? 0;
                         }elseif ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface Leveling') {
+                            $nama_model = ModelSerie::find($itemOrigin->model_series_id);
+
                             $biayaPerAction = (int)filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
                             $bonus_leveling = \App\Models\BonusLeveling::where('id_user',$cekTeknisi->id)
                             ->where('id_jenis_barang',$request->types_id)
@@ -1154,6 +1172,11 @@ class SudahDiambilController extends Controller
                 if ($ppn > 0) {
                     $biayaFinal += ($baseBiaya * $item->ppn / 100);
                 }
+
+                $transfer = $biayaFinal;
+                $tunai = 0;
+                $due = 0;
+                $pay = $biayaFinal;
 
                 if ($request->cara_pembayaran === 'Tunai & Transfer') {
                     $due = 0;

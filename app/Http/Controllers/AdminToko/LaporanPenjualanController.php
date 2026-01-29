@@ -228,10 +228,16 @@ class LaporanPenjualanController extends Controller
 
         // Hitung Statistik Pembayaran dari Order
         $total_tunai    = (clone $orderQuery)->sum('tunai');
-        $total_transfer = (clone $orderQuery)->sum('transfer');
+        $total_transfer = (clone $orderQuery)->whereNotIn('payment_method',getMetodePembayaran()->pluck('nama'))->sum('transfer');
         $total_kredit   = (clone $orderQuery)->sum('due');
 
 
+        $dataOtherMetodePembayaran = [];
+        foreach (getMetodePembayaran() as $key => $value) {
+            $dt['metode'] = $value->nama;
+            $dt['total']    = (clone $orderQuery)->where('payment_method',$value->nama)->sum('transfer');
+            array_push($dataOtherMetodePembayaran,$dt);
+        }
         // 5. RENDER PDF
         $pdf = PDF::loadView('pages.admintoko.cetak-laporan-penjualan', [
             'users'           => $users,
@@ -247,6 +253,7 @@ class LaporanPenjualanController extends Controller
             'total_diskon'    => $total_diskon,
             'total_tunai'     => $total_tunai,
             'total_transfer'  => $total_transfer,
+            'dataOtherMetodePembayaran'  => $dataOtherMetodePembayaran,
             'total_kredit'    => $total_kredit,
             'tipe_laporan'    => $tipe // Opsional: kirim ke view untuk judul
         ]);

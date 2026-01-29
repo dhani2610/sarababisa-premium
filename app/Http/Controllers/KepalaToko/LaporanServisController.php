@@ -432,8 +432,8 @@ class LaporanServisController extends Controller
         // 2. Menghitung total pembayaran (Tunai, DP, Transfer, Kredit)
         $total_tunai    = (clone $serviceQuery)->sum('tunai');
         $total_dp       = (clone $serviceQuery)->sum('uang_muka');
-        $total_transfer = (clone $serviceQuery)->sum('transfer');
-        $total_kredit   = (clone $serviceQuery)->sum('due');
+        $total_transfer = (clone $serviceQuery)->whereNotIn('cara_pembayaran',getMetodePembayaran()->pluck('nama'))->sum('transfer');
+            $total_kredit   = (clone $serviceQuery)->sum('due');
 
         // 3. Menghitung Keuangan (Modal, Biaya, Diskon, Profit)
         $total_modal    = (clone $serviceQuery)->sum('modal_sparepart');
@@ -483,6 +483,14 @@ class LaporanServisController extends Controller
         $total_pengeluaran_toko = $expensesToko->sum('price');
         $total_pengeluaran_servis = $expensesServis->sum('price');
 
+        $dataOtherMetodePembayaran = [];
+        foreach (getMetodePembayaran() as $key => $value) {
+            $dt['metode'] = $value->nama;
+            $dt['total']    = (clone $serviceQuery)->where('cara_pembayaran',$value->nama)->sum('transfer');
+            array_push($dataOtherMetodePembayaran,$dt);
+        }
+        // return response()->json($dataOtherMetodePembayaran);
+
         // Hitung Saldo Akhir
         $saldo_akhir = $total_profit - $total_pengeluaran_toko - $total_pengeluaran_servis - $total_insiden;
         // --- RETURN PDF ---
@@ -514,6 +522,8 @@ class LaporanServisController extends Controller
             'total_dp'          => $total_dp,
             'totalInsiden'      => $total_insiden,
             'insiden'           => $incidents,
+            'insiden'           => $incidents,
+            'dataOtherMetodePembayaran'           => $dataOtherMetodePembayaran,
             'tipe_laporan'      => $tipe // Opsional: kirim ke view biar judulnya dinamis
         ]);
 

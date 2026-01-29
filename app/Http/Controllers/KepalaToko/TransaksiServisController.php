@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
+use Midtrans\Config;
+use Midtrans\Snap;
 class TransaksiServisController extends Controller
 {
     /**
@@ -1032,6 +1034,122 @@ class TransaksiServisController extends Controller
         $filename = 'QC Check ' . $invoiceNumber . ' - ' . $namaPelanggan . '.pdf';
 
         return $pdf->setOption('isRemoteEnabled', true)->stream($filename);
+    }
+    public function payment($id)
+    {
+        $items = ServiceTransaction::with(['customer', 'admin'])->findOrFail($id);
+
+        // --- 1. BERSIHKAN NILAI AMOUNT ---
+        // Pakai (int) untuk memaksa jadi angka bulat.
+        // Ini mengatasi error "Price is not a number"
+        $amount = (int) $items->biaya;
+        // dd($items);
+
+        // --- 2. CEK APAKAH NILAI 0 ATAU KURANG ---
+        // Mengatasi error "gross_amount harus sama atau lebih besar dari 0.01"
+        if ($amount <= 0) {
+            toast('Total biaya tidak valid atau Rp 0. Tidak bisa melakukan pembayaran online.', 'error');
+            // return redirect()->back();
+        }
+
+        // --- KONFIGURASI MIDTRANS ---
+        Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        Config::$isProduction = false;
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        // --- CEK APAKAH SUDAH LUNAS ---
+        if ($items->status_pembayaran == 'paid') {
+             // Opsional
+        }
+
+        // Buat Order ID Unik
+        $orderId = $items->nomor_servis . '-' . time();
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $orderId,
+                'gross_amount' => $amount, // Pastikan pakai variabel yang sudah di-(int)
+            ],
+            'customer_details' => [
+                'first_name' => $items->customer->nama,
+                'phone' => $items->customer->nomor_hp,
+            ],
+            'item_details' => [
+                [
+                    'id' => $items->id, // ID Sebaiknya string/int sederhana
+                    'price' => $amount, // HARUS SAMA dengan gross_amount
+                    'quantity' => 1,
+                    'name' => substr('Service: ' . $items->nomor_servis, 0, 50) // Nama max 50 char biar aman
+                ]
+            ]
+        ];
+
+        // Debugging: Jika masih error, uncomment baris di bawah ini untuk melihat datanya
+        // dd($params);
+
+        try {
+            $snapToken = Snap::getSnapToken($params);
+        } catch (\Exception $e) {
+            // Tangkap error jika Midtrans menolak koneksi
+            // dd($e->getMessage());
+        }
+
+        // --- LOGIC BAWAAN ANDA ---
+        $qcMasuk = $items->qc_masuk ? json_decode($items->qc_masuk, true) : [];
+        $qcKeluar = $items->qc_keluar ? json_decode($items->qc_keluar, true) : [];
+        $qcItems = $qcMasuk != null ? array_keys($qcMasuk) : [];
+
+        if (empty($qcItems) && !empty($qcKeluar)) {
+            $qcItems = array_keys($qcKeluar);
+        }
+        if (empty($qcItems)) {
+            $qcItems = [];
+        }
+
+        if ($items->cabang_id == 1) {
+            $users = User::find(1);
+        } else {
+            $users = User::where('cabang_id', $items->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+        }
+
+        if (empty($users)) {
+            // dd('not found');
+            toast('Silahkan bikin akun kepala toko terlebih dahulu...', 'error');
+            // return redirect()->back();
+        }
+
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+
+        return view('pages.kepalatoko.servis.payment-page', [
+            'users' => $users,
+            'items' => $items,
+            'imagePath' => $imagePath,
+            'qcMasuk' => $qcMasuk,
+            'qcKeluar' => $qcKeluar,
+            'qcItems' => $qcItems,
+            'snapToken' => $snapToken,
+            'clientKey' => env('MIDTRANS_CLIENT_KEY')
+        ]);
+
+    }
+
+    // --- METHOD BARU: HANDLE SUKSES PEMBAYARAN ---
+    public function paymentSuccess(Request $request, $id)
+    {
+        $item = ServiceTransaction::findOrFail($id);
+
+        $item->status_pembayaran = 'paid'; // Sesuaikan nama kolom status
+
+        $item->external_id = $item->nomor_servis;
+        $item->paid_at = date('Y-m-d H:i:s');
+
+        $item->save();
+
+        // Redirect kembali dengan pesan sukses
+        toast('Pembayaran Berhasil! Status telah diperbarui.', 'success');
+        return redirect()->route('payment', $id);
     }
 
     /**

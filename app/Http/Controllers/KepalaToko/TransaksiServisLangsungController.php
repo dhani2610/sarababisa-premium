@@ -184,6 +184,8 @@ class TransaksiServisLangsungController extends Controller
                             $nama_model = ModelSerie::find($request->model_series_id);
                             $bonus_interface = $nama_model->nominal_bonus ?? 0;
                         }elseif ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface Leveling') {
+                            $nama_model = ModelSerie::find($request->model_series_id);
+
                             $biayaPerAction = (int)filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
                             $bonus_leveling = \App\Models\BonusLeveling::where('id_user',$cekTeknisi->id)
                             ->where('id_jenis_barang',$request->types_id)
@@ -271,6 +273,11 @@ class TransaksiServisLangsungController extends Controller
                 $transfer = 0;
                 $due = 0;
                 $pay = 0;
+
+                $transfer = $biayaFinal;
+                $tunai = 0;
+                $due = 0;
+                $pay = $biayaFinal;
 
                 if ($request->cara_pembayaran === 'Tunai & Transfer') {
                     $due = 0;
@@ -537,6 +544,8 @@ class TransaksiServisLangsungController extends Controller
                                 $nama_model = ModelSerie::find($request->model_series_id);
                                 $bonus_interface = $nama_model->nominal_bonus ?? 0;
                             }elseif ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface Leveling') {
+                                $nama_model = ModelSerie::find($request->model_series_id);
+
                                 $biayaPerAction = (int)filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
                                 $bonus_leveling = \App\Models\BonusLeveling::where('id_user',$cekTeknisi->id)
                                 ->where('id_jenis_barang',$request->types_id)

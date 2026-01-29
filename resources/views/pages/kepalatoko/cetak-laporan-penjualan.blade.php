@@ -157,6 +157,21 @@
 		</tbody>
 	</table>
 
+    <h4 style="margin-top: 15px; margin-bottom: 6px; text-decoration: underline;">
+        Pembayaran Lain
+    </h4>
+    <table id="ringkasan">
+        <tbody>
+            @foreach(array_chunk($dataOtherMetodePembayaran, 3) as $row)
+                <tr>
+                    @foreach($row as $data)
+                        <th>{{ $data['metode'] }}</th>
+                        <th>: Rp. {{ number_format($data['total']) }}</th>
+                    @endforeach
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 	<h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
 		Detail Penjualan
 	</h4>
@@ -235,6 +250,8 @@
                         @elseif ($item->order->payment_method == 'Tunai & Transfer')
                             Tunai : Rp. {{ number_format($item->order->tunai) }} <br> <hr>
                             Transfer : Rp. {{ number_format($item->order->transfer) }}
+                        @else
+                            {{ $item->order->payment_method }} : Rp. {{ number_format($item->order->transfer) }}
                         @endif
                     </td>
 				</tr>

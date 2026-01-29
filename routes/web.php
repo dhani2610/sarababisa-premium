@@ -690,6 +690,9 @@ Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisControll
 });
 
 // Route::get('izin', [MasterIzinController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
+Route::get('payment/{id}', [KepalaTokoTransaksiServisController::class, 'payment'])->name('payment');
+Route::get('payment/success/{id}', [KepalaTokoTransaksiServisController::class, 'paymentSuccess'])->name('payment.success');
+
 Route::get('nota-qc/{id}', [KepalaTokoTransaksiServisController::class, 'cetakQc'])->name('kepalatoko-cetak-qc');
 Route::get('nota-qc-garansi/{id}', [HistoryGaransiController::class, 'cetakQcGaransi'])->name('kepalatoko-cetak-qc-garansi');
 Route::get('nota-terima-inkjet/{id}', [KepalaTokoTransaksiServisController::class, 'cetakinkjet'])->name('kepalatoko-cetak-inkjet');

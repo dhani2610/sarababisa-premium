@@ -20,6 +20,7 @@
         "laravel/tinker": "^2.7",
         "livewire/livewire": "^2.5",
         "maatwebsite/excel": "^3.1",
+        "midtrans/midtrans-php": "^2.6",
         "picqer/php-barcode-generator": "^3.2",
         "realrashid/sweet-alert": "^7.0",
         "silviolleite/laravelpwa": "^2.0",

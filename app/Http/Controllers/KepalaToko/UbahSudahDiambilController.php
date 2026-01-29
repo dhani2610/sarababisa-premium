@@ -245,6 +245,16 @@ class UbahSudahDiambilController extends Controller
         $due = 0;
         $pay = 0;
 
+        $transfer = $biayaFinal;
+        $tunai = 0;
+        $due = 0;
+        $pay = $biayaFinal;
+
+        $transfer = $biayaFinal;
+        $tunai = 0;
+        $due = 0;
+        $pay = $biayaFinal;
+
         if ($request->cara_pembayaran === 'Tunai & Transfer') {
             $due = 0;
             if ($request->tunai != 0) {

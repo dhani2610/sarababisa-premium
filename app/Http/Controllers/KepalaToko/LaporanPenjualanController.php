@@ -281,7 +281,7 @@ class LaporanPenjualanController extends Controller
 
         // Hitung Data dari Order (Pembayaran)
         $total_tunai    = (clone $orderQuery)->sum('tunai');
-        $total_transfer = (clone $orderQuery)->sum('transfer');
+        $total_transfer = (clone $orderQuery)->whereNotIn('payment_method',getMetodePembayaran()->pluck('nama'))->sum('transfer');
         $total_kredit   = (clone $orderQuery)->sum('due'); // due = hutang/kredit
 
 
@@ -293,6 +293,13 @@ class LaporanPenjualanController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
         $total_pengeluaran = $expenses->sum('price');
+
+        $dataOtherMetodePembayaran = [];
+        foreach (getMetodePembayaran() as $key => $value) {
+            $dt['metode'] = $value->nama;
+            $dt['total']    = (clone $orderQuery)->where('payment_method',$value->nama)->sum('transfer');
+            array_push($dataOtherMetodePembayaran,$dt);
+        }
 
         // 6. RENDER PDF
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-penjualan', [
@@ -307,6 +314,7 @@ class LaporanPenjualanController extends Controller
             'total_profit'    => $total_profit,
             'total_diskon'    => $total_diskon,
             'total_tunai'     => $total_tunai,
+            'dataOtherMetodePembayaran'     => $dataOtherMetodePembayaran,
             'total_transfer'  => $total_transfer,
             'total_kredit'    => $total_kredit,
             'pengeluaran_data'          => $expenses, // Kirim variabel expenses yg sudah di query
