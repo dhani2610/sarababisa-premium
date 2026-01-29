@@ -245,7 +245,7 @@ class TransaksiServisController extends Controller
                     </div>';
             }
             // Kirim Fontee / manual WA button — gunakan JS function kirimFontee(...) di blade
-            $tokoName = e(config('app.name'));
+            $tokoName = e($kp->nama_toko);
             $notaLink = route('kepalatoko-cetak-inkjet', $row->id);
             $notaQc = route('kepalatoko-cetak-qc', $row->id);
             $trackingLink = env('APP_URL') . '/tracking';

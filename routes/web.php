@@ -12,6 +12,7 @@ use App\Http\Controllers\DefaultController;
 use App\Http\Controllers\GaransiController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\HakAksesController;
+use App\Http\Controllers\MetodePembayaranController;
 use App\Http\Controllers\TrackingController;
 // Kepala Toko
 use App\Http\Controllers\DashboardController;
@@ -448,6 +449,12 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
     Route::get('master-warna/data', [KepalaTokoMasterWarnaController::class, 'getData'])->name('master-warna.data');
     Route::resource('master/master-warna', KepalaTokoMasterWarnaController::class);
 
+
+    Route::prefix('master')->group(function () {
+        Route::post('metode-pembayaran/delete-batch', [MetodePembayaranController::class, 'deleteBatch'])->name('metode-pembayaran.delete-batch');
+        Route::get('metode-pembayaran/data', [MetodePembayaranController::class, 'getData'])->name('metode-pembayaran.data');
+        Route::resource('metode-pembayaran', MetodePembayaranController::class);
+    });
 
     Route::get('master-tipe-os/data', [TipeOsController::class, 'getData'])->name('master-tipe-os.data');
     Route::post('master-tipe-os/delete-batch', [TipeOsController::class, 'deleteBatch'])->name('master-tipe-os.delete-batch');
