@@ -181,7 +181,7 @@ class ProdukController extends Controller
                 })
                 // Harga Jual Toko
                 ->addColumn('harga_jual_toko', function ($row) {
-                    return '<div class="font-medium">Rp. ' . number_format($row->harga_jual_toko ?? 0) . '</div>';
+                    return '<div class="font-medium">Rp. ' . number_format((int)$row->harga_jual_toko ?? 0) . '</div>';
                 })
                 // Harga Jual Pelanggan
                 ->addColumn('harga_jual', function ($row) {
