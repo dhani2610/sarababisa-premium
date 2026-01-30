@@ -88,7 +88,8 @@ class ServisBelumDisetujuiController extends Controller
             // ✅ Hubungi (whatsapp + fonnte)
             ->addColumn('hubungi', function ($row) {
                  if (!$row->customer) return '';
-                    $toko = StoreSetting::first();
+                    $toko = StoreSetting::where('cabang_id',$row->cabang_id)->first();
+
                     $nomor = $row->customer->nomor_hp;
                     $nomorwa = preg_replace('/^08/', '628', $nomor);
                     $fonnteToken = $toko->fonnte ?? null;

@@ -43,7 +43,8 @@ class PosController extends Controller
     public function show($id)
     {
         $order = Order::with('customer', 'detailOrders')->where('id', $id)->first();
-        $toko = StoreSetting::first();
+        $toko = StoreSetting::where('cabang_id',$order->cabang_id)->first();
+
         return view('pages/admintoko/pos/cetak', compact('order', 'toko'));
     }
 

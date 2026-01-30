@@ -186,7 +186,7 @@ class SudahDiambilController extends Controller
                     } else {
                         // 💬 Manual via WhatsApp
                         $btn .= '
-                            <a href="https://wa.me/' . $nomorwa . '/?text=' . $waMessage . '" target="_blank"
+                            <a href="https://wa.me/' . $nomorwa . '?text=' . $waMessage . '" target="_blank"
                                 title="Kirim manual via WhatsApp">
                                 <svg xmlns=\'http://www.w3.org/2000/svg\' class=\'icon icon-tabler icon-tabler-file-invoice\' width=\'20\' height=\'20\' viewBox=\'0 0 24 24\' stroke-width=\'1.5\' stroke=\'#00abfb\' fill=\'none\' stroke-linecap=\'round\' stroke-linejoin=\'round\'>
                                     <path stroke=\'none\' d=\'M0 0h24v24H0z\' fill=\'none\'/>
