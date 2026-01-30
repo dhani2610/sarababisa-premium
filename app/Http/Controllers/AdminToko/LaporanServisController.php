@@ -32,18 +32,20 @@ class LaporanServisController extends Controller
             ->where('cabang_id',getCabangId())
             ->get()
             ->sum('profittoko');
-        $omzetbulan = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->where('cabang_id',getCabangId())
-            ->get()
-            ->sum('omzet');
+        // $omzetbulan = ServiceTransaction::with('serviceaction')
+        //     ->where('is_approve', 'Setuju')
+        //     ->whereMonth('tgl_disetujui', $currentMonth)
+        //     ->where('cabang_id',getCabangId())
+        //     ->get()
+        //     ->sum('omzet');
+        $omzetbulan = ServiceTransaction::where('is_approve', 'Setuju')->where('cabang_id', getCabangId())->whereYear('tgl_disetujui', $currentYear)->whereMonth('tgl_disetujui', $currentMonth)->sum('omzet');
+
         $profitbulan = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->whereMonth('tgl_disetujui', $currentMonth)
             ->where('cabang_id',getCabangId())
             ->get()
-            ->sum('profittoko');
+            ->sum('profit');
         $omzettahun = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', $currentYear)
@@ -55,7 +57,7 @@ class LaporanServisController extends Controller
             ->whereYear('tgl_disetujui', $currentYear)
             ->where('cabang_id',getCabangId())
             ->get()
-            ->sum('profittoko');
+            ->sum('profit');
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
         return view('pages/admintoko/laporan-servis', compact('omzethari', 'profithari', 'omzetbulan', 'profitbulan', 'omzettahun', 'profittahun', 'toko'));
     }

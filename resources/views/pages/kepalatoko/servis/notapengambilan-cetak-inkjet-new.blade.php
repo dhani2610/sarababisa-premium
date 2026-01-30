@@ -177,6 +177,8 @@
                             Transfer Rp. {{ number_format($items->transfer) }}
                         @elseif ($items->cara_pembayaran === 'Kredit')
                             Rp. {{ number_format($items->due) }} ({{ \Carbon\Carbon::parse($items->tempo)->locale('id')->translatedFormat('d F Y') }})
+                        @else
+                            {{ $items->cara_pembayaran  }} Rp. {{ number_format($items->transfer) }}
                         @endif
                     </td>
                 @endif
