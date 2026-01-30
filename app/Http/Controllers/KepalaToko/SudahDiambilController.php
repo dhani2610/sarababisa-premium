@@ -101,7 +101,10 @@ class SudahDiambilController extends Controller
                  if (!$row->customer) return '';
                     $toko = StoreSetting::where('cabang_id',$row->cabang_id)->first();
                     $nomor = $row->customer->nomor_hp;
-                    $nomorwa = preg_replace('/^08/', '628', $nomor);
+                    $nomorClean = preg_replace('/[^0-9]/', '', $nomor);
+
+                    // 2. Baru ubah 08 menjadi 628
+                    $nomorwa = preg_replace('/^08/', '628', $nomorClean);
                     $fonnteToken = $toko->fonnte ?? null;
                     $hasToken = !empty($fonnteToken);
 
