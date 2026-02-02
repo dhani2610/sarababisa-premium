@@ -132,6 +132,7 @@ class LaporanTeknisiController extends Controller
                 ->where('is_approve', 'Setuju')
                 ->where('tipe', 'Hardware')
                 ->sum('profit');
+                // ->get();
 
 
         $bonusTeknisiServisInterface = TeknisiServis::where('users_id', $request->users_id)
@@ -157,6 +158,7 @@ class LaporanTeknisiController extends Controller
                 return $item->profit * ($item->persen_teknisi / 100);
             });
 
+            // dd($total_profit,$teknisi->persen);
         // $total_bonus_prof = $total_profit / 100 * $teknisi->persen +$bonusTeknisiServisHardware;
         // $total_bonus = $total_bonus_prof + $total_profit_interface + $bonusTeknisiServisInterface ;
         $total_bonus_prof = $total_profit / 100 * $teknisi->persen ;

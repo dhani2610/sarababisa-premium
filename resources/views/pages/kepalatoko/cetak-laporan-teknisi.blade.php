@@ -170,7 +170,7 @@
                                 @php
                                     $bonus = bonusTeknisiMultiHardwareByTransactionId($item->id,$item->users_id);
                                 @endphp
-                                {{-- @dd(getTypeTeknisiMultiTransaksi($item->id,$item->users_id)->tipe,$bonus) --}}
+                                {{-- @dd(bonusTeknisiMultiHardwareByTransactionId($item->id,$item->users_id)->tipe,$bonus) --}}
 
                                 Rp. {{ number_format($bonus) }}
                             @else

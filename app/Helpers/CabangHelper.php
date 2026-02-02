@@ -184,12 +184,18 @@ if (!function_exists('bonusTeknisiMultiInterfaceByTransactionId')) {
         $currentYear = now()->year;
         $currentMonth = now()->month;
 
-        $teknisiServisInterface = TeknisiServis::where('service_transactions_id', $transactionId)->where('users_id', $userId)
-            ->whereIn('tipe', ['Interface','Interface Leveling'])
+        // $teknisiServisInterface = TeknisiServis::where('service_transactions_id', $transactionId)->where('users_id', $userId)
+        //     ->whereIn('tipe', ['Interface','Interface Leveling'])
 
+        //     ->sum('bonus_interface');
+
+        $total_profit_interface = ServiceTransaction::where('id', $transactionId)->where('users_id', $userId)
+        ->where('cabang_id',getCabangId())
+            ->whereIn('tipe', ['Interface','Interface Leveling'])
+            ->where('is_approve', 'Setuju')
             ->sum('bonus_interface');
 
-        return $teknisiServisInterface;
+        return $total_profit_interface;
     }
 }
 if (!function_exists('bonusTeknisiMultiHardwareByTransactionId')) {
@@ -203,14 +209,22 @@ if (!function_exists('bonusTeknisiMultiHardwareByTransactionId')) {
         $currentYear = now()->year;
         $currentMonth = now()->month;
 
-        $teknisiServisHardware = TeknisiServis::where('service_transactions_id', $transactionId)->where('users_id', $userId)
-            ->where('tipe', 'Hardware')
-            ->get()
-            ->sum(function ($item) {
-                return $item->profit * ($item->persen_teknisi / 100);
-            });
+        // $teknisiServisHardware = TeknisiServis::where('service_transactions_id', $transactionId)->where('users_id', $userId)
+        //     ->where('tipe', 'Hardware')
+        //     // ->where('is_approve', 'Setuju')
+        //     ->get()
+        //     ->sum(function ($item) {
+        //         return $item->profit * ($item->persen_teknisi / 100);
+        //         // return $item->profit;
+        //     });
 
-        return $teknisiServisHardware;
+        $usr = User::find($userId);
+        $total_profit = ServiceTransaction::where('id', $transactionId)->where('users_id', $userId)
+                ->where('tipe', 'Hardware')
+                ->sum('profit');
+        $total_bonus_prof = $total_profit / 100 * $usr->persen ;
+
+        return $total_bonus_prof;
     }
 }
 if (!function_exists('getTypeTeknisiMultiTransaksi')) {
