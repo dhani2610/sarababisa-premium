@@ -5,6 +5,7 @@ namespace App\Http\Controllers\KepalaToko;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\ServiceTransaction;
+use App\Models\Expense;
 
 class DataServisController extends ApiController
 {
@@ -40,11 +41,17 @@ class DataServisController extends ApiController
             ->where('is_approve', 'Setuju')
             ->sum('profit');
 
-             $bulanprofitkotorservis = ServiceTransaction::where('cabang_id', getCabangId())
+            $bulanprofitkotorservis = ServiceTransaction::where('cabang_id', getCabangId())
             ->whereYear('tgl_disetujui', $data->year)
             ->whereMonth('tgl_disetujui', $data->month)
             ->where('is_approve', 'Setuju')
             ->sum('profit');
+
+            $operasionalServis = Expense::where('cabang_id', getCabangId())
+                ->where('tipe',1)
+                ->whereYear('created_at', $data->year)
+                ->whereMonth('created_at', $data->month)
+                ->sum('price');
 
             $omzetservis = ServiceTransaction::where('cabang_id', getCabangId())
             ->where('status_servis', 'Sudah Diambil')
@@ -55,7 +62,7 @@ class DataServisController extends ApiController
 
             $omzet[] = $omzetservis;
             $profitkotor[] = $bulanprofitkotorservis;
-            $profitbersih[] = $bulanprofitbersihservis;
+            $profitbersih[] = $bulanprofitkotorservis - $operasionalServis;
         }
 
         $data = [
