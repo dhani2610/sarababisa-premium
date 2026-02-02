@@ -390,6 +390,15 @@ class LaporanServisController extends Controller
     {
         // Mengambil logo dan nama toko
         $users = User::find(1);
+        if (getCabangId() == 1) {
+            $users = User::find(1);
+        }else{
+            $users = User::where('cabang_id',getCabangId())->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
 

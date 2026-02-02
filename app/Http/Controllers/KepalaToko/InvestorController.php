@@ -53,7 +53,7 @@ class InvestorController extends Controller
                 $serviceCount  = (clone $serviceQuery)->count();
                 $serviceOmset  = (clone $serviceQuery)->sum('biaya');
                 $serviceModal  = (clone $serviceQuery)->sum('modal_sparepart');
-                $serviceProfit = (clone $serviceQuery)->sum('profittoko');
+                $serviceProfit = (clone $serviceQuery)->sum('profit');
             }
 
             // --- B. DATA PENJUALAN PRODUK (Status: Setuju) ---
@@ -83,6 +83,7 @@ class InvestorController extends Controller
             // kecuali ada request khusus untuk memisahkan expense per kategori.
 
             $operasionalToko = Expense::where('cabang_id', $cabangId)
+                ->where('tipe', 0)
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
                 ->sum('price');
             if ($filterCategory == 'service') {
