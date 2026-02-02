@@ -177,7 +177,7 @@
                                             <label class="block text-sm font-bold text-slate-800">Setting Bonus Leveling Interface</label>
                                             <div class="flex space-x-2">
                                                 <input type="file" id="excel_file" accept=".xlsx, .xls" style="display: none;" onchange="processExcel(this)">
-                                                
+
                                                 <button type="button" class="btn-xs bg-indigo-500 hover:bg-indigo-600 text-white" onclick="document.getElementById('excel_file').click()">
                                                     Import
                                                 </button>
@@ -185,7 +185,7 @@
                                                 <button type="button" class="btn-xs bg-emerald-500 hover:bg-emerald-600 text-white" onclick="addLevelingRow()">+ Tambah</button>
                                             </div>
                                         </div>
-                                        
+
                                         <div id="leveling-rows-wrapper" class="space-y-2">
                                             @if($bonusLeveling->count() > 0)
                                                 {{-- Jika data ada, loop data --}}
@@ -430,8 +430,8 @@
         // Ambil elemen berdasarkan ID saat fungsi dijalankan
         const role = document.getElementById('role').value;
         // Gunakan optional chaining (?.) untuk menghindari error jika elemen tidak ada
-        const bagianTeknisi = document.getElementById('bagian_teknisi')?.value; 
-        
+        const bagianTeknisi = document.getElementById('bagian_teknisi')?.value;
+
         const extraFields = document.getElementById('extra-fields');
         const uploadInvestor = document.getElementById('upload-investor');
         const bonusAdmin = document.getElementById('bonus-admin');
@@ -480,15 +480,20 @@
             ShiftInput.style.display = 'block';
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
-            
+
             bonusInterfaceInput.style.display = 'block';
 
             if (bagianTeknisi === 'Teknisi Interface') {
                 if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'block';
                 if(bonusPersen) bonusPersen.style.display = 'none';
             } else {
-                if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
-                if(bonusPersen) bonusPersen.style.display = 'block';
+
+                bonusLevelingContainer.style.display = 'none';
+                bonusPersen.style.display = 'block';
+
+                console.log('====================================');
+                console.log(bonusPersen);
+                console.log('====================================');
             }
 
         } else if (role === 'Sales') {
@@ -505,7 +510,7 @@
         }
     }
 
-    
+
     function processExcel(input) {
         if(!input.files || !input.files[0]) return;
 
@@ -515,11 +520,11 @@
         reader.onload = function(e) {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, {type: 'array'});
-            
+
             // Ambil sheet pertama
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
-            
+
             // Konversi ke JSON
             // Header Excel harus: id_jenis_barang, id_tipe_os, dari_rate, sampai_rate, nominal_bonus
             const jsonData = XLSX.utils.sheet_to_json(worksheet);
@@ -529,7 +534,7 @@
                 jsonData.forEach(row => {
                     appendExcelRow(row);
                 });
-                
+
                 // Reset input file agar bisa upload file yang sama jika perlu revisi
                 input.value = '';
                 alert('Berhasil import ' + jsonData.length + ' baris data!');
@@ -545,17 +550,17 @@
         const wrapper = document.getElementById('leveling-rows-wrapper');
         // Kita clone dari row pertama yang sudah ada di HTML (Template)
         const templateRow = wrapper.querySelector('.leveling-row');
-        
+
         if(!templateRow) {
             alert('Tidak ada template baris. Pastikan minimal ada 1 baris input.');
             return;
         }
 
         const newRow = templateRow.cloneNode(true);
-        
+
         // Mapping data excel ke input
         // Pastikan nama kolom di Excel sesuai (case sensitive biasanya, tapi kita handle basic)
-        
+
         const selJenis = newRow.querySelector('select[name="lvl_id_jenis_barang[]"]');
         const selOs = newRow.querySelector('select[name="lvl_id_tipe_os[]"]');
         const inpStart = newRow.querySelector('input[name="lvl_start_rate[]"]');
@@ -564,9 +569,9 @@
 
         // Set Value dari Excel
         // Menggunakan optional chaining (?.) dan fallback || ''
-        if(selJenis) selJenis.value = data['id_jenis_barang'] || data['ID Jenis Barang']; 
+        if(selJenis) selJenis.value = data['id_jenis_barang'] || data['ID Jenis Barang'];
         if(selOs) selOs.value = data['id_tipe_os'] || data['ID Tipe OS'];
-        
+
         // Format Rupiah untuk inputan angka
         // Fungsi helper formatRupiahManual ada di bawah
         if(inpStart) inpStart.value = formatRupiahManual(data['dari_rate'] || data['Dari Rate']);
@@ -586,19 +591,19 @@
     function addLevelingRow() {
         const wrapper = document.getElementById('leveling-rows-wrapper');
         const firstRow = wrapper.querySelector('.leveling-row');
-        
+
         if(firstRow) {
             const newRow = firstRow.cloneNode(true);
             const inputs = newRow.querySelectorAll('input');
             inputs.forEach(input => input.value = ''); // Reset value
-            
+
             // Format ulang rupiah untuk row baru jika ada class input-currency
             inputs.forEach(input => {
                  if(input.classList.contains('input-currency')) {
                      formatRupiahInput(input);
                  }
             });
-            
+
             wrapper.appendChild(newRow);
         }
     }
@@ -617,12 +622,12 @@
     function toggleBonusType() {
         const tipeElement = document.getElementById('tipe_bonus_admin');
         const roleElement = document.getElementById('role');
-        
+
         if(!tipeElement || !roleElement) return;
 
         const tipe = tipeElement.value;
         const roleAkun = roleElement.value;
-        const containerBonusTetap = document.querySelector('div#bonus-tetap'); 
+        const containerBonusTetap = document.querySelector('div#bonus-tetap');
         const bonusPersen = document.getElementById('bonus-persen');
 
         if(containerBonusTetap) containerBonusTetap.style.display = 'none';
@@ -645,8 +650,8 @@
         });
 
         // Jalankan toggleInputs pertama kali
-        toggleInputs();
         toggleBonusType();
+        toggleInputs();
 
         // Listener tambahan (opsional, karena sudah ada onchange di HTML)
         const roleSelect = document.getElementById('role');

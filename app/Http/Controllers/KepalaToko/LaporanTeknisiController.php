@@ -18,6 +18,7 @@ class LaporanTeknisiController extends Controller
 
         // Untuk Modal Cetak Laporan
         $users = User::where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
+        // $users = User::where('id',50)->where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
 
         return view('pages/kepalatoko/laporan-teknisi', compact('users'));
     }
@@ -71,7 +72,16 @@ class LaporanTeknisiController extends Controller
     public function cetak(Request $request)
     {
         // Mengambil logo dan nama toko
-        $users = User::find(1);
+        // $users = User::find(1);
+        if (getCabangId() == 1) {
+            $users = User::find(1);
+        }else{
+            $users = User::where('cabang_id',getCabangId())->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);

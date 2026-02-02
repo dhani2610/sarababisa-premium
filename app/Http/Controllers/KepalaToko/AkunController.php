@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\KepalaToko\UserRequest;
 use App\Models\Shift;
 use Yajra\DataTables\Facades\DataTables;
-use App\Models\TipeOs; 
+use App\Models\TipeOs;
 use App\Models\BonusLeveling;
 
 class AkunController extends Controller
@@ -126,7 +126,7 @@ class AkunController extends Controller
             })
             ->editColumn('bagian_teknisi', function ($row) {
                 $html = '<div class="font-medium">' . ($row->bagian_teknisi ?? '-') . '</div>';
-                
+
                 if ($row->role == 'Teknisi' && $row->bagian_teknisi == 'Teknisi Interface') {
                     // Tombol trigger modal detail
                     $html .= '<button type="button" class="btn-xs bg-indigo-500 text-white rounded mt-1 btn-detail-bonus" data-id="'.$row->id.'">Lihat Leveling</button>';
@@ -342,7 +342,7 @@ class AkunController extends Controller
         $workers = Worker::where('cabang_id', $cabangId)->get();
 
         $shift = Shift::where('cabang_id', $cabangId)->get();
-
+        // return response()->json($item);
         return view('pages.kepalatoko.akun-edit', [
             'types' => $types,
             'item' => $item,
@@ -471,7 +471,7 @@ class AkunController extends Controller
             }
         }
 
-        
+
 
         $data = [
             'name' => $request->name,
@@ -540,8 +540,8 @@ class AkunController extends Controller
             ->leftJoin('types', 'bonus_levelings.id_jenis_barang', '=', 'types.id') // Adjust nama table types
             ->leftJoin('tipe_os', 'bonus_levelings.id_tipe_os', '=', 'tipe_os.id') // Adjust nama table tipe_os
             ->select(
-                'bonus_levelings.*', 
-                'types.name as category_name', 
+                'bonus_levelings.*',
+                'types.name as category_name',
                 'tipe_os.nama as nama'
             )
             ->get();
