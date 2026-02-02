@@ -119,8 +119,8 @@
                         </div>
                     </div>
                 </div>
-            </div>                         
-            
+            </div>
+
         </div>
 
     </div>
@@ -188,7 +188,7 @@
                         @php
                             $i = 1
                         @endphp
-                        @foreach($targets as $item)                  
+                        @foreach($targets as $item)
                             <tr>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
@@ -284,7 +284,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>                                            
+                                            </div>
                                         </div>
                                         <!-- End -->
                                     </div>
@@ -349,7 +349,7 @@
                     });
                 },
             }))
-        })    
+        })
     </script>
 
     <!-- Pagination -->

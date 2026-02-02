@@ -14,6 +14,7 @@ class TargetBulanSebelumnyaController extends Controller
 {
     public function store(Request $request)
     {
+        // dd('msk');
         $target = Budget::all()->sum('total');
 
         $lastMonth = now()->subMonth(); // Mendapatkan tanggal bulan sebelumnya
@@ -23,13 +24,13 @@ class TargetBulanSebelumnyaController extends Controller
 
         $date = $lastMonth->endOfMonth(); // Set the value of $date to the last date of the previous month
 
-        $bulanprofitbersihservis = ServiceTransaction::whereYear('tgl_ambil', $year)
-            ->whereMonth('tgl_ambil', $month)
+        $bulanprofitbersihservis = ServiceTransaction::where('cabang_id',getCabangId())->whereYear('tgl_disetujui', $year)
+            ->whereMonth('tgl_disetujui', $month)
             ->where('is_approve', 'Setuju')
             ->get()
-            ->sum('profittoko');
+            ->sum('profit');
 
-        $profitpenjualan = Order::whereHas('detailOrders', function ($query) use ($year, $month) {
+        $profitpenjualan = Order::where('cabang_id',getCabangId())->whereHas('detailOrders', function ($query) use ($year, $month) {
             $query->whereYear('created_at', $year)
                 ->whereMonth('created_at', $month)
                 ->where('is_approve', 'Setuju');
@@ -50,6 +51,7 @@ class TargetBulanSebelumnyaController extends Controller
         $persen = round(($bulantotalprofitbersih / $target) * 100);
 
         Target::create([
+            'cabang_id' => getCabangId(),
             'target' => $target,
             'persen' => $persen,
             'nilai' => $bulantotalprofitbersih,
