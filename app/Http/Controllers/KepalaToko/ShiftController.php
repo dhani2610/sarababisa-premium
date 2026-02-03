@@ -100,7 +100,7 @@ class ShiftController extends Controller
             'nama_shift' => 'required|string|max:100',
             'jam_masuk' => 'required',
             'jam_pulang' => 'required',
-            'nominal_gaji' => 'required|integer',
+            'nominal_gaji' => 'nullable|integer',
             'potongan_terlambat' => 'required|integer',
             'potongan_tidak_masuk' => 'required|integer',
             'potongan_izin' => 'required|integer',
@@ -136,7 +136,7 @@ class ShiftController extends Controller
             'nama_shift' => 'required|string|max:100',
             'jam_masuk' => 'required',
             'jam_pulang' => 'required',
-            'nominal_gaji' => 'required|integer',
+            'nominal_gaji' => 'nullable|integer',
             'potongan_terlambat' => 'required|integer',
             'potongan_tidak_masuk' => 'required|integer',
             'potongan_izin' => 'required|integer',
@@ -155,11 +155,11 @@ class ShiftController extends Controller
             $user->save();
         }
 
-        $worker = Worker::find($item->worker_id);
-        if (!empty($worker)) {
-            $worker->gaji = $item->nominal_gaji;
-            $worker->save();
-        }
+        // $worker = Worker::find($item->worker_id);
+        // if (!empty($worker)) {
+        //     $worker->gaji = $item->nominal_gaji;
+        //     $worker->save();
+        // }
 
 
         toast('Shift berhasil diupdate.', 'success');

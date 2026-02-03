@@ -61,10 +61,11 @@
                                                 <input name="jam_pulang" type="time" class="form-input w-full" required>
                                             </div>
                                         </div>
-                                        <div>
+                                        <input name="nominal_gaji" type="hidden" class="form-input w-full sapator">
+                                        {{-- <div>
                                             <label class="block text-sm font-medium mb-1">Gaji Pokok</label>
                                             <input name="nominal_gaji" type="text" class="form-input w-full sapator" required>
-                                        </div>
+                                        </div> --}}
                                         <div class="flex gap-3">
                                             <div class="w-1/2">
                                                 <label class="block text-sm font-medium mb-1">Potongan Terlambat</label>
@@ -124,7 +125,7 @@
                             <th class="text-center px-2 py-3">Nama Shift</th>
                             <th class="text-center px-2 py-3">Jam Masuk</th>
                             <th class="text-center px-2 py-3">Jam Pulang</th>
-                            <th class="text-center px-2 py-3">Gaji Pokok</th>
+                            {{-- <th class="text-center px-2 py-3">Gaji Pokok</th> --}}
                             <th class="text-center px-2 py-3">Potongan Terlambat</th>
                             <th class="text-center px-2 py-3">Potongan Alfa</th>
                             <th class="text-center px-2 py-3">Potongan Izin</th>
@@ -175,10 +176,11 @@
                                     <input name="jam_pulang" type="time" x-model="editForm.jam_pulang" class="form-input w-full" required>
                                 </div>
                             </div>
-                            <div>
+                            <input name="nominal_gaji" type="text" x-model="editForm.nominal_gaji" class="form-input w-full sapator" required>
+                            {{-- <div>
                                 <label class="block text-sm font-medium mb-1">Gaji Pokok</label>
                                 <input name="nominal_gaji" type="text" x-model="editForm.nominal_gaji" class="form-input w-full sapator" required>
-                            </div>
+                            </div> --}}
                             <div class="flex gap-3">
                                 <div class="w-1/2">
                                     <label class="block text-sm font-medium mb-1">Potongan Terlambat</label>
@@ -291,7 +293,7 @@
                         {data: 'nama_shift', name: 'nama_shift', className: 'text-center'},
                         {data: 'jam_masuk', name: 'jam_masuk', className: 'text-center'},
                         {data: 'jam_pulang', name: 'jam_pulang', className: 'text-center'},
-                        {data: 'nominal_gaji', name: 'nominal_gaji', className: 'text-center'},
+                        // {data: 'nominal_gaji', name: 'nominal_gaji', className: 'text-center'},
                         {data: 'potongan_terlambat', name: 'potongan_terlambat', className: 'text-center'},
                         {data: 'potongan_tidak_masuk', name: 'potongan_tidak_masuk', className: 'text-center'},
                         {data: 'potongan_izin', name: 'potongan_izin', className: 'text-center'},
