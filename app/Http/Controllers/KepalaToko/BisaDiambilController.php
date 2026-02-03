@@ -13,6 +13,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ModelSerie;
 use Illuminate\Http\Request;
 use App\Models\ServiceAction;
+use App\Models\MetodePembayaran;
 use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
@@ -104,6 +105,13 @@ class BisaDiambilController extends Controller
                 } else {
                     $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
                 }
+
+                $metodePembayaranPaymentGateway = MetodePembayaran::where('is_payment_gateway',$row->cara_pembayaran)->first();
+                if (!empty($metodePembayaranPaymentGateway)) {
+                    $is_pg = true;
+                }else{
+                    $is_pg = false;
+                }
                 $banks = old('banks', json_decode($kp->banks ?? '[]', true));
 
                 $fonteeToken = StoreSetting::where('cabang_id',getCabangId())->first()->fonnte ?? null;
@@ -115,8 +123,17 @@ class BisaDiambilController extends Controller
                             "Kondisi: *{$row->kondisi_servis}*\n" .
                             "Tanggal: " . Carbon::parse($row->tgl_selesai)->translatedFormat('d F Y') . "\n" .
                             "Status: *{$row->status_servis}*\n" .
-                            "Biaya: Rp. " . number_format($row->biaya) . "\n\n" .
-                            "Link QC: {$notaQc}\n\n" ;
+                            "Biaya: Rp. " . number_format($row->biaya) . "\n\n";
+                            // "Link QC: {$notaQc}\n\n" ;
+
+                        if ($is_pg) {
+                            $message .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n";
+
+                            $message .= "Link Pembayaran : " . route('payment', $row->id) . "\n\n";
+                        } else {
+                            $message .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n\n";
+                        }
+
 
                 $rawPesan .= 'Informasi Pembayaran :' ."\n";
 
