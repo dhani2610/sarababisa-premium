@@ -113,13 +113,9 @@ class SudahDiambilController extends Controller
                     } else {
                         $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
                     }
-                    $metodePembayaranPaymentGateway = MetodePembayaran::where('is_payment_gateway',1)->first();
+                    $metodePembayaranPaymentGateway = MetodePembayaran::where('is_payment_gateway',$row->cara_pembayaran)->first();
                     if (!empty($metodePembayaranPaymentGateway)) {
-                        if($metodePembayaranPaymentGateway->nama == $row->cara_pembayaran){
-                            $is_pg = true;
-                        }else{
-                            $is_pg = false;
-                        }
+                        $is_pg = true;
                     }else{
                         $is_pg = false;
                     }

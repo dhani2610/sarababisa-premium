@@ -299,6 +299,7 @@
                                                 ' (Rp ' . number_format($item->price, 0, ',', '.') . ' x ' . $item->quantity . ' pcs)%0A';
                             }
 
+
                             // 3. Tambahkan Link QC di baris bawahnya
                             $waProductList .= "   📄 Cek QC: " . $linkQc . "%0A";
                         }
@@ -306,7 +307,19 @@
                     @php
                         $banks = json_decode($toko->banks ?? '[]', true);
 
-                        $infoBayar = 'Informasi Pembayaran :%0A';
+                        $metodePembayaranPaymentGateway = \App\Models\MetodePembayaran::where('is_payment_gateway',$item->payment_method)->first();
+                        if (!empty($metodePembayaranPaymentGateway)) {
+                            $is_pg = true;
+                        }else{
+                            $is_pg = false;
+                        }
+                        if ($is_pg) {
+                            $infoBayar = "Link Pembayaran : " . route('payment-produk', $order->id).'%0A';
+                            $infoBayar .= 'Informasi Pembayaran Lain nya:%0A';
+                        }else{
+                            $infoBayar = 'Informasi Pembayaran Lain nya:%0A';
+                        }
+
                         $infoBayar .= 'Bank : '. $toko->bank . '%0A';
                         $infoBayar .= 'Norek : '. $toko->rekening . '%0A';
                         $infoBayar .= 'a.n : '. $toko->pemilik_rekening . '%0A';

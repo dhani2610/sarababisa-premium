@@ -589,6 +589,10 @@ Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisControll
     Route::get('transaksi-produk/data', [App\Http\Controllers\KepalaToko\TransaksiProdukController::class, 'data'])->name('transaksi-produk.data');
     Route::get('transaksi-produk/data/lunas', [App\Http\Controllers\KepalaToko\TransaksiProdukController::class, 'dataLunas'])->name('transaksi-produk.data.lunas');
     Route::get('transaksi-produk/data/due', [App\Http\Controllers\KepalaToko\TransaksiProdukController::class, 'dataDue'])->name('transaksi-produk.data.due');
+
+    Route::get('payment-produk/{id}', [KepalaTokoTransaksiProdukController::class, 'payment'])->name('payment-produk');
+    Route::get('payment-produk/success/{id}', [KepalaTokoTransaksiProdukController::class, 'paymentSuccess'])->name('payment-produk.success');
+
     Route::resource('produk/transaksi-produk', KepalaTokoTransaksiProdukController::class);
     Route::get('/get-qc-data/{product_id?}', [KepalaTokoTransaksiProdukController::class, 'getQcData'])->name('get-qc-data');
     Route::post('/store-qc-data', [KepalaTokoTransaksiProdukController::class, 'storeQcData'])->name('store-qc-data');
@@ -690,6 +694,7 @@ Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisControll
 });
 
 // Route::get('izin', [MasterIzinController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
+// Route::get('payment-produk/{id}', [KepalaTokoTransaksiServisController::class, 'payment'])->name('payment-produk');
 Route::get('payment/{id}', [KepalaTokoTransaksiServisController::class, 'payment'])->name('payment');
 Route::get('payment/success/{id}', [KepalaTokoTransaksiServisController::class, 'paymentSuccess'])->name('payment.success');
 

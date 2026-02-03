@@ -10,13 +10,15 @@ use App\Models\Customer;
 use App\Models\OrderDetail;
 use App\Models\StoreSetting;
 use App\Models\QcProduk;
+use App\Models\MetodePembayaran;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
-
+use Midtrans\Config;
+use Midtrans\Snap;
 class TransaksiProdukController extends Controller
 {
     /**
@@ -804,7 +806,6 @@ class TransaksiProdukController extends Controller
     {
         // $toko = User::find(1);
         $order = Order::with('customer')->where('id', $orders_id)->first();
-
         if ($order->cabang_id == 1) {
             $toko = User::find(1);
         }else{
@@ -830,90 +831,116 @@ class TransaksiProdukController extends Controller
         return view('pages.kepalatoko.produk.transaksi-detail', compact('order', 'orderItem', 'total', 'subtotal', 'totalTax', 'toko', 'produkDetails'));
     }
 
-    // Tambahkan method ini untuk AJAX get data
-    public function getQcData($product_id = null)
+
+
+    public function payment($id)
     {
-        // 1. Cari Data QC berdasarkan Produk
-        $qcData = QcProduk::where('id_produk', $product_id)->first();
+        // 1. Load Order beserta Customer dan Detail Produknya
+        $order = Order::with(['customer'])->where('id', $id)->firstOrFail();
 
-        $mergedData = [];
+        // 2. Hitung Total Biaya dari item (agar akurat) atau dari kolom total di tabel order
+        // Disini saya ambil sum dari total per item agar aman
+        $orderDetails = OrderDetail::with('product')->where('orders_id', $id)->orderBy('id', 'DESC')->get();
 
-        if ($qcData) {
-            // PERHATIKAN: Menangani format JSON aneh ["[{...}]"] atau standard [{...}]
-            // Kita decoding 2 kali jika perlu, atau parsing array index 0
+        // dd($order->orderDetails);
+        $amount = (int) $orderDetails->sum('total');
 
-            $rawMasuk = json_decode($qcData->qc_masuk, true);
-            $rawKeluar = json_decode($qcData->qc_keluar, true);
-
-            // Fix jika formatnya string di dalam array ["[...]"]
-            if (is_array($rawMasuk) && count($rawMasuk) == 1 && is_string($rawMasuk[0])) {
-                $rawMasuk = json_decode($rawMasuk[0], true);
-            }
-            if (is_array($rawKeluar) && count($rawKeluar) == 1 && is_string($rawKeluar[0])) {
-                $rawKeluar = json_decode($rawKeluar[0], true);
-            }
-
-            // Mapping Data Masuk ke Array Key-Value biar mudah digabung
-            $mapMasuk = [];
-            if($rawMasuk) {
-                foreach ($rawMasuk as $row) {
-                    $mapMasuk[$row['item']] = [
-                        'value' => $row['value'],
-                        'is_custom' => $row['is_custom'] ?? false
-                    ];
-                }
-            }
-
-            // Mapping Data Keluar
-            $mapKeluar = [];
-            if($rawKeluar) {
-                foreach ($rawKeluar as $row) {
-                    $mapKeluar[$row['item']] = [
-                        'value' => $row['value'],
-                        'is_custom' => $row['is_custom'] ?? false
-                    ];
-                }
-            }
-
-            // GABUNGKAN (Merge) Item Masuk & Keluar
-            // Ambil semua nama item unik dari kedua sisi
-            $allItems = array_unique(array_merge(array_keys($mapMasuk), array_keys($mapKeluar)));
-
-            foreach ($allItems as $item) {
-                $mergedData[] = [
-                    'item'      => $item,
-                    'val_masuk' => $mapMasuk[$item]['value'] ?? '', // Value otomatis Masuk
-                    'val_keluar'=> $mapKeluar[$item]['value'] ?? '', // Value otomatis Keluar
-                    'is_custom' => ($mapMasuk[$item]['is_custom'] ?? false) || ($mapKeluar[$item]['is_custom'] ?? false)
-                ];
-            }
-
-        } else {
-            // JIKA DATA BELUM ADA (Baru) -> Load Template Default dari DB atau Array
-            // Contoh ambil dari tabel master: $templates = \App\Models\QcTemplate::pluck('nama_item')->toArray();
-            $templates = [
-                "CHECK FACE ID/FINGER", "CHECK FRONT CAM 1/2", "CHECK BACK CAM 1/2/3",
-                "CHECK CAM 30PFS,60PFS", "TOP SPEAKER", "BOTTOM SPEAKER",
-                "BODY HOUSING", "LCD (Truetone,Ts)", "NETWORK", "CALLING PHONE",
-                "BATTERY", "WIFI/BLUETOOTH", "ALL BUTTON", "CHARGING", "OTHER"
-            ];
-
-            foreach ($templates as $item) {
-                $mergedData[] = [
-                    'item'      => $item,
-                    'val_masuk' => '',
-                    'val_keluar'=> '',
-                    'is_custom' => false
-                ];
-            }
+        if ($amount <= 0) {
+            toast('Total biaya tidak valid atau Rp 0. Tidak bisa melakukan pembayaran online.', 'error');
+            return redirect()->back();
         }
 
-        return response()->json([
-            'status' => 'success',
-            'data'   => $mergedData // Ini data bersih yang dikirim ke JS
+        // --- KONFIGURASI MIDTRANS ---
+        Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        Config::$isProduction = false;
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        // --- SIAPKAN ITEM DETAILS UNTUK MIDTRANS (LOOPING) ---
+        $midtransItems = [];
+
+
+
+        foreach ($orderDetails as $detail) {
+            $midtransItems[] = [
+                'id'       => $detail->product_id, // ID Produk
+                'price'    => (int) $detail->price, // Harga Satuan
+                'quantity' => (int) $detail->quantity, // Jumlah
+                'name'     => substr($detail->product->product_name ?? 'Item Produk', 0, 50) // Nama Produk (Max 50 char)
+            ];
+        }
+
+        // Buat Order ID Unik
+        // Gunakan nomor invoice/transaksi produk, misal: INV-123-Timestamp
+        $orderId = $order->nomor_invoice . '-' . time(); // Pastikan ada kolom nomor_invoice atau id
+        // Jika pakai nomor_servis di table, ganti jadi: $order->id . '-' . time();
+
+        $params = [
+            'transaction_details' => [
+                'order_id'     => $orderId,
+                'gross_amount' => $amount,
+            ],
+            'customer_details' => [
+                'first_name' => $order->customer->nama,
+                'phone'      => $order->customer->nomor_hp,
+            ],
+            // Masukkan array item yang sudah di-looping tadi
+            'item_details' => $midtransItems
+        ];
+
+        try {
+            $snapToken = Snap::getSnapToken($params);
+        } catch (\Exception $e) {
+            $snapToken = null;
+        }
+
+        // --- AMBIL DATA USER (KEPALA TOKO) ---
+        if ($order->cabang_id == 1) {
+            $users = User::find(1);
+        } else {
+            $users = User::where('cabang_id', $order->cabang_id)
+                ->where('id', '!=', 1)
+                ->where('role', 'Kepala Toko')
+                ->orderBy('id', 'asc')
+                ->first();
+        }
+
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu...', 'error');
+            return redirect()->back();
+        }
+
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+        $metodePembayaran = MetodePembayaran::where('nama', $order->payment_method)->first();
+
+        return view('pages.kepalatoko.servis.payment-page-produk', [
+            'users'            => $users,
+            'items'            => $order, // Saya tetap namakan items agar view tidak banyak berubah
+            'orderDetails'     => $order->orderDetails, // Kirim detail produk ke view
+            'imagePath'        => $imagePath,
+            'snapToken'        => $snapToken,
+            'metodePembayaran' => $metodePembayaran,
+            'orderDetails' => $orderDetails,
+            'clientKey'        => env('MIDTRANS_CLIENT_KEY')
         ]);
     }
 
+    public function paymentSuccess(Request $request, $id)
+    {
+        $item = Order::findOrFail($id);
+
+        $item->status_pembayaran = 'paid'; // Sesuaikan nama kolom status
+
+        $item->external_id = $item->nomor_servis;
+        $item->paid_at = date('Y-m-d H:i:s');
+
+        $item->save();
+
+        // Redirect kembali dengan pesan sukses
+        toast('Pembayaran Berhasil! Status telah diperbarui.', 'success');
+        return redirect()->back();
+    }
     // Update pada method STORE untuk menyimpan ke tabel qc_produks
    public function storeQcData(Request $request)
     {

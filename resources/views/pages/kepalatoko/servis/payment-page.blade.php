@@ -230,30 +230,40 @@
                 <div class="total-amount">Rp {{ number_format($items->biaya, 0, ',', '.') }}</div>
             </div>
 
-            {{-- LOGIKA STATUS PEMBAYARAN --}}
-            @if($items->status_pembayaran == 'paid')
-                <div class="paid-stamp">
-                    ✓ LUNAS (PAID)
-                </div>
-                <div style="text-align: center; margin-top: 5px; font-size: 11px; color: #aaa;">
-                    Terimakasih atas kepercayaan Anda
-                </div>
+            @if ($metodePembayaran->is_payment_gateway == 1)
+                {{-- LOGIKA STATUS PEMBAYARAN --}}
+                @if($items->status_pembayaran == 'paid')
+                    <div class="paid-stamp">
+                        ✓ LUNAS (PAID)
+                    </div>
+                    <div style="text-align: center; margin-top: 5px; font-size: 11px; color: #aaa;">
+                        Terimakasih atas kepercayaan Anda
+                    </div>
+                @else
+                    <div style="text-align: center; margin-top: 15px; font-size: 12px; color: #666;">
+                        Silahkan selesaikan pembayaran untuk pengambilan unit.
+                    </div>
+                @endif
             @else
-                <div style="text-align: center; margin-top: 15px; font-size: 12px; color: #666;">
-                    Silahkan selesaikan pembayaran untuk pengambilan unit.
+
+                <div style="text-align: center; margin-top: 5px; font-size: 11px; color: #aaa;">
+                    <a target="_blank" href="{{ asset('storage/metode-pembayaran/' . $metodePembayaran->foto) }}"><img src="{{ asset('storage/metode-pembayaran/' . $metodePembayaran->foto) }}"  class=" w-auto object-contain rounded" /> </>
                 </div>
+
             @endif
         </div>
 
         <div class="card-footer no-print">
-            @if($items->status_pembayaran == 'paid')
-                <button onclick="window.print()" class="btn btn-print">
-                    <i class="fa fa-print"></i> Cetak Bukti Pembayaran
-                </button>
-            @else
-                <button id="pay-button" class="btn btn-primary">
-                    Bayar Sekarang
-                </button>
+            @if ($metodePembayaran->is_payment_gateway == 1)
+                @if($items->status_pembayaran == 'paid')
+                    <button onclick="window.print()" class="btn btn-print">
+                        <i class="fa fa-print"></i> Cetak Bukti Pembayaran
+                    </button>
+                @else
+                    <button id="pay-button" class="btn btn-primary">
+                        Bayar Sekarang
+                    </button>
+                @endif
             @endif
         </div>
     </div>

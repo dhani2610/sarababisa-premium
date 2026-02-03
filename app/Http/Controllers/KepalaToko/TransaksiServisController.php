@@ -17,6 +17,7 @@ use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
 use App\Models\Term;
 use App\Models\TipeOs;
+use App\Models\MetodePembayaran;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -1039,17 +1040,11 @@ class TransaksiServisController extends Controller
     {
         $items = ServiceTransaction::with(['customer', 'admin'])->findOrFail($id);
 
-        // --- 1. BERSIHKAN NILAI AMOUNT ---
-        // Pakai (int) untuk memaksa jadi angka bulat.
-        // Ini mengatasi error "Price is not a number"
         $amount = (int) $items->biaya;
         // dd($items);
 
-        // --- 2. CEK APAKAH NILAI 0 ATAU KURANG ---
-        // Mengatasi error "gross_amount harus sama atau lebih besar dari 0.01"
         if ($amount <= 0) {
             toast('Total biaya tidak valid atau Rp 0. Tidak bisa melakukan pembayaran online.', 'error');
-            // return redirect()->back();
         }
 
         // --- KONFIGURASI MIDTRANS ---
@@ -1060,7 +1055,6 @@ class TransaksiServisController extends Controller
 
         // --- CEK APAKAH SUDAH LUNAS ---
         if ($items->status_pembayaran == 'paid') {
-             // Opsional
         }
 
         // Buat Order ID Unik
@@ -1121,7 +1115,8 @@ class TransaksiServisController extends Controller
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
-
+        $metodePembayaran = MetodePembayaran::where('nama',$items->cara_pembayaran)->first();
+        // return response()->json([$metodePembayaran,$items]);
         return view('pages.kepalatoko.servis.payment-page', [
             'users' => $users,
             'items' => $items,
@@ -1130,6 +1125,7 @@ class TransaksiServisController extends Controller
             'qcKeluar' => $qcKeluar,
             'qcItems' => $qcItems,
             'snapToken' => $snapToken,
+            'metodePembayaran' => $metodePembayaran,
             'clientKey' => env('MIDTRANS_CLIENT_KEY')
         ]);
 
@@ -1149,7 +1145,7 @@ class TransaksiServisController extends Controller
 
         // Redirect kembali dengan pesan sukses
         toast('Pembayaran Berhasil! Status telah diperbarui.', 'success');
-        return redirect()->route('payment', $id);
+        return redirect()->back();
     }
 
     /**
