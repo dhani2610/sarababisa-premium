@@ -230,7 +230,7 @@
                 <div class="total-amount">Rp {{ number_format($items->biaya, 0, ',', '.') }}</div>
             </div>
 
-            @if ($metodePembayaran->is_payment_gateway == 1)
+            @if (!empty($metodePembayaran->is_payment_gateway) && $metodePembayaran->is_payment_gateway == 1)
                 {{-- LOGIKA STATUS PEMBAYARAN --}}
                 @if($items->status_pembayaran == 'paid')
                     <div class="paid-stamp">
