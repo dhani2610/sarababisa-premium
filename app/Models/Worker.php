@@ -19,6 +19,7 @@ class Worker extends Model
         'absen',
         'bpjs',
         'cabang_id',
+        'status_shift',
     ];
 
     // many to many

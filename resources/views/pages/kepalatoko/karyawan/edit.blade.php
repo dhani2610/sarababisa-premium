@@ -77,6 +77,33 @@
                         @method('PUT')
                         @csrf
                         <div class="px-5 py-4">
+
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-5 rounded-r">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-blue-800">Panduan Pengaturan Shift & Gaji</h3>
+                                    <div class="mt-2 text-sm text-blue-700">
+                                        <ul class="list-disc pl-5 space-y-1">
+                                            <li>
+                                                <span class="font-semibold">Gaji Pokok</span> terhubung langsung dengan data shift.
+                                            </li>
+                                            <li>
+                                                Untuk karyawan <span class="font-semibold">Rolling Shift</span>, pilih <u>General Shift</u> (Otomatis jam masuk/pulang nya menjadi 24 jam dan untuk potongan dapat di ubah di halaman shift).
+                                            </li>
+                                            <li>
+                                                Untuk karyawan <span class="font-semibold">Shift Tertentu</span>, pilih <u>Satu Shift</u> terlebih dahulu, lalu sesuaikan jam masuk/pulang dan potongan di halaman Shift.
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-5 py-4">
                             <div class="space-y-3">
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="name">Nama Karyawan</label>
@@ -100,11 +127,18 @@
                                     <label class="block text-sm font-medium mb-1" for="bulankerja">Bulan Kerja</label>
                                     <input id="bulankerja" name="bulankerja" class="form-input w-full px-2 py-1" type="date" value="{{ \Carbon\Carbon::parse($item->bulankerja)->format('Y-m-d') }}" />
                                 </div>
-                                    {{-- <div>
-                                        <label class="block text-sm font-medium mb-1" for="gaji">Gaji Pokok</label>
-                                        <input id="gaji" name="gaji" class="form-input w-full px-2 py-1" type="number" value="{{ $item->gaji }}"/>
-                                    </div> --}}
-                                <input id="gaji" name="gaji" class="form-input w-full px-2 py-1" type="hidden" value="{{ $item->gaji }}"/>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="status">Status Shift</label>
+                                    <select id="status_shift" name="status_shift" class="form-select text-sm py-1 w-full">
+                                        <option value="1" {{  (int)$item->status_aktif ==  1 ? 'selected' : '' }}>Multi Shift</option>
+                                        <option value="0" {{  (int)$item->status_aktif ==  0 ? 'selected' : '' }}>Satu Shift</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="gaji">Gaji Pokok</label>
+                                    <input id="gaji" name="gaji" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ $item->gaji }}"/>
+                                </div>
+                                {{-- <input id="gaji" name="gaji" class="form-input w-full px-2 py-1" type="hidden" value="{{ $item->gaji }}"/> --}}
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="absen">Tunjangan Kehadiran</label>
                                     <input id="absen" name="absen" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ $item->absen }}"/>
@@ -113,6 +147,7 @@
                                     <label class="block text-sm font-medium mb-1" for="bpjs">Tunjangan BPJS</label>
                                     <input id="bpjs" name="bpjs" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ $item->bpjs }}"/>
                                 </div>
+
                             </div>
                         </div>
                         <!-- Modal footer -->

@@ -45,8 +45,32 @@
                             <form action="{{ route('karyawan.store') }}" method="post">
                                 @csrf
                                 <div class="px-5 py-4">
+                                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-5 rounded-r">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <svg class="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h3 class="text-sm font-medium text-blue-800">Panduan Pengaturan Shift & Gaji</h3>
+                                                <div class="mt-2 text-sm text-blue-700">
+                                                    <ul class="list-disc pl-5 space-y-1">
+                                                        <li>
+                                                            <span class="font-semibold">Gaji Pokok</span> terhubung langsung dengan data shift.
+                                                        </li>
+                                                        <li>
+                                                            Untuk karyawan <span class="font-semibold">Rolling Shift</span>, pilih  <b><u>General Shift</u></b>  (Otomatis jam masuk/pulang nya menjadi 24 jam dan untuk potongan dapat di ubah di halaman shift).
+                                                        </li>
+                                                        <li>
+                                                            Untuk karyawan <span class="font-semibold">Shift Tertentu</span>, pilih <b><u>Satu Shift</u></b>  terlebih dahulu, lalu sesuaikan jam masuk/pulang dan potongan di halaman Shift.
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="space-y-3">
-                                        <span class="text-rose-500 text-sm">Untuk mengatur gaji pokok terdapat di menu shift.</span>
                                         <div><label class="block text-sm font-medium mb-1" for="name">Nama Karyawan
                                                 <span class="text-rose-500">*</span></label><input id="name"
                                                 name="name" class="form-input w-full px-2 py-1" type="text"
@@ -70,13 +94,20 @@
                                                 <span class="text-rose-500">*</span></label><input id="bulankerja"
                                                 name="bulankerja" class="form-input w-full px-2 py-1" type="date"
                                                 required /></div>
-                                        {{-- <div>
-                                                <label class="block text-sm font-medium mb-1" for="gaji">Gaji Pokok <span class="text-rose-500">*</span></label>
-                                                <div class="relative"><input id="gaji" name="gaji" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" required /><div class="absolute inset-0 right-auto flex items-center pointer-events-none"><span class="text-sm text-slate-400 font-medium px-3">Rp.</span></div></div>
-                                            </div> --}}
-                                        <input id="gaji" name="gaji"
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1" for="status">Status Shift</label>
+                                            <select id="status_shift" name="status_shift" class="form-select text-sm py-1 w-full">
+                                                <option value="Multi Shift">Multi Shift</option>
+                                                <option value="Satu Shift">Satu Shift</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1" for="gaji">Gaji Pokok <span class="text-rose-500">*</span></label>
+                                            <div class="relative"><input id="gaji" name="gaji" class="form-input w-full pl-10 px-2 py-1 input-currency" type="text" required /><div class="absolute inset-0 right-auto flex items-center pointer-events-none"><span class="text-sm text-slate-400 font-medium px-3">Rp.</span></div></div>
+                                        </div>
+                                        {{-- <input id="gaji" name="gaji"
                                             class="form-input w-full pl-10 px-2 py-1 input-currency" type="hidden"
-                                            value="0" />
+                                            value="0" /> --}}
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="absen">Absen Harian
                                                 <span class="text-rose-500">*</span></label>

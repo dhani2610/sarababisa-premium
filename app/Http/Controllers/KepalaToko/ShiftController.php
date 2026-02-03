@@ -155,6 +155,13 @@ class ShiftController extends Controller
             $user->save();
         }
 
+        $worker = Worker::find($item->worker_id);
+        if (!empty($worker)) {
+            $worker->gaji = $item->nominal_gaji;
+            $worker->save();
+        }
+
+
         toast('Shift berhasil diupdate.', 'success');
         return redirect()->route('shift.index');
     }
