@@ -257,7 +257,7 @@
         </div>
 
         <div class="card-footer no-print">
-            @if ($metodePembayaran->is_payment_gateway == 1)
+            @if (!empty($metodePembayaran->is_payment_gateway) && $metodePembayaran->is_payment_gateway == 1)
                 @if($items->status_pembayaran == 'paid')
                     <button onclick="window.print()" class="btn btn-print">
                         <i class="fa fa-print"></i> Cetak Bukti Pembayaran
