@@ -307,7 +307,7 @@
                     @php
                         $banks = json_decode($toko->banks ?? '[]', true);
 
-                        $metodePembayaranPaymentGateway = \App\Models\MetodePembayaran::where('is_payment_gateway',$item->payment_method)->first();
+                        $metodePembayaranPaymentGateway = \App\Models\MetodePembayaran::where('cabang_id',getCabangId())->where('nama',$item->payment_method)->first();
                         if (!empty($metodePembayaranPaymentGateway)) {
                             $is_pg = true;
                         }else{

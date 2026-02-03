@@ -102,7 +102,7 @@ class ServisBelumDisetujuiController extends Controller
                     }
                     $banks = old('banks', json_decode($kp->banks ?? '[]', true));
 
-                    $metodePembayaranPaymentGateway = MetodePembayaran::where('is_payment_gateway',$row->cara_pembayaran)->first();
+                    $metodePembayaranPaymentGateway = MetodePembayaran::where('cabang_id',getCabangId())->where('nama',$row->cara_pembayaran)->first();
                     if (!empty($metodePembayaranPaymentGateway)) {
                         $is_pg = true;
                     }else{

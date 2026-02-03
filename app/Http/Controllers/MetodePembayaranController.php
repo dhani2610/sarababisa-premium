@@ -18,7 +18,7 @@ class MetodePembayaranController extends Controller
 
     public function getData()
     {
-        $query = MetodePembayaran::latest();
+        $query = MetodePembayaran::where('cabang_id',getCabangId())->latest();
 
         return DataTables::of($query)
             ->addColumn('checkbox', function ($row) {

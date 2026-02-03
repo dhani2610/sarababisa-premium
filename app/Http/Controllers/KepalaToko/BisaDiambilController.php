@@ -106,7 +106,7 @@ class BisaDiambilController extends Controller
                     $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
                 }
 
-                $metodePembayaranPaymentGateway = MetodePembayaran::where('nama',$row->cara_pembayaran)->first();
+                $metodePembayaranPaymentGateway = MetodePembayaran::where('cabang_id',getCabangId())->where('nama',$row->cara_pembayaran)->first();
                 if (!empty($metodePembayaranPaymentGateway)) {
                     $is_pg = true;
                 }else{

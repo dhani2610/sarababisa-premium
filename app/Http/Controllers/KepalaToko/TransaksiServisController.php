@@ -1115,7 +1115,7 @@ class TransaksiServisController extends Controller
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
-        $metodePembayaran = MetodePembayaran::where('nama',$items->cara_pembayaran)->first();
+        $metodePembayaran = MetodePembayaran::where('cabang_id',getCabangId())->where('nama',$items->cara_pembayaran)->first();
         // return response()->json([$metodePembayaran,$items]);
         return view('pages.kepalatoko.servis.payment-page', [
             'users' => $users,

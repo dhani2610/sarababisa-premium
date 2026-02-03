@@ -912,7 +912,7 @@ class TransaksiProdukController extends Controller
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
-        $metodePembayaran = MetodePembayaran::where('nama', $order->payment_method)->first();
+        $metodePembayaran = MetodePembayaran::where('cabang_id',getCabangId())->where('nama', $order->payment_method)->first();
 
         return view('pages.kepalatoko.servis.payment-page-produk', [
             'users'            => $users,
