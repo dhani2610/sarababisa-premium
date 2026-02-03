@@ -188,6 +188,13 @@
             .btn, .no-print { display: none !important; }
             .paid-stamp { border: 2px solid black; color: black; }
         }
+        .responsive-img {
+            max-width: 100%;      /* Gambar mentok selebar container */
+            height: auto;         /* Tinggi menyesuaikan proporsi (agar tidak gepeng) */
+            object-fit: contain;  /* Memastikan seluruh gambar terlihat */
+            display: block;       /* Menghilangkan gap di bawah gambar */
+            margin: 0 auto;       /* Posisi tengah */
+        }
     </style>
 </head>
 
@@ -229,8 +236,7 @@
                 {{-- Gunakan total_biaya sesuai controller --}}
                 <div class="total-amount">Rp {{ number_format($items->biaya, 0, ',', '.') }}</div>
             </div>
-
-            @if (!empty($metodePembayaran->is_payment_gateway) && $metodePembayaran->is_payment_gateway == 1)
+            @if (!empty($metodePembayaran) && $metodePembayaran->is_payment_gateway == 1)
                 {{-- LOGIKA STATUS PEMBAYARAN --}}
                 @if($items->status_pembayaran == 'paid')
                     <div class="paid-stamp">
@@ -246,18 +252,19 @@
                 @endif
             @else
 
-                @if (!empty($metodePembayaran->is_payment_gateway))
+            {{-- @dd(!empty($metodePembayaran->is_payment_gateway),$metodePembayaran->is_payment_gateway) --}}
 
-                <div style="text-align: center; margin-top: 5px; font-size: 11px; color: #aaa;">
-                    <a target="_blank" href="{{ asset('storage/metode-pembayaran/' . $metodePembayaran->foto) }}"><img src="{{ asset('storage/metode-pembayaran/' . $metodePembayaran->foto) }}"  class=" w-auto object-contain rounded" /> </>
-                </div>
+                @if (!empty($metodePembayaran) && $metodePembayaran->is_payment_gateway == 0)
+                    <div style="text-align: center; margin-top: 5px; font-size: 11px; color: #aaa;">
+                        <a target="_blank" href="{{ asset('storage/metode-pembayaran/' . $metodePembayaran->foto) }}"><img src="{{ asset('storage/metode-pembayaran/' . $metodePembayaran->foto) }}"  class=" responsive-img rounded" /> </>
+                    </div>
                 @endif
 
             @endif
         </div>
 
         <div class="card-footer no-print">
-            @if (!empty($metodePembayaran->is_payment_gateway) && $metodePembayaran->is_payment_gateway == 1)
+            @if (!empty($metodePembayaran) && $metodePembayaran->is_payment_gateway == 1)
                 @if($items->status_pembayaran == 'paid')
                     <button onclick="window.print()" class="btn btn-print">
                         <i class="fa fa-print"></i> Cetak Bukti Pembayaran
