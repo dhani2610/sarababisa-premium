@@ -154,10 +154,12 @@
                     </div>
                 @endif
             @else
+                @if (!empty($metodePembayaran->is_payment_gateway))
                 {{-- Jika Manual Transfer / Cash --}}
                 <div style="text-align: center; margin-top: 5px; font-size: 11px; color: #aaa;">
                     <a target="_blank" href="{{ asset('storage/metode-pembayaran/' . $metodePembayaran->foto) }}"><img src="{{ asset('storage/metode-pembayaran/' . $metodePembayaran->foto) }}"  class=" w-auto object-contain rounded" /> </>
                 </div>
+                @endif
             @endif
         </div>
 
