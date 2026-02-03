@@ -7,14 +7,13 @@ use App\Models\Shift;
 use App\Models\Worker;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Yajra\DataTables\Facades\DataTables; // Pastikan ini diimport
+use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
 
 class ShiftController extends Controller
 {
     public function index(Request $request)
     {
-        // === LOGIC DATA TABLES ===
         if ($request->ajax()) {
             $query = Shift::with('worker')->where('cabang_id', getCabangId());
 
@@ -32,23 +31,35 @@ class ShiftController extends Controller
                 ->addColumn('worker_name', function ($row) {
                     return $row->worker->name ?? '-';
                 })
-                // Format Uang
+                // === LOGIC TAMPILAN MULTI JAM ===
+                ->addColumn('jadwal_shift', function ($row) {
+                    // Pastikan data berupa array (jaga-jaga jika data lama masih string)
+                    $jamMasuk = is_array($row->jam_masuk) ? $row->jam_masuk : [$row->jam_masuk];
+                    $jamPulang = is_array($row->jam_pulang) ? $row->jam_pulang : [$row->jam_pulang];
+
+                    $html = '<ul class="text-sm list-disc pl-4">';
+                    foreach ($jamMasuk as $key => $masuk) {
+                        $pulang = $jamPulang[$key] ?? '-';
+                        $html .= "<li>{$masuk} - {$pulang}</li>";
+                    }
+                    $html .= '</ul>';
+                    return $html;
+                })
                 ->editColumn('nominal_gaji', fn($row) => 'Rp ' . number_format($row->nominal_gaji, 0, ',', '.'))
                 ->editColumn('potongan_terlambat', fn($row) => 'Rp ' . number_format($row->potongan_terlambat, 0, ',', '.'))
                 ->editColumn('potongan_tidak_masuk', fn($row) => 'Rp ' . number_format($row->potongan_tidak_masuk, 0, ',', '.'))
                 ->editColumn('potongan_izin', fn($row) => 'Rp ' . number_format($row->potongan_izin, 0, ',', '.'))
                 ->editColumn('potongan_cuti', fn($row) => 'Rp ' . number_format($row->potongan_cuti, 0, ',', '.'))
                 ->editColumn('potongan_sakit', fn($row) => 'Rp ' . number_format($row->potongan_sakit, 0, ',', '.'))
-
                 ->addColumn('action', function ($row) {
-                    // Persiapkan data untuk Modal Edit (Sama persis dengan logic sebelumnya)
+                    // Siapkan data array untuk JSON
                     $data = [
                         'id' => $row->id,
                         'worker_id' => $row->worker_id,
                         'nama_shift' => $row->nama_shift,
-                        'jam_masuk' => $row->jam_masuk,
-                        'jam_pulang' => $row->jam_pulang,
-                        // Kita kirim format number string agar terbaca oleh input .sapator
+                        // Kirim array langsung, nanti JS yang looping
+                        'jam_masuk' => is_array($row->jam_masuk) ? $row->jam_masuk : [$row->jam_masuk],
+                        'jam_pulang' => is_array($row->jam_pulang) ? $row->jam_pulang : [$row->jam_pulang],
                         'nominal_gaji' => number_format($row->nominal_gaji, 0, ',', '.'),
                         'potongan_terlambat' => number_format($row->potongan_terlambat, 0, ',', '.'),
                         'potongan_tidak_masuk' => number_format($row->potongan_tidak_masuk, 0, ',', '.'),
@@ -57,35 +68,32 @@ class ShiftController extends Controller
                         'potongan_cuti' => number_format($row->potongan_cuti, 0, ',', '.'),
                     ];
 
-                    // Encode ke JSON agar bisa dipassing ke JS
                     $jsonData = htmlspecialchars(json_encode($data), ENT_QUOTES, 'UTF-8');
 
-                    $editBtn = '<button type="button" class="text-indigo-500 mr-2" onclick="openEditModal('.$jsonData.')">Edit</button>';
+                    $editBtn = '<button type="button" class="text-indigo-500 mr-2" onclick="openEditModal(' . $jsonData . ')">Edit</button>';
 
                     $deleteUrl = route('shift.destroy', $row->id);
                     $csrf = csrf_field();
                     $method = method_field('DELETE');
 
                     $deleteBtn = '
-                        <form action="'.$deleteUrl.'" method="post" class="inline-block" onsubmit="return confirm(\'Yakin ingin hapus?\')">
-                            '.$csrf.'
-                            '.$method.'
+                        <form action="' . $deleteUrl . '" method="post" class="inline-block" onsubmit="return confirm(\'Yakin ingin hapus?\')">
+                            ' . $csrf . '
+                            ' . $method . '
                             <button class="text-rose-500">Hapus</button>
                         </form>
                     ';
 
-                    return '<div class="flex justify-center">'.$editBtn.$deleteBtn.'</div>';
+                    return '<div class="flex justify-center">' . $editBtn . $deleteBtn . '</div>';
                 })
-                ->rawColumns(['checkbox', 'action'])
+                ->rawColumns(['checkbox', 'jadwal_shift', 'action']) // Tambahkan jadwal_shift agar HTML ter-render
                 ->make(true);
         }
 
-        // Return view biasa untuk load halaman pertama
         $workers = Worker::where('cabang_id', getCabangId())->get();
         return view('pages.kepalatoko.master.shift', compact('workers'));
     }
 
-    // Method store, update, destroy, deleteSelected TIDAK BERUBAH (tetap sama seperti kode asli Anda)
     public function store(Request $request)
     {
         $request->merge([
@@ -96,10 +104,14 @@ class ShiftController extends Controller
             'potongan_cuti' => str_replace('.', '', $request->potongan_cuti),
             'potongan_sakit' => str_replace('.', '', $request->potongan_sakit),
         ]);
+
         $validated = $request->validate([
             'nama_shift' => 'required|string|max:100',
-            'jam_masuk' => 'required',
-            'jam_pulang' => 'required',
+            // Validasi Array
+            'jam_masuk' => 'required|array',
+            'jam_masuk.*' => 'required', // Setiap item harus ada isinya
+            'jam_pulang' => 'required|array',
+            'jam_pulang.*' => 'required',
             'nominal_gaji' => 'nullable|integer',
             'potongan_terlambat' => 'required|integer',
             'potongan_tidak_masuk' => 'required|integer',
@@ -110,6 +122,8 @@ class ShiftController extends Controller
         ]);
 
         $validated['cabang_id'] = getCabangId();
+
+        // Simpan langsung (Model Casts akan mengubah array ke JSON otomatis)
         $data = Shift::create($validated);
 
         $user = User::where('workers_id', $data->worker_id)->first();
@@ -132,10 +146,14 @@ class ShiftController extends Controller
             'potongan_cuti' => str_replace('.', '', $request->potongan_cuti),
             'potongan_sakit' => str_replace('.', '', $request->potongan_sakit),
         ]);
+
         $validated = $request->validate([
             'nama_shift' => 'required|string|max:100',
-            'jam_masuk' => 'required',
-            'jam_pulang' => 'required',
+            // Validasi Array
+            'jam_masuk' => 'required|array',
+            'jam_masuk.*' => 'required',
+            'jam_pulang' => 'required|array',
+            'jam_pulang.*' => 'required',
             'nominal_gaji' => 'nullable|integer',
             'potongan_terlambat' => 'required|integer',
             'potongan_tidak_masuk' => 'required|integer',
@@ -147,6 +165,7 @@ class ShiftController extends Controller
 
         $item = Shift::findOrFail($id);
         $validated['cabang_id'] = getCabangId();
+
         $item->update($validated);
 
         $user = User::where('workers_id', $item->worker_id)->first();
@@ -155,17 +174,11 @@ class ShiftController extends Controller
             $user->save();
         }
 
-        // $worker = Worker::find($item->worker_id);
-        // if (!empty($worker)) {
-        //     $worker->gaji = $item->nominal_gaji;
-        //     $worker->save();
-        // }
-
-
         toast('Shift berhasil diupdate.', 'success');
         return redirect()->route('shift.index');
     }
 
+    // ... method destroy dan deleteSelected TETAP SAMA ...
     public function destroy($id)
     {
         Shift::findOrFail($id)->delete();

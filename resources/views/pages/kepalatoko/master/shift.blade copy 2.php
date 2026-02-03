@@ -6,61 +6,9 @@
         x-data="{
             modalOpen: false,
             editModalOpen: false,
-            editForm: {},
-            // State untuk menampung jam (default 1 baris)
-            createSlots: [{ masuk: '', pulang: '' }],
-            editSlots: [],
-
-            // Fungsi Tambah Baris
-            addSlot(mode) {
-                if (mode === 'create') {
-                    this.createSlots.push({ masuk: '', pulang: '' });
-                } else {
-                    this.editSlots.push({ masuk: '', pulang: '' });
-                }
-            },
-
-            // Fungsi Hapus Baris
-            removeSlot(mode, index) {
-                if (mode === 'create') {
-                    if (this.createSlots.length > 1) this.createSlots.splice(index, 1);
-                } else {
-                    if (this.editSlots.length > 1) this.editSlots.splice(index, 1);
-                }
-            },
-
-            // Reset Form Tambah saat modal dibuka
-            resetCreate() {
-                this.createSlots = [{ masuk: '', pulang: '' }];
-                this.modalOpen = true;
-            }
+            editForm: {}
         }"
-        @open-edit-modal.window="
-            editForm = $event.detail;
-
-            // LOGIC MAPPING DATA ARRAY DARI CONTROLLER KE ALPINE
-            // Kita pastikan data masuk sebagai array
-            let rawMasuk = $event.detail.jam_masuk;
-            let rawPulang = $event.detail.jam_pulang;
-
-            // Reset edit slots
-            editSlots = [];
-
-            // Jika data array (format baru), kita loop
-            if (Array.isArray(rawMasuk)) {
-                rawMasuk.forEach((m, i) => {
-                    editSlots.push({
-                        masuk: m,
-                        pulang: rawPulang[i] || ''
-                    });
-                });
-            } else {
-                // Fallback jika data lama (string), masukkan sebagai 1 baris
-                editSlots.push({ masuk: rawMasuk, pulang: rawPulang });
-            }
-
-            editModalOpen = true;
-        ">
+        @open-edit-modal.window="editForm = $event.detail; editModalOpen = true">
 
         <style>
             [x-cloak] { display: none !important; }
@@ -71,7 +19,7 @@
             <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Shift Kerja ✨</h1>
             <div class="flex gap-2">
                 <div>
-                    <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="resetCreate()">
+                    <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
                         <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
                             <path d="M15 7H9V1a1 1 0 10-2 0v6H1a1 1 0 100 2h6v6a1 1 0 102 0V9h6a1 1 0 100-2z" />
                         </svg>
@@ -81,7 +29,7 @@
                     <div x-show="modalOpen" x-cloak>
                         <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"></div>
                         <div class="fixed inset-0 z-50 overflow-auto flex items-center justify-center p-4">
-                            <div class="bg-white rounded shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                            <div class="bg-white rounded shadow-lg w-full max-w-lg">
                                 <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center">
                                     <div class="font-semibold text-slate-800">Tambah Shift</div>
                                     <button class="text-slate-400" @click="modalOpen = false">✕</button>
@@ -103,55 +51,44 @@
                                             <label class="block text-sm font-medium mb-1">Nama Shift</label>
                                             <input name="nama_shift" class="form-input w-full" required>
                                         </div>
-
-                                        <div class="bg-slate-50 p-3 rounded border border-slate-200">
-                                            <label class="block text-sm font-medium mb-2 text-slate-600">Jadwal Jam Kerja</label>
-
-                                            <template x-for="(slot, index) in createSlots" :key="index">
-                                                <div class="flex gap-2 mb-2 items-end">
-                                                    <div class="w-1/2">
-                                                        <label class="block text-xs font-medium mb-1 text-slate-500">Masuk</label>
-                                                        <input x-model="slot.masuk" name="jam_masuk[]" type="time" class="form-input w-full" required>
-                                                    </div>
-                                                    <div class="w-1/2">
-                                                        <label class="block text-xs font-medium mb-1 text-slate-500">Pulang</label>
-                                                        <input x-model="slot.pulang" name="jam_pulang[]" type="time" class="form-input w-full" required>
-                                                    </div>
-                                                    <button type="button" @click="removeSlot('create', index)" class="text-rose-500 hover:bg-rose-50 p-2 rounded mb-[2px]" x-show="createSlots.length > 1">
-                                                        ✕
-                                                    </button>
-                                                </div>
-                                            </template>
-
-                                            <button type="button" @click="addSlot('create')" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-1 flex items-center">
-                                                <span>+ Tambah Jam</span>
-                                            </button>
+                                        <div class="flex gap-3">
+                                            <div class="w-1/2">
+                                                <label class="block text-sm font-medium mb-1">Jam Masuk</label>
+                                                <input name="jam_masuk" type="time" class="form-input w-full" required>
+                                            </div>
+                                            <div class="w-1/2">
+                                                <label class="block text-sm font-medium mb-1">Jam Pulang</label>
+                                                <input name="jam_pulang" type="time" class="form-input w-full" required>
+                                            </div>
                                         </div>
                                         <input name="nominal_gaji" type="hidden" class="form-input w-full sapator">
-
+                                        {{-- <div>
+                                            <label class="block text-sm font-medium mb-1">Gaji Pokok</label>
+                                            <input name="nominal_gaji" type="text" class="form-input w-full sapator" required>
+                                        </div> --}}
                                         <div class="flex gap-3">
                                             <div class="w-1/2">
                                                 <label class="block text-sm font-medium mb-1">Potongan Terlambat</label>
                                                 <input name="potongan_terlambat" type="text" class="form-input w-full sapator" required>
                                             </div>
                                             <div class="w-1/2">
-                                                <label class="block text-sm font-medium mb-1">Potongan Alfa</label>
+                                                <label class="block text-sm font-medium mb-1">Potongan Tidak Masuk (Alfa)</label>
                                                 <input name="potongan_tidak_masuk" type="text" class="form-input w-full sapator" required>
                                             </div>
                                         </div>
                                         <div class="flex gap-3">
                                             <div class="w-1/2">
-                                                <label class="block text-sm font-medium mb-1">Potongan Izin</label>
+                                                <label class="block text-sm font-medium mb-1">Potongan Tidak Masuk (Izin)</label>
                                                 <input name="potongan_izin" type="text" class="form-input w-full sapator" required>
                                             </div>
                                             <div class="w-1/2">
-                                                <label class="block text-sm font-medium mb-1">Potongan Sakit</label>
+                                                <label class="block text-sm font-medium mb-1">Potongan Tidak Masuk (Sakit)</label>
                                                 <input name="potongan_sakit" type="text" class="form-input w-full sapator" required>
                                             </div>
                                         </div>
                                         <div class="flex gap-3">
                                             <div class="w-1/2">
-                                                <label class="block text-sm font-medium mb-1">Potongan Cuti</label>
+                                                <label class="block text-sm font-medium mb-1">Potongan Tidak Masuk (Cuti)</label>
                                                 <input name="potongan_cuti" type="text" class="form-input w-full sapator" required>
                                             </div>
                                         </div>
@@ -164,27 +101,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-5 rounded-r">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <h3 class="text-sm font-medium text-blue-800">Panduan Pengaturan Shift</h3>
-                    <div class="mt-2 text-sm text-blue-700">
-                        <ul class="list-disc pl-5 space-y-1">
-                            <li>
-                                Jika hanya memiliki 1 jam kerja maka isi jam kerja nya hanya 1 kali saja
-                            </li>
-                        </ul>
                     </div>
-                </div>
             </div>
         </div>
 
@@ -206,7 +123,9 @@
                             </th>
                             <th class="text-center px-2 py-3">Nama Karyawan</th>
                             <th class="text-center px-2 py-3">Nama Shift</th>
-                            <th class="text-center px-2 py-3">Jadwal Shift</th>
+                            <th class="text-center px-2 py-3">Jam Masuk</th>
+                            <th class="text-center px-2 py-3">Jam Pulang</th>
+                            {{-- <th class="text-center px-2 py-3">Gaji Pokok</th> --}}
                             <th class="text-center px-2 py-3">Potongan Terlambat</th>
                             <th class="text-center px-2 py-3">Potongan Alfa</th>
                             <th class="text-center px-2 py-3">Potongan Izin</th>
@@ -216,7 +135,7 @@
                         </tr>
                     </thead>
                     <tbody class="text-sm divide-y divide-slate-200">
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -224,7 +143,7 @@
         <div x-show="editModalOpen" x-cloak>
             <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"></div>
             <div class="fixed inset-0 z-50 overflow-auto flex items-center justify-center p-4">
-                <div class="bg-white rounded shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                <div class="bg-white rounded shadow-lg w-full max-w-lg">
                     <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center">
                         <div class="font-semibold text-slate-800">Edit Shift</div>
                         <button class="text-slate-400" @click="editModalOpen = false">✕</button>
@@ -247,29 +166,15 @@
                                 <label class="block text-sm font-medium mb-1">Nama Shift</label>
                                 <input name="nama_shift" x-model="editForm.nama_shift" class="form-input w-full" required>
                             </div>
-
-                            <div class="bg-slate-50 p-3 rounded border border-slate-200">
-                                <label class="block text-sm font-medium mb-2 text-slate-600">Jadwal Jam Kerja</label>
-
-                                <template x-for="(slot, index) in editSlots" :key="index">
-                                    <div class="flex gap-2 mb-2 items-end">
-                                        <div class="w-1/2">
-                                            <label class="block text-xs font-medium mb-1 text-slate-500">Masuk</label>
-                                            <input x-model="slot.masuk" name="jam_masuk[]" type="time" class="form-input w-full" required>
-                                        </div>
-                                        <div class="w-1/2">
-                                            <label class="block text-xs font-medium mb-1 text-slate-500">Pulang</label>
-                                            <input x-model="slot.pulang" name="jam_pulang[]" type="time" class="form-input w-full" required>
-                                        </div>
-                                        <button type="button" @click="removeSlot('edit', index)" class="text-rose-500 hover:bg-rose-50 p-2 rounded mb-[2px]" x-show="editSlots.length > 1">
-                                            ✕
-                                        </button>
-                                    </div>
-                                </template>
-
-                                <button type="button" @click="addSlot('edit')" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-1 flex items-center">
-                                    <span>+ Tambah Jam</span>
-                                </button>
+                            <div class="flex gap-3">
+                                <div class="w-1/2">
+                                    <label class="block text-sm font-medium mb-1">Jam Masuk</label>
+                                    <input name="jam_masuk" type="time" x-model="editForm.jam_masuk" class="form-input w-full" required>
+                                </div>
+                                <div class="w-1/2">
+                                    <label class="block text-sm font-medium mb-1">Jam Pulang</label>
+                                    <input name="jam_pulang" type="time" x-model="editForm.jam_pulang" class="form-input w-full" required>
+                                </div>
                             </div>
                             <input name="nominal_gaji" type="text" x-model="editForm.nominal_gaji" class="form-input w-full sapator" required>
                             {{-- <div>
@@ -282,23 +187,23 @@
                                     <input name="potongan_terlambat" type="text" x-model="editForm.potongan_terlambat" class="form-input w-full sapator" required>
                                 </div>
                                 <div class="w-1/2">
-                                    <label class="block text-sm font-medium mb-1">Potongan Alfa</label>
+                                    <label class="block text-sm font-medium mb-1">Potongan Tidak Masuk (Alfa)</label>
                                     <input name="potongan_tidak_masuk" type="text" x-model="editForm.potongan_tidak_masuk" class="form-input w-full sapator" required>
                                 </div>
                             </div>
                             <div class="flex gap-3">
                                 <div class="w-1/2">
-                                    <label class="block text-sm font-medium mb-1">Potongan Izin</label>
+                                    <label class="block text-sm font-medium mb-1">Potongan Tidak Masuk (Izin)</label>
                                     <input name="potongan_izin" type="text" x-model="editForm.potongan_izin" class="form-input w-full sapator" required>
                                 </div>
                                 <div class="w-1/2">
-                                    <label class="block text-sm font-medium mb-1">Potongan Sakit</label>
+                                    <label class="block text-sm font-medium mb-1">Potongan Tidak Masuk (Sakit)</label>
                                     <input name="potongan_sakit" type="text" x-model="editForm.potongan_sakit" class="form-input w-full sapator" required>
                                 </div>
                             </div>
                             <div class="flex gap-3">
                                 <div class="w-1/2">
-                                    <label class="block text-sm font-medium mb-1">Potongan Cuti</label>
+                                    <label class="block text-sm font-medium mb-1">Potongan Tidak Masuk (Cuti)</label>
                                     <input name="potongan_cuti" type="text" x-model="editForm.potongan_cuti" class="form-input w-full sapator" required>
                                 </div>
                             </div>
@@ -311,7 +216,7 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
 
     @push('styles')
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -330,7 +235,7 @@
                 window.dispatchEvent(new CustomEvent('open-edit-modal', { detail: data }));
             }
 
-            // 2. Fungsi Bulk Delete (TETAP SAMA)
+            // 2. Fungsi Bulk Delete
             function deleteSelected() {
                 var selectedIds = [];
                 $('.table-item:checked').each(function() {
@@ -355,14 +260,16 @@
                 .then(r => r.json())
                 .then(r => {
                     alert(r.message);
+                    // Reload DataTables, bukan reload page
                     $('#shift-table').DataTable().ajax.reload();
+                    // Reset UI
                     $('#parent-checkbox').prop('checked', false);
                     updateBulkUI();
                 })
                 .catch(() => alert('Gagal hapus data.'));
             }
 
-            // 3. Update UI
+            // 3. Update UI (Show/Hide tombol hapus dan hitung jumlah)
             function updateBulkUI() {
                 var count = $('.table-item:checked').length;
                 $('.table-items-count').text(count);
@@ -375,6 +282,7 @@
 
             // --- DOCUMENT READY ---
             $(document).ready(function() {
+                // Init DataTables
                 var table = $('#shift-table').DataTable({
                     processing: false,
                     serverSide: false,
@@ -383,8 +291,8 @@
                         {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false, className: 'text-center'},
                         {data: 'worker_name', name: 'worker.name', className: 'text-center'},
                         {data: 'nama_shift', name: 'nama_shift', className: 'text-center'},
-                        // Perhatikan: Kolom ini sekarang mengambil 'jadwal_shift' yang dikirim controller (HTML list)
-                        {data: 'jadwal_shift', name: 'jadwal_shift', className: 'text-left'},
+                        {data: 'jam_masuk', name: 'jam_masuk', className: 'text-center'},
+                        {data: 'jam_pulang', name: 'jam_pulang', className: 'text-center'},
                         // {data: 'nominal_gaji', name: 'nominal_gaji', className: 'text-center'},
                         {data: 'potongan_terlambat', name: 'potongan_terlambat', className: 'text-center'},
                         {data: 'potongan_tidak_masuk', name: 'potongan_tidak_masuk', className: 'text-center'},
@@ -394,24 +302,37 @@
                         {data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center'}
                     ],
                      language: {
-                        url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
+                        url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
+                        search: "Cari:",
+                        lengthMenu: "Tampilkan _MENU_ data",
+                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                        paginate: {
+                            first: "Awal",
+                            last: "Akhir",
+                            next: "Lanjut",
+                            previous: "Kembali"
+                        }
                     },
                     drawCallback: function() {
+                        // Reset parent checkbox saat pindah halaman/search
                         $('#parent-checkbox').prop('checked', false);
                         updateBulkUI();
+
+                        // Re-bind event listener checkbox setiap kali tabel di-draw ulang
                         $('.table-item').off('change').on('change', function() {
                             updateBulkUI();
                         });
                     }
                 });
 
+                // Parent Checkbox Logic
                 $('#parent-checkbox').change(function() {
                     var checked = this.checked;
                     $('.table-item').prop('checked', checked);
                     updateBulkUI();
                 });
 
-                // Sapator Logic
+                // Sapator Logic (Format Uang di Modal)
                 const sapators = document.querySelectorAll('.sapator');
                 sapators.forEach(input => {
                     input.addEventListener('input', function(e) {
@@ -420,6 +341,7 @@
                     });
                 });
 
+                // Clean Sapator value before submit
                 document.querySelectorAll('form').forEach(form => {
                     form.addEventListener('submit', function() {
                         sapators.forEach(input => {

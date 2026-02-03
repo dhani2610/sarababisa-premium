@@ -23,6 +23,11 @@ class Shift extends Model
         'worker_id',
     ];
 
+    protected $casts = [
+        'jam_masuk' => 'array',
+        'jam_pulang' => 'array',
+    ];
+
     public function worker()
     {
         return $this->belongsTo(Worker::class, 'worker_id');
