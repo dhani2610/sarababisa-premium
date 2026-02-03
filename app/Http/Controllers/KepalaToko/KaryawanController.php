@@ -381,7 +381,7 @@ class KaryawanController extends Controller
 
         if ((int)$item->status_shift == 1) {
             $jamMasuk = '00:00:00';
-            $jamPulang = '00:00:00';
+            $jamPulang = '23:59:59';
         }else{
             $jamMasuk = '10:00:00';
             $jamPulang = '21:00:00';
@@ -631,7 +631,7 @@ class KaryawanController extends Controller
         $item->update($data);
         if ((int)$item->status_shift == 1) {
             $jamMasuk = '00:00:00';
-            $jamPulang = '00:00:00';
+            $jamPulang = '23:59:59';
         }else{
             $jamMasuk = '10:00:00';
             $jamPulang = '21:00:00';
