@@ -127,11 +127,11 @@ class BisaDiambilController extends Controller
                             // "Link QC: {$notaQc}\n\n" ;
 
                         if ($is_pg) {
-                            $message .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n";
+                            $rawPesan .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n";
 
-                            $message .= "Link Pembayaran : " . route('payment', $row->id) . "\n\n";
+                            $rawPesan .= "Link Pembayaran : " . route('payment', $row->id) . "\n\n";
                         } else {
-                            $message .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n\n";
+                            $rawPesan .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n\n";
                         }
 
 
