@@ -97,8 +97,8 @@
                                         <div>
                                             <label class="block text-sm font-medium mb-1" for="status">Status Shift</label>
                                             <select id="status_shift" name="status_shift" class="form-select text-sm py-1 w-full">
-                                                <option value="Multi Shift">Multi Shift</option>
-                                                <option value="Satu Shift">Satu Shift</option>
+                                                <option value="1">Multi Shift</option>
+                                                <option value="0">Satu Shift</option>
                                             </select>
                                         </div>
                                         <div>
