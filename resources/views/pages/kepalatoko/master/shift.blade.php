@@ -180,7 +180,7 @@
                     <div class="mt-2 text-sm text-blue-700">
                         <ul class="list-disc pl-5 space-y-1">
                             <li>
-                                Jika hanya memiliki 1 jam kerja maka isi jam kerja nya hanya 1 kali saja
+                                Jika hanya memiliki 1 shift, maka hanya isi 1 jam kerja saja.
                             </li>
                         </ul>
                     </div>
