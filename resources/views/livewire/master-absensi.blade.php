@@ -69,7 +69,15 @@
                 }
             },
             async captureAndSubmit(type) {
-                // get geolocation
+                // --- LOGIC BARU: AMBIL 1 VALUE DARI DROPDOWN PERIODE ---
+                const el = document.getElementById('shift_periode_select');
+                const selectedShiftTime = el ? el.value : '';
+
+                if (!selectedShiftTime) {
+                    Swal.fire('Error', 'Silakan pilih Periode Shift terlebih dahulu!', 'error');
+                    return;
+                }
+
                 let coords = { lat: null, lng: null };
                 try {
                     await new Promise((resolve, reject) => {
@@ -89,7 +97,6 @@
                     });
                 } catch (e) {}
 
-                // capture from video
                 let dataUrl = null;
                 if ($refs.video && $refs.video.srcObject) {
                     const canvas = document.createElement('canvas');
@@ -99,7 +106,6 @@
                     dataUrl = canvas.toDataURL('image/jpeg', 0.9);
                 }
 
-                // build form and submit
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.enctype = 'multipart/form-data';
@@ -112,7 +118,8 @@
                     {name: 'waktu', value: new Date().toISOString()},
                     {name: 'lat', value: coords.lat ?? ''},
                     {name: 'lng', value: coords.lng ?? ''},
-                    {name: 'note', value: $refs.note ? $refs.note.value : ''}
+                    {name: 'note', value: $refs.note ? $refs.note.value : ''},
+                    {name: 'shift_jam_selected', value: selectedShiftTime} // Mengirim Jam Masuk dari Periode
                 ];
 
                 inputs.forEach(i => {
@@ -230,16 +237,39 @@
                 <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 grid grid-cols-1 gap-4">
                     <div>
                         <div class="flex justify-between items-center mb-3">
-                            <h2 class="font-semibold text-lg">Kamera</h2>
+                            <h2 class="font-semibold text-lg">Kamera Absensi</h2>
                             <button class="text-gray-500 hover:text-gray-700" @click="modalOpen = false" title="Tutup">✕</button>
                         </div>
+
                         <video x-ref="video" class="w-full h-64 bg-black rounded" autoplay muted playsinline></video>
-                        <div class="mt-2">
-                            <button class="btn bg-indigo-500 text-white" @click="captureAndSubmit('masuk')">Absen Masuk</button>
-                            <button class="btn bg-yellow-500 text-white" @click="captureAndSubmit('pulang')">Absen Pulang</button>
+
+                        <div class="mt-3">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Shift</label>
+                            <select id="shift_periode_select" class="form-select w-full border rounded px-3 py-2 text-sm bg-gray-50 border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                                @if(!empty($shiftList))
+                                    @foreach($shiftList as $index => $s)
+                                        {{-- Value adalah Jam Masuk untuk pengecekan telat --}}
+                                        <option value="{{ $s['value'] }}">
+                                            Periode {{ $index + 1 }} ({{ $s['label'] }} WIB)
+                                        </option>
+                                    @endforeach
+                                @else
+                                    <option value="">Anda tidak memiliki shift</option>
+                                @endif
+                            </select>
                         </div>
+
+                        <div class="mt-4 flex gap-2">
+                            <button class="flex-1 btn bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded" @click="captureAndSubmit('masuk')">
+                                <i class="fas fa-camera mr-1"></i> Absen Masuk
+                            </button>
+                            <button class="flex-1 btn bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded" @click="captureAndSubmit('pulang')">
+                                <i class="fas fa-camera mr-1"></i> Absen Pulang
+                            </button>
+                        </div>
+
                         <label class="block mt-3 text-sm">Catatan (opsional)</label>
-                        <textarea x-ref="note" class="form-input w-full"></textarea>
+                        <textarea x-ref="note" class="form-input w-full border rounded p-2" rows="2" placeholder="Keterangan pekerjaan..."></textarea>
                     </div>
                 </div>
             </div>
@@ -363,7 +393,7 @@
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false, className: 'text-center' },
                     @endif
                 ],
-                order: [[3, 'desc']], // Urutkan berdasarkan waktu'
+                order: [[3, 'desc']],
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
                     search: "Cari:",
@@ -377,26 +407,20 @@
                     }
                 },
                 drawCallback: function() {
-                    // Reset checkbox parent saat draw ulang
                     $('#parent-checkbox').prop('checked', false);
                     updateBulkUI();
-
-                    // Event listener untuk checkbox item (perlu re-bind setiap draw)
                     $('.table-item').off('change').on('change', function() {
                         updateBulkUI();
-                        // Cek apakah semua terpilih untuk update parent
                         var allChecked = $('.table-item:checked').length === $('.table-item').length;
                         $('#parent-checkbox').prop('checked', allChecked);
                     });
                 }
             });
 
-            // Filter Dropdown User (Auto Reload)
             $('#filter_role_user_id').change(function() {
                 table.draw();
             });
 
-            // Expose table reload untuk fungsi filter modal
             window.reloadTable = function() {
                 table.draw();
             }
@@ -417,7 +441,6 @@
         }
 
         // --- BULK DELETE LOGIC ---
-        // Parent Checkbox Logic
         $('#parent-checkbox').change(function() {
             var checked = this.checked;
             $('.table-item').prop('checked', checked);
@@ -479,10 +502,7 @@
         function showMapModal(lat, lng) {
             const modal = document.getElementById('mapModal');
             modal.style.display = 'flex';
-
-            // Render Map
-            if (mapInstance) { mapInstance.remove(); } // Bersihkan instance lama
-
+            if (mapInstance) { mapInstance.remove(); }
             setTimeout(() => {
                 mapInstance = L.map('map').setView([lat, lng], 16);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -492,7 +512,6 @@
                 mapInstance.invalidateSize();
             }, 200);
         }
-
         function closeMapModal() {
             document.getElementById('mapModal').style.display = 'none';
         }

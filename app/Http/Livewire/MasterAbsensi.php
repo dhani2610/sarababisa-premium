@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Attendance;
 use App\Models\User;
+use App\Models\Shift;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -47,7 +48,7 @@ class MasterAbsensi extends Component
     public function render()
     {
         $user = Auth::user();
-        $query = Attendance::where('cabang_id',getCabangId())->with('user')->latest();
+        $query = Attendance::where('cabang_id', getCabangId())->with('user')->latest();
 
         // Filter berdasarkan role
         if ($user->role !== 'Kepala Toko') {
@@ -73,17 +74,39 @@ class MasterAbsensi extends Component
         }
 
         $users = $user->role === 'Kepala Toko'
-            ? User::where('cabang_id',getCabangId())->select('id','name')->whereIn('role',['Teknisi','Sales','Admin Toko'])->get()
-            : User::where('cabang_id',getCabangId())->where('id', $user->id)->select('id','name')->whereIn('role',['Teknisi','Sales','Admin Toko'])->get();
+            ? User::where('cabang_id', getCabangId())->select('id','name')->whereIn('role',['Teknisi','Sales','Admin Toko'])->get()
+            : User::where('cabang_id', getCabangId())->where('id', $user->id)->select('id','name')->whereIn('role',['Teknisi','Sales','Admin Toko'])->get();
 
         $totalMasuk = Attendance::where('type', 'masuk')->count();
         $totalPulang = Attendance::where('type', 'pulang')->count();
         $totalAbsen = $totalMasuk + $totalPulang;
 
         $today = Carbon::today();
-        $hariIniMasuk = Attendance::where('cabang_id',getCabangId())->where('type', 'masuk')->whereDate('created_at', $today)->count();
-        $hariIniPulang = Attendance::where('cabang_id',getCabangId())->where('type', 'pulang')->whereDate('created_at', $today)->count();
+        $hariIniMasuk = Attendance::where('cabang_id', getCabangId())->where('type', 'masuk')->whereDate('created_at', $today)->count();
+        $hariIniPulang = Attendance::where('cabang_id', getCabangId())->where('type', 'pulang')->whereDate('created_at', $today)->count();
         $hariIniTotal = $hariIniMasuk + $hariIniPulang;
+
+        // --- LOGIC PERBAIKAN SHIFT LIST ---
+        $userShift = Shift::where('worker_id', auth()->user()->workers_id)->first();
+
+        $shiftList = [];
+
+        if ($userShift) {
+            // Langsung akses array (karena model sudah casting)
+            $jamMasukArr = $userShift->jam_masuk ?? [];
+            $jamPulangArr = $userShift->jam_pulang ?? [];
+
+            // Gabungkan menjadi format Periode
+            if (is_array($jamMasukArr)) {
+                foreach ($jamMasukArr as $index => $masuk) {
+                    $pulang = $jamPulangArr[$index] ?? '-';
+                    $shiftList[] = [
+                        'value' => $masuk, // Value yang dikirim ke DB untuk cek telat
+                        'label' => $masuk . ' - ' . $pulang // Label tampilan: "07:00 - 22:00"
+                    ];
+                }
+            }
+        }
 
         return view('livewire.master-absensi', [
             'attendances' => $query->paginate($this->paginate),
@@ -94,6 +117,7 @@ class MasterAbsensi extends Component
             'hariIniMasuk' => $hariIniMasuk,
             'hariIniPulang' => $hariIniPulang,
             'hariIniTotal' => $hariIniTotal,
+            'shiftList' => $shiftList, // Kirim variabel gabungan ini
             'count' => Attendance::count(),
         ]);
     }

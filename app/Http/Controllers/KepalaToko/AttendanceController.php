@@ -155,12 +155,14 @@ class AttendanceController extends Controller
             'lat' => 'nullable|numeric',
             'lng' => 'nullable|numeric',
             'photo' => 'nullable|string',
-            'photo_file' => 'nullable|image|max:2048'
+            'photo_file' => 'nullable|image|max:2048',
+            'shift_jam_selected' => 'required', // Wajib dipilih
         ]);
 
         $user = Auth::user();
         $tanggal = Carbon::parse($request->tanggal)->toDateString();
 
+        // --- 1. Cek Double Input ---
         $sudahMasuk = Attendance::where('user_id', $user->id)
             ->where('tanggal', $tanggal)
             ->where('type', 'masuk')
@@ -184,6 +186,7 @@ class AttendanceController extends Controller
             }
         }
 
+        // --- 2. Proses Upload Foto ---
         $photoPath = null;
         if ($request->hasFile('photo_file')) {
             $photoPath = $request->file('photo_file')->store('attendances', 'public');
@@ -200,28 +203,35 @@ class AttendanceController extends Controller
 
         $potonganTelat = 0;
         $telat = 0;
-        $shift = Shift::where('id',$user->shift_id)->first();
 
-        if (!empty($shift)) {
+        $shift = Shift::where('worker_id', $user->workers_id)->first();
+
+        if ($shift) {
             if ($request->type === 'masuk') {
-                if (date('H:i:s') > $shift->jam_masuk) {
+                $jamJadwal = $request->shift_jam_selected . ':00';
+
+                $waktuAktual = date('H:i:s');
+
+                if ($waktuAktual > $jamJadwal) {
                     $potonganTelat = $shift->potongan_terlambat ?? 0;
-                    $telat  = 1;
+                    $telat = 1;
                 }
             }
         } else {
-            return redirect()->back()->with('error', 'Anda belum memiliki shift kerja silahkan hubungi kepala toko.');
+            return redirect()->back()->with('error', 'Anda belum memiliki shift kerja, hubungi admin.');
         }
 
+        // --- 4. Simpan Data ---
         Attendance::create([
             'user_id' => $user->id,
             'type' => $request->type,
             'tanggal' => $request->tanggal,
-            'waktu' => Carbon::parse($request->waktu),
+            'waktu' => Carbon::parse($request->waktu), // Ini jam dari Client/HP user (untuk display)
             'lat' => $request->lat,
             'lng' => $request->lng,
             'photo' => $photoPath,
-            'note' => $request->note,
+            // Simpan info shift yang dipilih ke notes agar admin tahu dia ambil shift jam berapa
+            'note' => $request->note . ' (Shift: ' . $request->shift_jam_selected . ')',
             'nominal_potongan' => $potonganTelat,
             'telat' => $telat,
             'cabang_id' => getCabangId(),
