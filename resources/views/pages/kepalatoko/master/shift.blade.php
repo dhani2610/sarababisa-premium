@@ -271,7 +271,7 @@
                                     <span>+ Tambah Jam</span>
                                 </button>
                             </div>
-                            <input name="nominal_gaji" type="text" x-model="editForm.nominal_gaji" class="form-input w-full sapator" required>
+                            <input name="nominal_gaji" type="hidden" x-model="editForm.nominal_gaji" class="form-input w-full sapator">
                             {{-- <div>
                                 <label class="block text-sm font-medium mb-1">Gaji Pokok</label>
                                 <input name="nominal_gaji" type="text" x-model="editForm.nominal_gaji" class="form-input w-full sapator" required>
