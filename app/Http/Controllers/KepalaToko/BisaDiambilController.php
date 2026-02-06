@@ -912,7 +912,7 @@ class BisaDiambilController extends Controller
                             'garansi' => !empty($garansi_data) ? $garansi_data[0] ?? null : null,
                             'exp_garansi' => !empty($list_garansi) ? $list_garansi[0] ?? null : null,
                             'exp_garansi_j' => !empty($list_garansi) ? json_encode($list_garansi) : null,
-                            'bagian_teknisi' => $cekTeknisi->bagian_teknisi,
+                            'bagian_teknisi' => !empty($cekTeknisi) ? $cekTeknisi->bagian_teknisi : null,
                             'tipe_teknisi' => $tipeTeknisi,
                         ];
                     }
