@@ -92,13 +92,13 @@ class InvestorController extends Controller
                     ->whereBetween('created_at', [$monthStart, $monthEnd])
                     ->sum('price');
 
-                $operasional = $operasionalToko + $operasionalServis;
+                $operasional =  $operasionalServis;
             }else{
                 $operasionalProduk = Expense::where('cabang_id', $cabangId)
                     ->where('tipe',2)
                     ->whereBetween('created_at', [$monthStart, $monthEnd])
                     ->sum('price');
-                $operasional = $operasionalToko + $operasionalProduk;
+                $operasional =  $operasionalProduk;
             }
 
             $insiden = Incident::where('cabang_id', $cabangId)
