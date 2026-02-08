@@ -174,7 +174,7 @@
                     { data: 'is_approve', name: 'is_approve' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                 ],
-                order: [[2, 'asc']], // Urut tanggal
+                order: [[1, 'asc']], // Urut tanggal
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
                     search: "Cari:",
