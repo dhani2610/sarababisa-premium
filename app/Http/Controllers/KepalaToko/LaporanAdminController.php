@@ -26,6 +26,15 @@ class LaporanAdminController extends Controller
     {
         // Mengambil logo dan nama toko
         $users = User::find(1);
+        if (getCabangId() == 1) {
+            $users = User::find(1);
+        }else{
+            $users = User::where('cabang_id',getCabangId())->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
 
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
@@ -44,9 +53,14 @@ class LaporanAdminController extends Controller
             ->get();
 
         // Menghitung total tindakan
-        $total_tindakan = ServiceTransaction::where('admin_id', $request->admin_id)->where('status_servis', 'Sudah Diambil')
+        // $total_tindakan = ServiceTransaction::where('admin_id', $request->admin_id)->where('status_servis', 'Sudah Diambil')
+        //     ->whereDate('tgl_ambil', '>=', $start_date)
+        //     ->whereDate('tgl_ambil', '<=', $end_date)
+        //     ->count();
+        $total_tindakan = ServiceTransaction::with('brand', 'modelserie')->where('admin_id', $request->admin_id)->where('status_servis', 'Sudah Diambil')
             ->whereDate('tgl_ambil', '>=', $start_date)
             ->whereDate('tgl_ambil', '<=', $end_date)
+            ->orderBy('tgl_ambil', 'asc')
             ->count();
 
         // Menghitung total biaya servis
@@ -110,8 +124,11 @@ class LaporanAdminController extends Controller
             $total_bonus_penjualan = 0;
         }
 
-        $total_bonus_admin = $total_bonus_servis + $total_bonus_penjualan;
+        // dd($admin->tipe_bonus_admin,$nominalTetap,$total_tindakan,$total_penjualan);
 
+
+        $total_bonus_admin = $total_bonus_servis + $total_bonus_penjualan;
+        // dd($total_bonus_admin);
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-admin', [
             'users' => $users,
             'admin' => $admin,
