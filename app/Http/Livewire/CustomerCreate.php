@@ -44,8 +44,8 @@ class CustomerCreate extends Component
         $this->resetInput();
 
         $this->emit('customerStored', $customer);
-        session()->flash('message', 'Pelanggan berhasil ditambahkan!');
-        // return redirect()->route('pelanggan.index');
+        // session()->flash('message', 'Pelanggan berhasil ditambahkan!');
+        return redirect()->route('pelanggan.index');
     }
 
     private function resetInput()
