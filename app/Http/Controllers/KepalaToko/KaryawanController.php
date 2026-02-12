@@ -473,9 +473,11 @@ class KaryawanController extends Controller
             ->whereMonth('created_at', $date->month)
             ->sum('biaya_teknisi');
 
-        $potonganServis = Refund::where('teknisi_id', $user->id)->whereYear('created_at', $date->year)
-        ->whereMonth('created_at', $date->month)
+        $potonganServis = Refund::where('teknisi_id', $user->id)
+        ->whereYear('period', $date->year)
+        ->whereMonth('period', $date->month)
         ->get();
+        // dd($potonganServis);
 
         $totalPotonganServis = $potonganServis;
         $namaKaryawan = $items->name;
