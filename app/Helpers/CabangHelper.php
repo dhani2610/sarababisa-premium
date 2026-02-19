@@ -330,17 +330,18 @@ if (!function_exists('calculateBonus')) {
         $end_date = $date->copy()->endOfMonth()->toDateString();
 
         if ($user->role === 'Teknisi') {
-            $total_profit_interface = ServiceTransaction::where('users_id', $user->id)->where('status_servis', 'Sudah Diambil')
-                    ->whereDate('tgl_ambil', '>=', $start_date)
-                    ->whereDate('tgl_ambil', '<=', $end_date)
-                ->where('cabang_id',getCabangId())
+            $total_profit_interface = ServiceTransaction::where('users_id', $user->id)
+                    ->whereDate('tgl_disetujui', '>=', $start_date)
+                    ->whereDate('tgl_disetujui', '<=', $end_date)
+                    ->where('cabang_id',getCabangId())
                     ->whereIn('tipe', ['Interface','Interface Leveling'])
                     ->where('is_approve', 'Setuju')
                     ->sum('bonus_interface');
+            return $total_profit_interface;
                 // Menghitung total profit
-                $total_profit = ServiceTransaction::where('users_id', $user->id)->where('status_servis', 'Sudah Diambil')
-                    ->whereDate('tgl_ambil', '>=', $start_date)
-                    ->whereDate('tgl_ambil', '<=', $end_date)
+                $total_profit = ServiceTransaction::where('users_id', $user->id)
+                    ->whereDate('tgl_disetujui', '>=', $start_date)
+                    ->whereDate('tgl_disetujui', '<=', $end_date)
                 ->where('cabang_id',getCabangId())
                     ->where('is_approve', 'Setuju')
                     ->where('tipe', 'Hardware')
