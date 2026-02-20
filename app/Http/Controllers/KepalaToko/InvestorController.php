@@ -92,26 +92,34 @@ class InvestorController extends Controller
                     ->whereBetween('created_at', [$monthStart, $monthEnd])
                     ->sum('price');
 
-                $operasional =  $operasionalServis;
+                $operasional =  $operasionalToko + $operasionalServis;
+
+                $totalOmset   = $serviceOmset;
+                $totalModal   = $serviceModal;
+                $grossProfit  = $serviceProfit; // Profit Kotor
             }else{
                 $operasionalProduk = Expense::where('cabang_id', $cabangId)
                     ->where('tipe',2)
                     ->whereBetween('created_at', [$monthStart, $monthEnd])
                     ->sum('price');
                 $operasional =  $operasionalProduk;
+
+                $totalOmset   = $productOmset;
+                $totalModal   = $productModal;
+                $grossProfit  = $productProfit; // Profit Kotor
             }
+
 
             $insiden = Incident::where('cabang_id', $cabangId)
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
                 ->sum('biaya_toko');
 
             // --- D. AGREGASI DATA ---
-            $totalOmset   = $serviceOmset + $productOmset;
-            $totalModal   = $serviceModal + $productModal;
-            $grossProfit  = $serviceProfit + $productProfit; // Profit Kotor
+
 
             // Sisa Profit (Net Profit) = Profit Kotor - Operasional - Insiden
             $sisaProfit   = $grossProfit - $operasional - $insiden;
+            // return response()->json([$grossProfit,$filterCategory,$operasionalToko,$operasionalServis]);
 
             // Target (Dummy 10jt) - Ambil dari Budget
             // $target = Budget::all()->sum('total');
