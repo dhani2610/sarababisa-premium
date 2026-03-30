@@ -17,8 +17,8 @@ class LaporanTeknisiController extends Controller
         $cabang_id = getCabangId();
 
         // Untuk Modal Cetak Laporan
-        // $users = User::where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
-        $users = User::where('id',57)->where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
+        $users = User::where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
+        // $users = User::where('id',51)->where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
 
         return view('pages/kepalatoko/laporan-teknisi', compact('users'));
     }
