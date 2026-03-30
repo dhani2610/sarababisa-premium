@@ -73,9 +73,16 @@
 </head>
 <body>
 	<div class="text-center">
-		@if ($users->profile_photo_path != null)
-			<img src="data:image/png;base64,{{ base64_encode(file_get_contents($imagePath)) }}" alt="" height="70">
-		@endif
+		@php
+            $actualPath = public_path($users->profile_photo_path);
+
+        @endphp
+
+        @if ($users->profile_photo_path != null && file_exists($imagePath))
+            <img src="data:image/png;base64,{{ base64_encode(file_get_contents($imagePath)) }}" alt="Profile Photo" height="70">
+        @else
+            <span>No Image Available</span>
+        @endif
 		<h4 style="margin-top: 5px; margin-bottom: 0">{{ $users->nama_toko }}</h4>
 		<p style="margin-top: 3px; margin-bottom: 5px;">{{ $users->alamat_toko }}</p>
 	</div>

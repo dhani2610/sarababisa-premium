@@ -225,7 +225,7 @@ class TransaksiServisController extends Controller
         ->addColumn('hubungi', function ($row) {
             $nomor = $row->customer->nomor_hp ?? null;
             $nomorwa = $nomor ? preg_replace('/^08/', '628', preg_replace('/\D+/', '', $nomor)) : null;
-            $fonteeToken = StoreSetting::where('cabang_id',getCabangId())->first()->fonnte ?? null;
+            $fonteeToken = StoreSetting::where('cabang_id',$row->cabang_id)->first()->fonnte ?? null;
             $toko = optional($row->customer)->nama ?? config('app.name');
 
             if ($row->cabang_id == 1) {

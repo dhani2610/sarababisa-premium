@@ -337,7 +337,7 @@ if (!function_exists('calculateBonus')) {
                     ->whereIn('tipe', ['Interface','Interface Leveling'])
                     ->where('is_approve', 'Setuju')
                     ->sum('bonus_interface');
-            return $total_profit_interface;
+            // return $total_profit_interface;
                 // Menghitung total profit
                 $total_profit = ServiceTransaction::where('users_id', $user->id)
                     ->whereDate('tgl_disetujui', '>=', $start_date)
