@@ -116,11 +116,13 @@
 	<h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
 		Detail Servis
 	</h4>
+            {{-- @dd($services); --}}
 
 	<table id="detail">
 		<thead>
 			<tr>
 				<th>No.</th>
+				<th>Tanggal</th>
 				<th>No. Servis</th>
 				<th>Pelanggan</th>
 				<th>Model Seri</th>
@@ -139,6 +141,7 @@
 			@foreach ($services as $item)
 				<tr>
 					<td style="width: 10px;">{{ $i++ }}</td>
+					<td class="text-center" style="width: 60px;">{{ \Carbon\Carbon::parse($item->tgl_ambil)->format('d-m-Y') }}</td>
 					<td class="text-center" style="width: 60px;">{{ $item->nomor_servis }}</td>
 					<td style="text-align: left; width: 90px;" class="capital">{{ $item->nama_pelanggan }}</td>
 					<td style="text-align: left; width: 80px;">{{ $item->modelserie->name ?? '-' ?? '-' }}</td>
