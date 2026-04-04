@@ -12,6 +12,7 @@ use App\Http\Requests\KepalaToko\UserRequest;
 use App\Models\Shift;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\TipeOs;
+use App\Models\Category;
 use App\Models\BonusLeveling;
 
 class AkunController extends Controller
@@ -61,6 +62,7 @@ class AkunController extends Controller
         $categories = Type::where('cabang_id',getCabangId())->get();
         $tipe_os = TipeOs::where('cabang_id',getCabangId())->get();
 
+        $category = Category::where('cabang_id', getCabangId())->get();
         return view('pages/kepalatoko/akun', compact(
             'users',
             'users_count',
@@ -70,6 +72,7 @@ class AkunController extends Controller
             'shift',
             'categories',
             'tipe_os',
+            'category',
         ));
     }
 
@@ -340,9 +343,9 @@ class AkunController extends Controller
             ->count();
 
         $workers = Worker::where('cabang_id', $cabangId)->get();
-
+        $category = Category::where('cabang_id', $cabangId)->get();
         $shift = Shift::where('cabang_id', $cabangId)->get();
-        // return response()->json($item);
+        $selectedCategories = $item->kategori_investor ? json_decode($item->kategori_investor, true) : [];
         return view('pages.kepalatoko.akun-edit', [
             'types' => $types,
             'item' => $item,
@@ -352,6 +355,8 @@ class AkunController extends Controller
             'shift' => $shift,
             'bonusLeveling' => $bonusLeveling,
             'tipe_os' => $tipe_os,
+            'category' => $category,
+            'selectedCategories' => $selectedCategories,
         ]);
     }
 
@@ -494,6 +499,7 @@ class AkunController extends Controller
             'exp_date' => $langganan,
             'total_cabang' => $total_cabang,
             'cabang_id' => getCabangId(),
+            'kategori_investor' => $request->kategori_investor ? json_encode($request->kategori_investor) : null,
         ];
 
         $dokumenFiles = ['foto_ktp', 'foto_kk', 'foto_ijasah', 'dokumen_lain'];
@@ -595,6 +601,7 @@ class AkunController extends Controller
             'shift_id' => $request->shift_id,
             'exp_date' => $langganan,
             'total_cabang' => $total_cabang,
+            'kategori_investor' => $request->kategori_investor ? json_encode($request->kategori_investor) : null,
         ];
 
         $dokumenFiles = ['foto_ktp', 'foto_kk', 'foto_ijasah', 'dokumen_lain'];

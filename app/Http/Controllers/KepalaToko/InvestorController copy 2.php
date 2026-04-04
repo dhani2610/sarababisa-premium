@@ -28,19 +28,6 @@ class InvestorController extends Controller
         $start = $request->start_month ? Carbon::parse($request->start_month . '-01') : Carbon::now()->startOfYear();
         $end = $request->end_month ? Carbon::parse($request->end_month . '-01')->endOfMonth() : Carbon::now()->endOfMonth();
         $filterCategory = $request->category ?? 'all'; // all, service, product
-        $cabangId = getCabangId(); // Helper function
-
-        // 1. Ambil Data Investor & Kategorinya (Taruh di luar loop agar Query lebih ringan)
-        $userInvestor = User::where('cabang_id', $cabangId)->where('role', 'Investor')->first();
-        $kategoriInvestor = [];
-        if ($userInvestor && $userInvestor->kategori_investor) {
-            // Decode string JSON array ["1", "2"] menjadi array PHP murni
-            $kategoriInvestor = json_decode($userInvestor->kategori_investor, true) ?? [];
-        }
-        // return response()->json([
-        //     'userInvestor' => $userInvestor,
-        //     'kategoriInvestor' => $kategoriInvestor,
-        // ]);
 
         // Buat periode bulanan untuk looping
         $period = CarbonPeriod::create($start, '1 month', $end);
@@ -50,12 +37,14 @@ class InvestorController extends Controller
         foreach ($period as $date) {
             $monthStart = $date->copy()->startOfMonth();
             $monthEnd = $date->copy()->endOfMonth();
+            $cabangId = getCabangId(); // Helper function
 
             // Inisialisasi variabel agar tidak error jika di-skip
             $serviceCount = 0; $serviceOmset = 0; $serviceModal = 0; $serviceProfit = 0;
             $productCount = 0; $productOmset = 0; $productModal = 0; $productProfit = 0;
 
             // --- A. DATA SERVIS (Status: Setuju) ---
+            // Jalankan hanya jika Kategori = 'all' ATAU 'service'
             if ($filterCategory == 'all' || $filterCategory == 'service') {
                 $serviceQuery = ServiceTransaction::where('cabang_id', $cabangId)
                     ->where('is_approve', 'Setuju')
@@ -68,39 +57,35 @@ class InvestorController extends Controller
             }
 
             // --- B. DATA PENJUALAN PRODUK (Status: Setuju) ---
+            // Jalankan hanya jika Kategori = 'all' ATAU 'product'
             if ($filterCategory == 'all' || $filterCategory == 'product') {
+                // 1. Hitung Transaksi (Jumlah Order)
+                $productCount = Order::where('cabang_id', $cabangId)
+                    ->where('is_approve', 'Setuju')
+                    ->whereBetween('tgl_disetujui', [$monthStart, $monthEnd])
+                    ->count();
 
-                // Query Order Detail Dasar
+                // 2. Hitung Nominal (Dari Order Detail)
                 $productDetailsQuery = OrderDetail::where('cabang_id', $cabangId)
                     ->whereHas('order', function ($q) use ($monthStart, $monthEnd) {
                         $q->where('is_approve', 'Setuju')
                         ->whereBetween('tgl_disetujui', [$monthStart, $monthEnd]);
                     });
 
-                // JIKA INVESTOR PUNYA FILTER KATEGORI, TERAPKAN DI SINI:
-                // Relasi: OrderDetail -> product -> categories_id
-                // if (!empty($kategoriInvestor)) {
-                    $productDetailsQuery->whereHas('product', function ($q) use ($kategoriInvestor) {
-                        $q->whereIn('categories_id', $kategoriInvestor);
-                    });
-                // }
-
-                // 1. Hitung Transaksi
-                // Menggunakan distinct agar 1 nota yang isinya 3 barang kategori sama tetap dihitung 1 transaksi
-                $productCount = (clone $productDetailsQuery)->distinct('orders_id')->count('orders_id');
-
-                // 2. Hitung Nominal (Hanya dari detail order yang lolos filter di atas)
                 $productOmset  = (clone $productDetailsQuery)->sum('total');
                 $productModal  = (clone $productDetailsQuery)->sum('modal');
                 $productProfit = (clone $productDetailsQuery)->sum('profit');
             }
 
             // --- C. PENGELUARAN (Expense & Insiden) ---
+            // Menggunakan created_at sesuai referensi cetak
+            // Note: Pengeluaran operasional toko biasanya tetap dihitung full mengurangi profit
+            // kecuali ada request khusus untuk memisahkan expense per kategori.
+
             $operasionalToko = Expense::where('cabang_id', $cabangId)
                 ->where('tipe', 0)
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
                 ->sum('price');
-
             if ($filterCategory == 'service') {
                 $operasionalServis = Expense::where('cabang_id', $cabangId)
                     ->where('tipe',1)
@@ -112,7 +97,7 @@ class InvestorController extends Controller
                 $totalOmset   = $serviceOmset;
                 $totalModal   = $serviceModal;
                 $grossProfit  = $serviceProfit; // Profit Kotor
-            } else {
+            }else{
                 $operasionalProduk = Expense::where('cabang_id', $cabangId)
                     ->where('tipe',2)
                     ->whereBetween('created_at', [$monthStart, $monthEnd])
@@ -124,15 +109,25 @@ class InvestorController extends Controller
                 $grossProfit  = $productProfit; // Profit Kotor
             }
 
+
             $insiden = Incident::where('cabang_id', $cabangId)
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
                 ->sum('biaya_toko');
 
             // --- D. AGREGASI DATA ---
+
+
             // Sisa Profit (Net Profit) = Profit Kotor - Operasional - Insiden
             $sisaProfit   = $grossProfit - $operasional - $insiden;
+            // return response()->json([$grossProfit,$filterCategory,$operasionalToko,$operasionalServis]);
 
-            // Target
+            // Target (Dummy 10jt) - Ambil dari Budget
+            // $target = Budget::all()->sum('total');
+            // $target = DB::table('targets')
+            //     ->where('cabang_id', $cabangId)
+            //     ->whereMonth('created_at', $date->month)
+            //     ->whereYear('created_at', $date->year)
+            //     ->sum('nilai');
             $target = Budget::where('cabang_id', $cabangId)->sum('total');
 
             // Hitung Result Persentase
@@ -157,12 +152,16 @@ class InvestorController extends Controller
         // 3. Hitung Total Keseluruhan untuk Footer
         $totalSisaProfit = $dataCollection->sum('sisa_profit');
 
+        $userInvestor = User::where('cabang_id', getCabangId())->where('role', 'Investor')->first();
+
         $persenInvestor = 0;
         if ($userInvestor) {
             // LOGIKA PERSENTASE KHUSUS PRODUK
             if ($filterCategory == 'product') {
+                // Ambil kolom persen_investor_produk
                 $persenInvestor = $userInvestor->persen_investor_produk ?? 0;
             } else {
+                // Ambil kolom default (persen_investor) untuk 'all' atau 'service'
                 $persenInvestor = $userInvestor->persen_investor ?? 0;
             }
         }

@@ -126,6 +126,17 @@
                                         type="number" />
                                 </div>
 
+                                <div id="kategori_investor_input" style="display: none" class="mt-3">
+                                    <label class="block text-sm font-medium mb-1" for="kategori_investor">Kategori Investor <span class="text-xs text-slate-400">(Bisa pilih lebih dari satu)</span></label>
+                                    <select id="kategori_investor" name="kategori_investor[]" class="form-select text-sm py-1 w-full select2-multiple" multiple="multiple">
+                                        @foreach ($category as $cat)
+                                            <option value="{{ $cat->id }}" {{ in_array($cat->id, $selectedCategories) ? 'selected' : '' }}>
+                                                {{ $cat->category_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
 
                                 <div id="shift_input" style="display: none">
                                     <label class="block text-sm font-medium mb-1" for="shift_id">Shift</label>
@@ -411,6 +422,8 @@
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     // 1. Script Format Rupiah (Jalankan Global)
     function formatRupiahInput(el) {
@@ -425,11 +438,17 @@
         }
     });
 
+    $(document).ready(function() {
+        $('.select2-multiple').select2({
+            placeholder: "Pilih Kategori Barang",
+            allowClear: true,
+            width: '100%' // Menjaga lebar select2 tetap responsive di dalam modal
+        });
+    });
+
     // 2. Fungsi toggleInputs (Dibuat Global agar bisa dipanggil HTML onchange)
     function toggleInputs() {
-        // Ambil elemen berdasarkan ID saat fungsi dijalankan
         const role = document.getElementById('role').value;
-        // Gunakan optional chaining (?.) untuk menghindari error jika elemen tidak ada
         const bagianTeknisi = document.getElementById('bagian_teknisi')?.value;
 
         const extraFields = document.getElementById('extra-fields');
@@ -443,7 +462,9 @@
         const persenInvestorProdukInput = document.getElementById('persen_investor_produk_input');
         const bonusLevelingContainer = document.getElementById('bonus-leveling-container');
 
-        // Logic display
+        // TAMBAHAN: Deklarasikan Kategori Investor Input
+        const kategoriInvestorInput = document.getElementById('kategori_investor_input');
+
         if (role === 'Investor') {
             extraFields.style.display = 'none';
             uploadInvestor.style.display = 'block';
@@ -453,6 +474,10 @@
             ShiftInput.style.display = 'none';
             persenInvestorInput.style.display = 'block';
             persenInvestorProdukInput.style.display = 'block';
+
+            // Tampilkan Kategori Investor
+            if(kategoriInvestorInput) kategoriInvestorInput.style.display = 'block';
+
         } else if (role === 'Kepala Toko') {
             extraFields.style.display = 'none';
             uploadInvestor.style.display = 'none';
@@ -462,6 +487,10 @@
             ShiftInput.style.display = 'none';
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
+
+            // Sembunyikan Kategori Investor
+            if(kategoriInvestorInput) kategoriInvestorInput.style.display = 'none';
+
         } else if (role === 'Admin Toko') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
@@ -472,6 +501,9 @@
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
             if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
+
+            if(kategoriInvestorInput) kategoriInvestorInput.style.display = 'none';
+
         } else if (role === 'Teknisi') {
             extraFields.style.display = 'block';
             uploadInvestor.style.display = 'none';
@@ -480,20 +512,15 @@
             ShiftInput.style.display = 'block';
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
-
             bonusInterfaceInput.style.display = 'block';
+            if(kategoriInvestorInput) kategoriInvestorInput.style.display = 'none';
 
             if (bagianTeknisi === 'Teknisi Interface') {
                 if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'block';
                 if(bonusPersen) bonusPersen.style.display = 'none';
             } else {
-
-                bonusLevelingContainer.style.display = 'none';
-                bonusPersen.style.display = 'block';
-
-                console.log('====================================');
-                console.log(bonusPersen);
-                console.log('====================================');
+                if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
+                if(bonusPersen) bonusPersen.style.display = 'block';
             }
 
         } else if (role === 'Sales') {
@@ -507,6 +534,7 @@
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
             if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
+            if(kategoriInvestorInput) kategoriInvestorInput.style.display = 'none';
         }
     }
 
