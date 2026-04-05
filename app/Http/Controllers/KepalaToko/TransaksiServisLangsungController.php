@@ -22,7 +22,8 @@ use App\Models\TipeOs;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\TransaksiBaruNotification;
 class TransaksiServisLangsungController extends Controller
 {
 
@@ -632,6 +633,23 @@ class TransaksiServisLangsungController extends Controller
             } catch (\Exception $e) {
                 \Log::error("Gagal kirim Telegram: " . $e->getMessage());
             }
+
+            try {
+                $kepalaToko = User::find(1);
+
+                if($kepalaToko) {
+                    $judulNotif = 'Servis Baru Masuk! 📦';
+                    $isiNotif   = "No Servis: {$transaksi->nomor_servis}\nPelanggan: {$nama_pelanggan->nama}";
+                    $linkNotif  = route('transaksi-servis-sudah-diambil.index');
+
+                    // Kirim ke notifikasi
+                    Notification::send($kepalaToko, new TransaksiBaruNotification($judulNotif, $isiNotif, $linkNotif));
+                }
+
+            } catch (\Exception $e) {
+                \Log::error("Gagal kirim notifikasi: " . $e->getMessage());
+            }
+
             toast('Data servis berhasil disimpan.', 'success');
 
             return redirect()->route('transaksi-servis-sudah-diambil.index')->with('success', 'Data servis berhasil disimpan.');

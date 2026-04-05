@@ -19,7 +19,8 @@ use Illuminate\Support\Facades\Auth;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Facades\Http;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
-
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\TransaksiBaruNotification;
 class Index extends Component
 {
     use LivewireAlert;
@@ -397,6 +398,23 @@ class Index extends Component
             } catch (\Exception $e) {
                 \Log::error("Gagal kirim Telegram: " . $e->getMessage());
             }
+
+            try {
+                $kepalaToko = User::find(1);
+
+                if($kepalaToko) {
+                    $judulNotif = 'Penjualan Baru Masuk! 📦';
+                    $isiNotif   = "No Invoice: {$sale->invoice_no}\nPelanggan: {$nama_pelanggan->nama}";
+                    $linkNotif  = url('produk/transaksi-produk');
+
+                    // Kirim ke notifikasi
+                    Notification::send($kepalaToko, new TransaksiBaruNotification($judulNotif, $isiNotif, $linkNotif));
+                }
+
+            } catch (\Exception $e) {
+                \Log::error("Gagal kirim notifikasi: " . $e->getMessage());
+            }
+
 
             $this->alert('success', 'Transaksi penjualan berhasil dibuat!');
 

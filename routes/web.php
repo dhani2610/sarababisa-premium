@@ -354,7 +354,53 @@ Route::get('master/master-absensi/export', [AttendanceController::class, 'export
 
     // 4. Proses Simpan Password (POST)
     Route::post('/lupa-password/update', [DirectPasswordResetController::class, 'updatePassword'])->name('direct.reset.update');
+
+;
 Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja'])->group(function () {
+
+
+    Route::post('/push-subscribe', function (\Illuminate\Http\Request $request) {
+        // Menggunakan method input() lebih aman untuk mengambil data JSON yang bersarang (nested)
+        $endpoint = $request->input('endpoint');
+        $token = $request->input('keys.p256dh');
+        $auth = $request->input('keys.auth');
+
+        // Simpan token ke database untuk user yang sedang login
+        auth()->user()->updatePushSubscription($endpoint, $token, $auth);
+
+        return response()->json(['success' => true]);
+    });
+
+    Route::get('/test-notif', function () {
+        $user = auth()->user();
+
+        if (!$user) {
+            return "Anda harus login dulu!";
+        }
+
+        // Cek apakah user sudah punya token push di database
+        if ($user->pushSubscriptions()->count() === 0) {
+            return "User " . $user->name . " belum mengizinkan notifikasi di browser atau belum subscribe (tabel push_subscriptions kosong).";
+        }
+
+        try {
+            // Buat data dummy transaksi
+            $dummyTransaksi = new \stdClass();
+            $dummyTransaksi->nomor_servis = 'TEST-' . rand(1000, 9999);
+            $dummyTransaksi->nama_pelanggan = 'Bapak Tester';
+
+            // Kirim notif ke user yang sedang membuka URL ini
+            \Illuminate\Support\Facades\Notification::send(
+                $user,
+                new \App\Notifications\TransaksiBaruNotification($dummyTransaksi)
+            );
+
+            return "Notifikasi sukses dikirim ke " . $user->name . "! Silakan cek layar pojok kanan/bawah Anda.";
+
+        } catch (\Exception $e) {
+            return "Gagal mengirim notifikasi. Error: " . $e->getMessage();
+        }
+    });
 
     Route::get('top-produk-kepala-toko/data',[KepalaTokoProdukController::class, 'dataTop'])->name('top-produk-kepala-toko.data');
     Route::get('top-produk-kepala-toko', [KepalaTokoProdukController::class, 'indexTopNew'])->name('top-produk-kepala-toko');

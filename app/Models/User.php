@@ -11,13 +11,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
+use NotificationChannels\WebPush\HasPushSubscriptions;
 class User extends Authenticatable
 {
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
-    use Notifiable;
+    use Notifiable,HasPushSubscriptions;
     use TwoFactorAuthenticatable;
     use SoftDeletes;
 
@@ -26,46 +26,6 @@ class User extends Authenticatable
      *
      * @var string[]
      */
-    // protected $fillable = [
-    //     'nama_portal',
-    //     'name',
-    //     'email',
-    //     'password',
-    //     'username',
-    //     'alamat',
-    //     'role',
-    //     'types_id',
-    //     'nomor_hp',
-    //     'nik',
-    //     'persen',
-    //     'owner',
-    //     'kota',
-    //     'nama_toko',
-    //     'deskripsi_toko',
-    //     'alamat_toko',
-    //     'nomor_hp_toko',
-    //     'bank',
-    //     'rekening',
-    //     'pemilik_rekening',
-    //     'profile_photo_path',
-    //     'workers_id',
-    //     'exp_date',
-    //     'phones',
-    //     'banks',
-    //     'foto_portal',
-    //     'color_portal',
-    //     'ig',
-    //     'fb',
-    //     'tiktok',
-    //     'bagian_teknisi',
-    //     'pdf_investor',
-    //     'foto_login',
-    //     'tipe_bonus_admin',
-    //     'nominal_bonus_admin',
-    //     'shift_id',
-    //     'cabang_id',
-    //     'total_cabang',
-    // ];
 
     protected $guarded = [];
 

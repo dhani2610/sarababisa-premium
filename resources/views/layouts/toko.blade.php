@@ -25,7 +25,7 @@
         class="font-inter antialiased bg-slate-100 text-slate-600"
         :class="{ 'sidebar-expanded': sidebarExpanded }"
         x-data="{ sidebarOpen: false, sidebarExpanded: localStorage.getItem('sidebar-expanded') == 'true' }"
-        x-init="$watch('sidebarExpanded', value => localStorage.setItem('sidebar-expanded', value))"    
+        x-init="$watch('sidebarExpanded', value => localStorage.setItem('sidebar-expanded', value))"
     >
 
         <script>
@@ -54,7 +54,7 @@
             </div>
 
         </div>
-        
+
         @livewireScripts
 
         <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -62,5 +62,60 @@
         <x-livewire-alert::scripts />
 
         @stack('scripts')
+        @if(auth()->check() && (auth()->user()->role == 'Kepala Toko' || auth()->user()->id == 1))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+
+                // Helper wajib untuk konversi VAPID key
+                function urlBase64ToUint8Array(base64String) {
+                    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+                    const rawData = window.atob(base64);
+                    const outputArray = new Uint8Array(rawData.length);
+                    for (let i = 0; i < rawData.length; ++i) {
+                        outputArray[i] = rawData.charCodeAt(i);
+                    }
+                    return outputArray;
+                }
+
+                // Daftarkan Service Worker
+                if ('serviceWorker' in navigator && 'PushManager' in window) {
+                    console.log("Service Worker didukung oleh browser!"); // CEK 1
+                    
+                    navigator.serviceWorker.register('/sw.js').then(function (registration) {
+                        console.log("Service Worker berhasil didaftarkan!"); // CEK 2
+                        // Minta izin ke user
+                        Notification.requestPermission().then(function (permission) {
+                            if (permission === 'granted') {
+                                const vapidPublicKey = "{{ env('VAPID_PUBLIC_KEY') }}";
+                                const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+
+                                // Subscribe ke server Push (Google/Mozilla)
+                                registration.pushManager.subscribe({
+                                    userVisibleOnly: true,
+                                    applicationServerKey: convertedVapidKey
+                                }).then(function (subscription) {
+
+                                    // Kirim token ke Route web.php kita
+                                    fetch('/push-subscribe', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        },
+                                        body: JSON.stringify(subscription)
+                                    });
+
+                                }).catch(function (error) {
+                                    console.error('Push subscription error: ', error);
+                                });
+                            }
+                        });
+
+                    });
+                }
+            });
+        </script>
+        @endif
     </body>
 </html>

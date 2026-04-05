@@ -25,5 +25,9 @@ class AppServiceProvider extends ServiceProvider
     {
         config(['app.locale' => 'id']);
         \Carbon\Carbon::setLocale('id');
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            putenv('OPENSSL_CONF=C:\xampp\apache\conf\openssl.cnf');
+        }
     }
 }
