@@ -27,7 +27,7 @@ class LaporanTeknisiController extends Controller
 
         $profithariInterface = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
-            ->whereIn('tipe', ['Interface','Interface Leveling'])
+            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
             ->where('users_id', Auth::user()->id)
             ->whereDate('tgl_disetujui', today())
             ->get()
@@ -41,7 +41,7 @@ class LaporanTeknisiController extends Controller
             ->sum('profit');
 
         $bonusTeknisiServisInterface = TeknisiServis::where('users_id', Auth::user()->id)
-            ->whereIn('tipe', ['Interface','Interface Leveling'])
+            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
             ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
                 $query->where('is_approve', 'Setuju') // Pastikan status sudah disetujui
                 ->whereDate('tgl_disetujui', today());
@@ -72,7 +72,7 @@ class LaporanTeknisiController extends Controller
 
         $profitbulanInterface = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
-            ->whereIn('tipe', ['Interface','Interface Leveling'])
+            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
             ->where('users_id', Auth::user()->id)
             ->whereMonth('tgl_disetujui', $currentMonth)
             ->get()
@@ -94,7 +94,7 @@ class LaporanTeknisiController extends Controller
 
         $profittahunInterface = ServiceTransaction::with('serviceaction')
             ->where('is_approve', 'Setuju')
-            ->whereIn('tipe', ['Interface','Interface Leveling'])
+            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
             ->where('users_id', Auth::user()->id)
             ->whereYear('tgl_disetujui', $currentYear)
             ->get()

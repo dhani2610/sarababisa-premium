@@ -845,17 +845,20 @@ class BisaDiambilController extends Controller
                     // --- 4. HITUNG PROFIT PER TEKNISI ---
                     $profitTransaksi = $subTotalBiaya - $subTotalModal;
                     $nilaiBagiHasil = ($profitTransaksi) / 100;
-                    $profitToko = $profitTransaksi - ($nilaiBagiHasil * $persen_teknisi);
+                    // $profitToko = $profitTransaksi - ($nilaiBagiHasil * $persen_teknisi);
 
                     // Bonus Interface
                     $bonus_interface = 0;
+                    $potongan_teknisi = 0;
                     if ($request->kondisi_servis !== 'Dibatalkan' && $userId) {
                         $cekTeknisi = User::find($userId);
                         if ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface') {
-                            $nama_model = ModelSerie::find($itemOrigin->model_series_id);
+                            $nama_model = ModelSerie::find($request->model_series_id);
                             $bonus_interface = $nama_model->nominal_bonus ?? 0;
+
+                            $potongan_teknisi = $bonus_interface;
                         }elseif ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface Leveling') {
-                            $nama_model = ModelSerie::find($itemOrigin->model_series_id);
+                            $nama_model = ModelSerie::find($request->model_series_id);
 
                             $biayaPerAction = (int)filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
                             $bonus_leveling = \App\Models\BonusLeveling::where('id_user',$cekTeknisi->id)
@@ -870,9 +873,23 @@ class BisaDiambilController extends Controller
                                 $nama_model = ModelSerie::find($request->model_series_id);
                                 $bonus_interface = $nama_model->nominal_bonus ?? 0;
                             }
+                            $potongan_teknisi = $bonus_interface;
+
+                        }elseif ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Persentase Interface' && $tipeTeknisi == 'Interface Persentase') {
+                            $persen_interface = $cekTeknisi->persen_bonus_interface ?? 0;
+                            $persen_teknisi = $persen_interface;
+
+                            $bonus_interface = ($profitTransaksi / 100) * $persen_interface;
+                            $potongan_teknisi = $bonus_interface;
+                        }else {
+
+                            // Default: Teknisi Hardware / Persentase biasa
+                            $potongan_teknisi = ($profitTransaksi / 100) * $persen_teknisi;
+
                         }
                     }
 
+                    $profitToko = $profitTransaksi - $potongan_teknisi;
                     if ($request->kondisi_servis !== 'Dibatalkan' && $userId) {
                         TeknisiServis::create([
                             'service_transactions_id' => $itemOrigin->id,

@@ -141,7 +141,7 @@ if (!function_exists('bonusTeknisiMultiInterface')) {
         $currentMonth = now()->month;
 
         $teknisiServisInterface = TeknisiServis::where('users_id', Auth::user()->id)
-            ->whereIn('tipe', ['Interface','Interface Leveling'])
+            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
             ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
                 $query->where('is_approve', 'Setuju') // Pastikan status sudah disetujui
                     ->whereYear('tgl_disetujui', $currentYear)
@@ -185,13 +185,13 @@ if (!function_exists('bonusTeknisiMultiInterfaceByTransactionId')) {
         $currentMonth = now()->month;
 
         // $teknisiServisInterface = TeknisiServis::where('service_transactions_id', $transactionId)->where('users_id', $userId)
-        //     ->whereIn('tipe', ['Interface','Interface Leveling'])
+        //     ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
 
         //     ->sum('bonus_interface');
 
         $total_profit_interface = ServiceTransaction::where('id', $transactionId)->where('users_id', $userId)
         ->where('cabang_id',getCabangId())
-            ->whereIn('tipe', ['Interface','Interface Leveling'])
+            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
             ->where('is_approve', 'Setuju')
             ->sum('bonus_interface');
 
@@ -334,7 +334,7 @@ if (!function_exists('calculateBonus')) {
                     ->whereDate('tgl_disetujui', '>=', $start_date)
                     ->whereDate('tgl_disetujui', '<=', $end_date)
                     ->where('cabang_id',getCabangId())
-                    ->whereIn('tipe', ['Interface','Interface Leveling'])
+                    ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
                     ->where('is_approve', 'Setuju')
                     ->sum('bonus_interface');
             // return $total_profit_interface;

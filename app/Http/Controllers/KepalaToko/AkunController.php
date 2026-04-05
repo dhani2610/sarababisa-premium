@@ -137,7 +137,10 @@ class AkunController extends Controller
                 return $html;
             })
             ->addColumn('persen', function ($row) {
-                return '<div class="font-medium text-slate-800">' . e($row->persen) . '</div>';
+                return '<div class="font-medium text-slate-800">' . e($row->persen) . '%</div>';
+            })
+            ->addColumn('persen_interface', function ($row) {
+                return '<div class="font-medium text-slate-800">' . e($row->persen_bonus_interface) . '%</div>';
             })
             ->addColumn('pdf_investor', function ($row) {
                 if ($row->role == 'Investor' && $row->pdf_investor) {
@@ -231,7 +234,7 @@ class AkunController extends Controller
                 ';
             })
             // Tambahkan nama kolom baru ke rawColumns agar HTML link terbaca
-            ->rawColumns(['checkbox', 'name', 'username', 'bagian_teknisi', 'nik', 'alamat', 'nomor_hp', 'hak_akses', 'persen', 'pdf_investor','persen_investor','persen_investor_produk', 'shift_name', 'foto_ktp', 'foto_kk', 'foto_ijasah', 'dokumen_lain', 'aksi'])
+            ->rawColumns(['checkbox', 'name', 'username', 'bagian_teknisi', 'nik', 'alamat', 'nomor_hp', 'hak_akses', 'persen','persen_interface', 'pdf_investor','persen_investor','persen_investor_produk', 'shift_name', 'foto_ktp', 'foto_kk', 'foto_ijasah', 'dokumen_lain', 'aksi'])
             ->make(true);
     }
 
@@ -491,6 +494,7 @@ class AkunController extends Controller
             'nomor_hp' => $request->nomor_hp,
             'alamat' => $request->alamat,
             'persen' => $request->persen,
+            'persen_bonus_interface' => $request->persen_bonus_interface,
             'tipe_bonus_admin' => $request->tipe_bonus_admin,
             'nominal_bonus_admin' => $request->nominal_bonus_admin,
             'persen_investor' => $request->persen_investor ?? 0,
@@ -596,6 +600,7 @@ class AkunController extends Controller
             'persen' => $request->persen,
             'tipe_bonus_admin' => $request->tipe_bonus_admin,
             'persen_investor' => $request->persen_investor ?? 0,
+            'persen_bonus_interface' => $request->persen_bonus_interface,
             'persen_investor_produk' => $request->persen_investor_produk ?? 0,
             'nominal_bonus_admin' => $request->nominal_bonus_admin,
             'shift_id' => $request->shift_id,

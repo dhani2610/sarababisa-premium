@@ -39,7 +39,7 @@ class DashboardController extends Controller
             ->get();
 
         $bonusServisInterface = ServiceTransaction::with('serviceaction')
-            ->whereIn('tipe', ['Interface','Interface Leveling'])
+            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
             ->where('is_approve', 'Setuju')
             ->where('users_id', Auth::user()->id)
             ->whereYear('tgl_disetujui', $currentYear)
@@ -49,7 +49,7 @@ class DashboardController extends Controller
 
         // 1. Hitung Bonus Interface (Multi Teknisi)
         $teknisiServisInterface = TeknisiServis::where('users_id', Auth::user()->id)
-            ->whereIn('tipe', ['Interface','Interface Leveling'])
+            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
             ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
                 $query->where('is_approve', 'Setuju') // Pastikan status sudah disetujui
                     ->whereYear('tgl_disetujui', $currentYear)
@@ -78,7 +78,7 @@ class DashboardController extends Controller
         //     Auth::user()->id
         // );
         $bonusServisInterface = ServiceTransaction::with('serviceaction')
-            ->whereIn('tipe', ['Interface','Interface Leveling'])
+            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
             ->where('is_approve', 'Setuju')
             ->where('users_id', Auth::user()->id)
             ->whereYear('tgl_disetujui', $currentYear)

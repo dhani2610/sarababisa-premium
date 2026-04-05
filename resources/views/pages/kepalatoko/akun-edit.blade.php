@@ -165,17 +165,19 @@
                                 <!-- Semua field setelah role dibungkus -->
                                 <div id="extra-fields">
                                     <div id="bonus-interface-input">
-                                        <label class="block text-sm font-medium mb-1" for="role">Bonus
-                                            Interface?</label>
+                                        <label class="block text-sm font-medium mb-1" for="role">Tipe Bonus?</label>
                                         <select id="bagian_teknisi" name="bagian_teknisi"
                                             class="form-select text-sm py-1 w-full" onchange="toggleInputs()">
                                             <option value="">Pilih</option>
                                             <option value="Teknisi Interface"
-                                                {{ $item->bagian_teknisi == 'Teknisi Interface' ? 'selected' : '' }}>Nominal Pertipe
+                                                {{ $item->bagian_teknisi == 'Teknisi Interface' ? 'selected' : '' }}>Nominal Interface Pertipe
+                                            </option>
+                                            <option value="Teknisi Persentase Interface"
+                                                {{ $item->bagian_teknisi == 'Teknisi Persentase Interface' ? 'selected' : '' }}>Persentase Interface
                                             </option>
                                             <option value="Teknisi Hardware"
                                                 {{ $item->bagian_teknisi == 'Teknisi Hardware' ? 'selected' : '' }}>
-                                                Persentase</option>
+                                                Persentase Hardware</option>
                                         </select>
                                     </div>
 
@@ -360,6 +362,11 @@
                                         <input id="persen" name="persen" class="form-input w-full px-2 py-1"
                                             type="number" value="{{ $item->persen }}" placeholder="Contoh: 10" />
                                     </div>
+                                    <div id="bonus-persen-interface" style="display: none;">
+                                        <label class="block text-sm font-medium mb-1" for="persen_bonus_interface">Bonus Persentase Interface </label>
+                                        <input id="persen_bonus_interface" name="persen_bonus_interface" class="form-input w-full px-2 py-1"
+                                            type="number" value="{{ $item->persen_bonus_interface }}" placeholder="Contoh: 10" />
+                                    </div>
                                 </div>
 
                             </div>
@@ -455,14 +462,16 @@
         const uploadInvestor = document.getElementById('upload-investor');
         const bonusAdmin = document.getElementById('bonus-admin');
         const spesialisInput = document.getElementById('spesialis-input');
-        const bonusPersen = document.getElementById('bonus-persen');
+
+        // Element Persentase
+        const bonusPersen = document.getElementById('bonus-persen'); // Hardware
+        const bonusPersenInterface = document.getElementById('bonus-persen-interface'); // Interface
+
         const bonusInterfaceInput = document.getElementById('bonus-interface-input');
         const ShiftInput = document.getElementById('shift_input');
         const persenInvestorInput = document.getElementById('persen_investor_input');
         const persenInvestorProdukInput = document.getElementById('persen_investor_produk_input');
         const bonusLevelingContainer = document.getElementById('bonus-leveling-container');
-
-        // TAMBAHAN: Deklarasikan Kategori Investor Input
         const kategoriInvestorInput = document.getElementById('kategori_investor_input');
 
         if (role === 'Investor') {
@@ -500,8 +509,8 @@
             ShiftInput.style.display = 'block';
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
-            if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
 
+            if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
             if(kategoriInvestorInput) kategoriInvestorInput.style.display = 'none';
 
         } else if (role === 'Teknisi') {
@@ -513,14 +522,25 @@
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
             bonusInterfaceInput.style.display = 'block';
+
             if(kategoriInvestorInput) kategoriInvestorInput.style.display = 'none';
 
+            // --- LOGIKA BAGIAN TEKNISI ---
             if (bagianTeknisi === 'Teknisi Interface') {
                 if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'block';
                 if(bonusPersen) bonusPersen.style.display = 'none';
-            } else {
+                if(bonusPersenInterface) bonusPersenInterface.style.display = 'none';
+
+            } else if (bagianTeknisi === 'Teknisi Persentase Interface') {
                 if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
-                if(bonusPersen) bonusPersen.style.display = 'block';
+                if(bonusPersen) bonusPersen.style.display = 'none'; // Hardware Sembunyi
+                if(bonusPersenInterface) bonusPersenInterface.style.display = 'block'; // Interface Muncul
+
+            } else {
+                // Default: Teknisi Hardware atau belum memilih
+                if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
+                if(bonusPersen) bonusPersen.style.display = 'block'; // Hardware Muncul
+                if(bonusPersenInterface) bonusPersenInterface.style.display = 'none'; // Interface Sembunyi
             }
 
         } else if (role === 'Sales') {
@@ -528,11 +548,15 @@
             uploadInvestor.style.display = 'none';
             bonusAdmin.style.display = 'none';
             spesialisInput.style.display = 'none';
+
             if(bonusPersen) bonusPersen.style.display = 'block';
+            if(bonusPersenInterface) bonusPersenInterface.style.display = 'none'; // Pastikan sembunyi untuk Sales
+
             bonusInterfaceInput.style.display = 'none';
             ShiftInput.style.display = 'block';
             persenInvestorInput.style.display = 'none';
             persenInvestorProdukInput.style.display = 'none';
+
             if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
             if(kategoriInvestorInput) kategoriInvestorInput.style.display = 'none';
         }

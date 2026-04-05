@@ -170,9 +170,9 @@
                                                 <select id="bagian_teknisi" name="bagian_teknisi"
                                                     class="form-select text-sm py-1 w-full" onchange="toggleInputs()">
                                                     <option value="">Pilih</option>
-                                                    <option value="Teknisi Interface">Nominal Leveling Pertipe
-                                                    </option>
-                                                    <option value="Teknisi Hardware">Persentase</option>
+                                                    <option value="Teknisi Interface">Nominal Leveling Pertipe</option>
+                                                    <option value="Teknisi Persentase Interface">Persentase Interface</option>
+                                                    <option value="Teknisi Hardware">Persentase Hardware</option>
                                                 </select>
                                             </div>
                                             <br>
@@ -346,6 +346,14 @@
                                                     Bonus Hardware Persentase <span class="text-rose-500">*</span>
                                                 </label>
                                                 <input id="persen" name="persen"
+                                                    class="form-input w-full px-2 py-1" type="number"
+                                                    placeholder="Contoh: 10" />
+                                            </div>
+                                            <div id="bonus-persen-interface" style="display: none;">
+                                                <label class="block text-sm font-medium mb-1" for="persen_bonus_interface">
+                                                    Bonus Persentase Interface <span class="text-rose-500">*</span>
+                                                </label>
+                                                <input id="persen_bonus_interface" name="persen_bonus_interface"
                                                     class="form-input w-full px-2 py-1" type="number"
                                                     placeholder="Contoh: 10" />
                                             </div>
@@ -558,7 +566,10 @@
                                 <div class="font-semibold text-left">Hak Akses</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-semibold text-left">Persen</div>
+                                <div class="font-semibold text-left">Persen Hardware</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Persen Interface</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">PDF Investor</div>
@@ -614,19 +625,22 @@
 
         function toggleInputs() {
             const role = document.getElementById('role').value;
-            const bagianTeknisi = document.getElementById('bagian_teknisi').value;
+            const bagianTeknisi = document.getElementById('bagian_teknisi')?.value;
+
             const extraFields = document.getElementById('extra-fields');
             const uploadInvestor = document.getElementById('upload-investor');
             const bonusAdmin = document.getElementById('bonus-admin');
             const spesialisInput = document.getElementById('spesialis-input');
+
+            // Variabel Persentase
             const bonusPersen = document.getElementById('bonus-persen');
+            const bonusPersenInterface = document.getElementById('bonus-persen-interface'); // Tambahan Baru
+
             const bonusInterfaceInput = document.getElementById('bonus-interface-input');
             const ShiftInput = document.getElementById('shift_input');
             const persenInvestorInput = document.getElementById('persen_investor_input');
             const persenInvestorProdukInput = document.getElementById('persen_investor_input_produk');
             const bonusLevelingContainer = document.getElementById('bonus-leveling-container');
-
-            // TAMBAHAN: Variabel Input Kategori Investor
             const kategoriInvestorInput = document.getElementById('kategori_investor_input');
 
             if (role === 'Investor') {
@@ -638,8 +652,6 @@
                 ShiftInput.style.display = 'none';
                 persenInvestorInput.style.display = 'block';
                 persenInvestorProdukInput.style.display = 'block';
-
-                // Tampilkan Kategori
                 if (kategoriInvestorInput) kategoriInvestorInput.style.display = 'block';
 
             } else if (role === 'Kepala Toko') {
@@ -651,8 +663,6 @@
                 bonusInterfaceInput.style.display = 'none';
                 persenInvestorInput.style.display = 'none';
                 persenInvestorProdukInput.style.display = 'none';
-
-                // Sembunyikan
                 if (kategoriInvestorInput) kategoriInvestorInput.style.display = 'none';
 
             } else if (role === 'Admin Toko') {
@@ -665,39 +675,52 @@
                 persenInvestorInput.style.display = 'none';
                 persenInvestorProdukInput.style.display = 'none';
                 if (kategoriInvestorInput) kategoriInvestorInput.style.display = 'none';
+                if (bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
 
             } else if (role === 'Teknisi') {
                 extraFields.style.display = 'block';
                 uploadInvestor.style.display = 'none';
                 bonusAdmin.style.display = 'none';
                 spesialisInput.style.display = 'block';
-                bonusPersen.style.display = 'block';
                 bonusInterfaceInput.style.display = 'block';
                 ShiftInput.style.display = 'block';
                 persenInvestorInput.style.display = 'none';
                 persenInvestorProdukInput.style.display = 'none';
                 if (kategoriInvestorInput) kategoriInvestorInput.style.display = 'none';
 
+                // --- LOGIKA BAGIAN TEKNISI ---
                 if (bagianTeknisi === 'Teknisi Interface') {
-                    bonusLevelingContainer.style.display = 'block';
-                    bonusPersen.style.display = 'none';
-                } else if (bagianTeknisi === 'Teknisi Hardware') {
-                    bonusLevelingContainer.style.display = 'none';
-                    bonusPersen.style.display = 'block';
+                    if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'block';
+                    if(bonusPersen) bonusPersen.style.display = 'none';
+                    if(bonusPersenInterface) bonusPersenInterface.style.display = 'none';
+
+                } else if (bagianTeknisi === 'Teknisi Persentase Interface') {
+                    if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
+                    if(bonusPersen) bonusPersen.style.display = 'none'; // Sembunyikan Hardware
+                    if(bonusPersenInterface) bonusPersenInterface.style.display = 'block'; // Tampilkan Interface
+
                 } else {
-                    bonusPersen.style.display = 'block';
+                    // Default / Teknisi Hardware
+                    if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
+                    if(bonusPersen) bonusPersen.style.display = 'block'; // Tampilkan Hardware
+                    if(bonusPersenInterface) bonusPersenInterface.style.display = 'none'; // Sembunyikan Interface
                 }
+
             } else if (role === 'Sales') {
                 extraFields.style.display = 'block';
                 uploadInvestor.style.display = 'none';
                 bonusAdmin.style.display = 'none';
                 spesialisInput.style.display = 'none';
-                bonusPersen.style.display = 'block';
+
+                if (bonusPersen) bonusPersen.style.display = 'block';
+                if (bonusPersenInterface) bonusPersenInterface.style.display = 'none'; // Pastikan disembunyikan
+
                 bonusInterfaceInput.style.display = 'none';
                 ShiftInput.style.display = 'block';
                 persenInvestorInput.style.display = 'none';
                 persenInvestorProdukInput.style.display = 'none';
                 if (kategoriInvestorInput) kategoriInvestorInput.style.display = 'none';
+                if (bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
             }
         }
 
@@ -977,6 +1000,10 @@
                         {
                             data: 'persen',
                             name: 'persen'
+                        },
+                        {
+                            data: 'persen_interface',
+                            name: 'persen_interface'
                         },
                         {
                             data: 'pdf_investor',
