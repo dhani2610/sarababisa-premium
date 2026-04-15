@@ -47,7 +47,8 @@
                 x-transition:leave="transition ease-in-out duration-200"
                 x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-4"
                 x-cloak>
-                <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full">
+                {{-- <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full"> --}}
+                    <div id="modal-container-scroll" class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full relative">
                     <!-- Modal header -->
                     <div class="px-5 py-3 border-b border-slate-200">
                         <div class="flex justify-between items-center">
@@ -449,7 +450,7 @@
         $('.select2-multiple').select2({
             placeholder: "Pilih Kategori Barang",
             allowClear: true,
-            width: '100%' // Menjaga lebar select2 tetap responsive di dalam modal
+            width: '100%',
         });
     });
 

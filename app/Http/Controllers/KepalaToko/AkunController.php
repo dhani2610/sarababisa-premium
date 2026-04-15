@@ -346,7 +346,7 @@ class AkunController extends Controller
             ->count();
 
         $workers = Worker::where('cabang_id', $cabangId)->get();
-        $category = Category::where('cabang_id', $cabangId)->get();
+        $category = Category::all();
         $shift = Shift::where('cabang_id', $cabangId)->get();
         $selectedCategories = $item->kategori_investor ? json_decode($item->kategori_investor, true) : [];
         return view('pages.kepalatoko.akun-edit', [
