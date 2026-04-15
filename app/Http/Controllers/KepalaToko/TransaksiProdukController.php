@@ -45,29 +45,19 @@ class TransaksiProdukController extends Controller
         $limit = $request->get('limit', 200);
         $offset = $request->get('offset', 0);
 
-        if (Auth::user()->role != 'Sales') {
-            $orders = Order::select('orders.*', 'order_details.modal')
-                ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
-                ->with(['user', 'customer'])
-                ->where('orders.cabang_id',getCabangId())
-                ->orderByRaw('is_approve IS NULL DESC')
-                ->latest()
-                ->skip($offset)
-                ->take($limit)
-                ->get();
-        }else{
-            $orders = Order::select('orders.*', 'order_details.modal')
-                ->join('order_details', 'orders.id', '=', 'order_details.orders_id')
-                ->with(['user', 'customer'])
-                ->where('orders.users_id',Auth::user()->id)
-                ->where('orders.cabang_id',getCabangId())
-                ->orderByRaw('is_approve IS NULL DESC')
-                ->latest()
-                ->skip($offset)
-                ->take($limit)
-                ->get();
+        $query = Order::select('orders.*')
+        ->selectRaw('(SELECT SUM(modal) FROM order_details WHERE order_details.orders_id = orders.id) as modal')
+        ->with(['user', 'customer'])
+        ->where('orders.cabang_id', getCabangId())
+        ->orderByRaw('is_approve IS NULL DESC')
+        ->latest();
+
+        if (Auth::user()->role == 'Sales') {
+            $query->where('orders.users_id', Auth::user()->id);
         }
 
+        $orders = $query->skip($offset)->take($limit)->get();
+        
         return DataTables::of($orders)
             ->addIndexColumn()
             ->addColumn('checkbox', fn($row) => '
