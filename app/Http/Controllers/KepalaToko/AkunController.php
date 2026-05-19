@@ -600,7 +600,7 @@ class AkunController extends Controller
             'persen' => $request->persen,
             'tipe_bonus_admin' => $request->tipe_bonus_admin,
             'persen_investor' => $request->persen_investor ?? 0,
-            'persen_bonus_interface' => $request->persen_bonus_interface,
+            'persen_bonus_interface' => $request->persen_bonus_interface ?? 0,
             'persen_investor_produk' => $request->persen_investor_produk ?? 0,
             'nominal_bonus_admin' => $request->nominal_bonus_admin,
             'shift_id' => $request->shift_id,

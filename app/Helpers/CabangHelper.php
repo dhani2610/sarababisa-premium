@@ -334,6 +334,7 @@ if (!function_exists('calculateBonus')) {
                     ->whereDate('tgl_disetujui', '>=', $start_date)
                     ->whereDate('tgl_disetujui', '<=', $end_date)
                     ->where('cabang_id',getCabangId())
+                    ->where('status_servis', 'Sudah Diambil')
                     ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
                     ->where('is_approve', 'Setuju')
                     ->sum('bonus_interface');
@@ -343,6 +344,7 @@ if (!function_exists('calculateBonus')) {
                     ->whereDate('tgl_disetujui', '>=', $start_date)
                     ->whereDate('tgl_disetujui', '<=', $end_date)
                 ->where('cabang_id',getCabangId())
+                ->where('status_servis', 'Sudah Diambil')
                     ->where('is_approve', 'Setuju')
                     ->where('tipe', 'Hardware')
                     ->sum('profit');
