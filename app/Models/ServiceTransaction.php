@@ -77,6 +77,7 @@ class ServiceTransaction extends Model
         "status_pembayaran",
         "external_id",
         "paid_at",
+        "tipe_status_pembayaran",
     ];
 
     public function getActivitylogOptions(): LogOptions

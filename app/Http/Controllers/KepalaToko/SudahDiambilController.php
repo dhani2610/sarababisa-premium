@@ -90,6 +90,7 @@ class SudahDiambilController extends Controller
             // ✅ Tanggal Terima
             ->editColumn('created_at', fn($row) => Carbon::parse($row->created_at)->format('d/m/Y'))
 
+            ->addColumn('tipe_status_pembayaran', fn($row) => $row->tipe_status_pembayaran == 1 ? 'Lunas' : 'Belum Lunas')
             // ✅ Penerima
             ->addColumn('penerima', fn($row) => $row->penerima ?? '')
 
@@ -1274,6 +1275,7 @@ class SudahDiambilController extends Controller
                     'created_at' => $request->created_at,
                     'tgl_disetujui' => $request->tgl_disetujui,
                     'kondisi_servis' => $request->kondisi_servis,
+                    'tipe_status_pembayaran' => $request->tipe_status_pembayaran,
                     'tgl_selesai' => $request->tgl_selesai,
                     'penerima' => $request->penerima,
                     'customers_id' => $request->customers_id,

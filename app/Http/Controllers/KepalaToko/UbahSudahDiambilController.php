@@ -359,6 +359,7 @@ class UbahSudahDiambilController extends Controller
             'tgl_ambil' => $request->tgl_ambil,
             'pengambil' => $request->pengambil,
             'modal_sparepart' => $request->modal_sparepart,
+            'tipe_status_pembayaran' => $request->tipe_status_pembayaran,
             'biaya' => $request->biaya,
             'persen_teknisi' => $persen_teknisi,
             'omzet' => $request->biaya - $request->diskon,

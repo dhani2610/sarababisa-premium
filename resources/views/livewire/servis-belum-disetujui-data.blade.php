@@ -197,7 +197,7 @@
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Pengecekan Fungsi</div>
                             </th>
-                          
+
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Kondisi</div>
                             </th>
@@ -220,6 +220,9 @@
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Pembayaran</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Status Pembayaran</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Tgl Ambil</div>

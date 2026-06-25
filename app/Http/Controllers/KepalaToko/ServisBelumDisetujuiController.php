@@ -79,6 +79,8 @@ class ServisBelumDisetujuiController extends Controller
             // ✅ Tanggal Terima
             ->editColumn('created_at', fn($row) => Carbon::parse($row->created_at)->format('d/m/Y'))
 
+            ->addColumn('tipe_status_pembayaran', fn($row) => $row->tipe_status_pembayaran == 1 ? 'Lunas' : 'Belum Lunas')
+
             // ✅ Penerima
             ->addColumn('penerima', fn($row) => $row->penerima ?? '')
 
@@ -938,6 +940,7 @@ class ServisBelumDisetujuiController extends Controller
                     'brands_id' => $request->brands_id,
                     'model_series_id' => $request->model_series_id,
                     'kerusakan' => $request->kerusakan,
+                    'tipe_status_pembayaran' => $request->tipe_status_pembayaran,
                     'qc_masuk' => $qc_masuk_data,
                     'qc_keluar' => $qc_keluar_data,
                     'uang_muka' => $request->uang_muka,

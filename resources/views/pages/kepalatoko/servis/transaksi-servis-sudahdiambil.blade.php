@@ -173,6 +173,15 @@
                                         @endforeach
                                     </select>
 
+
+                                      <label class="block text-sm font-medium mb-1"
+                                            for="tipe_status_pembayaran">Status Pembayaran</label>
+                                        <select id="tipe_status_pembayaran" name="tipe_status_pembayaran"
+                                            class="form-select text-sm py-1 w-full">
+                                            <option value="0" {{ $item->tipe_status_pembayaran == 0 ? 'selected' : '' }}>Belum Lunas</option>
+                                            <option value="1" {{ $item->tipe_status_pembayaran == 1 ? 'selected' : '' }}>Lunas</option>
+                                        </select>
+
                                     <div x-show="caraPembayaran === 'Tunai & Transfer'" class="mt-3">
                                         <label class="block text-sm font-medium text-indigo-500">Silahkan isi hanya pada salah satu input saja: Tunai / Transfer</label>
                                         <div class="flex flex-row gap-3">

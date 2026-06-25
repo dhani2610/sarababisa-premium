@@ -765,6 +765,15 @@
                                                             @endforeach
                                                         </select>
 
+                                                        <label class="block text-sm font-medium mb-1"
+                                                            for="tipe_status_pembayaran">Status Pembayaran</label>
+                                                        <select id="tipe_status_pembayaran" name="tipe_status_pembayaran"
+                                                            class="form-select text-sm py-1 w-full">
+                                                            <option selected value="0">Belum Lunas</option>
+                                                            <option value="1">Lunas</option>
+                                                        </select>
+
+
                                                         <div x-show="caraPembayaran === 'Tunai & Transfer'"
                                                             class="mt-3">
                                                             <label

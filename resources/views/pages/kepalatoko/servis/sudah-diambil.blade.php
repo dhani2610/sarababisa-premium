@@ -71,6 +71,7 @@
                         {data: 'biaya', name: 'biaya'},
                         {data: 'diskon', name: 'diskon'},
                         {data: 'cara_pembayaran', name: 'cara_pembayaran'},
+                        {data: 'tipe_status_pembayaran', name: 'tipe_status_pembayaran'},
                         {data: 'tgl_ambil', name: 'tgl_ambil'},
                         {data: 'pengambil', name: 'pengambil'},
                         {data: 'penyerah', name: 'penyerah'},

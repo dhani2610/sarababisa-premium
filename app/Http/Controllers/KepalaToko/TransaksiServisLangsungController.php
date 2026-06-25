@@ -404,6 +404,7 @@ class TransaksiServisLangsungController extends Controller
                     'penerima' => $request->penerima,
                     'users_id' => $mainTechnicianId, // Penanggung Jawab Utama
                     'kondisi_servis' => $request->kondisi_servis,
+                    'tipe_status_pembayaran' => $request->tipe_status_pembayaran,
                     // 'service_actions_id' => $request->service_actions_id,
                     'tindakan_servis' => $mainTechDetails['tindakan'],
                     'modal_sparepart' => $grandTotalModal,
