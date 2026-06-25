@@ -352,6 +352,9 @@
                             {{-- KOLOM PEMBAYARAN (Rowspan Utama) --}}
                             @if ($isFirstRowTransaction)
                                 <td class="" rowspan="{{ $total_rows_transaksi }}" style="text-align: left; width: 80px;">
+                                    @if ($item->kondisi_servis != 'Dibatalkan')
+                                    <div><strong>Status:</strong><br> {{ $item->tipe_status_pembayaran == 1 ? 'Lunas' : 'Belum Lunas' }} <br>
+                                    @endif
                                     @php
                                         $metode = [];
                                         if (in_array($item->cara_pembayaran, $listNamaMetode)) {
