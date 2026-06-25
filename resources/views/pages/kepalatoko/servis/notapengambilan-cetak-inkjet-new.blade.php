@@ -162,11 +162,18 @@
                 <td class="capital row-line">: {{ $items->kondisi_servis }}</td>
 
                 @if ($items->kondisi_servis === 'Dibatalkan')
-                    <td class="b-left row-line">Metode Pembayaran</td>
-                    <td class="row-line">: - </td>
+                    <td class="b-left row-line">
+                        Metode Pembayaran
+                        <br><br> Status Pembayaran
+                    </td>
+                    <td class="row-line">
+                        : -
+                        <br><br> : {{ $items->tipe_status_pembayaran == 1 ? 'Lunas' : 'Belum Lunas' }}
+                    </td>
                 @else
                     <td class="b-left row-line">
                         {{ $items->cara_pembayaran === 'Kredit' ? 'Tempo' : 'Metode Pembayaran' }}
+                        <br><br> Status Pembayaran
                     </td>
                     <td class="row-line">:
                         @if ($items->cara_pembayaran === 'Tunai & Transfer')
@@ -180,6 +187,7 @@
                         @else
                             {{ $items->cara_pembayaran  }} Rp. {{ number_format($items->transfer) }}
                         @endif
+                        <br><br> : {{ $items->tipe_status_pembayaran == 1 ? 'Lunas' : 'Belum Lunas' }}
                     </td>
                 @endif
             </tr>

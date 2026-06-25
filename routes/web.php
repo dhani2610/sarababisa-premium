@@ -160,6 +160,7 @@ use App\Http\Controllers\KepalaToko\UbahStatusProsesServisController as KepalaTo
 use App\Http\Controllers\KepalaToko\TransaksiServisLangsungController as KepalaTokoTransaksiServisLangsungController;
 use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTransaksiServisLangsungController;
 use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as KepalaTokoServisBelumDisetujuiApproveController;
+use App\Http\Controllers\KepalaToko\BelumLunasController as KepalaTokoBelumLunasController;
 use App\Http\Controllers\TipeOsController;
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\DirectPasswordResetController;
@@ -475,6 +476,9 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
     Route::get('servis/transaksi-servis-sudah-diambil/data', [KepalaTokoSudahDiambilController::class,'getData'])->name('transaksi-servis-sudah-diambil.data');
     Route::resource('servis/transaksi-servis-sudah-diambil', KepalaTokoSudahDiambilController::class);
+
+    Route::get('servis/transaksi-servis-belum-lunas/data', [KepalaTokoBelumLunasController::class,'getData'])->name('transaksi-servis-belum-lunas.data');
+    Route::resource('servis/transaksi-servis-belum-lunas', KepalaTokoBelumLunasController::class);
 
     Route::get('servis/transaksi-servis-belum-disetujui/data', [KepalaTokoServisBelumDisetujuiController::class,'getData'])->name('transaksi-servis-belum-disetujui.data');
     Route::resource('servis/transaksi-servis-belum-disetujui', KepalaTokoServisBelumDisetujuiController::class);

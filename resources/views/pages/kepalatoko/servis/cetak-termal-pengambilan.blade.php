@@ -281,6 +281,10 @@
                     <td class="value">: {{ $items->cara_pembayaran }}</td>
                 </tr>
                 <tr>
+                    <td class="title">Status Pembayaran</td>
+                    <td class="value">: {{ $items->tipe_status_pembayaran == 1 ? 'Lunas' : 'Belum Lunas' }}</td>
+                </tr>
+                <tr>
                     @if ($items->exp_garansi === null)
                         <td class="title">Garansi</td>
                         <td class="value">: Tidak Ada</td>
