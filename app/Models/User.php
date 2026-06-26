@@ -287,6 +287,18 @@ class User extends Authenticatable
             ->whereMonth('created_at', $date->month);
     }
 
+    // public function filteredTargetSale()
+    // {
+    //     $date = request('filter_month') ? \Carbon\Carbon::parse(request('filter_month')) : now();
+
+    //     return $this->hasMany(SalesTarget::class, 'users_id', 'id')
+    //         ->whereYear('created_at', $date->year)
+    //         ->where('cabang_id', getCabangId())
+    //         ->whereMonth('created_at', $date->month);
+    // }
+
+    // ... fungsi lainnya di Model User
+
     public function filteredTargetSale()
     {
         $date = request('filter_month') ? \Carbon\Carbon::parse(request('filter_month')) : now();
@@ -297,4 +309,60 @@ class User extends Authenticatable
             ->whereMonth('created_at', $date->month);
     }
 
+    /**
+     * Fungsi baru untuk menghitung progres dan bonus target teknisi
+     */
+    public function getTargetTeknisiStats($totalBonus)
+{
+    $targets = $this->filteredTargetServis;
+    $services = $this->filteredServiceTransaction;
+
+    // Jika teknisi tidak punya target bulan ini
+    if ($targets->isEmpty()) {
+        return [
+            'target_text'   => '-',
+            'progres_text'  => '-',
+            'reward'        => 0,
+            'achieved_text' => '-' // <-- TAMBAHAN: Default kosong jika tidak ada target
+        ];
+    }
+
+    $tipeTarget = $targets->first()->tipe;
+
+    if ($tipeTarget == 'nominal') {
+        $achieved = $services->sum('profit');
+        $targetValue = $targets->sum('nominal');
+        $targetText = 'Rp ' . number_format($targetValue, 0, ',', '.');
+
+        // <-- TAMBAHAN: Format teks pencapaian nominal
+        $achievedText = 'Rp ' . number_format($achieved, 0, ',', '.');
+    } else {
+        $achieved = $services->count();
+        $targetValue = $targets->sum('item');
+        $targetText = $targetValue . ' Item';
+
+        // <-- TAMBAHAN: Format teks pencapaian item
+        $achievedText = $achieved . ' Item';
+    }
+
+    // Hitung persentase progres
+    $progres = $targetValue > 0 ? ($achieved / $targetValue) * 100 : 0;
+
+    // Batasi progres maksimal di 100% jika diinginkan
+    $progresLimit = $progres > 100 ? 100 : $progres;
+
+    // Hitung nominal bonus pencapaian
+    if ($achieved < $targetValue) {
+        $reward = $totalBonus * ($progresLimit / 100);
+    } else {
+        $reward = $totalBonus;
+    }
+
+    return [
+        'target_text'   => $targetText,
+        'progres_text'  => number_format($progresLimit, 1, ',', '.') . '%',
+        'reward'        => $reward,
+        'achieved_text' => $achievedText // <-- TAMBAHAN: Lempar ke view
+    ];
+}
 }

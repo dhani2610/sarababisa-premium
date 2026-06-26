@@ -9,11 +9,6 @@ use App\Http\Controllers\Controller;
 
 class TargetTeknisiController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         return view('pages/kepalatoko/target-teknisi/index');
@@ -26,57 +21,48 @@ class TargetTeknisiController extends Controller
         return response()->json(['message' => 'Data target teknisi berhasil dihapus.']);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $teknisi_name = User::find($request->users_id);
 
+        // Bersihkan format ribuan jika tipe yang dipilih adalah nominal
+        $nominal = null;
+        $item = null;
+
+        if (!empty($request->nominal)) {
+            // Menghapus semua karakter selain angka (menghapus titik/koma)
+            $nominal = preg_replace('/[^0-9]/', '', $request->nominal);
+            $item = !empty($request->nominal) ? 'nominal' : 'item';
+        } else {
+            $item = !empty($request->nominal) ? 'nominal' : 'item';
+        }
+
         TeknisiTarget::create([
-            'users_id' => $request->users_id,
-            'item' => $request->item,
+            'users_id'     => $request->users_id,
             'teknisi_name' => $teknisi_name->name,
-            'cabang_id' => getCabangId(),
+            'cabang_id'    => getCabangId(),
+            'tipe'         => !empty($request->nominal) ? 'nominal' : 'item',
+            'item'         => $item,
+            'nominal'      => $nominal,
         ]);
 
         return redirect()->route('target-teknisi.index');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $item = TeknisiTarget::findOrFail($id);
-        $teknisi = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
+        $teknisi = User::where('cabang_id', getCabangId())->where('role', 'Teknisi')->get();
 
         return view('pages.kepalatoko.target-teknisi.edit', [
             'item' => $item,
@@ -84,39 +70,36 @@ class TargetTeknisiController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        $item = TeknisiTarget::findOrFail($id);
-
+        $target = TeknisiTarget::findOrFail($id);
         $teknisi_name = User::find($request->users_id);
 
-        $item->update([
-            'users_id' => $request->users_id,
-            'item' => $request->item,
+        // Bersihkan format ribuan jika tipe yang dipilih adalah nominal
+        $nominal = null;
+        $item = null;
+
+        if ($request->tipe == 'nominal') {
+            $nominal = preg_replace('/[^0-9]/', '', $request->nominal);
+        } else {
+            $item = $request->item;
+        }
+
+        $target->update([
+            'users_id'     => $request->users_id,
             'teknisi_name' => $teknisi_name->name,
-            'created_at' => $request->created_at,
+            'tipe'         => $request->tipe,
+            'item'         => $item,
+            'nominal'      => $nominal,
+            'created_at'   => $request->created_at, // Opsional, sesuaikan kebutuhan
         ]);
 
         return redirect()->route('target-teknisi.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $item = TeknisiTarget::findOrFail($id);
-
         $item->delete();
 
         return redirect()->route('target-teknisi.index');

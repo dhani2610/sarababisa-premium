@@ -1,19 +1,14 @@
 <div>
-    <!-- Page header -->
     <div class="sm:flex sm:justify-between sm:items-center mb-3">
 
-        <!-- Left: Title -->
         <div class="mb-4 sm:mb-0">
             <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Target Teknisi✨</h1>
         </div>
 
-        <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
-            <!-- Search form -->
             <x-search-form placeholder="Cari berdasarkan nama" />
 
-            <!-- Create invoice button -->
             <div x-data="{ modalOpen: false }">
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true" aria-controls="tambah-modal">
                     <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
@@ -21,7 +16,6 @@
                     </svg>
                     <span class="hidden xs:block ml-2">Tambah Target</span>
                 </button>
-                <!-- Modal backdrop -->
                 <div
                     class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
                     x-show="modalOpen"
@@ -34,7 +28,6 @@
                     aria-hidden="true"
                     x-cloak
                 ></div>
-                <!-- Modal dialog -->
                 <div
                     id="tambah-modal"
                     class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
@@ -50,7 +43,6 @@
                     x-cloak
                 >
                     <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
-                        <!-- Modal header -->
                         <div class="px-5 py-3 border-b border-slate-200">
                             <div class="flex justify-between items-center">
                                 <div class="font-semibold text-slate-800">Tambah Hasil Target</div>
@@ -62,8 +54,7 @@
                                 </button>
                             </div>
                         </div>
-                        <!-- Modal content -->
-                        <form action="{{ route('target-teknisi.store') }}" method="post">
+                        <form action="{{ route('target-teknisi.store') }}" method="post" x-data="{ tipe: 'item' }">
                             @csrf
                             <div class="px-5 py-4">
                                 <div class="space-y-3">
@@ -76,24 +67,37 @@
                                             @endforeach
                                         </select>
                                     </div>
+
                                     <div>
-                                        <label class="block text-sm font-medium mb-1" for="item">Item <span class="text-rose-500">*</span></label>
-                                        <input id="item" name="item" class="form-input w-full px-2 py-1" type="number" required />
+                                        <label class="block text-sm font-medium mb-1" for="tipe_target">Tipe Target <span class="text-rose-500">*</span></label>
+                                        <select id="tipe_target" name="tipe_target" x-model="tipe" class="form-select text-sm py-1 w-full" required>
+                                            <option value="item">Berdasarkan Item</option>
+                                            <option value="nominal">Berdasarkan Nominal</option>
+                                        </select>
+                                    </div>
+
+                                    <div x-show="tipe === 'item'">
+                                        <label class="block text-sm font-medium mb-1" for="item">Jumlah Item <span class="text-rose-500">*</span></label>
+                                        <input id="item" name="item" class="form-input w-full px-2 py-1" type="number" x-bind:required="tipe === 'item'" />
+                                    </div>
+
+                                    <div x-show="tipe === 'nominal'" x-cloak>
+                                        <label class="block text-sm font-medium mb-1" for="nominal">Target Nominal (Rp) <span class="text-rose-500">*</span></label>
+                                        <input id="nominal" name="nominal" class="form-input w-full px-2 py-1" type="text" onkeyup="formatRibuan(this)" x-bind:required="tipe === 'nominal'" />
                                     </div>
                                 </div>
                             </div>
-                            <!-- Modal footer -->
                             <div class="px-5 py-4 border-t border-slate-200">
                                 <div class="flex flex-wrap justify-end space-x-2">
-                                    <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" @click="modalOpen = false">Batal</button>
-                                    <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Simpan</button>
+                                    <button type="button" class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" @click="modalOpen = false">Batal</button>
+                                    <button type="submit" class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Simpan</button>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
-            </div>                         
-            
+            </div>
+
         </div>
 
     </div>
@@ -121,10 +125,8 @@
                     </div>
                 </div>
             </div>
-            <!-- Table -->
             <div class="overflow-x-auto">
                 <table class="table-auto w-full">
-                    <!-- Table header -->
                     <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                         <tr>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
@@ -152,13 +154,11 @@
                             </th>
                         </tr>
                     </thead>
-                    <!-- Table body -->
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <!-- Row -->
                         @php
                             $i = 1
                         @endphp
-                        @foreach($targets as $item)                  
+                        @foreach($targets as $item)
                             <tr>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="flex items-center">
@@ -186,7 +186,13 @@
                                     @endif
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-medium">{{ $item->item }} item</div>
+                                    <div class="font-medium">
+                                        @if($item->tipe == 'nominal')
+                                            Rp {{ number_format($item->nominal, 0, ',', '.') }}
+                                        @else
+                                            {{ $item->item }} item
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                     <div class="space-x-1 flex">
@@ -198,7 +204,6 @@
                                                 </svg>
                                             </button>
                                         </a>
-                                        <!-- Start -->
                                         <div x-data="{ modalOpen: false }">
                                             <button class="text-rose-500 hover:text-rose-600 rounded-full" @click.prevent="modalOpen = true" aria-controls="danger-modal">
                                                 <span class="sr-only">Delete</span>
@@ -207,7 +212,6 @@
                                                     <path d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z" />
                                                 </svg>
                                             </button>
-                                            <!-- Modal backdrop -->
                                             <div
                                                 class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
                                                 x-show="modalOpen"
@@ -220,7 +224,6 @@
                                                 aria-hidden="true"
                                                 x-cloak
                                             ></div>
-                                            <!-- Modal dialog -->
                                             <div
                                                 id="danger-modal"
                                                 class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
@@ -237,25 +240,20 @@
                                             >
                                                 <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalOpen = false" @keydown.escape.window="modalOpen = false">
                                                     <div class="p-5 flex space-x-4">
-                                                        <!-- Icon -->
                                                         <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
                                                             <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16">
                                                                 <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
                                                             </svg>
                                                         </div>
-                                                        <!-- Content -->
                                                         <div>
-                                                            <!-- Modal header -->
                                                             <div class="mb-2">
                                                                 <div class="text-lg font-semibold text-slate-800">Apakah anda sudah yakin ?</div>
                                                             </div>
-                                                            <!-- Modal content -->
                                                             <div class="text-sm mb-10">
                                                                 <div class="space-y-2">
                                                                     <p>Jika sudah terhapus, maka tidak bisa dikembalikan lagi.</p>
                                                                 </div>
                                                             </div>
-                                                            <!-- Modal footer -->
                                                             <div class="flex flex-wrap justify-end space-x-2">
                                                                 <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" @click="modalOpen = false">Batal</button>
                                                                 <form action="{{ route('target-teknisi.destroy', $item->id) }}" method="post">
@@ -267,10 +265,9 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>                                            
+                                            </div>
                                         </div>
-                                        <!-- End -->
-                                    </div>
+                                        </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -281,6 +278,22 @@
     </div>
 
     <script>
+        // Fungsi JS untuk format ribuan
+        function formatRibuan(angka) {
+            let number_string = angka.value.replace(/[^,\d]/g, '').toString(),
+                split         = number_string.split(','),
+                sisa          = split[0].length % 3,
+                rupiah        = split[0].substr(0, sisa),
+                ribuan        = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            angka.value = rupiah;
+        }
+
         document.addEventListener('alpine:init', () => {
             Alpine.data('handleSelect', () => ({
                 selectall: false,
@@ -332,10 +345,9 @@
                     });
                 },
             }))
-        })    
+        })
     </script>
 
-    <!-- Pagination -->
     <div class="mt-8">
         {{ $targets->links() }}
     </div>

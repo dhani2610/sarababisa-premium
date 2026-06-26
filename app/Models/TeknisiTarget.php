@@ -16,6 +16,8 @@ class TeknisiTarget extends Model
         'created_at',
         'teknisi_name',
         'cabang_id',
+        'tipe',
+        'nominal',
     ];
 
     public function user()

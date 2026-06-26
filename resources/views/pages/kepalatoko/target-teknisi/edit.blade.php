@@ -5,33 +5,28 @@
 <x-toko-layout>
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
-        <!-- Page header -->
         <div class="sm:flex sm:justify-between sm:items-center mb-5">
 
-            <!-- Left: Title -->
             <div class="mb-4 sm:mb-0">
                 <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Target Teknisi ✨</h1>
             </div>
 
-            <!-- Right: Actions -->
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
-                <!-- Search form -->
                 <x-search-form placeholder="Cari berdasarkan nama" />
 
-                <!-- Create invoice button -->
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white">
                         <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
                             <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                         </svg>
                         <span class="hidden xs:block ml-2">Tambah Target</span>
-                </button>                      
-                
+                </button>
+
             </div>
 
         </div>
-        <div x-data="{ modalOpen: true }">
-            <!-- Modal backdrop -->
+
+        <div x-data="{ modalOpen: true, tipeTarget: '{{ $item->tipe ?? 'item' }}' }">
             <div
                 class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
                 x-show="modalOpen"
@@ -44,7 +39,6 @@
                 aria-hidden="true"
                 x-cloak
             ></div>
-            <!-- Modal dialog -->
             <div
                 id="edit-modal"
                 class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
@@ -60,7 +54,6 @@
                 x-cloak
             >
                 <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full">
-                    <!-- Modal header -->
                     <div class="px-5 py-3 border-b border-slate-200">
                         <div class="flex justify-between items-center">
                             <div class="font-semibold text-slate-800">Edit Target Teknisi</div>
@@ -72,7 +65,6 @@
                             </a>
                         </div>
                     </div>
-                    <!-- Modal content -->
                     <form action="{{ route('target-teknisi.update', $item->id) }}" method="post">
                         @method('PUT')
                         @csrf
@@ -84,32 +76,66 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="users_id">Teknisi</label>
-                                    <select id="users_id" name="users_id" class="form-select text-sm py-1 w-full">
-                                        <option selected value="{{ $item->user->id }}">{{ $item->user->name }}</option>
-                                        @foreach ($teknisi as $teknisi)
-                                            <option value="{{ $teknisi->id }}">{{ $teknisi->name }}</option>
+                                    <select id="users_id" name="users_id" class="form-select text-sm py-1 w-full" required>
+                                        @if($item->user)
+                                            <option selected value="{{ $item->user->id }}">{{ $item->user->name }}</option>
+                                        @endif
+                                        @foreach ($teknisi as $tkn)
+                                            <option value="{{ $tkn->id }}">{{ $tkn->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
+
                                 <div>
-                                    <label class="block text-sm font-medium mb-1" for="item">Item</label>
-                                    <input id="item" name="item" class="form-input w-full px-2 py-1" type="text" value="{{ $item->item }}" />
+                                    <label class="block text-sm font-medium mb-1" for="tipe_target">Tipe Target <span class="text-rose-500">*</span></label>
+                                    <select id="tipe_target" name="tipe" x-model="tipeTarget" class="form-select text-sm py-1 w-full" required>
+                                        <option value="item">Berdasarkan Item</option>
+                                        <option value="nominal">Berdasarkan Nominal</option>
+                                    </select>
                                 </div>
+
+                                <div x-show="tipeTarget === 'item'">
+                                    <label class="block text-sm font-medium mb-1" for="item">Jumlah Item <span class="text-rose-500">*</span></label>
+                                    <input id="item" name="item" class="form-input w-full px-2 py-1" type="number" value="{{ $item->item }}" x-bind:required="tipeTarget === 'item'" />
+                                </div>
+
+                                <div x-show="tipeTarget === 'nominal'" x-cloak>
+                                    <label class="block text-sm font-medium mb-1" for="nominal">Target Nominal (Rp) <span class="text-rose-500">*</span></label>
+                                    <input id="nominal" name="nominal" class="form-input w-full px-2 py-1" type="text" onkeyup="formatRibuan(this)" value="{{ $item->nominal ? number_format($item->nominal, 0, '', '.') : '' }}" x-bind:required="tipeTarget === 'nominal'" />
+                                </div>
+
                             </div>
                         </div>
-                        <!-- Modal footer -->
                         <div class="px-5 py-4 border-t border-slate-200">
                             <div class="flex flex-wrap justify-end space-x-2">
                                 <a href="{{ route('target-teknisi.index') }}" class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600">
                                     Batal
                                 </a>
-                                <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Simpan</button>
+                                <button type="submit" class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Simpan Perubahan</button>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        
+
     </div>
+
+    <script>
+        function formatRibuan(angka) {
+            // Hapus semua karakter selain angka (0-9)
+            let number_string = angka.value.replace(/[^0-9]/g, '').toString(),
+                sisa          = number_string.length % 3,
+                rupiah        = number_string.substr(0, sisa),
+                ribuan        = number_string.substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            // Tampilkan kembali hasil format
+            angka.value = rupiah;
+        }
+    </script>
 </x-toko-layout>
