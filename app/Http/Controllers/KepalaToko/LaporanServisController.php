@@ -406,6 +406,7 @@ class LaporanServisController extends Controller
         $start_date = $request->start_date;
         $end_date = $request->end_date;
         $tipe = $request->tipe; // Ambil input tipe dari form
+        $status_pembayaran = $request->status_pembayaran; // Ambil input tipe dari form
 
         // --- LOGIC UTAMA (BASE QUERY) ---
         // Kita buat query dasar dulu agar tidak perlu if-else di setiap variabel
@@ -428,6 +429,10 @@ class LaporanServisController extends Controller
                         ->whereDate('tgl_ambil', '<=', $end_date);
 
             $dateColumn = 'tgl_ambil'; // Set kolom tanggal untuk sorting
+        }
+
+        if ($status_pembayaran != 'all') {
+            $serviceQuery->where('tipe_status_pembayaran',$status_pembayaran);
         }
 
         // --- EKSEKUSI DATA (Menggunakan clone agar query dasar tidak berubah) ---

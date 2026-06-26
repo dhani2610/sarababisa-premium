@@ -126,7 +126,7 @@
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="users_id">Sales </label>
                                         <select id="users_id" name="users_id" class="form-select text-sm py-1 w-full" >
-                                            <option selected value="{{ $item->user->id }}">{{ $item->user->name }}</option>
+                                            <option selected value="{{ $item->user->id ?? '' }}">{{ $item->user->name ?? '' }}</option>
                                             @foreach ($users as $user)
                                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                                             @endforeach

@@ -87,6 +87,14 @@
                                                 <option value="Sudah Diambil">Sudah Diambil</option>
                                             </select>
                                         </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Status Pembayaran <span class="text-rose-500">*</span></label>
+                                            <select name="status_pembayaran" class="form-select text-sm py-1 w-full" id="status_pembayaran">
+                                                <option value="all">Semua</option>
+                                                <option value="0">Belum Lunas</option>
+                                                <option value="1">Sudah Lunas</option>
+                                            </select>
+                                        </div>
                                         @endif
                                         <div>
                                             <label class="block text-sm font-medium mb-1">Mulai tanggal <span class="text-rose-500">*</span></label>

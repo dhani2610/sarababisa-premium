@@ -256,6 +256,18 @@ class LaporanPenjualanController extends Controller
                        ->whereDate('created_at', '<=', $end_date);
         }
 
+       $status_pembayaran = $request->status_pembayaran; // Ambil input tipe dari form
+
+        if ($status_pembayaran != 'all') {
+            // 1. Terapkan ke orderQuery (Untuk perhitungan Total Pembayaran di bawah PDF)
+            $orderQuery->where('tipe_status_pembayaran', $status_pembayaran);
+
+            // 2. Terapkan ke detailQuery (Untuk List Data di tabel PDF dan Total Biaya/Profit)
+            $detailQuery->whereHas('order', function ($q) use ($status_pembayaran) {
+                $q->where('tipe_status_pembayaran', $status_pembayaran);
+            });
+        }
+
         if (!empty($kategori)) {
             // Filter berdasarkan kategori produk
             $detailQuery->whereHas('product', function ($q) use ($kategori) {

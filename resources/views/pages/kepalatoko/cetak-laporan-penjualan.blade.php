@@ -243,6 +243,8 @@
 					<td style="width: 60px; text-align: right;">Rp. {{ number_format($item->sub_total - $item->total) }}</td>
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
 					<td style="width: 70px; text-align: left;">
+                        <div><strong>Status:</strong><br> {{ $item->order->tipe_status_pembayaran == 1 ? 'Lunas' : 'Belum Lunas' }} <br>
+
                         @if ($item->order->payment_method == 'Tunai')
                             Tunai : Rp. {{ number_format($item->order->tunai) }}
                         @elseif ($item->order->payment_method == 'Transfer')
