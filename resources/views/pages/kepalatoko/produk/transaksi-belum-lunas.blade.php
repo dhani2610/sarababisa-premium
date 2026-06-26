@@ -1,16 +1,11 @@
 @section('title')
-    Transaksi Produk Lunas
+    Transaksi Produk
 @endsection
 <x-toko-layout>
 
 
-    <!-- ✅ DataTables core CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
-    <!-- ✅ (Opsional) DataTables Buttons extension CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
-
-    <!-- ✅ (Opsional) Jika kamu pakai Bootstrap -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
@@ -39,28 +34,6 @@
             <!-- More actions -->
             <div class="sm:flex sm:justify-between sm:items-center mb-5">
 
-                <!-- Left side -->
-                <div class="mb-4 sm:mb-0">
-                    <ul class="flex flex-wrap -m-1">
-                        <li class="m-1">
-                            <a href="{{ route('transaksi-produk.index') }}">
-                                <button class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500 duration-150 ease-in-out">Semua <span class="ml-1 text-slate-400">{{ $jumlah_semua }}</span></button>
-                            </a>
-                        </li>
-                        <li class="m-1">
-                            <a href="{{ route('transaksi-produk-paid.index') }}">
-                                <button class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-transparent shadow-sm  bg-indigo-500 text-white duration-150 ease-in-out">Lunas <span class="ml-1 text-indigo-200">{{ $jumlah_lunas }}</span></button>
-                            </a>
-                        </li>
-                        <li class="m-1">
-                            <a href="{{ route('transaksi-produk-due.index') }}">
-                                <button
-                                    class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500 duration-150 ease-in-out">Belum
-                                    Lunas <span class="ml-1 text-slate-400">{{ $jumlah_tidaklunas }}</span></button>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
                 {{-- <!-- Right side -->
                 <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
                     <div class="mb-0">
@@ -106,7 +79,7 @@
                         </div>
                     </div>
                     <!-- Table -->
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto p-4">
 
                         <table id="transaksiTable" class="table-auto w-full text-sm">
                             <thead
@@ -165,6 +138,8 @@
                             }
                         },
                         toggleAll() {
+                            console.log('klik');
+
                             this.selectall = !this.selectall;
                             checkboxes = document.querySelectorAll('input.table-item');
                             [...checkboxes].map((el) => {
@@ -267,7 +242,7 @@
                     let table = $('#transaksiTable').DataTable({
                         processing: false,
                         serverSide: false,
-                        // ajax: '{{ route('transaksi-produk.data.lunas') }}',
+                        // ajax: '{{ route('transaksi-produk.data') }}',
                         columns: [
                             @if (Auth::user()->role == 'Kepala Toko')
                             {
@@ -287,7 +262,7 @@
                             {
                                 data: 'invoice_no'
                             },
-                             {
+                            {
                                 data: 'item',
                                 render: function(data) {
                                     return data ?? '';
@@ -310,7 +285,7 @@
                                 {
                                     data: 'modal'
                                 },
-                                @endif
+                                 @endif
                             @endif {
                                 data: 'sub_total'
                             },
@@ -356,7 +331,6 @@
                         ]
                     });
 
-
                     // --- custom pagination load bertahap ---
                     let batchSize = 20;
                     let offset = 0;
@@ -366,7 +340,7 @@
                         if (loading) return;
                         loading = true;
                         $.ajax({
-                            url: '{{ route('transaksi-produk.data.lunas') }}?offset=' + offset + '&limit=' + batchSize,
+                            url: '{{ route('transaksi-produk-belum-lunas.data') }}?offset=' + offset + '&limit=' + batchSize,
                             success: function(response) {
                                 if (response.data.length > 0) {
                                     table.rows.add(response.data).draw(false);
@@ -380,6 +354,8 @@
                             }
                         });
                     }
+
+                    // mulai load pertama
                     loadBatch();
 
                     $('#parent-checkbox').on('click', function() {

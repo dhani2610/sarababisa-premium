@@ -161,6 +161,7 @@ use App\Http\Controllers\KepalaToko\TransaksiServisLangsungController as KepalaT
 use App\Http\Controllers\Teknisi\TransaksiServisLangsungController as TeknisiTransaksiServisLangsungController;
 use App\Http\Controllers\KepalaToko\ServisBelumDisetujuiApproveController as KepalaTokoServisBelumDisetujuiApproveController;
 use App\Http\Controllers\KepalaToko\BelumLunasController as KepalaTokoBelumLunasController;
+use App\Http\Controllers\KepalaToko\TransaksiProdukBelumLunasController as KepalaTokoTransaksiProdukBelumLunasController;
 use App\Http\Controllers\TipeOsController;
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\DirectPasswordResetController;
@@ -659,6 +660,10 @@ Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisControll
     Route::delete('/due-product-transactions/delete', [KepalaTokoTransaksiProdukDueController::class, 'deleteSelected']);
     Route::patch('/due-product-transactions/update', [KepalaTokoTransaksiProdukDueController::class, 'approveSelected']);
     Route::patch('/due-product-transactions/reject', [KepalaTokoTransaksiProdukDueController::class, 'rejectSelected']);
+
+    Route::resource('produk/transaksi-produk-belum-lunas', KepalaTokoTransaksiProdukBelumLunasController::class);
+
+    Route::get('data/transaksi-produk-belum-lunas', [KepalaTokoTransaksiProdukBelumLunasController::class, 'data'])->name('transaksi-produk-belum-lunas.data');
 
     // Route::resource('laporan/harian', KepalaTokoLaporanHarianController::class);
 

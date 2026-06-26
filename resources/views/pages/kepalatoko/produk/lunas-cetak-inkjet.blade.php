@@ -277,7 +277,8 @@
                 Subtotal (sebelum pajak): Rp. {{ number_format($total - $orderItem->sum('ppn')) }}
               </span><br>
             @endif
-            <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;">( {{ terbilang($total) }} rupiah )</span>
+            <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;">( {{ terbilang($total) }} rupiah )</span> <br>
+            <span style="text-transform: capitalize; font-size: 12px; font-weight: normal;">Status Pembayaran : <strong> {{ $order->tipe_status_pembayaran == 1 ? 'Lunas' : 'Belum Lunas'  }} </strong></span>
           </h3>
       </td>
     </tr>

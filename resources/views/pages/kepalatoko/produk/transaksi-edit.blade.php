@@ -115,6 +115,15 @@
                                         </select>
                                     </div>
                                     <div>
+                                        <label class="block text-sm font-medium mb-1"
+                                            for="tipe_status_pembayaran">Status Pembayaran</label>
+                                        <select wire:model.defer="tipe_status_pembayaran" id="tipe_status_pembayaran" name="tipe_status_pembayaran"
+                                            class="form-select text-sm py-1 w-full">
+                                            <option value="0" {{ $item->tipe_status_pembayaran == 0 ? 'selected' : '' }}>Belum Lunas</option>
+                                            <option value="1" {{ $item->tipe_status_pembayaran == 1 ? 'selected' : '' }}>Lunas</option>
+                                        </select>
+                                    </div>
+                                    <div>
                                         <label class="block text-sm font-medium mb-1" for="users_id">Sales </label>
                                         <select id="users_id" name="users_id" class="form-select text-sm py-1 w-full" >
                                             <option selected value="{{ $item->user->id }}">{{ $item->user->name }}</option>

@@ -157,6 +157,10 @@
               <td class="title">M.Pembayaran</td>
               <td class="value">: {{ $order->payment_method  }}</td>
           </tr>
+          <tr>
+              <td class="title">S.Pembayaran</td>
+              <td class="value">: {{ $order->tipe_status_pembayaran == 1 ? 'Lunas' : 'Belum Lunas'  }}</td>
+          </tr>
           @if ($order->payment_method == 'Tunai')
           <tr>
               <td class="title">Tunai</td>

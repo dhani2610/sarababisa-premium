@@ -57,7 +57,7 @@ class TransaksiProdukController extends Controller
         }
 
         $orders = $query->skip($offset)->take($limit)->get();
-        
+
         return DataTables::of($orders)
             ->addIndexColumn()
             ->addColumn('checkbox', fn($row) => '
@@ -95,6 +95,12 @@ class TransaksiProdukController extends Controller
             ->addColumn('sales', fn($row) => $row->user ? $row->user->name : '<span class="text-red-500">Akun dihapus</span>')
             ->addColumn('pelanggan', fn($row) => $row->customer ? $row->customer->nama : '-')
             ->addColumn('pembayaran', fn($row) => $row->payment_method)
+            ->addColumn('status_pembayaran', function ($row) {
+                if ($row->tipe_status_pembayaran == 0) {
+                    return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">Belum Lunas</div>';
+                }
+                return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-600">Lunas</div>';
+            })
             ->addColumn('modal', fn($row) => 'Rp. '.number_format($row->modal))
             ->addColumn('sub_total', fn($row) => 'Rp. '.number_format($row->sub_total))
             ->addColumn('pay', fn($row) => 'Rp. '.number_format($row->pay))
@@ -264,7 +270,7 @@ class TransaksiProdukController extends Controller
                     </div>
                 </div>';
             })
-            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi','item'])
+            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi','item','status_pembayaran'])
             ->make(true);
     }
 
@@ -336,6 +342,12 @@ class TransaksiProdukController extends Controller
             ->addColumn('sales', fn($row) => $row->user ? $row->user->name : '<span class="text-red-500">Akun dihapus</span>')
             ->addColumn('pelanggan', fn($row) => $row->customer ? $row->customer->nama : '-')
             ->addColumn('pembayaran', fn($row) => $row->payment_method)
+            ->addColumn('status_pembayaran', function ($row) {
+                if ($row->tipe_status_pembayaran == 0) {
+                    return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">Belum Lunas</div>';
+                }
+                return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-600">Lunas</div>';
+            })
             ->addColumn('modal', fn($row) => 'Rp. '.number_format($row->modal))
             ->addColumn('sub_total', fn($row) => 'Rp. '.number_format($row->sub_total))
             ->addColumn('pay', fn($row) => 'Rp. '.number_format($row->pay))
@@ -504,7 +516,7 @@ class TransaksiProdukController extends Controller
                     </div>
                 </div>';
             })
-            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi','item'])
+            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi','item','status_pembayaran'])
             ->make(true);
     }
     public function dataDue(Request $request)
@@ -565,6 +577,12 @@ class TransaksiProdukController extends Controller
             ->addColumn('sales', fn($row) => $row->user ? $row->user->name : '<span class="text-red-500">Akun dihapus</span>')
             ->addColumn('pelanggan', fn($row) => $row->customer ? $row->customer->nama : '-')
             ->addColumn('pembayaran', fn($row) => $row->payment_method)
+            ->addColumn('status_pembayaran', function ($row) {
+                if ($row->tipe_status_pembayaran == 0) {
+                    return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">Belum Lunas</div>';
+                }
+                return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-600">Lunas</div>';
+            })
             ->addColumn('modal', fn($row) => 'Rp. '.number_format($row->modal))
             ->addColumn('sub_total', fn($row) => 'Rp. '.number_format($row->sub_total))
             ->addColumn('pay', fn($row) => 'Rp. '.number_format($row->pay))
@@ -733,7 +751,7 @@ class TransaksiProdukController extends Controller
                     </div>
                 </div>';
             })
-            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi','item'])
+            ->rawColumns(['checkbox','invoice_no','sales','sisa','status','aksi','item','status_pembayaran'])
             ->make(true);
     }
 
@@ -1237,6 +1255,7 @@ class TransaksiProdukController extends Controller
             'nama_pelanggan' => $nama_pelanggan->nama,
             'users_id' => $request->users_id,
             'payment_method' => $request->payment_method,
+            'tipe_status_pembayaran' => $request->tipe_status_pembayaran,
             'pay' => $request->pay,
             'due' => $request->due,
             'created_at' => $request->created_at,

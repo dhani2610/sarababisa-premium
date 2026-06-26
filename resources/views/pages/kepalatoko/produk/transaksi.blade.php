@@ -136,6 +136,7 @@
                                     <th>Total Harga</th>
                                     <th>Jumlah Pembayaran</th>
                                     <th>Sisa Pembayaran</th>
+                                    <th>Status Pembayaran</th>
                                     @if (Auth::user()->role != 'Investor')
                                         <th>Status</th>
                                         <th>Aksi</th>
@@ -319,6 +320,12 @@
                             },
                             {
                                 data: 'sisa',
+                                render: function(data) {
+                                    return data ?? '';
+                                }
+                            },
+                            {
+                                data: 'status_pembayaran',
                                 render: function(data) {
                                     return data ?? '';
                                 }

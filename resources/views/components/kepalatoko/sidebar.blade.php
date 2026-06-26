@@ -483,6 +483,16 @@
                             </div>
                         </a>
                     </li>
+                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0">
+                        <a class="block text-slate-200 hover:text-white truncate transition duration-150" href="{{ route('transaksi-produk-belum-lunas.index') }}">
+                            <div class="flex items-center">
+                                <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                    <path class="fill-current text-slate-400" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 100-16 8 8 0 000 16zM11 7h2v5.414l3.293 3.293-1.414 1.414L11 13.293V7z" />
+                                </svg>
+                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Produk Belum Lunas</span>
+                            </div>
+                        </a>
+                    </li>
                 </ul>
             </div>
             <div>

@@ -112,6 +112,17 @@
                             </div>
 
                             <div class="w-full px-2">
+                                <label class="block text-sm font-medium mb-1"
+                                    for="tipe_status_pembayaran">Status Pembayaran</label>
+                                <select wire:model.defer="tipe_status_pembayaran" id="tipe_status_pembayaran" name="tipe_status_pembayaran"
+                                    class="form-select text-sm py-1 w-full">
+                                    <option value="0">Belum Lunas</option>
+                                    <option value="1">Lunas</option>
+                                </select>
+                            </div>
+
+
+                            <div class="w-full px-2">
                                 <label class="block text-sm font-medium mb-1" for="total_amount">Jumlah Total <span class="text-rose-500">*</span></label>
                                 <input id="total_amount" type="text"
                                     value="{{ number_format($total_amount, 0, ',', '.') }}"

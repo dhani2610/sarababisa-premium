@@ -91,6 +91,7 @@ class Index extends Component
     public $manual_kategori;
     public $manual_nomor_hp;
     public $manual_alamat;
+    public $tipe_status_pembayaran;
 
     // Saat ID Customer (Select2) berubah
     public function updatedCustomerId($value)
@@ -158,6 +159,7 @@ class Index extends Component
 
         $this->tax_percentage = 0;
         $this->paid_amount = 0;
+        $this->tipe_status_pembayaran = 0;
 
         $this->customers = Customer::where('cabang_id',getCabangId())->get();
     }
@@ -210,7 +212,6 @@ class Index extends Component
         DB::transaction(function () {
             $this->validate();
 
-            // dd($this->is_manual_customer);
 
             if ($this->is_manual_customer) {
                 $newCustomer = Customer::create([
@@ -296,6 +297,7 @@ class Index extends Component
                 'nama_pelanggan'          => $nama_pelanggan->nama,
                 'payment_status'      => $payment_status,
                 'payment_method'      => $this->payment_method,
+                'tipe_status_pembayaran'      => $this->tipe_status_pembayaran,
                 'tunai'      => $this->tunai,
                 'transfer'      => $this->transfer,
                 'note'                => $this->note,
