@@ -522,6 +522,13 @@ class AkunController extends Controller
 
         $user = User::create($data);
 
+        $karyawanData = $this->storeKaryawan($user);
+
+        $updateUser = User::find($user->id);
+        $updateUser->workers_id = $karyawanData['worker']->id;
+        $updateUser->shift_id = $karyawanData['shift']->id;
+        $updateUser->save();
+
         if ($request->role == 'Teknisi' && $request->bagian_teknisi == 'Teknisi Interface') {
             if ($request->has('lvl_start_rate')) {
                 foreach ($request->lvl_start_rate as $key => $start_rate) {
@@ -544,6 +551,62 @@ class AkunController extends Controller
         return redirect()->route('akun');
     }
 
+    public function storeKaryawan($data)
+    {
+        $item = new Worker();
+        $item->name = $data->name;
+        $item->jabatan = $data->role;
+        $item->status = 'Karyawan Kontrak';
+        $item->bulankerja = date('Y-m-d');
+        $item->gaji = 0;
+        $item->absen = 0;
+        $item->bpjs = 0;
+        $item->cabang_id = getCabangId();
+        $item->status_shift = 1;
+        $item->save();
+
+        if ((int)$item->status_shift == 1) {
+            $jamMasuk = '00:00:00';
+            $jamPulang = '23:59:59';
+        } else {
+            $jamMasuk = '10:00:00';
+            $jamPulang = '21:00:00';
+        }
+
+        $shiftCheck = Shift::where('worker_id', $item->id)->first();
+        $shiftInstance = null; // Siapkan variabel untuk menampung Shift
+
+        if (!empty($shiftCheck)) {
+            $shiftCheck->nominal_gaji = 0;
+            $shiftCheck->jam_masuk = $jamMasuk;
+            $shiftCheck->jam_pulang = $jamPulang;
+            $shiftCheck->save();
+
+            $shiftInstance = $shiftCheck; // Masukkan ke variabel
+        } else {
+            $newShift = new Shift();
+            $newShift->nama_shift = 'SHIFT ' . $item->name;
+            $newShift->jam_masuk = $jamMasuk;
+            $newShift->jam_pulang = $jamPulang;
+            $newShift->nominal_gaji = 0;
+            $newShift->potongan_terlambat = 0;
+            $newShift->potongan_tidak_masuk = 0;
+            $newShift->potongan_izin = 0;
+            $newShift->potongan_cuti = 0;
+            $newShift->potongan_sakit = 0;
+            $newShift->cabang_id = $item->cabang_id;
+            $newShift->worker_id = $item->id;
+            $newShift->save();
+
+            $shiftInstance = $newShift; // Masukkan ke variabel
+        }
+
+        // Return keduanya dalam bentuk array
+        return [
+            'worker' => $item,
+            'shift'  => $shiftInstance
+        ];
+    }
     public function getBonusLevelingDetail($id)
     {
         $data = BonusLeveling::where('id_user', $id)
