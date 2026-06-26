@@ -534,7 +534,7 @@
 
             } else if (bagianTeknisi === 'Teknisi Persentase Interface') {
                 if(bonusLevelingContainer) bonusLevelingContainer.style.display = 'none';
-                if(bonusPersen) bonusPersen.style.display = 'none'; // Hardware Sembunyi
+                if(bonusPersen) bonusPersen.style.display = 'block'; // Hardware Sembunyi
                 if(bonusPersenInterface) bonusPersenInterface.style.display = 'block'; // Interface Muncul
 
             } else {
