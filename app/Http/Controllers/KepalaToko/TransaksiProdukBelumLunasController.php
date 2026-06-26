@@ -15,7 +15,7 @@ class TransaksiProdukBelumLunasController extends Controller
 {
     public function index()
     {
-        $jumlah_semua = Order::where('cabang_id', getCabangId())->count();
+        $jumlah_semua = Order::where('cabang_id', getCabangId())->where('tipe_status_pembayaran',0)->count();
         $jumlah_lunas = Order::where('cabang_id', getCabangId())->where('due', '0')->count();
         $jumlah_tidaklunas = Order::where('cabang_id', getCabangId())->where('due', '>', '0')->count();
         $storeSettings = StoreSetting::where('cabang_id', getCabangId())->first();
