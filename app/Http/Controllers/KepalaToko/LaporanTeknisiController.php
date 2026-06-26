@@ -18,7 +18,7 @@ class LaporanTeknisiController extends Controller
 
         // Untuk Modal Cetak Laporan
         $users = User::where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
-        // $users = User::where('id',51)->where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
+        // $users = User::where('id',63)->where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
 
         return view('pages/kepalatoko/laporan-teknisi', compact('users'));
     }
@@ -101,46 +101,59 @@ class LaporanTeknisiController extends Controller
             ->where('cabang_id',getCabangId())
             ->orderBy('tgl_ambil', 'asc')
             ->get();
+
+        $services->map(function ($service) use ($request, $teknisi) {
+            $relasiTeknisi = \App\Models\TeknisiServis::where('service_transactions_id', $service->id)
+                ->where('users_id', $request->users_id)
+                ->first();
+
+            if ($relasiTeknisi) {
+                // Cek apakah akun tersebut Teknisi Interface dan tipenya Interface Leveling (atau varian Interface lainnya)
+                $tipeInterface = ['Interface Leveling', 'Interface', 'Interface Persentase'];
+
+
+                if ($teknisi->bagian_teknisi == 'Teknisi Interface' && in_array($relasiTeknisi->tipe, $tipeInterface)) {
+                    $service->bonus_interface = $relasiTeknisi->bonus_interface;
+
+
+                }
+                elseif ($relasiTeknisi->tipe == 'Hardware') {
+                    $service->bonus_interface = 0;
+                }
+
+
+                // $service->tipe = $relasiTeknisi->tipe;
+
+            } else {
+                $service->bonus_interface = 0;
+            }
+            // dd($relasiTeknisi,$teknisi->bagian_teknisi == 'Teknisi Interface' && in_array($relasiTeknisi->tipe, $tipeInterface),$relasiTeknisi->bonus_interface,$service);
+
+
+            return $service;
+        });
+
         // dd($services,servisIdMultiTeknisi($request->users_id));
         // Menghitung total biaya
-        $total_biaya = ServiceTransaction::where('status_servis', 'Sudah Diambil')->where('users_id', $request->users_id)
-            ->whereDate('tgl_ambil', '>=', $start_date)
-            ->whereDate('tgl_ambil', '<=', $end_date)
-            ->where('cabang_id',getCabangId())
-            ->sum('biaya');
+        $total_biaya = $services->sum('biaya');
 
         // Menghitung total tindakan
-        $total_tindakan = ServiceTransaction::where('users_id', $request->users_id)->where('status_servis', 'Sudah Diambil')
-            ->whereDate('tgl_ambil', '>=', $start_date)
-            ->whereDate('tgl_ambil', '<=', $end_date)
-            ->where('cabang_id',getCabangId())
-            ->count();;
+       $total_tindakan = $services->count();
 
-        // Menghitung total bonus
-            $total_profit_interface = ServiceTransaction::where('users_id', $request->users_id)
-            ->where('status_servis', 'Sudah Diambil')
-                ->whereDate('tgl_disetujui', '>=', $start_date)
-                ->whereDate('tgl_disetujui', '<=', $end_date)
-            ->where('cabang_id',getCabangId())
-                ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
-                ->where('is_approve', 'Setuju')
-                ->sum('bonus_interface');
-            // Menghitung total profit
-            $total_profit = ServiceTransaction::where('users_id', $request->users_id)
-            ->where('status_servis', 'Sudah Diambil')
-                ->whereDate('tgl_disetujui', '>=', $start_date)
-                ->whereDate('tgl_disetujui', '<=', $end_date)
-            ->where('cabang_id',getCabangId())
-                ->where('is_approve', 'Setuju')
-                ->where('tipe', 'Hardware')
-                ->sum('profit');
-                // ->get();
+        // 3. Menghitung total bonus interface (Hanya jumlahkan yang is_approve = 'Setuju' dan tipe Interface)
+        $total_profit_interface = $services->where('is_approve', 'Setuju')
+            ->whereIn('tipe', ['Interface', 'Interface Leveling', 'Interface Persentase'])
+            ->sum('bonus_interface');
 
-            // dd($total_profit,$teknisi->persen);
-        // $total_bonus_prof = $total_profit / 100 * $teknisi->persen +$bonusTeknisiServisHardware;
-        // $total_bonus = $total_bonus_prof + $total_profit_interface + $bonusTeknisiServisInterface ;
-        $total_bonus_prof = $total_profit / 100 * $teknisi->persen ;
-        $total_bonus = $total_bonus_prof + $total_profit_interface ;
+        // 4. Menghitung total profit hardware (Hanya jumlahkan yang is_approve = 'Setuju' dan tipe Hardware)
+        $total_profit = $services->where('is_approve', 'Setuju')
+            ->where('tipe', 'Hardware')
+            ->sum('profit');
+
+        // 5. Kalkulasi akhir
+        $total_bonus_prof = ($total_profit / 100) * $teknisi->persen;
+        $total_bonus = $total_bonus_prof + $total_profit_interface;
+
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-teknisi', [
         // return View('pages.kepalatoko.cetak-laporan-teknisi', [
             'users' => $users,

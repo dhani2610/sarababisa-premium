@@ -10,6 +10,7 @@ use App\Models\ModelSerie;
 use App\Models\MetodePembayaran;
 use App\Models\User;
 use App\Models\TeknisiServis;
+use App\Models\OrderDetail;
 use App\Models\ServiceTransaction;
 use Carbon\Carbon;
 if (!function_exists('getCabangId')) {
@@ -174,28 +175,48 @@ if (!function_exists('bonusTeknisiMultiHardware')) {
     }
 }
 if (!function_exists('bonusTeknisiMultiInterfaceByTransactionId')) {
-    function bonusTeknisiMultiInterfaceByTransactionId($transactionId = null,$id_user = null)
+    function bonusTeknisiMultiInterfaceByTransactionId($transactionId = null, $id_user = null)
     {
         if ($id_user == null) {
             $userId = Auth::user()->id;
-        }else{
+        } else {
             $userId = $id_user;
         }
-        $currentYear = now()->year;
-        $currentMonth = now()->month;
 
-        // $teknisiServisInterface = TeknisiServis::where('service_transactions_id', $transactionId)->where('users_id', $userId)
-        //     ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
+        // Ambil data teknisi untuk pengecekan "bagian_teknisi"
+        $teknisi = \App\Models\User::find($userId);
 
-        //     ->sum('bonus_interface');
-
-        $total_profit_interface = ServiceTransaction::where('id', $transactionId)->where('users_id', $userId)
-        ->where('cabang_id',getCabangId())
-            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
+        // Ambil data transaksi dalam bentuk collection (meskipun cuma 1 data)
+        $transactions = \App\Models\ServiceTransaction::where('id', $transactionId)
+            ->where('cabang_id', getCabangId())
             ->where('is_approve', 'Setuju')
-            ->sum('bonus_interface');
+            ->get();
 
-        return $total_profit_interface;
+        // Gunakan map persis seperti yang kamu buat sebelumnya
+        $transactions->map(function ($service)   use ($userId, $teknisi) {
+            $relasiTeknisi = \App\Models\TeknisiServis::where('service_transactions_id', $service->id)
+                ->where('users_id', $userId)
+                ->first();
+
+            if ($relasiTeknisi) {
+                $tipeInterface = ['Interface Leveling', 'Interface', 'Interface Persentase'];
+
+                // Cek role teknisi dan tipe dari relasi
+                if ($teknisi && $teknisi->bagian_teknisi == 'Teknisi Interface' && in_array($relasiTeknisi->tipe, $tipeInterface)) {
+                    $service->bonus_interface = $relasiTeknisi->bonus_interface;
+                } else {
+                    // Kalau bukan interface atau bukan teknisi interface, set 0
+                    $service->bonus_interface = 0;
+                }
+            } else {
+                $service->bonus_interface = 0;
+            }
+
+            return $service;
+        });
+
+        // Terakhir, kita jumlahkan 'bonus_interface' dari collection yang sudah di-override nilainya
+        return $transactions->sum('bonus_interface');
     }
 }
 if (!function_exists('bonusTeknisiMultiHardwareByTransactionId')) {
@@ -315,45 +336,75 @@ if (!function_exists('insertManualModelSerie')) {
     }
 }
 if (!function_exists('calculateBonus')) {
-    function calculateBonus($id)
+    function calculateBonus($id,$start_date = null, $end_date = null)
     {
         $user = User::find($id);
         $bonus = 0;
 
-        if (request('filter_month')) {
-            $date = \Carbon\Carbon::parse(request('filter_month'));
-        } else {
-            $date = \Carbon\Carbon::now();
+        if (empty($start_date) && empty($end_date)) {
+
+            if (request('filter_month')) {
+                $date = \Carbon\Carbon::parse(request('filter_month'));
+            } else {
+                $date = \Carbon\Carbon::now();
+            }
+            $start_date = $date->copy()->startOfMonth()->toDateString();
+            $end_date = $date->copy()->endOfMonth()->toDateString();
         }
 
-        $start_date = $date->copy()->startOfMonth()->toDateString();
-        $end_date = $date->copy()->endOfMonth()->toDateString();
 
         if ($user->role === 'Teknisi') {
-            $total_profit_interface = ServiceTransaction::where('users_id', $user->id)
-                    ->whereDate('tgl_disetujui', '>=', $start_date)
-                    ->whereDate('tgl_disetujui', '<=', $end_date)
-                    ->where('cabang_id',getCabangId())
-                    ->where('status_servis', 'Sudah Diambil')
-                    ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
-                    ->where('is_approve', 'Setuju')
-                    ->sum('bonus_interface');
-            // return $total_profit_interface;
-                // Menghitung total profit
-                $total_profit = ServiceTransaction::where('users_id', $user->id)
-                    ->whereDate('tgl_disetujui', '>=', $start_date)
-                    ->whereDate('tgl_disetujui', '<=', $end_date)
-                ->where('cabang_id',getCabangId())
-                ->where('status_servis', 'Sudah Diambil')
-                    ->where('is_approve', 'Setuju')
-                    ->where('tipe', 'Hardware')
-                    ->sum('profit');
 
-            $total_bonus_prof = $total_profit / 100 * $user->persen;
+            // 1. Ambil transaksi menggunakan helper multi-teknisi
+            $transactions = ServiceTransaction::whereIn('id', servisIdMultiTeknisi($user->id))
+                ->whereDate('tgl_disetujui', '>=', $start_date)
+                ->whereDate('tgl_disetujui', '<=', $end_date)
+                ->where('cabang_id', getCabangId())
+                ->where('status_servis', 'Sudah Diambil')
+                ->where('is_approve', 'Setuju')
+                ->get();
+
+            // 2. Map data untuk override value dari tabel teknisi_servis
+            $transactions->map(function ($service) use ($user) {
+                $relasiTeknisi = \App\Models\TeknisiServis::where('service_transactions_id', $service->id)
+                    ->where('users_id', $user->id)
+                    ->first();
+
+                if ($relasiTeknisi) {
+                    $tipeInterface = ['Interface Leveling', 'Interface', 'Interface Persentase'];
+
+                    // Cek apakah akun tersebut Teknisi Interface
+                    if ($user->bagian_teknisi == 'Teknisi Interface' && in_array($relasiTeknisi->tipe, $tipeInterface)) {
+                        $service->bonus_interface = $relasiTeknisi->bonus_interface;
+                    } else {
+                        $service->bonus_interface = 0;
+                    }
+
+                    // Override value utama agar hitungan per teknisi akurat
+                    $service->tipe = $relasiTeknisi->tipe;
+                    $service->profit = $relasiTeknisi->profit;
+
+                } else {
+                    $service->bonus_interface = 0;
+                    $service->profit = 0;
+                    $service->tipe = null;
+                }
+
+                return $service;
+            });
+
+            // 3. Hitung total dari collection yang sudah di-override
+            $total_profit_interface = $transactions->whereIn('tipe', ['Interface', 'Interface Leveling', 'Interface Persentase'])
+                ->sum('bonus_interface');
+
+            $total_profit = $transactions->where('tipe', 'Hardware')
+                ->sum('profit');
+
+            // 4. Kalkulasi hasil akhir
+            $total_bonus_prof = ($total_profit / 100) * $user->persen;
             $bonus = $total_bonus_prof + $total_profit_interface;
+
         } elseif ($user->role === 'Sales') {
-            // $bonus = $user->sale->sum('profit') / 100;
-            // $bonus *= $user->persen;
             $data = OrderDetail::where('users_id', $user->id)
             ->whereHas('order', function ($query) use ($start_date, $end_date) {
                 $query->where('is_approve', 'Setuju')
@@ -369,7 +420,6 @@ if (!function_exists('calculateBonus')) {
             $tipeBonusNota = $user->tipe_bonus_admin ?? 'Persen'; // default biar aman
             $persen = $user->persen ?? 0;
             $nominalBonus = $user->nominal_bonus_admin ?? 0;
-
 
             $service = ServiceTransaction::where('admin_id', $user->id)
             ->where('status_servis', 'Sudah Diambil')
@@ -409,7 +459,6 @@ if (!function_exists('calculateBonus')) {
         function getMetodePembayaran(){
             try {
                 $data = MetodePembayaran::where('cabang_id',getCabangId())->get();
-
                 return $data;
             } catch (\Throwable $th) {
                 return 0;

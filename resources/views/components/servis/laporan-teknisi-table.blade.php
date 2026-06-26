@@ -55,7 +55,6 @@
                         // $bonus_cek = ($item->servicetransaction->where('tipe','Hardware')->sum('profit') / 100) * $item->persen;
                         // $bonus = $bonus_cek + $item->servicetransaction->where('tipe','Interface')->sum('bonus_interface');
                         $bonus = calculateBonus($item->id);
-                        // dd($bonus);
                     @endphp
 
                     <tr>
