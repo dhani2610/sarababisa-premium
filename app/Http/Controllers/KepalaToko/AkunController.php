@@ -459,9 +459,8 @@ class AkunController extends Controller
     //     return redirect()->route('akun');
     // }
 
-    public function store(UserRequest $request)
+    public function store(Request $request)
     {
-        // dd($request->all());
         $request->merge([
             'nominal_bonus_admin' => str_replace('.', '', $request->nominal_bonus_admin),
         ]);
