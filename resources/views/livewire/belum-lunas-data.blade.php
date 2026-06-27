@@ -26,7 +26,7 @@
             width: 100% !important;
         }
     </style>
-    @include('layout.messages')
+    @include('layout.messages2')
     <div>
         <!-- Page header -->
         <div class="sm:flex sm:justify-between sm:items-center mb-3">
