@@ -266,7 +266,7 @@ class TransaksiServisLangsungController extends Controller
                 $modalSparepart = $request->total_modal_sparepart;
                 $biaya = $request->biaya ?? 0;
                 $profittransaksi = (int)$biaya - (int)$modalSparepart - (int)$request->diskon;
-                $bagihasil = ($biaya - $modalSparepart - $request->diskon) / 100;
+                $bagihasil = ($biaya - $modalSparepart - (int)$request->diskon) / 100;
 
 
                 $ppn = 0;
@@ -277,7 +277,7 @@ class TransaksiServisLangsungController extends Controller
 
                 // Hitung dasar (pakai diskon kalau ada)
                 if (!empty($request->diskon) && $request->diskon > 0) {
-                    $baseBiaya = $request->biaya - $request->diskon;
+                    $baseBiaya = $request->biaya - (int)$request->diskon;
                 } else {
                     $baseBiaya = $request->biaya;
                 }
@@ -418,7 +418,7 @@ class TransaksiServisLangsungController extends Controller
                     'profittoko' => $profittransaksi - ($bagihasil * $persen_teknisi),
                     'qc_keluar' => $qc_keluar_final,
                     'cara_pembayaran' => $request->cara_pembayaran,
-                    'diskon' => $request->diskon,
+                    'diskon' => (int)$request->diskon,
                     // 'garansi' => !empty($request->garansi) ? $request->garansi[0] : null,
                     'garansi' => $mainTechDetails['garansi'],
                     'exp_garansi' => $mainTechDetails['exp_garansi'],
