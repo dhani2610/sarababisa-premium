@@ -265,7 +265,7 @@ class TransaksiServisLangsungController extends Controller
 
                 $modalSparepart = $request->total_modal_sparepart;
                 $biaya = $request->biaya ?? 0;
-                $profittransaksi = $biaya - $modalSparepart - $request->diskon;
+                $profittransaksi = (int)$biaya - (int)$modalSparepart - (int)$request->diskon;
                 $bagihasil = ($biaya - $modalSparepart - $request->diskon) / 100;
 
 
