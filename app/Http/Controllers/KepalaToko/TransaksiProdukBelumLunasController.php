@@ -21,8 +21,12 @@ class TransaksiProdukBelumLunasController extends Controller
         $jumlah_lunas = Order::where('cabang_id', getCabangId())->where('due', '0')->count();
         $jumlah_tidaklunas = Order::where('cabang_id', getCabangId())->where('due', '>', '0')->count();
         $storeSettings = StoreSetting::where('cabang_id', getCabangId())->first();
-        $customers = Customer::where('cabang_id',getCabangId())->get();
 
+        $customers = Customer::where('cabang_id', getCabangId())
+        ->whereHas('sale', function ($query) {
+            $query->where('tipe_status_pembayaran', 0);
+        })
+        ->get();
         // Arahkan ke file blade yang baru
         return view('pages.kepalatoko.produk.transaksi-belum-lunas', compact(
             'jumlah_semua',

@@ -37,7 +37,6 @@ class BelumLunasData extends Component
     public function render()
     {
         $toko = User::find(1);
-        $customers = Customer::where('cabang_id',getCabangId())->get();
         $types = Type::where('cabang_id',getCabangId())->get();
         $brands = Brand::where('cabang_id',getCabangId())->get();
         $capacities = Capacity::where('cabang_id',getCabangId())->get();
@@ -47,6 +46,11 @@ class BelumLunasData extends Component
         $actions = ServiceAction::where('cabang_id',getCabangId())->get();
         $storeSetting = StoreSetting::where('cabang_id',getCabangId())->first();
 
+         $customers = Customer::where('cabang_id', getCabangId())
+        ->whereHas('servicetransaction', function ($query) {
+            $query->where('tipe_status_pembayaran', 0);
+        })
+        ->get();
         // Hitung khusus untuk badge Belum Lunas
         $jumlah_belum_lunas = ServiceTransaction::where('cabang_id',getCabangId())->where('tipe_status_pembayaran', '0')->count();
 
