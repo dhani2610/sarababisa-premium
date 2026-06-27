@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
@@ -17,6 +18,9 @@
             }
             div.dataTables_wrapper{
                 padding: 1%!important;
+            }
+            .select2-container {
+                width: 100% !important;
             }
         </style>
 
@@ -34,20 +38,34 @@
             <!-- More actions -->
             <div class="sm:flex sm:justify-between sm:items-center mb-5">
 
-                {{-- <!-- Right side -->
-                <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-                    <div class="mb-0">
-                        <select wire:model="paginate" id="" class="form-select">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                            <option value="250">250</option>
-                            <option value="500">500</option>
-                            <option value="1000">1000</option>
-                        </select>
+                <div x-data="{ modalOpen: false }">
+                    <button class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500"
+                        @click.prevent="modalOpen = true">
+                        Export Belum Lunas
+                    </button>
+
+                    <div x-show="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4" x-cloak>
+                        <div class="fixed inset-0 bg-slate-900 bg-opacity-30" @click="modalOpen = false"></div>
+                        <div class="bg-white rounded shadow-lg max-w-sm w-full p-5 z-10">
+                            <h2 class="font-semibold text-slate-800 mb-4">Pilih Customer</h2>
+                            <form action="{{ route('cetak-customer-produk-belum-lunas') }}" method="get"
+                                target="_blank">
+                                <select name="customers_id" class="form-select selectjs2 w-full mb-4" required>
+                                    <option value="">Pilih Pelanggan</option>
+                                    @foreach ($customers as $item)
+                                        <option value="{{ $item->id }}">{{ $item->nama }} - {{ $item->nomor_hp }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="flex justify-end space-x-2">
+                                    <button type="button" class="btn border-slate-200"
+                                        @click="modalOpen = false">Batal</button>
+                                    <button type="submit" class="btn bg-indigo-500 text-white">Cetak</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div> --}}
+                </div>
 
             </div>
 
@@ -236,8 +254,12 @@
 
             <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
             <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
             <script>
+                 $(document).ready(function() {
+                    $('.selectjs2').select2();
+                });
                 $(document).ready(function() {
                     let table = $('#transaksiTable').DataTable({
                         processing: false,

@@ -663,7 +663,7 @@ Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisControll
     Route::patch('/due-product-transactions/reject', [KepalaTokoTransaksiProdukDueController::class, 'rejectSelected']);
 
     Route::resource('produk/transaksi-produk-belum-lunas', KepalaTokoTransaksiProdukBelumLunasController::class);
-
+    Route::get('produk/cetak-customer-belum-lunas', [KepalaTokoTransaksiProdukBelumLunasController::class, 'cetakPerCustomer'])->name('cetak-customer-produk-belum-lunas');
     Route::get('data/transaksi-produk-belum-lunas', [KepalaTokoTransaksiProdukBelumLunasController::class, 'data'])->name('transaksi-produk-belum-lunas.data');
 
     // Route::resource('laporan/harian', KepalaTokoLaporanHarianController::class);

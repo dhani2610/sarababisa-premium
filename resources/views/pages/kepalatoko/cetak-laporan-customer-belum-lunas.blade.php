@@ -109,11 +109,7 @@
 
                 <th>Total Biaya Servis</th>
                 <th>: Rp. {{ number_format($total_biaya) }}</th>
-
             </tr>
-
-
-
         </tbody>
     </table>
 

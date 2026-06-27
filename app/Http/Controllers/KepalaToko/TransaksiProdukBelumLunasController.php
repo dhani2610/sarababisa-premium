@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\StoreSetting;
 use App\Models\OrderDetail;
+use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
@@ -19,14 +21,93 @@ class TransaksiProdukBelumLunasController extends Controller
         $jumlah_lunas = Order::where('cabang_id', getCabangId())->where('due', '0')->count();
         $jumlah_tidaklunas = Order::where('cabang_id', getCabangId())->where('due', '>', '0')->count();
         $storeSettings = StoreSetting::where('cabang_id', getCabangId())->first();
+        $customers = Customer::where('cabang_id',getCabangId())->get();
 
         // Arahkan ke file blade yang baru
         return view('pages.kepalatoko.produk.transaksi-belum-lunas', compact(
             'jumlah_semua',
             'jumlah_lunas',
             'jumlah_tidaklunas',
+            'customers',
             'storeSettings'
         ));
+    }
+
+    public function cetakPerCustomer(Request $request)
+    {
+
+        $request->validate(['customers_id' => 'required']);
+
+        // 1. Mengambil logo dan nama toko (Kepala Toko)
+        if (getCabangId() == 1) {
+            $users = User::find(1);
+        } else {
+            $users = User::where('cabang_id', getCabangId())
+                ->where('id', '!=', 1)
+                ->where('role', 'Kepala Toko')
+                ->orderBy('id', 'asc')
+                ->first();
+        }
+
+        // Fallback jika user kepala toko tidak ditemukan
+        if (!$users) {
+             $users = User::find(1);
+        }
+
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+
+        // 2. Filter Input
+        $customers_id = $request->customers_id;
+        $tipe       = $request->tipe; // Ambil input tipe (Sudah Disetujui / Belum Disetujui)
+
+        $detailQuery = OrderDetail::with('order')
+            ->where('cabang_id', getCabangId());
+
+        $orderQuery = Order::where('cabang_id', getCabangId());
+
+        $detailQuery->whereHas('order', function ($q) use ($customers_id) {
+            $q->where('customers_id', $customers_id);
+            $q->where('tipe_status_pembayaran', 0);
+
+        });
+
+        $orderQuery->where('customers_id', $customers_id);
+
+
+        $orders = (clone $detailQuery)->orderBy('created_at', 'asc')->get();
+
+        $total_biaya     = (clone $detailQuery)->sum('total');
+        $total_penjualan = (clone $detailQuery)->sum('quantity'); // Total Item
+
+        $sum_total       = (clone $detailQuery)->sum('total');
+        $sum_sub_total   = (clone $detailQuery)->sum('sub_total');
+
+
+        $dataOtherMetodePembayaran = [];
+        foreach (getMetodePembayaran() as $key => $value) {
+            $dt['metode'] = $value->nama;
+            $dt['total']    = (clone $orderQuery)->where('payment_method',$value->nama)->sum('transfer');
+            array_push($dataOtherMetodePembayaran,$dt);
+        }
+
+        $customerName  = Customer::find($request->customers_id)->first()->nama;
+
+        // 6. RENDER PDF
+        $pdf = \PDF::loadView('pages.kepalatoko.cetak-laporan-penjualan-belum-lunas', [
+            'users'           => $users,
+            'imagePath'       => $imagePath,
+            'orders'          => $orders,
+            'total_penjualan' => $total_penjualan,
+            'customerName'     => $customerName,
+            'total_biaya'     => $total_biaya,
+            'dataOtherMetodePembayaran'     => $dataOtherMetodePembayaran,
+            'tipe_laporan'    => $tipe // (Opsional) jika ingin menampilkan judul tipe di PDF
+        ]);
+
+        $filename = 'Laporan Transaksi Penjualan (' . ($tipe ?: 'Default') . ') ' . $customerName . '.pdf';
+
+        return $pdf->stream($filename);
     }
 
     public function data(Request $request)

@@ -45,7 +45,7 @@
                 <div x-data="{ modalOpen: false }">
                     <button class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500"
                         @click.prevent="modalOpen = true">
-                        Export PDF Belum Lunas
+                        Export Belum Lunas
                     </button>
 
                     <div x-show="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4" x-cloak>
