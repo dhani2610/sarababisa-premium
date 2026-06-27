@@ -41,6 +41,7 @@ class TransaksiServisLangsungController extends Controller
             'total_modal_sparepart' => str_replace('.', '', $request->total_modal_sparepart),
             'tunai' => str_replace('.', '', $request->tunai),
             'transfer' => str_replace('.', '', $request->transfer),
+            'diskon' => str_replace('.', '', $request->diskon),
         ]);
 
 

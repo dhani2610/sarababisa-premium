@@ -747,7 +747,7 @@
                                                         <label class="block text-sm font-medium mb-1"
                                                             for="diskon">Diskon</label>
                                                         <input id="diskon" name="diskon"
-                                                            class="form-input w-full px-2 py-1" type="text"
+                                                            class="form-input w-full px-2 py-1 input-currency" type="text"
                                                             placeholder="Kosongkan jika tidak ada diskon" />
                                                     </div>
                                                     <div x-data="{ caraPembayaran: 'Tunai' }">
