@@ -212,6 +212,10 @@ class Index extends Component
         DB::transaction(function () {
             $this->validate();
 
+            $this->paid_amount = (int) preg_replace('/\D/', '', $this->paid_amount);
+            $this->tunai       = (int) preg_replace('/\D/', '', $this->tunai);
+            $this->transfer    = (int) preg_replace('/\D/', '', $this->transfer);
+
 
             if ($this->is_manual_customer) {
                 $newCustomer = Customer::create([

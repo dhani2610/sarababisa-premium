@@ -1209,7 +1209,6 @@ class TransaksiProdukController extends Controller
 
         if ($orderDetails && is_array($orderDetails)) {
             foreach ($orderDetails as $key => $detail) {
-                // Hapus titik pada field spesifik di dalam detail
                 if (isset($detail['modal'])) {
                     $orderDetails[$key]['modal'] = (int) str_replace('.', '', $detail['modal']);
                 }
@@ -1222,16 +1221,29 @@ class TransaksiProdukController extends Controller
             }
         }
 
-        // 2. Merge (timpa) request dengan data yang sudah bersih
+        // Merge (timpa) request dengan data yang sudah bersih
         $request->merge([
-            'pay' => (int) str_replace('.', '', $request->pay),
-            'due' => (int) str_replace('.', '', $request->due),
-            'order_details' => $orderDetails, // Masukkan array yang sudah di-loop di atas
+            'pay'      => (int) str_replace('.', '', $request->pay),
+            'due'      => (int) str_replace('.', '', $request->due),
+            'tunai'    => $request->has('tunai') ? (int) str_replace('.', '', $request->tunai) : 0,
+            'transfer' => $request->has('transfer') ? (int) str_replace('.', '', $request->transfer) : 0,
+            'order_details' => $orderDetails,
         ]);
-        // dd($request->all());
 
         $item = Order::findOrFail($id);
         $nama_pelanggan = Customer::find($request->customers_id);
+
+        // Tentukan nilai Fix Tunai & Transfer berdasarkan Metode Pembayaran
+        $tunai = 0;
+        $transfer = 0;
+        if ($request->payment_method == 'Tunai & Transfer') {
+            $tunai = $request->tunai;
+            $transfer = $request->transfer;
+        } elseif ($request->payment_method == 'Tunai') {
+            $tunai = $request->pay;
+        } else {
+            $transfer = $request->pay;
+        }
 
         // Loop untuk mengupdate order_details
         foreach ($request->input('order_details', []) as $orderDetailId => $orderDetailData) {
@@ -1242,23 +1254,25 @@ class TransaksiProdukController extends Controller
 
             // Update order_details termasuk profit
             $orderDetail->update([
-                'modal' => $orderDetailData['modal'],
-                'total' => $orderDetailData['total'],
-                'profit' => $profit,
+                'modal'       => $orderDetailData['modal'],
+                'total'       => $orderDetailData['total'],
+                'profit'      => $profit,
                 'profit_toko' => $profit_toko,
             ]);
         }
 
-        // Transaction update
+        // Transaction update (Tambahkan tunai & transfer)
         $item->update([
-            'customers_id' => $request->customers_id,
-            'nama_pelanggan' => $nama_pelanggan->nama,
-            'users_id' => $request->users_id,
-            'payment_method' => $request->payment_method,
+            'customers_id'           => $request->customers_id,
+            'nama_pelanggan'         => $nama_pelanggan->nama,
+            'users_id'               => $request->users_id,
+            'payment_method'         => $request->payment_method,
             'tipe_status_pembayaran' => $request->tipe_status_pembayaran,
-            'pay' => $request->pay,
-            'due' => $request->due,
-            'created_at' => $request->created_at,
+            'pay'                    => $request->pay,
+            'due'                    => $request->due,
+            'tunai'                  => $tunai,
+            'transfer'               => $transfer,
+            'created_at'             => $request->created_at,
         ]);
 
         return redirect()->route('transaksi-produk.index');
