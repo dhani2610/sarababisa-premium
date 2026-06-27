@@ -12,6 +12,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 
 class BelumLunasController extends Controller
 {
@@ -20,6 +21,64 @@ class BelumLunasController extends Controller
         $storeSetting = StoreSetting::where('cabang_id', getCabangId())->first();
         // Mengarah ke file blade baru
         return view('pages.kepalatoko.servis.belum-lunas', compact('storeSetting'));
+    }
+
+    public function cetakPerCustomer(Request $request)
+    {
+        $request->validate(['customers_id' => 'required']);
+
+        $users = User::find(1);
+        if (getCabangId() == 1) {
+            $users = User::find(1);
+        }else{
+            $users = User::where('cabang_id',getCabangId())->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
+        }
+        if (empty($users)) {
+            toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
+            return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
+        }
+        $logo = $users->profile_photo_path;
+        $imagePath = public_path('storage/' . $logo);
+
+        // Query untuk data yang BELUM LUNAS saja (tipe_status_pembayaran = 0)
+        $services = ServiceTransaction::where('cabang_id', getCabangId())
+            ->where('customers_id', $request->customers_id)
+            ->where('tipe_status_pembayaran', 0)
+            ->with('brand', 'modelserie', 'user')
+            ->get();
+
+        $customerName  = Customer::find($request->customers_id)->first()->nama;
+        if ($services->isEmpty()) {
+            return back()->with('error', 'Tidak ada data transaksi belum lunas untuk pelanggan ini.');
+        }
+
+        $total_biaya = $services->sum('biaya');
+        $total_modal = $services->sum('modal_sparepart');
+        $total_diskon = $services->sum('diskon');
+        $total_profit = $services->sum('profit');
+
+          $dataOtherMetodePembayaran = [];
+        foreach (getMetodePembayaran() as $key => $value) {
+            $dt['metode'] = $value->nama;
+            $dt['total']    = (clone $services)->where('cara_pembayaran',$value->nama)->sum('transfer');
+            array_push($dataOtherMetodePembayaran,$dt);
+        }
+        // return response()->json($services);
+
+        $pdf = \PDF::loadView('pages.kepalatoko.cetak-laporan-customer-belum-lunas', [
+            'services' => $services,
+            'total_biaya' => $total_biaya,
+            'total_modal' => $total_modal,
+            'total_diskon' => $total_diskon,
+            'total_profit' => $total_profit,
+            'users' => $users,
+            'customerName' => $customerName,
+            'imagePath' => $imagePath,
+            'dataOtherMetodePembayaran' => $dataOtherMetodePembayaran,
+            'customer_name' => $services->first()->customer->nama ?? 'Pelanggan',
+        ]);
+
+        return $pdf->stream('Laporan_Belum_Lunas_' . $request->customers_id . '.pdf');
     }
 
 
@@ -420,7 +479,7 @@ class BelumLunasController extends Controller
                         </svg>
                     </button>
 
-                   
+
                     <!-- Start Delete Modal -->
                     <div x-data="{ showDelete: false, deleteId: null }"
                         x-show="showDelete"

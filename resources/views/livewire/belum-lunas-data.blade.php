@@ -1,5 +1,6 @@
     <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet" />
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
+        rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
     <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
@@ -8,10 +9,24 @@
 
     <style>
         /* Agar modal filepond terlihat rapi */
-        .filepond--root { font-family: sans-serif; }
-        .filepond--panel-root { background-color: #f1f5f9; border: 1px solid #cbd5e1; }
-        .filepond--drop-label { color: #64748b; }
+        .filepond--root {
+            font-family: sans-serif;
+        }
+
+        .filepond--panel-root {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+        }
+
+        .filepond--drop-label {
+            color: #64748b;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
     </style>
+    @include('layout.messages')
     <div>
         <!-- Page header -->
         <div class="sm:flex sm:justify-between sm:items-center mb-3">
@@ -27,190 +42,34 @@
                 <!-- Search form -->
                 {{-- <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan/IMEI" /> --}}
 
-                @if (Auth::user()->role != 'Investor')
-                <!-- Create invoice button -->
                 <div x-data="{ modalOpen: false }">
-                    {{-- @if (allowTransaksiCabang() == 1)
-
-                    <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true" aria-controls="tambah-modal">
-                        <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
-                            <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-                        </svg>
-                        <span class="hidden xs:block ml-2">Tambah Transaksi Baru</span>
+                    <button class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500"
+                        @click.prevent="modalOpen = true">
+                        Export PDF Belum Lunas
                     </button>
-                    @endif --}}
-                    <!-- Modal backdrop -->
-                    <div
-                        class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
-                        x-show="modalOpen"
-                        x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0"
-                        x-transition:enter-end="opacity-100"
-                        x-transition:leave="transition ease-out duration-100"
-                        x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0"
-                        aria-hidden="true"
-                        x-cloak
-                    ></div>
-                    <!-- Modal dialog -->
-                    <div
-                        id="tambah-modal"
-                        class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                        role="dialog"
-                        aria-modal="true"
-                        x-show="modalOpen"
-                        x-transition:enter="transition ease-in-out duration-200"
-                        x-transition:enter-start="opacity-0 translate-y-4"
-                        x-transition:enter-end="opacity-100 translate-y-0"
-                        x-transition:leave="transition ease-in-out duration-200"
-                        x-transition:leave-start="opacity-100 translate-y-0"
-                        x-transition:leave-end="opacity-0 translate-y-4"
-                        x-cloak
-                    >
-                        <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full">
-                            <!-- Modal header -->
-                            <div class="px-5 py-3 border-b border-slate-200">
-                                <div class="flex justify-between items-center">
-                                    <div class="font-semibold text-slate-800">Tambah Transaksi Baru</div>
-                                    <button class="text-slate-400 hover:text-slate-500" @click="modalOpen = false">
-                                        <div class="sr-only">Close</div>
-                                        <svg class="w-4 h-4 fill-current">
-                                            <path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <!-- Modal content -->
-                            <form action="{{ route('transaksi-servis-sudah-diambil.store') }}" method="post">
-                                @csrf
-                                <input type="hidden" name="status_servis" value="Belum cek">
-                                <div class="px-5 py-4">
-                                    <div class="space-y-3">
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="customers_id">Nama Pelanggan <span class="text-rose-500">*</span></label>
-                                            <select name="customers_id" class="form-select text-sm py-1 w-full" id="selectjs1" required style="width: 100%">
-                                                <option selected value="">Pilih Pelanggan</option>
-                                                @foreach ($customers as $item)
-                                                    <option value="{{ $item->id }}">{{ $item->nama }} {{ $item->nomor_hp }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="types_id">Jenis Barang <span class="text-rose-500">*</span></label>
-                                            <select id="types_id" name="types_id" class="form-select text-sm py-1 w-full" required>
-                                                @foreach ($types as $type)
-                                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="brands_id">Merek <span class="text-rose-500">*</span></label>
-                                            <select id="brands_id" name="brands_id" class="form-select text-sm py-1 w-full" required>
-                                                <option selected="">Pilih Merek</option>
-                                                @foreach ($brands as $brand)
-                                                    <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="model_series_id">Model Seri <span class="text-rose-500">*</span></label>
-                                            <select id="model_series_id" name="model_series_id" class="form-select text-sm py-1 w-full selectjs2" required style="width: 100%">
-                                                <option selected="">Pilih Model Seri</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="imei">Nomor Imei <span class="text-rose-500">*</span></label>
-                                            <input id="imei" name="imei" class="form-input w-full px-2 py-1" type="text" required/>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="warna">Warna <span class="text-rose-500">*</span></label>
-                                            <input id="warna" name="warna" class="form-input w-full px-2 py-1" type="text" required/>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="capacities_id">Kapasitas <span class="text-rose-500">*</span></label>
-                                            <select id="capacities_id" name="capacities_id" class="form-select text-sm py-1 w-full" required>
-                                                @foreach ($capacities as $capacity)
-                                                    <option value="{{ $capacity->id }}">{{ $capacity->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="kelengkapan">Kelengkapan</label>
-                                            <input id="kelengkapan" name="kelengkapan" class="form-input w-full px-2 py-1" type="text" placeholder="Kosongkan jika kelengkapannya hanya unit"/>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="kerusakan">Kerusakan <span class="text-rose-500">*</span></label>
-                                            <input id="kerusakan" name="kerusakan" class="form-input w-full px-2 py-1" type="text" required/>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="qc_masuk">Pengecekan Fungsi <span class="text-rose-500">*</span></label>
-                                            <input id="qc_masuk" name="qc_masuk" class="form-input w-full px-2 py-1" type="text" placeholder="Contoh: Tombol, Kamera, Speaker, dll" required/>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="estimasi_pengerjaan">Estimasi Pengerjaan</label>
-                                            <select id="estimasi_pengerjaan" name="estimasi_pengerjaan" class="form-select text-sm py-2 w-full">
-                                                <option selected value="">Pilih Estimasi Pengerjaan</option>
-                                                <option value="1 Hari">1 Hari</option>
-                                                <option value="2 Hari">2 Hari</option>
-                                                <option value="3 Hari">3 Hari</option>
-                                                <option value="4 Hari">4 Hari</option>
-                                                <option value="5 Hari">5 Hari</option>
-                                                <option value="6 Hari">6 Hari</option>
-                                                <option value="1 Minggu">1 Minggu</option>
-                                                <option value="2 Minggu">2 Minggu</option>
-                                                <option value="3 Minggu">3 Minggu</option>
-                                                <option value="1 Bulan">1 Bulan</option>
-                                                <option value="2 Bulan">2 Bulan</option>
-                                                <option value="3 Bulan">3 Bulan</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="estimasi_biaya">Estimasi Biaya Servis</label>
-                                            <div class="relative">
-                                                <input id="estimasi_biaya" name="estimasi_biaya" class="form-input w-full pl-10 px-2 py-1" type="number" placeholder="Kosongkan jika tidak ada"/>
-                                                <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
-                                                    <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="uang_muka">DP/Uang Muka</label>
-                                            <div class="relative">
-                                                <input id="uang_muka" name="uang_muka" class="form-input w-full pl-10 px-2 py-1" type="number" placeholder="Kosongkan jika tidak ada"/>
-                                                <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
-                                                    <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="penerima">Penerima</label>
-                                            <select id="penerima" name="penerima" class="form-select text-sm py-1 w-full" required>
-                                                @foreach ($workers as $worker)
-                                                    <option value="{{ $worker->name }}">{{ $worker->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Modal footer -->
-                                <div class="px-5 py-4 border-t border-slate-200">
-                                    <div class="flex flex-wrap justify-between space-x-2">
-                                        <a href="{{ route('pelanggan.index') }}" class="btn-sm bg-green-500 hover:bg-green-600 text-white">
-                                            Tambah Pelanggan Baru
-                                        </a>
-                                        <div>
-                                            <a href="{{ route('transaksi-servis-sudah-diambil.index') }}" class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600">
-                                                Batal
-                                            </a>
-                                            <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Simpan</button>
-                                        </div>
-                                    </div>
+
+                    <div x-show="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4" x-cloak>
+                        <div class="fixed inset-0 bg-slate-900 bg-opacity-30" @click="modalOpen = false"></div>
+                        <div class="bg-white rounded shadow-lg max-w-sm w-full p-5 z-10">
+                            <h2 class="font-semibold text-slate-800 mb-4">Pilih Customer</h2>
+                            <form action="{{ route('cetak-servis-customer-belum-lunas') }}" method="get"
+                                target="_blank">
+                                <select name="customers_id" class="form-select selectjs2 w-full mb-4" required>
+                                    <option value="">Pilih Pelanggan</option>
+                                    @foreach ($customers as $item)
+                                        <option value="{{ $item->id }}">{{ $item->nama }} - {{ $item->nomor_hp }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="flex justify-end space-x-2">
+                                    <button type="button" class="btn border-slate-200"
+                                        @click="modalOpen = false">Batal</button>
+                                    <button type="submit" class="btn bg-indigo-500 text-white">Cetak</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
-                @endif
 
             </div>
 
@@ -304,16 +163,24 @@
             <div x-data="handleSelect">
                 <div class="sm:flex sm:justify-between sm:items-center px-5 py-4">
                     {{-- Left side --}}
-                    <h2 class="font-semibold text-slate-800">Servis Belum Lunas <span class="text-slate-400 font-medium">{{ $jumlah_belum_lunas }}</span></h2>
+                    <h2 class="font-semibold text-slate-800">Servis Belum Lunas <span
+                            class="text-slate-400 font-medium">{{ $jumlah_belum_lunas }}</span></h2>
                     {{-- Right side --}}
                     <div class="relative inline-flex">
                         <div class="table-items-action hidden">
                             <div class="flex items-center">
-                                <div class="text-sm italic mr-2 whitespace-nowrap"><span class="table-items-count"></span> item yang dipilih</div>
+                                <div class="text-sm italic mr-2 whitespace-nowrap"><span
+                                        class="table-items-count"></span> item yang dipilih</div>
                                 <div class="space-x-1">
-                                    <button class="btn bg-white border-slate-200 hover:border-slate-300 text-blue-500 hover:text-blue-600" @click="approveSelected">Setujui</button>
-                                    <button class="btn bg-white border-slate-200 hover:border-slate-300 text-gray-900 hover:text-gray-950" @click="rejectSelected">Tolak</button>
-                                    <button class="btn bg-white border-slate-200 hover:border-slate-300 text-rose-500 hover:text-rose-600" @click="deleteSelected">Hapus</button>
+                                    <button
+                                        class="btn bg-white border-slate-200 hover:border-slate-300 text-blue-500 hover:text-blue-600"
+                                        @click="approveSelected">Setujui</button>
+                                    <button
+                                        class="btn bg-white border-slate-200 hover:border-slate-300 text-gray-900 hover:text-gray-950"
+                                        @click="rejectSelected">Tolak</button>
+                                    <button
+                                        class="btn bg-white border-slate-200 hover:border-slate-300 text-rose-500 hover:text-rose-600"
+                                        @click="deleteSelected">Hapus</button>
                                 </div>
                             </div>
                         </div>
@@ -323,17 +190,19 @@
                 <div class="overflow-x-auto">
                     <table id="transaksi-servis-table" class="table-auto w-full">
                         <!-- Table header -->
-                        <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
+                        <thead
+                            class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
                             <tr>
                                 @if (Auth::user()->role != 'Investor')
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
-                                    <div class="flex items-center">
-                                        <label class="inline-flex">
-                                            <span class="sr-only">Select all</span>
-                                            <input id="parent-checkbox" class="form-checkbox" type="checkbox" @click="toggleAll" />
-                                        </label>
-                                    </div>
-                                </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                                        <div class="flex items-center">
+                                            <label class="inline-flex">
+                                                <span class="sr-only">Select all</span>
+                                                <input id="parent-checkbox" class="form-checkbox" type="checkbox"
+                                                    @click="toggleAll" />
+                                            </label>
+                                        </div>
+                                    </th>
                                 @endif
                                 <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-semibold text-left">No.</div>
@@ -351,9 +220,9 @@
                                     <div class="font-semibold text-left">Pelanggan</div>
                                 </th>
                                 @if (Auth::user()->role != 'Investor')
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-semibold text-left">Hubungi</div>
-                                </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <div class="font-semibold text-left">Hubungi</div>
+                                    </th>
                                 @endif
                                 <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-semibold text-left">Nama Barang</div>
@@ -381,9 +250,9 @@
                                     <div class="font-semibold text-left">Teknisi</div>
                                 </th>
                                 @if (Auth::user()->role == 'Kepala Toko' || $storeSetting->is_modal == 1)
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-semibold text-left">Modal Sparepart</div>
-                                </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <div class="font-semibold text-left">Modal Sparepart</div>
+                                    </th>
                                 @endif
                                 <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-semibold text-left">Biaya</div>
@@ -410,12 +279,12 @@
                                     <div class="font-semibold text-left">Masa Garansi</div>
                                 </th>
                                 @if (Auth::user()->role != 'Investor')
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-semibold text-left">Status</div>
-                                </th>
-                                <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                    <div class="font-semibold text-left">Aksi</div>
-                                </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <div class="font-semibold text-left">Status</div>
+                                    </th>
+                                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                        <div class="font-semibold text-left">Aksi</div>
+                                    </th>
                                 @endif
                             </tr>
                         </thead>
@@ -425,7 +294,7 @@
                             @php
                                 $i = 1
                             @endphp
-                            @foreach($service_transactions as $transaction)
+                            @foreach ($service_transactions as $transaction)
                                 @php
                                     if ($transaction->profit < '0') :
                                         $color = 'text-red-600';
@@ -883,217 +752,258 @@
         </div>
 
 
-    <div id="modal-upload-foto" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div id="modal-upload-foto" class="fixed inset-0 z-[100] hidden overflow-y-auto"
+            aria-labelledby="modal-title" role="dialog" aria-modal="true">
 
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
 
-            <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" aria-hidden="true" onclick="closeModalFoto()"></div>
+                <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" aria-hidden="true"
+                    onclick="closeModalFoto()"></div>
 
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-            <div class="inline-block w-full text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl overflow-hidden sm:my-8 sm:align-middle sm:max-w-3xl">
+                <div
+                    class="inline-block w-full text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl overflow-hidden sm:my-8 sm:align-middle sm:max-w-3xl">
 
-                <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="w-full mt-3 text-center sm:mt-0 sm:text-left">
+                    <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="w-full mt-3 text-center sm:mt-0 sm:text-left">
 
-                            <div class="flex items-center justify-between pb-2 mb-4 border-b">
-                                <h3 class="text-xl font-bold leading-6 text-gray-900" id="modal-title">
-                                    📸 Dokumentasi Foto Servis
-                                </h3>
-                                <button onclick="closeModalFoto()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
-                                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <input type="hidden" id="current-servis-id">
-
-                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div class="p-4 border rounded-lg bg-slate-50 border-slate-200">
-                                    <div class="flex items-center mb-2">
-                                        <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">IN</span>
-                                        <label class="block text-sm font-bold text-gray-700">Kondisi Masuk</label>
-                                    </div>
-                                    <small class="text-rose-500">*Klik lagi untuk menambah foto lainnya (Multi-upload).</small>
-                                    <input type="file" class="filepond-masuk" name="file" multiple data-max-file-size="10MB">
+                                <div class="flex items-center justify-between pb-2 mb-4 border-b">
+                                    <h3 class="text-xl font-bold leading-6 text-gray-900" id="modal-title">
+                                        📸 Dokumentasi Foto Servis
+                                    </h3>
+                                    <button onclick="closeModalFoto()"
+                                        class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                                 </div>
 
-                                <div class="p-4 border rounded-lg bg-slate-50 border-slate-200">
-                                    <div class="flex items-center mb-2">
-                                        <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">OUT</span>
-                                        <label class="block text-sm font-bold text-gray-700">Kondisi Selesai</label>
+                                <input type="hidden" id="current-servis-id">
+
+                                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                    <div class="p-4 border rounded-lg bg-slate-50 border-slate-200">
+                                        <div class="flex items-center mb-2">
+                                            <span
+                                                class="bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">IN</span>
+                                            <label class="block text-sm font-bold text-gray-700">Kondisi Masuk</label>
+                                        </div>
+                                        <small class="text-rose-500">*Klik lagi untuk menambah foto lainnya
+                                            (Multi-upload).</small>
+                                        <input type="file" class="filepond-masuk" name="file" multiple
+                                            data-max-file-size="10MB">
                                     </div>
-                                    <small class="text-rose-500">*Klik lagi untuk menambah foto lainnya (Multi-upload).</small>
-                                    <input type="file" class="filepond-selesai" name="file" multiple data-max-file-size="10MB">
+
+                                    <div class="p-4 border rounded-lg bg-slate-50 border-slate-200">
+                                        <div class="flex items-center mb-2">
+                                            <span
+                                                class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">OUT</span>
+                                            <label class="block text-sm font-bold text-gray-700">Kondisi
+                                                Selesai</label>
+                                        </div>
+                                        <small class="text-rose-500">*Klik lagi untuk menambah foto lainnya
+                                            (Multi-upload).</small>
+                                        <input type="file" class="filepond-selesai" name="file" multiple
+                                            data-max-file-size="10MB">
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="mt-4 text-xs italic text-gray-500">
-                                * Foto otomatis tersimpan saat berhasil di-upload. Klik foto untuk memperbesar (zoom).
-                            </div>
+                                <div class="mt-4 text-xs italic text-gray-500">
+                                    * Foto otomatis tersimpan saat berhasil di-upload. Klik foto untuk memperbesar
+                                    (zoom).
+                                </div>
 
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="closeModalFoto()">
-                        Tutup
-                    </button>
-                </div>
+                    <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="button"
+                            class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                            onclick="closeModalFoto()">
+                            Tutup
+                        </button>
+                    </div>
 
+                </div>
             </div>
         </div>
-    </div>
-    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+        <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+        <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
+            rel="stylesheet">
 
-    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
-    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
-    <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.min.js"></script>
-    <script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.min.js"></script>
-    <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
-    <script>
-        // 1. Register Plugin
-        FilePond.registerPlugin(
-            FilePondPluginFileValidateType,
-            FilePondPluginImageResize,
-            FilePondPluginImageTransform,
-            FilePondPluginImagePreview
-        );
+        <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+        <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js">
+        </script>
+        <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.min.js"></script>
+        <script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.min.js"></script>
+        <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+        <script>
+            // 1. Register Plugin
+            FilePond.registerPlugin(
+                FilePondPluginFileValidateType,
+                FilePondPluginImageResize,
+                FilePondPluginImageTransform,
+                FilePondPluginImagePreview
+            );
 
-        let pondMasuk, pondSelesai;
-        let viewer;
+            let pondMasuk, pondSelesai;
+            let viewer;
 
-        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function() {
 
-            // Cek apakah library kompresi sudah jalan
-            if (typeof imageCompression === 'undefined') {
-                console.error("ERROR: Library browser-image-compression belum terload! Cek koneksi internet atau script tag.");
+                // Cek apakah library kompresi sudah jalan
+                if (typeof imageCompression === 'undefined') {
+                    console.error(
+                        "ERROR: Library browser-image-compression belum terload! Cek koneksi internet atau script tag."
+                    );
+                }
+
+                // 2. Config Dasar FilePond
+                const baseConfig = {
+                    allowMultiple: true,
+                    acceptedFileTypes: ['image/jpeg', 'image/png',
+                        'image/webp'
+                    ], // Batasi tipe file agar transform jalan
+                    labelIdle: 'Drag & Drop gambar atau <span class="filepond--label-action">Cari</span>',
+                    credits: false,
+
+                    // --- KONFIGURASI RESIZE (DIMENSI) ---
+                    allowImageResize: true,
+                    imageResizeTargetWidth: 1280,
+                    imageResizeTargetHeight: 1280,
+                    imageResizeMode: 'contain',
+                    imageResizeUpscale: false,
+
+                    // --- KONFIGURASI TRANSFORM (KOMPRESI) ---
+                    allowImageTransform: true,
+                    imageTransformOutputQuality: 70, // Turunkan sedikit ke 70 agar size lebih kecil
+                    imageTransformOutputMimeType: 'image/jpeg', // Paksa convert ke JPEG (lebih kecil dari PNG)
+
+                    // Fix untuk orientasi foto HP (EXIF data)
+                    imageTransformOutputStripImageHead: false,
+
+                    // Preview
+                    imagePreviewHeight: 150,
+
+                    // Event Zoom Viewer
+                    onactivatefile: (file) => {
+                        let imageUrl = file.getMetadata('url');
+                        if (!imageUrl && file.file) {
+                            imageUrl = URL.createObjectURL(file.file);
+                        }
+                        if (imageUrl) showImagePopup(imageUrl);
+                    }
+                };
+
+                // 3. Create Instance
+                const inputMasuk = document.querySelector('.filepond-masuk');
+                const inputSelesai = document.querySelector('.filepond-selesai');
+
+                // Cek element ada atau tidak sebelum create
+                if (inputMasuk) pondMasuk = FilePond.create(inputMasuk, baseConfig);
+                if (inputSelesai) pondSelesai = FilePond.create(inputSelesai, baseConfig);
+
+                // 4. Event Listener Tombol Modal
+                $(document).on('click', '.btn-upload-foto', function() {
+                    let id = $(this).data('id');
+                    $('#current-servis-id').val(id);
+                    $('#modal-upload-foto').removeClass('hidden');
+
+                    if (pondMasuk) pondMasuk.removeFiles();
+                    if (pondSelesai) pondSelesai.removeFiles();
+
+                    if (pondMasuk) setupPondServer(pondMasuk, id, 'masuk');
+                    if (pondSelesai) setupPondServer(pondSelesai, id, 'selesai');
+
+                    loadExistingImages(id);
+                });
+            });
+
+            // ... (Fungsi setupPondServer, loadExistingImages, showImagePopup sama seperti sebelumnya) ...
+            // ... Copy paste fungsi-fungsi helper di bawah sini ...
+
+            function setupPondServer(pondInstance, id, type) {
+                // (Paste kode setupPondServer sebelumnya disini)
+                // Pastikan kode server process/revert/remove/load ada disini
+                pondInstance.setOptions({
+                    server: {
+                        process: {
+                            url: `/servis/transaksi-servis/${id}/upload-foto`,
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            ondata: (formData) => {
+                                formData.append('type', type);
+                                return formData;
+                            }
+                        },
+                        revert: {
+                            url: `/servis/transaksi-servis/${id}/delete-foto?type=${type}`,
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        },
+                        remove: (source, load, error) => {
+                            fetch(`/servis/transaksi-servis/${id}/delete-foto?type=${type}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Content-Type': 'text/plain'
+                                },
+                                body: source
+                            }).then(() => load()).catch((err) => error('Gagal menghapus'));
+                        },
+                        load: (source, load, error) => {
+                            let myRequest = new Request(`/storage/servis/${source}`);
+                            fetch(myRequest).then(res => res.blob()).then(blob => load(blob)).catch(err => error(
+                                'Gagal load'));
+                        }
+                    }
+                });
             }
 
-            // 2. Config Dasar FilePond
-            const baseConfig = {
-                allowMultiple: true,
-                acceptedFileTypes: ['image/jpeg', 'image/png', 'image/webp'], // Batasi tipe file agar transform jalan
-                labelIdle: 'Drag & Drop gambar atau <span class="filepond--label-action">Cari</span>',
-                credits: false,
+            function loadExistingImages(id) {
+                fetch(`/servis/transaksi-servis/${id}/get-foto`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.masuk && pondMasuk) pondMasuk.files = data.masuk;
+                        if (data.selesai && pondSelesai) pondSelesai.files = data.selesai;
+                    })
+                    .catch(err => console.error("Gagal load foto", err));
+            }
 
-                // --- KONFIGURASI RESIZE (DIMENSI) ---
-                allowImageResize: true,
-                imageResizeTargetWidth: 1280,
-                imageResizeTargetHeight: 1280,
-                imageResizeMode: 'contain',
-                imageResizeUpscale: false,
-
-                // --- KONFIGURASI TRANSFORM (KOMPRESI) ---
-                allowImageTransform: true,
-                imageTransformOutputQuality: 70, // Turunkan sedikit ke 70 agar size lebih kecil
-                imageTransformOutputMimeType: 'image/jpeg', // Paksa convert ke JPEG (lebih kecil dari PNG)
-
-                // Fix untuk orientasi foto HP (EXIF data)
-                imageTransformOutputStripImageHead: false,
-
-                // Preview
-                imagePreviewHeight: 150,
-
-                // Event Zoom Viewer
-                onactivatefile: (file) => {
-                    let imageUrl = file.getMetadata('url');
-                    if (!imageUrl && file.file) {
-                        imageUrl = URL.createObjectURL(file.file);
-                    }
-                    if (imageUrl) showImagePopup(imageUrl);
-                }
-            };
-
-            // 3. Create Instance
-            const inputMasuk = document.querySelector('.filepond-masuk');
-            const inputSelesai = document.querySelector('.filepond-selesai');
-
-            // Cek element ada atau tidak sebelum create
-            if(inputMasuk) pondMasuk = FilePond.create(inputMasuk, baseConfig);
-            if(inputSelesai) pondSelesai = FilePond.create(inputSelesai, baseConfig);
-
-            // 4. Event Listener Tombol Modal
-            $(document).on('click', '.btn-upload-foto', function() {
-                let id = $(this).data('id');
-                $('#current-servis-id').val(id);
-                $('#modal-upload-foto').removeClass('hidden');
-
-                if(pondMasuk) pondMasuk.removeFiles();
-                if(pondSelesai) pondSelesai.removeFiles();
-
-                if(pondMasuk) setupPondServer(pondMasuk, id, 'masuk');
-                if(pondSelesai) setupPondServer(pondSelesai, id, 'selesai');
-
-                loadExistingImages(id);
-            });
-        });
-
-        // ... (Fungsi setupPondServer, loadExistingImages, showImagePopup sama seperti sebelumnya) ...
-        // ... Copy paste fungsi-fungsi helper di bawah sini ...
-
-        function setupPondServer(pondInstance, id, type) {
-        // (Paste kode setupPondServer sebelumnya disini)
-        // Pastikan kode server process/revert/remove/load ada disini
-            pondInstance.setOptions({
-                server: {
-                    process: {
-                        url: `/servis/transaksi-servis/${id}/upload-foto`,
-                        method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        ondata: (formData) => {
-                            formData.append('type', type);
-                            return formData;
-                        }
+            function showImagePopup(imageUrl) {
+                const image = new Image();
+                image.src = imageUrl;
+                const viewer = new Viewer(image, {
+                    hidden: function() {
+                        viewer.destroy();
                     },
-                    revert: {
-                        url: `/servis/transaksi-servis/${id}/delete-foto?type=${type}`,
-                        method: 'DELETE',
-                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                    toolbar: {
+                        zoomIn: 1,
+                        zoomOut: 1,
+                        oneToOne: 1,
+                        reset: 1,
+                        rotateLeft: 1,
+                        rotateRight: 1,
+                        flipHorizontal: 1,
+                        flipVertical: 1
                     },
-                    remove: (source, load, error) => {
-                        fetch(`/servis/transaksi-servis/${id}/delete-foto?type=${type}`, {
-                            method: 'DELETE',
-                            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'text/plain' },
-                            body: source
-                        }).then(() => load()).catch((err) => error('Gagal menghapus'));
-                    },
-                    load: (source, load, error) => {
-                        let myRequest = new Request(`/storage/servis/${source}`);
-                        fetch(myRequest).then(res => res.blob()).then(blob => load(blob)).catch(err => error('Gagal load'));
-                    }
-                }
-            });
-        }
+                });
+                viewer.show();
+            }
 
-        function loadExistingImages(id) {
-            fetch(`/servis/transaksi-servis/${id}/get-foto`)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.masuk && pondMasuk) pondMasuk.files = data.masuk;
-                    if(data.selesai && pondSelesai) pondSelesai.files = data.selesai;
-                })
-                .catch(err => console.error("Gagal load foto", err));
-        }
-
-        function showImagePopup(imageUrl) {
-            const image = new Image();
-            image.src = imageUrl;
-            const viewer = new Viewer(image, {
-                hidden: function () { viewer.destroy(); },
-                toolbar: { zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1, rotateLeft: 1, rotateRight: 1, flipHorizontal: 1, flipVertical: 1 },
-            });
-            viewer.show();
-        }
-
-        function closeModalFoto() {
-            $('#modal-upload-foto').addClass('hidden');
-        }
-    </script>
+            function closeModalFoto() {
+                $('#modal-upload-foto').addClass('hidden');
+            }
+        </script>
 
         <script>
             document.addEventListener('alpine:init', () => {
@@ -1129,22 +1039,24 @@
 
                         // Kirim permintaan penghapusan ke server
                         fetch('/services/delete', {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            },
-                            body: JSON.stringify({ selectedIds }),
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            alert(data.message);
-                            // Refresh halaman atau lakukan tindakan lain setelah penghapusan
-                            window.location.reload();
-                        })
-                        .catch(error => {
-                            console.error('Gagal menghapus data:', error);
-                        });
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                },
+                                body: JSON.stringify({
+                                    selectedIds
+                                }),
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                alert(data.message);
+                                // Refresh halaman atau lakukan tindakan lain setelah penghapusan
+                                window.location.reload();
+                            })
+                            .catch(error => {
+                                console.error('Gagal menghapus data:', error);
+                            });
                     },
                     approveSelected() {
                         const checkboxes = document.querySelectorAll('input.table-item:checked');
@@ -1152,22 +1064,24 @@
 
                         // Kirim permintaan update ke server
                         fetch('/services/update', {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}', // Tambahkan token CSRF jika menggunakan Laravel
-                            },
-                            body: JSON.stringify({ selectedIds }),
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            alert(data.message);
-                            // Refresh halaman atau lakukan tindakan lain setelah update
-                            window.location.reload();
-                        })
-                        .catch(error => {
-                            console.error('Gagal memperbarui data:', error);
-                        });
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}', // Tambahkan token CSRF jika menggunakan Laravel
+                                },
+                                body: JSON.stringify({
+                                    selectedIds
+                                }),
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                alert(data.message);
+                                // Refresh halaman atau lakukan tindakan lain setelah update
+                                window.location.reload();
+                            })
+                            .catch(error => {
+                                console.error('Gagal memperbarui data:', error);
+                            });
                     },
                     rejectSelected() {
                         const checkboxes = document.querySelectorAll('input.table-item:checked');
@@ -1175,50 +1089,52 @@
 
                         // Kirim permintaan update ke server
                         fetch('/services/reject', {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}', // Tambahkan token CSRF jika menggunakan Laravel
-                            },
-                            body: JSON.stringify({ selectedIds }),
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            alert(data.message);
-                            // Refresh halaman atau lakukan tindakan lain setelah update
-                            window.location.reload();
-                        })
-                        .catch(error => {
-                            console.error('Gagal memperbarui data:', error);
-                        });
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}', // Tambahkan token CSRF jika menggunakan Laravel
+                                },
+                                body: JSON.stringify({
+                                    selectedIds
+                                }),
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                alert(data.message);
+                                // Refresh halaman atau lakukan tindakan lain setelah update
+                                window.location.reload();
+                            })
+                            .catch(error => {
+                                console.error('Gagal memperbarui data:', error);
+                            });
                     },
                 }))
             })
         </script>
 
         <script>
-        function kirimFontee(token, phone, message) {
-            fetch('https://api.fonnte.com/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token
-                },
-                body: JSON.stringify({
-                    target: phone,
-                    message: decodeURIComponent(message)
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === true || data.success) {
-                    alert('✅ Pesan berhasil dikirim ke Pelanggan!');
-                } else {
-                    alert('⚠️ Gagal mengirim ke Pelanggan. Coba lagi.');
-                }
-            })
-            .catch(() => alert('❌ Terjadi kesalahan saat mengirim ke Fontee.'));
-        }
+            function kirimFontee(token, phone, message) {
+                fetch('https://api.fonnte.com/send', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': token
+                        },
+                        body: JSON.stringify({
+                            target: phone,
+                            message: decodeURIComponent(message)
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === true || data.success) {
+                            alert('✅ Pesan berhasil dikirim ke Pelanggan!');
+                        } else {
+                            alert('⚠️ Gagal mengirim ke Pelanggan. Coba lagi.');
+                        }
+                    })
+                    .catch(() => alert('❌ Terjadi kesalahan saat mengirim ke Fontee.'));
+            }
         </script>
 
         <!-- Pagination -->

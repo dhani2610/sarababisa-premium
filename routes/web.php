@@ -480,6 +480,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
     Route::get('servis/transaksi-servis-belum-lunas/data', [KepalaTokoBelumLunasController::class,'getData'])->name('transaksi-servis-belum-lunas.data');
     Route::resource('servis/transaksi-servis-belum-lunas', KepalaTokoBelumLunasController::class);
+    Route::get('servis/cetak-servis-customer-belum-lunas', [KepalaTokoBelumLunasController::class, 'cetakPerCustomer'])->name('cetak-servis-customer-belum-lunas');
 
     Route::get('servis/transaksi-servis-belum-disetujui/data', [KepalaTokoServisBelumDisetujuiController::class,'getData'])->name('transaksi-servis-belum-disetujui.data');
     Route::resource('servis/transaksi-servis-belum-disetujui', KepalaTokoServisBelumDisetujuiController::class);
