@@ -115,6 +115,15 @@
                                         @endforeach
                                     </select>
                                 </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="capacities_id">Kapasitas</label>
+                                    <select id="capacities_id" name="capacities_id" class="form-select text-sm py-1 w-full">
+                                        @foreach ($capacities as $capacity)
+                                            <option value="{{ $capacity->id }}" {{ $item->capacity->id == $capacity->id ? 'selected' : ''}}>{{ $capacity->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="kerusakan">Kerusakan</label>
                                     <input id="kerusakan" name="kerusakan" class="form-input w-full px-2 py-1" type="text" value="{{ $item->kerusakan }}" />

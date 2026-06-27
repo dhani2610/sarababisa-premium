@@ -532,7 +532,7 @@ class SudahDiambilController extends Controller
             ->rawColumns(['fungsi','checkbox', 'nomor_servis', 'hubungi', 'kondisi_servis', 'status', 'aksi', 'exp_garansi','tindakan_servis','teknisi'])
             ->make(true);
     }
-    
+
 
     public function approveSelected(Request $request)
     {
@@ -1282,6 +1282,7 @@ class SudahDiambilController extends Controller
                     'nama_pelanggan' => $nama_pelanggan->nama,
                     'types_id' => $request->types_id,
                     'brands_id' => $request->brands_id,
+                    'capacities_id' => $request->capacities_id,
                     'model_series_id' => $request->model_series_id,
                     'kerusakan' => $request->kerusakan,
                     'qc_masuk' => $qc_masuk_data,
