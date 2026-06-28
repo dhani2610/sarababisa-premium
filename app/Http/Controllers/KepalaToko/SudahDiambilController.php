@@ -543,6 +543,15 @@ class SudahDiambilController extends Controller
         return response()->json(['message' => 'Data transaksi servis berhasil disetujui.']);
     }
 
+    public function approveSelectedLunas(Request $request)
+    {
+        $tanggal = Carbon::now()->translatedFormat('Y-m-d');
+        $selectedIds = $request->input('selectedIds');
+        ServiceTransaction::whereIn('id', $selectedIds)->update(['tipe_status_pembayaran' => 1]);
+
+        return response()->json(['message' => 'Data transaksi servis berhasil disetujui.']);
+    }
+
     public function rejectSelected(Request $request)
     {
         $tanggal = Carbon::now()->translatedFormat('Y-m-d');

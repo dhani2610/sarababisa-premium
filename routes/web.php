@@ -469,6 +469,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
     Route::delete('/services/delete', [KepalaTokoTransaksiServisController::class, 'deleteSelected']);
     Route::patch('/services/update', [KepalaTokoSudahDiambilController::class, 'approveSelected']);
+    Route::patch('/services/update-lunas', [KepalaTokoSudahDiambilController::class, 'approveSelectedLunas']);
     Route::patch('/services/reject', [KepalaTokoSudahDiambilController::class, 'rejectSelected']);
     Route::resource('servis/transaksi-servis-approve', KepalaTokoApproveController::class);
     Route::resource('servis/servis-belum-disetujui-approve', KepalaTokoServisBelumDisetujuiApproveController::class);

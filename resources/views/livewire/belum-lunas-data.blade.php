@@ -178,9 +178,6 @@
                                     <button
                                         class="btn bg-white border-slate-200 hover:border-slate-300 text-gray-900 hover:text-gray-950"
                                         @click="rejectSelected">Tolak</button>
-                                    <button
-                                        class="btn bg-white border-slate-200 hover:border-slate-300 text-rose-500 hover:text-rose-600"
-                                        @click="deleteSelected">Hapus</button>
                                 </div>
                             </div>
                         </div>
@@ -1063,7 +1060,7 @@
                         const selectedIds = [...checkboxes].map((checkbox) => checkbox.value);
 
                         // Kirim permintaan update ke server
-                        fetch('/services/update', {
+                        fetch('/services/update-lunas', {
                                 method: 'PATCH',
                                 headers: {
                                     'Content-Type': 'application/json',
