@@ -35,11 +35,16 @@ class TargetTeknisiController extends Controller
         $item = null;
 
         if (!empty($request->nominal)) {
-            // Menghapus semua karakter selain angka (menghapus titik/koma)
             $nominal = preg_replace('/[^0-9]/', '', $request->nominal);
             $item = !empty($request->nominal) ? 'nominal' : 'item';
         } else {
             $item = !empty($request->nominal) ? 'nominal' : 'item';
+        }
+
+        // Bersihkan format ribuan untuk bonus pencapaian
+        $bonus_nominal = null;
+        if (!empty($request->bonus_nominal)) {
+            $bonus_nominal = preg_replace('/[^0-9]/', '', $request->bonus_nominal);
         }
 
         TeknisiTarget::create([
@@ -49,6 +54,7 @@ class TargetTeknisiController extends Controller
             'tipe'         => !empty($request->nominal) ? 'nominal' : 'item',
             'item'         => $item,
             'nominal'      => $nominal,
+            'bonus_nominal'=> $bonus_nominal, // Insert ke DB
         ]);
 
         return redirect()->route('target-teknisi.index');
@@ -75,7 +81,6 @@ class TargetTeknisiController extends Controller
         $target = TeknisiTarget::findOrFail($id);
         $teknisi_name = User::find($request->users_id);
 
-        // Bersihkan format ribuan jika tipe yang dipilih adalah nominal
         $nominal = null;
         $item = null;
 
@@ -85,13 +90,20 @@ class TargetTeknisiController extends Controller
             $item = $request->item;
         }
 
+        // Bersihkan format ribuan untuk bonus pencapaian saat update
+        $bonus_nominal = null;
+        if (!empty($request->bonus_nominal)) {
+            $bonus_nominal = preg_replace('/[^0-9]/', '', $request->bonus_nominal);
+        }
+
         $target->update([
             'users_id'     => $request->users_id,
             'teknisi_name' => $teknisi_name->name,
             'tipe'         => $request->tipe,
             'item'         => $item,
             'nominal'      => $nominal,
-            'created_at'   => $request->created_at, // Opsional, sesuaikan kebutuhan
+            'bonus_nominal'=> $bonus_nominal, // Update ke DB
+            'created_at'   => $request->created_at,
         ]);
 
         return redirect()->route('target-teknisi.index');

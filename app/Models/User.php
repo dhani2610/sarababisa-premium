@@ -312,57 +312,65 @@ class User extends Authenticatable
     /**
      * Fungsi baru untuk menghitung progres dan bonus target teknisi
      */
+    /**
+     * Fungsi baru untuk menghitung progres dan bonus target teknisi
+     */
     public function getTargetTeknisiStats($totalBonus)
-{
-    $targets = $this->filteredTargetServis;
-    $services = $this->filteredServiceTransaction;
+    {
+        $targets = $this->filteredTargetServis;
+        $services = $this->filteredServiceTransaction;
 
-    // Jika teknisi tidak punya target bulan ini
-    if ($targets->isEmpty()) {
+        // Jika teknisi tidak punya target bulan ini
+        if ($targets->isEmpty()) {
+            return [
+                'target_text'   => '-',
+                'progres_text'  => '-',
+                'reward'        => 0,
+                'achieved_text' => '-' // Default kosong jika tidak ada target
+            ];
+        }
+
+        $tipeTarget = $targets->first()->tipe;
+
+        // Ambil nilai bonus nominal dari tabel target (jumlahkan jika ada multiple target di bulan yg sama)
+        $targetBonusNominal = $targets->sum('bonus_nominal');
+
+        if ($tipeTarget == 'nominal') {
+            $achieved = $services->sum('profit');
+            $targetValue = $targets->sum('nominal');
+            $targetText = 'Rp ' . number_format($targetValue, 0, ',', '.');
+            $achievedText = 'Rp ' . number_format($achieved, 0, ',', '.');
+        } else {
+            $achieved = $services->count();
+            $targetValue = $targets->sum('item');
+            $targetText = $targetValue . ' Item';
+            $achievedText = $achieved . ' Item';
+        }
+
+        // Hitung persentase progres
+        $progres = $targetValue > 0 ? ($achieved / $targetValue) * 100 : 0;
+
+        // Batasi progres maksimal di 100% jika diinginkan
+        $progresLimit = $progres > 100 ? 100 : $progres;
+
+        // Hitung nominal bonus pencapaian dari database
+        if ($progresLimit >= 100) {
+            // Jika target tembus 100%, berikan bonus pencapaian seutuhnya
+            $reward = $targetBonusNominal;
+        } else {
+            // Jika target belum 100%, bonus = 0.
+            $reward = 0;
+
+            // NOTE: Jika kamu ingin bonus tetap diberikan secara proporsional
+            // walau belum 100%, hapus angka 0 di atas dan gunakan kode di bawah ini:
+            // $reward = $targetBonusNominal * ($progresLimit / 100);
+        }
+
         return [
-            'target_text'   => '-',
-            'progres_text'  => '-',
-            'reward'        => 0,
-            'achieved_text' => '-' // <-- TAMBAHAN: Default kosong jika tidak ada target
+            'target_text'   => $targetText,
+            'progres_text'  => number_format($progresLimit, 1, ',', '.') . '%',
+            'reward'        => $reward,
+            'achieved_text' => $achievedText
         ];
     }
-
-    $tipeTarget = $targets->first()->tipe;
-
-    if ($tipeTarget == 'nominal') {
-        $achieved = $services->sum('profit');
-        $targetValue = $targets->sum('nominal');
-        $targetText = 'Rp ' . number_format($targetValue, 0, ',', '.');
-
-        // <-- TAMBAHAN: Format teks pencapaian nominal
-        $achievedText = 'Rp ' . number_format($achieved, 0, ',', '.');
-    } else {
-        $achieved = $services->count();
-        $targetValue = $targets->sum('item');
-        $targetText = $targetValue . ' Item';
-
-        // <-- TAMBAHAN: Format teks pencapaian item
-        $achievedText = $achieved . ' Item';
-    }
-
-    // Hitung persentase progres
-    $progres = $targetValue > 0 ? ($achieved / $targetValue) * 100 : 0;
-
-    // Batasi progres maksimal di 100% jika diinginkan
-    $progresLimit = $progres > 100 ? 100 : $progres;
-
-    // Hitung nominal bonus pencapaian
-    if ($achieved < $targetValue) {
-        $reward = $totalBonus * ($progresLimit / 100);
-    } else {
-        $reward = $totalBonus;
-    }
-
-    return [
-        'target_text'   => $targetText,
-        'progres_text'  => number_format($progresLimit, 1, ',', '.') . '%',
-        'reward'        => $reward,
-        'achieved_text' => $achievedText // <-- TAMBAHAN: Lempar ke view
-    ];
-}
 }

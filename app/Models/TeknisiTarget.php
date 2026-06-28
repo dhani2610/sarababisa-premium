@@ -18,6 +18,7 @@ class TeknisiTarget extends Model
         'cabang_id',
         'tipe',
         'nominal',
+        'bonus_nominal',
     ];
 
     public function user()

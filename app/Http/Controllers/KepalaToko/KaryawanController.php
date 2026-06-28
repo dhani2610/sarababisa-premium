@@ -432,78 +432,93 @@ class KaryawanController extends Controller
         $periode = $request->input('periode');
         $date = Carbon::createFromFormat('Y-m', $periode);
 
+        // Trick: Gabungkan periode ke dalam request sebagai 'filter_month'
+        // agar fungsi query di Model User (seperti filteredTargetServis) mengambil bulan yang sesuai dengan slip gaji.
+        $request->merge(['filter_month' => $periode]);
+
         $start_date = $date->copy()->startOfMonth()->format('Y-m-d');
         $end_date   = $date->copy()->endOfMonth()->format('Y-m-d');
-        // dd($start_date, $end_date);
 
         $namaBulanFile = Carbon::now()->translatedFormat('F Y');
 
         $items = Worker::findOrFail($id);
-        // dd($items);
+
         $salaries = Salary::where('workers_id', $id)
             ->whereYear('created_at', $date->year)
             ->whereMonth('created_at', $date->month)
             ->get();
-        $bonusOld = Salary::where('workers_id', $id)->whereYear('created_at', $date->year)->whereMonth('created_at', $date->month)
+
+        $bonusOld = Salary::where('workers_id', $id)
+            ->whereYear('created_at', $date->year)
+            ->whereMonth('created_at', $date->month)
             ->sum('bonus');
 
         $user = User::where('workers_id', $id)->first();
+
         $bonus = 0;
+        $bonusTarget = 0; // Inisialisasi bonus target
+
         if($user) {
             $bonus = calculateBonus($user->id, $start_date, $end_date);
+
+            // Panggil fungsi target dari model
+            $targetStats = $user->getTargetTeknisiStats($bonus);
+            $bonusTarget = $targetStats['reward']; // Ambil nominal dari array
         }
-        // dd($items,$user,$bonus,$start_date, $end_date);
-        // dd($bonus,$bonusOld);
-        // $users = User::find(1);
+
         if ($items->cabang_id == 1) {
             $users = User::find(1);
         }else{
             $users = User::where('cabang_id',$items->cabang_id)->where('id','!=',1)->where('role','Kepala Toko')->orderBy('id','asc')->first();
         }
+
         if (empty($users)) {
             toast('Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini. lalu setting kop di pengaturan toko melalui akun kepala toko', 'error');
             return redirect('/akun')->with('error', 'Silahkan bikin akun kepala toko terlebih dahulu untuk cabang ini.');
         }
+
         $debts = Debt::where('workers_id', $id)
             ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', $date->year)
             ->whereMonth('tgl_disetujui', $date->month)
             ->get();
+
         $incidents = Incident::where('workers_id', $id)
             ->whereYear('created_at', $date->year)
             ->whereMonth('created_at', $date->month)
             ->get();
+
         $totalkasbon = Debt::where('workers_id', $id)
             ->where('is_approve', 'Setuju')
             ->whereYear('tgl_disetujui', $date->year)
             ->whereMonth('tgl_disetujui', $date->month)
             ->sum('total');
+
         $totalinsiden = Incident::where('workers_id', $id)
             ->whereYear('created_at', $date->year)
             ->whereMonth('created_at', $date->month)
             ->sum('biaya_teknisi');
 
         $potonganServis = Refund::where('teknisi_id', $user->id)
-        ->whereYear('period', $date->year)
-        ->whereMonth('period', $date->month)
-        ->get();
-        // dd($potonganServis);
+            ->whereYear('period', $date->year)
+            ->whereMonth('period', $date->month)
+            ->get();
 
         $totalPotonganServis = $potonganServis;
         $namaKaryawan = $items->name;
 
         $izin = Izin::where('status',1)->where('user_id',$user->id)->whereYear('tanggal', $date->year)
-        ->whereMonth('tanggal', $date->month)->get()->sum('nominal_potongan');
-        // dd($izin);
+            ->whereMonth('tanggal', $date->month)->get()->sum('nominal_potongan');
+
         $overtime = Overtime::where('id_user',$user->id)->whereYear('tanggal', $date->year)
-        ->whereMonth('tanggal', $date->month)->get()->sum('nominal_overtime');
+            ->whereMonth('tanggal', $date->month)->get()->sum('nominal_overtime');
+
         $potongan_telat = Attendance::where('user_id',$user->id)->whereYear('tanggal', $date->year)
-        ->whereMonth('tanggal', $date->month)->where('telat',1)->get()->sum('nominal_potongan');
+            ->whereMonth('tanggal', $date->month)->where('telat',1)->get()->sum('nominal_potongan');
 
         $shift = Shift::where('worker_id',$id)->first();
 
         $pdf = PDF::loadView('pages.kepalatoko.karyawan.cetak', [
-        // return View('pages.kepalatoko.karyawan.cetak', [
             'overtime' => $overtime,
             'izin' => $izin,
             'tanggal' => $tanggal,
@@ -512,6 +527,7 @@ class KaryawanController extends Controller
             'items' => $items,
             'salaries' => $salaries,
             'bonus' => $bonus,
+            'bonusTarget' => $bonusTarget, // Teruskan ke view
             'debts' => $debts,
             'incidents' => $incidents,
             'shift' => $shift,
