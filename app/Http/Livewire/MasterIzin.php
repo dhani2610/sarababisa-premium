@@ -101,7 +101,7 @@ class MasterIzin extends Component
         if ($user->role == 'Kepala Toko') {
             $users = User::where('cabang_id',getCabangId())->whereIn('role', ['Teknisi', 'Sales','Admin Toko'])->select('id', 'name')->get();
         }else if($user->role == 'Admin Toko'){
-            $users = User::where('cabang_id',getCabangId())->whereIn('role', ['Teknisi', 'Sales'])->select('id', 'name')->get();
+            $users = User::where('cabang_id',getCabangId())->whereIn('role', ['Teknisi', 'Sales','Admin Toko'])->select('id', 'name')->get();
         }else{
             $users = User::where('cabang_id',getCabangId())->where('id', $user->id)->select('id', 'name')->get();
         }
