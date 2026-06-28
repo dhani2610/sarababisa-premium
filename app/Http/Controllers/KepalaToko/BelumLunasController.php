@@ -47,7 +47,7 @@ class BelumLunasController extends Controller
             ->with('brand', 'modelserie', 'user')
             ->get();
 
-        $customerName  = Customer::find($request->customers_id)->first()->nama;
+        $customerName  = Customer::find($request->customers_id)->nama;
         if ($services->isEmpty()) {
             return back()->with('error', 'Tidak ada data transaksi belum lunas untuk pelanggan ini.');
         }
