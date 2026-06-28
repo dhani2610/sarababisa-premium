@@ -104,6 +104,11 @@
                                     <input id="nominal" name="nominal" class="form-input w-full px-2 py-1" type="text" onkeyup="formatRibuan(this)" value="{{ $item->nominal ? number_format($item->nominal, 0, '', '.') : '' }}" x-bind:required="tipeTarget === 'nominal'" />
                                 </div>
 
+                                <div>
+                                    <label class="block text-sm font-medium mb-1" for="bonus_nominal">Bonus Pencapaian (Rp) <span class="text-rose-500">*</span></label>
+                                    <input id="bonus_nominal" name="bonus_nominal" class="form-input w-full px-2 py-1" type="text" onkeyup="formatRibuan(this)" value="{{ $item->bonus_nominal ? number_format($item->bonus_nominal, 0, '', '.') : '' }}" required />
+                                </div>
+
                             </div>
                         </div>
                         <div class="px-5 py-4 border-t border-slate-200">
