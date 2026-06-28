@@ -134,7 +134,7 @@ class MasterIzinController extends Controller
         if ($user->role == 'Kepala Toko') {
             $users = User::where('cabang_id', $cabangId)->whereIn('role', ['Teknisi', 'Sales', 'Admin Toko'])->select('id', 'name')->get();
         } else if ($user->role == 'Admin Toko') {
-            $users = User::where('cabang_id', $cabangId)->whereIn('role', ['Teknisi', 'Sales'])->select('id', 'name')->get();
+            $users = User::where('cabang_id', $cabangId)->whereIn('role', ['Teknisi', 'Sales', 'Admin Toko'])->select('id', 'name')->get();
         } else {
             $users = User::where('cabang_id', $cabangId)->where('id', $user->id)->select('id', 'name')->get();
         }
