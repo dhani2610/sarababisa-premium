@@ -478,62 +478,6 @@ class BelumLunasController extends Controller
                             <rect x="7" y="13" width="10" height="8" rx="2" />
                         </svg>
                     </button>
-
-
-                    <!-- Start Delete Modal -->
-                    <div x-data="{ showDelete: false, deleteId: null }"
-                        x-show="showDelete"
-                        x-on:open-delete.window="showDelete = true; deleteId = $event.detail.id"
-                        x-on:close-delete.window="showDelete = false"
-                        x-on:keydown.escape.window="showDelete = false"
-                        class="fixed z-50 inset-0">
-
-                        <div x-on:click="showDelete = false" class="fixed inset-0 bg-slate-900 bg-opacity-40" x-cloak></div>
-
-                        <div id="danger-modal"
-                            class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
-                            role="dialog" aria-modal="true"
-                            x-show="showDelete" x-cloak>
-                            <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full">
-                                <div class="p-5 flex space-x-4">
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
-                                        <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16">
-                                            <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <div class="mb-2">
-                                            <div class="text-lg font-semibold text-slate-800">Apakah anda sudah yakin ?</div>
-                                        </div>
-                                        <div class="text-sm mb-10">
-                                            <p>Jika sudah terhapus, maka tidak bisa dikembalikan lagi.</p>
-                                        </div>
-                                        <div class="flex flex-wrap justify-end space-x-2">
-                                            <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600"
-                                                    x-on:click="$dispatch(\'close-delete\')">Batal</button>
-                                            <form x-bind:action="\''.$destroyBase.'/\' + deleteId" method="post">
-                                                '.csrf_field().method_field('delete').'
-                                                <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Ya, Hapus</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button  x-data x-on:click="$dispatch(\'open-delete\', { id: '.$row->id.' })"
-                            class="text-rose-500 hover:text-rose-600 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#ff2825" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                            <line x1="4" y1="7" x2="20" y2="7" />
-                            <line x1="10" y1="11" x2="10" y2="17" />
-                            <line x1="14" y1="11" x2="14" y2="17" />
-                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                        </svg>
-                    </button>
-
                 </div>';
             })
 

@@ -42,7 +42,6 @@
             text-align: left;
         }
 
-        /* Cari bagian ini di <style> */
         #detail td,
         #detail th,
         #detail tr,
@@ -53,10 +52,8 @@
             table-layout: fixed;
             padding: 4px;
             text-align: center;
-            border: solid;
+            border: solid 1px #000; /* Perbaikan border untuk tabel detail */
             word-wrap: break-word;
-
-            /* UBAH DARI 'top' MENJADI 'middle' */
             vertical-align: middle;
         }
 
@@ -107,7 +104,7 @@
                 <th>Total Item Servis</th>
                 <th>: {{ count($services) }} Item</th>
 
-                <th>Total Biaya Servis</th>
+                <th style="padding-left: 20px;">Total Biaya Servis</th>
                 <th>: Rp. {{ number_format($total_biaya) }}</th>
             </tr>
         </tbody>
@@ -139,8 +136,8 @@
                     <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</td>
 
                     <td class="text-center" style="width: 60px;" >
-                                    {{ $item->nomor_servis }}
-                                </td>
+                        {{ $item->nomor_servis }}
+                    </td>
 
                     {{-- Tipe (Model) --}}
                     <td>{{ $item->modelserie->name ?? '-' }}</td>
@@ -170,6 +167,23 @@
         </tbody>
     </table>
 
+    <!-- TAMBAHAN: Informasi Pembayaran / Bank -->
+    <div style="margin-top: 20px; font-size: 12px; font-style: italic;">
+        <h4 style="margin-bottom: 6px; font-style: normal; text-decoration: underline;">
+            Informasi Pembayaran (Transfer)
+        </h4>
+        @php
+            $banks = old('banks', json_decode($users->banks ?? '[]', true));
+        @endphp
+
+        <strong>No. Rekening : {{ $users->rekening }} {{ $users->bank }} An. {{ $users->pemilik_rekening }} </strong>
+
+        @if(!empty($banks))
+            @foreach ($banks as $index => $bank)
+                <br><strong>No. Rekening : {{ $bank['rekening'] }}, {{ $bank['bank'] }} An. {{ $bank['pemilik'] }} </strong>
+            @endforeach
+        @endif
+    </div>
 
 </body>
 
