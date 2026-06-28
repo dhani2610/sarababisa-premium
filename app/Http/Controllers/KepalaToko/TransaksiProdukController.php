@@ -773,6 +773,14 @@ class TransaksiProdukController extends Controller
 
         return response()->json(['message' => 'Data transaksi produk berhasil disetujui.']);
     }
+    public function approveSelectedLunas(Request $request)
+    {
+        $tanggal = Carbon::now()->translatedFormat('Y-m-d');
+        $selectedIds = $request->input('selectedIds');
+        Order::whereIn('id', $selectedIds)->update(['tipe_status_pembayaran' => 1]);
+
+        return response()->json(['message' => 'Data transaksi produk berhasil disetujui.']);
+    }
 
     public function rejectSelected(Request $request)
     {

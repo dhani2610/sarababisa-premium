@@ -151,48 +151,65 @@
     </h4>
 
     <table id="detail">
-		<thead>
-			<tr>
-				<th>No.</th>
-				<th>Nota</th>
-				<th>Nama Produk</th>
-				<th>Jumlah</th>
-				<th>Harga Jual</th>
-			</tr>
-		</thead>
-		<tbody>
-			@php
-				$i = 1
-			@endphp
-			@foreach ($orders as $item)
-				<tr>
-					<td style="width: 10px;">{{ $i++ }}</td>
-					<td class="text-center" style="width: 60px;">
-						@if ($item->order != null)
-							{{ $item->order->invoice_no }}
-						@else
-							-
-						@endif
-					</td>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Nota</th>
+                <th>Nama Produk</th>
+                <th>Jumlah</th>
+                <th>Harga Jual</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $i = 1
+            @endphp
+            @foreach ($orders as $item)
+                <tr>
+                    <td style="width: 10px;">{{ $i++ }}</td>
+                    <td class="text-center" style="width: 60px;">
+                        @if ($item->order != null)
+                            {{ $item->order->invoice_no }}
+                        @else
+                            -
+                        @endif
+                    </td>
 
-					<td style="text-align: left; width: 90px;">
-						@if ($item->product->categories_id == 1)
-							{{ $item->product->product_name }} {{ $item->product->kondisi }} {{ $item->product->warna }} {{ $item->product->ram }}/@if($item->product->capacity != null)
+                    <td style="text-align: left; width: 90px;">
+                        @if ($item->product->categories_id == 1)
+                            {{ $item->product->product_name }} {{ $item->product->kondisi }} {{ $item->product->warna }} {{ $item->product->ram }}/@if($item->product->capacity != null)
                                                 {{ $item->product->capacity->name }}
                                             @else
                                                 -
                                             @endif {{ $item->product->keterangan }} (IMEI {{ $item->product->nomor_seri }})
-						@else
-							{{ $item->product->product_name }} {{ $item->product->keterangan }}
-						@endif
-					</td>
-					<td style="text-align: center; width: 40px;">{{ $item->quantity }}</td>
-					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->total) }}</td>
+                        @else
+                            {{ $item->product->product_name }} {{ $item->product->keterangan }}
+                        @endif
+                    </td>
+                    <td style="text-align: center; width: 40px;">{{ $item->quantity }}</td>
+                    <td style="width: 70px; text-align: right;">Rp. {{ number_format($item->total) }}</td>
 
-				</tr>
-			@endforeach
-		</tbody>
-	</table>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px; font-size: 12px; font-style: italic;">
+        <h4 style="margin-bottom: 6px; font-style: normal; text-decoration: underline;">
+            Informasi Pembayaran (Transfer)
+        </h4>
+        @php
+            $banks = old('banks', json_decode($users->banks ?? '[]', true));
+        @endphp
+
+        <strong>No. Rekening : {{ $users->rekening }} {{ $users->bank }} An. {{ $users->pemilik_rekening }} </strong>
+
+        @if(!empty($banks))
+            @foreach ($banks as $index => $bank)
+                <br><strong>No. Rekening : {{ $bank['rekening'] }}, {{ $bank['bank'] }} An. {{ $bank['pemilik'] }} </strong>
+            @endforeach
+        @endif
+    </div>
 
 </body>
 

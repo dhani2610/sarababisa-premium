@@ -653,6 +653,7 @@ Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisControll
 
     Route::delete('/product-transactions/delete', [KepalaTokoTransaksiProdukController::class, 'deleteSelected']);
     Route::patch('/product-transactions/update', [KepalaTokoTransaksiProdukController::class, 'approveSelected']);
+    Route::patch('/product-transactions/update-lunas', [KepalaTokoTransaksiProdukController::class, 'approveSelectedLunas']);
     Route::patch('/product-transactions/reject', [KepalaTokoTransaksiProdukController::class, 'rejectSelected']);
     Route::resource('produk/transaksi-produk-paid', KepalaTokoTransaksiProdukPaidController::class);
     Route::delete('/paid-product-transactions/delete', [KepalaTokoTransaksiProdukPaidController::class, 'deleteSelected']);
