@@ -25,12 +25,12 @@
                         <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                     </svg>
                     <span class="hidden xs:block ml-2">Tambah Transaksi Baru</span>
-                </button>                        
-                
+                </button>
+
             </div>
 
         </div>
-     
+
         <!-- Start -->
         <div x-data="{ modalOpen: true }">
             <!-- Modal backdrop -->
@@ -90,8 +90,13 @@
                                 <form action="{{ route('transaksi-servis-approve.update', $item->id) }}" method="post">
                                     @method('PUT')
                                     @csrf
+                                    <div class="row mb-3">
+                                        <div class="form-control">
+                                            <label class="block text-sm font-medium mb-1" for="tgl_disetujui">Tgl. Disetujui </label>
+                                            <input type="date" name="tgl_disetujui" class="form-input px-2 py-1" value="<?php echo date('Y/m/d') ?>"/>
+                                        </div>
+                                    </div>
                                     <div class="flex justify-center space-x-2">
-                                        <input type="hidden" name="tgl_disetujui" value="<?php echo date('Y/m/d') ?>"/>
                                         <input type="submit" name="is_approve" value="Setuju" class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
                                         <input type="submit" name="is_approve" value="Ditolak" class="btn-sm bg-red-500 hover:bg-red-600 text-white">
                                     </div>
@@ -100,7 +105,7 @@
                         </div>
                     </div>
                 </div>
-            </div>                                            
+            </div>
         </div>
         <!-- End -->
 

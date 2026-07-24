@@ -623,6 +623,7 @@ class AkunController extends Controller
 
     public function update(Request $request, $id)
     {
+        dd($request->all());
         $request->merge([
             'nominal_bonus_admin' => str_replace('.', '', $request->nominal_bonus_admin),
         ]);

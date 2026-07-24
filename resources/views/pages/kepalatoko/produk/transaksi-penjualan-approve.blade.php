@@ -14,7 +14,7 @@
             </div>
 
         </div>
-     
+
         <!-- Start -->
         <div x-data="{ modalOpen: true }">
             <!-- Modal backdrop -->
@@ -74,6 +74,12 @@
                                 <form action="{{ route('transaksi-penjualan-approve.update', $item->id) }}" method="post">
                                     @method('PUT')
                                     @csrf
+                                    <div class="row mb-3">
+                                        <div class="form-control">
+                                            <label class="block text-sm font-medium mb-1" for="tgl_disetujui">Tgl. Disetujui </label>
+                                            <input type="date" name="tgl_disetujui" class="form-input px-2 py-1" value="<?php echo date('Y/m/d') ?>"/>
+                                        </div>
+                                    </div>
                                     <div class="flex justify-center space-x-2">
                                         <input type="hidden" name="tgl_disetujui" value="<?php echo date('Y/m/d') ?>"/>
                                         <input type="submit" name="is_approve" value="Setuju" class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
@@ -84,7 +90,7 @@
                         </div>
                     </div>
                 </div>
-            </div>                                            
+            </div>
         </div>
         <!-- End -->
 
