@@ -144,6 +144,7 @@
                     <div class="table-items-action hidden">
                         <div class="flex items-center">
                             <div class="text-sm italic mr-2 whitespace-nowrap"><span class="table-items-count"></span> item yang dipilih</div>
+                            <button class="btn bg-white border-slate-200 text-emerald-500 mr-2" id="btn-approve-selected">Setujui</button>
                             <button class="btn bg-white border-slate-200 text-rose-500" id="btn-delete-selected">Hapus</button>
                         </div>
                     </div>
@@ -167,6 +168,7 @@
                             <th class="text-center px-2 py-3">Pengembalian Biaya</th>
                             <th class="text-center px-2 py-3">Teknisi</th>
                             <th class="text-center px-2 py-3">Bulan/Tahun</th>
+                            <th class="text-center px-2 py-3">Status</th>
                             @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                                 <th class="text-center px-2 py-3">Aksi</th>
                             @endif
@@ -209,6 +211,7 @@
                 { data: 'nominal_servis', name: 'nominal_servis', className: 'text-center' },
                 { data: 'teknisi_name', name: 'teknisi.name', className: 'text-center' },
                 { data: 'period', name: 'period', className: 'text-center' },
+                { data: 'is_approve', name: 'is_approve', orderable: false, searchable: false, className: 'text-center' },
                 @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                 { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' },
                 @endif
@@ -288,6 +291,42 @@
                 error: function(err) {
                     console.error(err);
                     alert('Gagal menghapus data.');
+                }
+            });
+        });
+
+        // 5. Action Approve Selected
+        $('#btn-approve-selected').on('click', async function() {
+            var selectedIds = [];
+            $('.table-item:checked').each(function() {
+                selectedIds.push($(this).val());
+            });
+
+            if (selectedIds.length === 0) {
+                alert('Tidak ada item yang dipilih.');
+                return;
+            }
+
+            var tgl_disetujui = await promptTanggalDisetujui();
+            if (!tgl_disetujui) return;
+
+            $.ajax({
+                url: '{{ route("refund.approveSelected") }}',
+                method: 'POST',
+                data: {
+                    selectedIds: selectedIds,
+                    tgl_disetujui: tgl_disetujui,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(res) {
+                    alert(res.message);
+                    table.ajax.reload(); // Reload DataTables
+                    $('#parent-checkbox').prop('checked', false);
+                    updateBulkDeleteUI();
+                },
+                error: function(err) {
+                    console.error(err);
+                    alert('Gagal menyetujui data.');
                 }
             });
         });

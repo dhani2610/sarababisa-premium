@@ -59,6 +59,44 @@
 
         <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+        <script>
+            // Prompt tanggal disetujui (backdate) sebelum bulk approve. Resolve null jika dibatalkan.
+            function promptTanggalDisetujui() {
+                const today = new Date().toISOString().split('T')[0];
+                return Swal.fire({
+                    title: 'Tanggal Disetujui',
+                    html: `<input type="date" id="swal-tgl-disetujui" class="swal2-input" value="${today}" max="${today}">`,
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    buttonsStyling: true,
+                    confirmButtonText: 'Setujui',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#6366f1',
+                    cancelButtonColor: '#94a3b8',
+                    didOpen: () => {
+                        // Tailwind preflight (button{background-color:transparent}) menimpa warna default SweetAlert2, paksa dengan !important
+                        const confirmBtn = Swal.getConfirmButton();
+                        const cancelBtn = Swal.getCancelButton();
+                        if (confirmBtn) {
+                            confirmBtn.style.setProperty('background-color', '#6366f1', 'important');
+                            confirmBtn.style.setProperty('color', '#ffffff', 'important');
+                        }
+                        if (cancelBtn) {
+                            cancelBtn.style.setProperty('background-color', '#94a3b8', 'important');
+                            cancelBtn.style.setProperty('color', '#ffffff', 'important');
+                        }
+                    },
+                    preConfirm: () => {
+                        const val = document.getElementById('swal-tgl-disetujui').value;
+                        if (!val) {
+                            Swal.showValidationMessage('Tanggal wajib diisi');
+                        }
+                        return val;
+                    }
+                }).then((result) => result.isConfirmed ? result.value : null);
+            }
+        </script>
+
         <x-livewire-alert::scripts />
 
         @stack('scripts')

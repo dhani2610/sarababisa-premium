@@ -51,6 +51,12 @@ class RefundController extends Controller
                 ->editColumn('period', function ($row) {
                     return $row->period ? Carbon::parse($row->period)->format('F Y') : '-';
                 })
+                ->addColumn('is_approve', function ($row) {
+                    if ($row->is_approve === 'Setuju') {
+                        return '<span class="text-xs font-medium px-2.5 py-0.5 rounded bg-emerald-100 text-emerald-600">Disetujui</span>';
+                    }
+                    return '<span class="text-xs font-medium px-2.5 py-0.5 rounded bg-slate-100 text-slate-500">Belum</span>';
+                })
                 ->addColumn('action', function ($row) {
                     if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko') {
                         $editUrl = route('refund.edit', $row->id);
@@ -72,7 +78,7 @@ class RefundController extends Controller
                     }
                     return '';
                 })
-                ->rawColumns(['checkbox', 'action']) // Render HTML
+                ->rawColumns(['checkbox', 'is_approve', 'action']) // Render HTML
                 ->make(true);
         }
 
@@ -143,6 +149,22 @@ class RefundController extends Controller
         Refund::whereIn('id', $selectedIds)->delete();
 
         return response()->json(['message' => 'Data pengembalian dana berhasil dihapus.']);
+    }
+
+    public function approveSelected(Request $request)
+    {
+        $selectedIds = $request->input('selectedIds', []);
+        if (!is_array($selectedIds) || empty($selectedIds)) {
+            return response()->json(['message' => 'Tidak ada data yang dipilih.'], 422);
+        }
+
+        $tanggal = $request->filled('tgl_disetujui')
+            ? Carbon::parse($request->input('tgl_disetujui'))->format('Y-m-d')
+            : Carbon::now()->format('Y-m-d');
+
+        Refund::whereIn('id', $selectedIds)->update(['is_approve' => 'Setuju', 'tgl_disetujui' => $tanggal]);
+
+        return response()->json(['message' => 'Data pengembalian dana berhasil disetujui.']);
     }
 
     public function store(Request $request)

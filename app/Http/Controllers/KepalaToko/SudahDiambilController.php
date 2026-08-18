@@ -536,7 +536,9 @@ class SudahDiambilController extends Controller
 
     public function approveSelected(Request $request)
     {
-        $tanggal = Carbon::now()->translatedFormat('Y-m-d');
+        $tanggal = $request->filled('tgl_disetujui')
+            ? Carbon::parse($request->input('tgl_disetujui'))->format('Y-m-d')
+            : Carbon::now()->format('Y-m-d');
         $selectedIds = $request->input('selectedIds');
         ServiceTransaction::whereIn('id', $selectedIds)->update(['is_approve' => 'Setuju', 'tgl_disetujui' => $tanggal]);
 

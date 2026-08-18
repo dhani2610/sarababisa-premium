@@ -217,7 +217,7 @@
             }
 
             // Fungsi Bulk Actions (Delete, Approve, Reject)
-            window.bulkAction = function(actionType) {
+            window.bulkAction = async function(actionType) {
                 var selectedIds = $('input.table-item:checked').map(function() {
                     return $(this).val();
                 }).get();
@@ -226,27 +226,30 @@
 
                 var url = '';
                 var confirmMsg = '';
+                var extraData = {};
 
                 if(actionType === 'delete') {
                     url = "{{ route('kasbon.delete-batch') }}";
                     confirmMsg = 'Yakin ingin menghapus data terpilih?';
+                    if (!confirm(confirmMsg)) return;
                 } else if(actionType === 'approve') {
                     url = "{{ route('kasbon.approve-batch') }}";
-                    confirmMsg = 'Yakin ingin menyetujui data terpilih?';
+                    var tgl_disetujui = await promptTanggalDisetujui();
+                    if (!tgl_disetujui) return;
+                    extraData = { tgl_disetujui: tgl_disetujui };
                 } else if(actionType === 'reject') {
                     url = "{{ route('kasbon.reject-batch') }}";
                     confirmMsg = 'Yakin ingin menolak data terpilih?';
+                    if (!confirm(confirmMsg)) return;
                 }
-
-                if (!confirm(confirmMsg)) return;
 
                 $.ajax({
                     url: url,
                     method: 'POST',
-                    data: {
+                    data: Object.assign({
                         ids: selectedIds,
                         _token: "{{ csrf_token() }}"
-                    },
+                    }, extraData),
                     success: function(response) {
                         alert(response.message);
                         table.ajax.reload();

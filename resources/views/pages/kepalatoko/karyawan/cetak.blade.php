@@ -69,7 +69,13 @@
         <tbody>
             <tr>
             <th class="w-50">{{ $users->nama_toko }}</th>
-            <td class="w-50 text-right">Periode : {{ \Carbon\Carbon::parse($periode)->locale('id')->translatedFormat('F Y') }}</td>
+            <td class="w-50 text-right">Periode :
+                @if (($type ?? 'bulanan') === 'rentang')
+                    {{ \Carbon\Carbon::parse($start_date)->locale('id')->translatedFormat('d F Y') }} - {{ \Carbon\Carbon::parse($end_date)->locale('id')->translatedFormat('d F Y') }}
+                @else
+                    {{ \Carbon\Carbon::parse($periode)->locale('id')->translatedFormat('F Y') }}
+                @endif
+            </td>
             </tr>
             <tr>
             <th>{{ $users->deskripsi_toko }}</th>
@@ -126,10 +132,12 @@
             <td>Bonus Reguler</td>
             <td class="text-right">Rp. {{ number_format($bonus) }}</td>
             </tr>
+            @if (($type ?? 'bulanan') !== 'rentang')
             <tr>
             <td>Bonus Pencapaian Target</td>
             <td class="text-right">Rp. {{ number_format($bonusTarget) }}</td>
             </tr>
+            @endif
             <tr>
                 <td>Lembur</td>
                 <td class="text-right">Rp. {{ number_format($overtime) }}</td>

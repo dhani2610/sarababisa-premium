@@ -175,7 +175,9 @@ class ExpenseController extends Controller
     public function approveBatch(Request $request)
     {
         $ids = $request->input('ids');
-        $tanggal = Carbon::now()->translatedFormat('Y-m-d');
+        $tanggal = $request->filled('tgl_disetujui')
+            ? Carbon::parse($request->input('tgl_disetujui'))->format('Y-m-d')
+            : Carbon::now()->format('Y-m-d');
         Expense::whereIn('id', $ids)->update(['is_approve' => 'Setuju', 'tgl_disetujui' => $tanggal]);
         return response()->json(['message' => 'Data pengeluaran berhasil disetujui.']);
     }

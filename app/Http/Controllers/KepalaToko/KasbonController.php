@@ -117,9 +117,12 @@ class KasbonController extends Controller
     public function approveBatch(Request $request)
     {
         $ids = $request->input('ids');
+        $tanggal = $request->filled('tgl_disetujui')
+            ? Carbon::parse($request->input('tgl_disetujui'))->format('Y-m-d')
+            : Carbon::now()->format('Y-m-d');
         Debt::whereIn('id', $ids)->update([
             'is_approve' => 'Setuju',
-            'tgl_disetujui' => Carbon::now()
+            'tgl_disetujui' => $tanggal
         ]);
         return response()->json(['message' => 'Data kasbon berhasil disetujui.']);
     }

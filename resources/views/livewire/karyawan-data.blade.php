@@ -252,11 +252,40 @@
                         <input type="hidden" id="modal_penanggalan" name="penanggalan" value="{{ date('Y-m-d') }}">
 
                         <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Tipe Slip</label>
+                            <div class="flex gap-4">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="type" value="bulanan" id="modal_type_bulanan"
+                                        class="form-radio" checked onchange="togglePrintModalType()">
+                                    <span class="ml-2 text-sm">Bulanan</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="type" value="rentang" id="modal_type_rentang"
+                                        class="form-radio" onchange="togglePrintModalType()">
+                                    <span class="ml-2 text-sm">Rentang Tanggal</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4" id="modal_periode_wrapper">
                             <label class="block text-sm font-medium mb-1">Periode Gaji</label>
                             <input id="modal_periode" type="month" name="periode"
                                 class="form-input w-full bg-gray-100 text-slate-500 cursor-not-allowed" readonly
                                 required>
                             <p class="text-xs text-gray-500 mt-1">*Periode otomatis sesuai data yang dipilih.</p>
+                        </div>
+
+                        <div class="mb-4 hidden" id="modal_rentang_wrapper">
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium mb-1">Dari Tanggal</label>
+                                <input id="modal_start_date" type="date" name="start_date"
+                                    class="form-input w-full" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Sampai Tanggal</label>
+                                <input id="modal_end_date" type="date" name="end_date" class="form-input w-full"
+                                    required>
+                            </div>
                         </div>
 
                         <input type="hidden" id="modal_worker_id">
@@ -548,6 +577,12 @@
             // 2. Periode otomatis sesuai baris data yang diklik (YYYY-MM)
             $('#modal_periode').val(periodeValue);
 
+            // Reset selalu ke mode Bulanan tiap modal dibuka
+            $('#modal_type_bulanan').prop('checked', true);
+            $('#modal_start_date').val('');
+            $('#modal_end_date').val('');
+            togglePrintModalType();
+
             // Set Form Action
             let urlCetak = "{{ url('slip-gaji') }}/" + id;
             $('#printForm').attr('action', urlCetak);
@@ -559,15 +594,34 @@
             $('#printModalWrapper').addClass('hidden');
         }
 
+        function togglePrintModalType() {
+            const isRentang = $('#modal_type_rentang').is(':checked');
+            $('#modal_periode_wrapper').toggleClass('hidden', isRentang);
+            $('#modal_rentang_wrapper').toggleClass('hidden', !isRentang);
+        }
+
     function sendWAFromModal() {
         const id = $('#modal_worker_id').val();
         const name = $('#modal_worker_name').val();
         const originalHp = $('#modal_worker_hp').val();
         const penanggalan = $('#modal_penanggalan').val();
+        const type = $('input[name="type"]:checked').val();
         const periode = $('#modal_periode').val();
+        const startDate = $('#modal_start_date').val();
+        const endDate = $('#modal_end_date').val();
 
-        if (!penanggalan || !periode) {
-            alert('Harap isi Penanggalan dan Periode Gaji terlebih dahulu!');
+        if (!penanggalan) {
+            alert('Harap isi Penanggalan terlebih dahulu!');
+            return;
+        }
+
+        if (type === 'rentang') {
+            if (!startDate || !endDate) {
+                alert('Harap isi Dari Tanggal dan Sampai Tanggal terlebih dahulu!');
+                return;
+            }
+        } else if (!periode) {
+            alert('Harap isi Periode Gaji terlebih dahulu!');
             return;
         }
 
@@ -582,11 +636,14 @@
         }
 
         const baseUrl = "{{ url('slip-gaji') }}/" + id;
-        const fullLink = `${baseUrl}?penanggalan=${penanggalan}&periode=${periode}`;
+        const periodeLabel = type === 'rentang' ? `${startDate} s/d ${endDate}` : periode;
+        const fullLink = type === 'rentang' ?
+            `${baseUrl}?penanggalan=${penanggalan}&type=rentang&start_date=${startDate}&end_date=${endDate}` :
+            `${baseUrl}?penanggalan=${penanggalan}&type=bulanan&periode=${periode}`;
 
         const message = `*Slip Gaji Karyawan*%0A%0A` +
             `Halo ${name},%0A` +
-            `Berikut adalah link slip gaji Anda untuk periode *${periode}*:%0A%0A` +
+            `Berikut adalah link slip gaji Anda untuk periode *${periodeLabel}*:%0A%0A` +
             `${fullLink}%0A%0A` +
             `Harap disimpan. Terima kasih.`;
 

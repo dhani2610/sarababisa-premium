@@ -16,6 +16,8 @@ class Refund extends Model
         'teknisi_id',
         'period',
         'cabang_id',
+        'is_approve',
+        'tgl_disetujui',
     ];
 
     protected $dates = ['period'];

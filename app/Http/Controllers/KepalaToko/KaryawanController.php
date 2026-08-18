@@ -429,28 +429,37 @@ class KaryawanController extends Controller
     public function cetak(Request $request, $id)
     {
         $tanggal = $request->penanggalan;
+        $type = $request->input('type', 'bulanan');
         $periode = $request->input('periode');
-        $date = Carbon::createFromFormat('Y-m', $periode);
 
-        // Trick: Gabungkan periode ke dalam request sebagai 'filter_month'
-        // agar fungsi query di Model User (seperti filteredTargetServis) mengambil bulan yang sesuai dengan slip gaji.
-        $request->merge(['filter_month' => $periode]);
+        if ($type === 'rentang') {
+            $start_date = $request->input('start_date');
+            $end_date = $request->input('end_date');
+            $date = Carbon::parse($start_date);
+            $namaBulanFile = $start_date . ' sd ' . $end_date;
+        } else {
+            $date = Carbon::createFromFormat('Y-m', $periode);
 
-        $start_date = $date->copy()->startOfMonth()->format('Y-m-d');
-        $end_date   = $date->copy()->endOfMonth()->format('Y-m-d');
+            // Trick: Gabungkan periode ke dalam request sebagai 'filter_month'
+            // agar fungsi query di Model User (seperti filteredTargetServis) mengambil bulan yang sesuai dengan slip gaji.
+            $request->merge(['filter_month' => $periode]);
 
-        $namaBulanFile = Carbon::now()->translatedFormat('F Y');
+            $start_date = $date->copy()->startOfMonth()->format('Y-m-d');
+            $end_date   = $date->copy()->endOfMonth()->format('Y-m-d');
+
+            $namaBulanFile = Carbon::now()->translatedFormat('F Y');
+        }
 
         $items = Worker::findOrFail($id);
 
         $salaries = Salary::where('workers_id', $id)
-            ->whereYear('created_at', $date->year)
-            ->whereMonth('created_at', $date->month)
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
             ->get();
 
         $bonusOld = Salary::where('workers_id', $id)
-            ->whereYear('created_at', $date->year)
-            ->whereMonth('created_at', $date->month)
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
             ->sum('bonus');
 
         $user = User::where('workers_id', $id)->first();
@@ -461,9 +470,11 @@ class KaryawanController extends Controller
         if($user) {
             $bonus = calculateBonus($user->id, $start_date, $end_date);
 
-            // Panggil fungsi target dari model
-            $targetStats = $user->getTargetTeknisiStats($bonus);
-            $bonusTarget = $targetStats['reward']; // Ambil nominal dari array
+            // Bonus Pencapaian Target hanya berlaku untuk mode Bulanan (targetnya per bulan kalender)
+            if ($type !== 'rentang') {
+                $targetStats = $user->getTargetTeknisiStats($bonus);
+                $bonusTarget = $targetStats['reward']; // Ambil nominal dari array
+            }
         }
 
         if ($items->cabang_id == 1) {
@@ -479,42 +490,45 @@ class KaryawanController extends Controller
 
         $debts = Debt::where('workers_id', $id)
             ->where('is_approve', 'Setuju')
-            ->whereYear('tgl_disetujui', $date->year)
-            ->whereMonth('tgl_disetujui', $date->month)
+            ->whereDate('tgl_disetujui', '>=', $start_date)
+            ->whereDate('tgl_disetujui', '<=', $end_date)
             ->get();
 
         $incidents = Incident::where('workers_id', $id)
-            ->whereYear('created_at', $date->year)
-            ->whereMonth('created_at', $date->month)
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
             ->get();
 
         $totalkasbon = Debt::where('workers_id', $id)
             ->where('is_approve', 'Setuju')
-            ->whereYear('tgl_disetujui', $date->year)
-            ->whereMonth('tgl_disetujui', $date->month)
+            ->whereDate('tgl_disetujui', '>=', $start_date)
+            ->whereDate('tgl_disetujui', '<=', $end_date)
             ->sum('total');
 
         $totalinsiden = Incident::where('workers_id', $id)
-            ->whereYear('created_at', $date->year)
-            ->whereMonth('created_at', $date->month)
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
             ->sum('biaya_teknisi');
 
         $potonganServis = Refund::where('teknisi_id', $user->id)
-            ->whereYear('period', $date->year)
-            ->whereMonth('period', $date->month)
+            ->whereDate('period', '>=', $start_date)
+            ->whereDate('period', '<=', $end_date)
             ->get();
 
         $totalPotonganServis = $potonganServis;
         $namaKaryawan = $items->name;
 
-        $izin = Izin::where('status',1)->where('user_id',$user->id)->whereYear('tanggal', $date->year)
-            ->whereMonth('tanggal', $date->month)->get()->sum('nominal_potongan');
+        $izin = Izin::where('status',1)->where('user_id',$user->id)
+            ->whereDate('tanggal', '>=', $start_date)
+            ->whereDate('tanggal', '<=', $end_date)->get()->sum('nominal_potongan');
 
-        $overtime = Overtime::where('id_user',$user->id)->whereYear('tanggal', $date->year)
-            ->whereMonth('tanggal', $date->month)->get()->sum('nominal_overtime');
+        $overtime = Overtime::where('id_user',$user->id)
+            ->whereDate('tanggal', '>=', $start_date)
+            ->whereDate('tanggal', '<=', $end_date)->get()->sum('nominal_overtime');
 
-        $potongan_telat = Attendance::where('user_id',$user->id)->whereYear('tanggal', $date->year)
-            ->whereMonth('tanggal', $date->month)->where('telat',1)->get()->sum('nominal_potongan');
+        $potongan_telat = Attendance::where('user_id',$user->id)
+            ->whereDate('tanggal', '>=', $start_date)
+            ->whereDate('tanggal', '<=', $end_date)->where('telat',1)->get()->sum('nominal_potongan');
 
         $shift = Shift::where('worker_id',$id)->first();
 
@@ -522,7 +536,10 @@ class KaryawanController extends Controller
             'overtime' => $overtime,
             'izin' => $izin,
             'tanggal' => $tanggal,
+            'type' => $type,
             'periode' => $periode,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
             'users' => $users,
             'items' => $items,
             'salaries' => $salaries,

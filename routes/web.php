@@ -523,6 +523,7 @@ Route::middleware(['ensureUserRole:KepalaToko', 'checkSubscription','jam_kerja']
 
     Route::resource('refund', RefundController::class)->names('refund');
     Route::post('refund/delete-selected', [RefundController::class, 'deleteSelected'])->name('refund.deleteSelected');
+    Route::post('refund/approve-selected', [RefundController::class, 'approveSelected'])->name('refund.approveSelected');
     Route::get('refund/service/{id}', [RefundController::class, 'serviceDetail'])->name('refund.serviceDetail');
     Route::get('/refund-cetak', [RefundController::class, 'cetak'])->name('refunds.cetak');
 

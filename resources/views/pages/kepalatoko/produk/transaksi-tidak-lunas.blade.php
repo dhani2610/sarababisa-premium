@@ -200,9 +200,12 @@
                                     console.error('Gagal menghapus data:', error);
                                 });
                         },
-                        approveSelected() {
+                        async approveSelected() {
                             const checkboxes = document.querySelectorAll('input.table-item:checked');
                             const selectedIds = [...checkboxes].map((checkbox) => checkbox.value);
+
+                            const tgl_disetujui = await promptTanggalDisetujui();
+                            if (!tgl_disetujui) return;
 
                             // Kirim permintaan update ke server
                             fetch('/product-transactions/update', {
@@ -212,7 +215,8 @@
                                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                     },
                                     body: JSON.stringify({
-                                        selectedIds
+                                        selectedIds,
+                                        tgl_disetujui
                                     }),
                                 })
                                 .then(response => response.json())

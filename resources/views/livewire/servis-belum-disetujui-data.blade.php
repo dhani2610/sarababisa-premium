@@ -760,9 +760,12 @@
                         console.error('Gagal menghapus data:', error);
                     });
                 },
-                approveSelected() {
+                async approveSelected() {
                     const checkboxes = document.querySelectorAll('input.table-item:checked');
                     const selectedIds = [...checkboxes].map((checkbox) => checkbox.value);
+
+                    const tgl_disetujui = await promptTanggalDisetujui();
+                    if (!tgl_disetujui) return;
 
                     // Kirim permintaan update ke server
                     fetch('/services/update', {
@@ -771,7 +774,7 @@
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}', // Tambahkan token CSRF jika menggunakan Laravel
                         },
-                        body: JSON.stringify({ selectedIds }),
+                        body: JSON.stringify({ selectedIds, tgl_disetujui }),
                     })
                     .then(response => response.json())
                     .then(data => {
