@@ -65,7 +65,7 @@ class ExpenseController extends Controller
                 return Carbon::parse($row->created_at)->format('d/m/Y');
             })
             ->editColumn('tgl_disetujui', function ($row) {
-                return Carbon::parse($row->tgl_disetujui)->format('d/m/Y');
+                return $row->tgl_disetujui ? Carbon::parse($row->tgl_disetujui)->format('d/m/Y') : '-';
             })
             ->editColumn('created_by', function ($row) {
                 if (!empty($row->createdBy)) {
@@ -424,7 +424,7 @@ class ExpenseController extends Controller
                 'tipe' => $request->tipe,
                 'users_id' => $request->users_id,
                 'created_at' => $request->created_at,
-                'tgl_disetujui' => $request->tgl_disetujui,
+                'tgl_disetujui' => $request->filled('tgl_disetujui') ? $request->tgl_disetujui : null,
                 'foto' => $fotoPath,
             ]);
 
