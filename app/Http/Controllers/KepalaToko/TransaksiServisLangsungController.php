@@ -185,24 +185,27 @@ class TransaksiServisLangsungController extends Controller
                         $cekTeknisi = User::find($userId);
                         if ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface') {
                             $nama_model = ModelSerie::find($request->model_series_id);
-                            $bonus_interface = $nama_model->nominal_bonus ?? 0;
+                            $bonus_interface = $nama_model ? ($nama_model->nominal_bonus ?? 0) : 0;
 
                             $potongan_teknisi = $bonus_interface;
                         }elseif ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface Leveling') {
                             $nama_model = ModelSerie::find($request->model_series_id);
 
-                            $biayaPerAction = (int)filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+                            $biayaPerAction = (int)$subTotalBiaya;
+                            
+                            $tipe_os_id = $nama_model ? $nama_model->id_tipe_os : null;
+
                             $bonus_leveling = \App\Models\BonusLeveling::where('id_user',$cekTeknisi->id)
                             ->where('id_jenis_barang',$request->types_id)
-                            ->where('id_tipe_os',$nama_model->id_tipe_os)
-                            ->where('start_rate','<=',(int)$biayaPerAction)
-                            ->where('end_rate','>=',(int)$biayaPerAction)
+                            ->where('id_tipe_os',$tipe_os_id)
+                            ->where('start_rate','<=',$biayaPerAction)
+                            ->where('end_rate','>=',$biayaPerAction)
                             ->first();
+
                             if (!empty($bonus_leveling)) {
                                 $bonus_interface = $bonus_leveling->nominal_bonus ?? 0;
                             }else{
-                                $nama_model = ModelSerie::find($request->model_series_id);
-                                $bonus_interface = $nama_model->nominal_bonus ?? 0;
+                                $bonus_interface = $nama_model ? ($nama_model->nominal_bonus ?? 0) : 0;
                             }
                             $potongan_teknisi = $bonus_interface;
 
@@ -563,25 +566,31 @@ class TransaksiServisLangsungController extends Controller
                     if ($request->kondisi_servis !== 'Dibatalkan' && $userId) {
                         $cekTeknisi = User::find($userId);
                         if ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface') {
-                            $nama_model = ModelSerie::find($request->model_series_id);
-                            $bonus_interface = $nama_model->nominal_bonus ?? 0;
+                            $model_id = $itemOrigin->model_series_id ?? $request->model_series_id;
+                            $nama_model = ModelSerie::find($model_id);
+                            $bonus_interface = $nama_model ? ($nama_model->nominal_bonus ?? 0) : 0;
 
                             $potongan_teknisi = $bonus_interface;
                         }elseif ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface Leveling') {
-                            $nama_model = ModelSerie::find($request->model_series_id);
+                            $model_id = $itemOrigin->model_series_id ?? $request->model_series_id;
+                            $nama_model = ModelSerie::find($model_id);
 
-                            $biayaPerAction = (int)filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+                            $biayaPerAction = (int)$subTotalBiaya;
+                            
+                            $tipe_os_id = $nama_model ? $nama_model->id_tipe_os : null;
+                            $jenis_barang_id = $itemOrigin->types_id ?? $request->types_id;
+
                             $bonus_leveling = \App\Models\BonusLeveling::where('id_user',$cekTeknisi->id)
-                            ->where('id_jenis_barang',$request->types_id)
-                            ->where('id_tipe_os',$nama_model->id_tipe_os)
-                            ->where('start_rate','<=',(int)$biayaPerAction)
-                            ->where('end_rate','>=',(int)$biayaPerAction)
+                            ->where('id_jenis_barang', $jenis_barang_id)
+                            ->where('id_tipe_os', $tipe_os_id)
+                            ->where('start_rate','<=',$biayaPerAction)
+                            ->where('end_rate','>=',$biayaPerAction)
                             ->first();
+
                             if (!empty($bonus_leveling)) {
                                 $bonus_interface = $bonus_leveling->nominal_bonus ?? 0;
                             }else{
-                                $nama_model = ModelSerie::find($request->model_series_id);
-                                $bonus_interface = $nama_model->nominal_bonus ?? 0;
+                                $bonus_interface = $nama_model ? ($nama_model->nominal_bonus ?? 0) : 0;
                             }
                             $potongan_teknisi = $bonus_interface;
 

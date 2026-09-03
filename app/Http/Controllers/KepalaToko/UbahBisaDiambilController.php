@@ -421,12 +421,12 @@ class UbahBisaDiambilController extends Controller
                         }elseif ($cekTeknisi && $cekTeknisi->bagian_teknisi == 'Teknisi Interface' && $tipeTeknisi == 'Interface Leveling') {
                             $nama_model = ModelSerie::find($itemOrigin->model_series_id);
 
-                            $biayaPerAction = (int)filter_var($action['biaya_servis'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+                            $biayaPerAction = (int)$subTotalBiaya;
                             $bonus_leveling = $nama_model ? \App\Models\BonusLeveling::where('id_user',$cekTeknisi->id)
                             ->where('id_jenis_barang',$itemOrigin->types_id)
                             ->where('id_tipe_os',$nama_model->id_tipe_os)
-                            ->where('start_rate','<=',(int)$biayaPerAction)
-                            ->where('end_rate','>=',(int)$biayaPerAction)
+                            ->where('start_rate','<=',$biayaPerAction)
+                            ->where('end_rate','>=',$biayaPerAction)
                             ->first() : null;
                             if (!empty($bonus_leveling)) {
                                 $bonus_interface = $bonus_leveling->nominal_bonus ?? 0;

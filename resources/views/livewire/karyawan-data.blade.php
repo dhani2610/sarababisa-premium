@@ -598,6 +598,9 @@
             const isRentang = $('#modal_type_rentang').is(':checked');
             $('#modal_periode_wrapper').toggleClass('hidden', isRentang);
             $('#modal_rentang_wrapper').toggleClass('hidden', !isRentang);
+            
+            $('#modal_start_date').prop('required', isRentang);
+            $('#modal_end_date').prop('required', isRentang);
         }
 
     function sendWAFromModal() {
