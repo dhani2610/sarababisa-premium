@@ -1099,28 +1099,34 @@ class BisaDiambilController extends Controller
 
     public function back(Request $request, $id)
     {
-        $item = ServiceTransaction::findOrFail($id);
+        try {
+            $item = ServiceTransaction::findOrFail($id);
 
-        // Transaction update
-        $item->update([
-            'users_id' => null,
-            'kondisi_servis' => null,
-            'status_servis' => $request->status_servis,
-            'tgl_selesai' => null,
-            'service_actions_id' => null,
-            'products_id' => null,
-            'tindakan_servis' => null,
-            'catatan' => null,
-            'modal_sparepart' => null,
-            'biaya' => null,
-            'persen_admin' => null,
-            'persen_teknisi' => null,
-            'omzet' => null,
-            'profit' => null,
-            'profittoko' => null
-        ]);
+            // Transaction update
+            $item->update([
+                'users_id' => null,
+                'kondisi_servis' => null,
+                'status_servis' => $request->status_servis ?? 'Dalam Proses',
+                'tgl_selesai' => null,
+                'service_actions_id' => null,
+                'products_id' => null,
+                'tindakan_servis' => null,
+                'catatan' => null,
+                'modal_sparepart' => null,
+                'biaya' => null,
+                'persen_admin' => null,
+                'persen_teknisi' => null,
+                'omzet' => null,
+                'profit' => null,
+                'profittoko' => null
+            ]);
 
-        return redirect()->route('transaksi-servis-bisa-diambil.index');
+            toast('Status servis berhasil dikembalikan ke Dalam Proses.', 'success');
+            return redirect()->route('transaksi-servis-bisa-diambil.index')->with('success', 'Status servis berhasil dikembalikan.');
+        } catch (\Throwable $e) {
+            \Log::error('Gagal kembalikan proses: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal mengembalikan status servis: ' . $e->getMessage());
+        }
     }
 
     /**

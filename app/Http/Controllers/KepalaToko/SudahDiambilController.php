@@ -1394,31 +1394,39 @@ class SudahDiambilController extends Controller
 
     public function back(Request $request, $id)
     {
-        $item = ServiceTransaction::findOrFail($id);
+        try {
+            $item = ServiceTransaction::findOrFail($id);
 
-        $profittransaksi = $request->biaya - $request->modal_sparepart;
-        $bagihasil = ($request->biaya - $request->modal_sparepart) / 100;
+            $biaya = (float)str_replace('.', '', $request->biaya ?? $item->biaya);
+            $modal = (float)str_replace('.', '', $request->modal_sparepart ?? $item->modal_sparepart);
+            $profittransaksi = $biaya - $modal;
+            $bagihasil = $profittransaksi / 100;
 
-        // Transaction update
-        $item->update([
-            'qc_keluar' => null,
-            'cara_pembayaran' => null,
-            'status_servis' => 'Bisa Diambil',
-            'kondisi_servis' => $request->kondisi_servis,
-            'diskon' => null,
-            'garansi' => null,
-            'exp_garansi' => null,
-            'is_approve' => null,
-            'pengambil' => null,
-            'penyerah' => null,
-            'tgl_ambil' => null,
-            'tgl_disetujui' => null,
-            'omzet' => $request->biaya,
-            'profit' => $profittransaksi,
-            'profittoko' => $profittransaksi - $bagihasil * ($request->persen_teknisi + $request->persen_admin),
-        ]);
+            // Transaction update
+            $item->update([
+                'qc_keluar' => null,
+                'cara_pembayaran' => null,
+                'status_servis' => 'Bisa Diambil',
+                'kondisi_servis' => $request->kondisi_servis ?? $item->kondisi_servis,
+                'diskon' => null,
+                'garansi' => null,
+                'exp_garansi' => null,
+                'is_approve' => null,
+                'pengambil' => null,
+                'penyerah' => null,
+                'tgl_ambil' => null,
+                'tgl_disetujui' => null,
+                'omzet' => $biaya,
+                'profit' => $profittransaksi,
+                'profittoko' => $profittransaksi - $bagihasil * ((float)($request->persen_teknisi ?? 0) + (float)($request->persen_admin ?? 0)),
+            ]);
 
-        return redirect()->route('transaksi-servis-sudah-diambil.index');
+            toast('Status transaksi servis berhasil dikembalikan ke Bisa Diambil.', 'success');
+            return redirect()->route('transaksi-servis-sudah-diambil.index')->with('success', 'Status transaksi servis berhasil dikembalikan ke Bisa Diambil.');
+        } catch (\Throwable $e) {
+            \Log::error('Gagal kembalikan ke bisa diambil: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal mengembalikan status servis: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -159,14 +159,20 @@ class UbahSudahDiambilController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        $request->merge([
-            'tunai' => str_replace('.', '', $request->tunai),
-            'transfer' => str_replace('.', '', $request->transfer),
+        $request->validate([
+            'cara_pembayaran' => 'required',
+        ], [
+            'cara_pembayaran.required' => 'Cara pembayaran wajib dipilih!',
         ]);
-        $item = ServiceTransaction::findOrFail($id);
-        $profittransaksi = $request->biaya - $request->modal_sparepart - $request->diskon;
-        $bagihasil = ($request->biaya - $request->modal_sparepart - $request->diskon) / 100;
+
+        try {
+            $request->merge([
+                'tunai' => str_replace('.', '', $request->tunai),
+                'transfer' => str_replace('.', '', $request->transfer),
+            ]);
+            $item = ServiceTransaction::findOrFail($id);
+            $profittransaksi = $request->biaya - $request->modal_sparepart - $request->diskon;
+            $bagihasil = ($request->biaya - $request->modal_sparepart - $request->diskon) / 100;
 
         $finalExpiredDates = []; // Penampung semua tanggal expired untuk update ke service_transactions (gabungan)
 
@@ -406,7 +412,12 @@ class UbahSudahDiambilController extends Controller
             \Log::error("Gagal kirim Telegram: " . $e->getMessage());
         }
 
-        return redirect()->route('transaksi-servis-sudah-diambil.index');
+            toast('Data transaksi servis berhasil diubah ke Sudah Diambil.', 'success');
+            return redirect()->route('transaksi-servis-sudah-diambil.index')->with('success', 'Data transaksi servis berhasil diubah ke Sudah Diambil.');
+        } catch (\Throwable $e) {
+            \Log::error('Gagal update UbahSudahDiambil: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Gagal memproses penyerahan servis: ' . $e->getMessage());
+        }
     }
 
     public function sendMessage($message)

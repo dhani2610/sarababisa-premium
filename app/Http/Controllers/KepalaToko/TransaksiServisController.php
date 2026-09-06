@@ -676,68 +676,81 @@ class TransaksiServisController extends Controller
      */
     public function store(Request $request)
     {
-        $qc_data = $request->qc_masuk ?? [];
+        $request->validate([
+            'status_servis' => 'required',
+            'kerusakan' => 'required',
+        ], [
+            'status_servis.required' => 'Status servis wajib ditentukan!',
+            'kerusakan.required' => 'Deskripsi kerusakan wajib diisi!',
+        ]);
 
-        // Gabungkan dengan baris Custom (jika ada input manual)
-        if ($request->has('custom_item_name')) {
-            foreach ($request->custom_item_name as $key => $name) {
-                // Hanya proses jika nama item tidak kosong
-                if (!empty($name)) {
-                    // Ambil value statusnya (OK/Rusak/dll), default '-' jika kosong
-                    $val = $request->custom_qc_masuk[$key] ?? '-';
+        if (empty($request->customers_id) && empty($request->customers_manual)) {
+            return redirect()->back()->withInput()->with('error', 'Pelanggan wajib dipilih atau diisi manual!');
+        }
 
-                    // Masukkan ke array utama
-                    $qc_data[$name] = $val;
+        try {
+            $qc_data = $request->qc_masuk ?? [];
+
+            // Gabungkan dengan baris Custom (jika ada input manual)
+            if ($request->has('custom_item_name')) {
+                foreach ($request->custom_item_name as $key => $name) {
+                    // Hanya proses jika nama item tidak kosong
+                    if (!empty($name)) {
+                        // Ambil value statusnya (OK/Rusak/dll), default '-' jika kosong
+                        $val = $request->custom_qc_masuk[$key] ?? '-';
+
+                        // Masukkan ke array utama
+                        $qc_data[$name] = $val;
+                    }
                 }
             }
-        }
 
-        // Ubah array menjadi JSON agar bisa disimpan di database text/longtext
-        $qc_masuk_final = json_encode($qc_data);
-        // dd($qc_masuk_final);
+            // Ubah array menjadi JSON agar bisa disimpan di database text/longtext
+            $qc_masuk_final = json_encode($qc_data);
 
-        if (empty($request->customers_id)) {
-            $insertCustomer = insertManualPelanggan($request->customers_manual,$request->customers_tlp_manual,$request->customers_kategori_manual,$request->customers_alamat_manual);
-            if ($insertCustomer) {
-                $request->customers_id = $insertCustomer;
+            if (empty($request->customers_id)) {
+                $insertCustomer = insertManualPelanggan($request->customers_manual,$request->customers_tlp_manual,$request->customers_kategori_manual,$request->customers_alamat_manual);
+                if ($insertCustomer) {
+                    $request->customers_id = $insertCustomer;
+                }
             }
-        }
-        if (empty($request->types_id)) {
-            $insertType = insertManualKategori($request->types_manual);
-            if ($insertType) {
-                $request->types_id = $insertType;
+            if (empty($request->types_id)) {
+                $insertType = insertManualKategori($request->types_manual);
+                if ($insertType) {
+                    $request->types_id = $insertType;
+                }
             }
-        }
-        if (empty($request->brands_id)) {
-            $insertBrand = insertManualBrand($request->brands_manual);
-            if ($insertBrand) {
-                $request->brands_id = $insertBrand;
+            if (empty($request->brands_id)) {
+                $insertBrand = insertManualBrand($request->brands_manual);
+                if ($insertBrand) {
+                    $request->brands_id = $insertBrand;
+                }
             }
-        }
-        if (empty($request->model_series_id)) {
-            $insertModelSeri = insertManualModelSerie($request->model_series_manual,$request->brands_id);
-            if ($insertModelSeri) {
-                $request->model_series_id = $insertModelSeri;
+            if (empty($request->model_series_id)) {
+                $insertModelSeri = insertManualModelSerie($request->model_series_manual,$request->brands_id);
+                if ($insertModelSeri) {
+                    $request->model_series_id = $insertModelSeri;
+                }
             }
-        }
 
-        // dd($request->all(),$request->customers_id,insertManualPelanggan($request->customers_manual));
+            $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99'));
+            $nama_pelanggan = Customer::find($request->customers_id);
+            if (!$nama_pelanggan) {
+                return redirect()->back()->withInput()->with('error', 'Data pelanggan tidak ditemukan!');
+            }
+            $nama_tipe = Type::find($request->types_id);
+            $nama_merek = Brand::find($request->brands_id);
+            $nama_model = ModelSerie::find($request->model_series_id);
+            $nama_barang = '' . ($nama_tipe->name ?? '-') . ' ' . ($nama_merek->name ?? '-') . ' ' . ($nama_model->name ?? '-');
 
-        $nomor_servis = '' . mt_rand(date('Ymd00'), date('Ymd99'));
-        $nama_pelanggan = Customer::find($request->customers_id);
-        $nama_tipe = Type::find($request->types_id);
-        $nama_merek = Brand::find($request->brands_id);
-        $nama_model = ModelSerie::find($request->model_series_id);
-        $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
-
-        // Transaction create
-        $transaksi = ServiceTransaction::create([
-            'admin_id' => Auth::user()->id,
-            'is_admin_toko' => Auth::user()->role == 'Admin Toko' ? 'Admin' : null,
-            'nomor_servis' => $nomor_servis,
-            'customers_id' => $request->customers_id,
-            'nama_pelanggan' => $nama_pelanggan->nama,
-            'types_id' => $request->types_id,
+            // Transaction create
+            $transaksi = ServiceTransaction::create([
+                'admin_id' => Auth::user()->id,
+                'is_admin_toko' => Auth::user()->role == 'Admin Toko' ? 'Admin' : null,
+                'nomor_servis' => $nomor_servis,
+                'customers_id' => $request->customers_id,
+                'nama_pelanggan' => $nama_pelanggan->nama,
+                'types_id' => $request->types_id,
             'brands_id' => $request->brands_id,
             'model_series_id' => $request->model_series_id,
             'nama_barang' => $nama_barang,
@@ -798,7 +811,12 @@ class TransaksiServisController extends Controller
             \Log::error("Gagal kirim notifikasi: " . $e->getMessage());
         }
 
-        return redirect()->route('transaksi-servis.index');
+            toast('Data transaksi servis berhasil dibuat.', 'success');
+            return redirect()->route('transaksi-servis.index')->with('success', 'Data transaksi servis berhasil dibuat.');
+        } catch (\Throwable $e) {
+            \Log::error('Gagal create TransaksiServis: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Gagal membuat transaksi servis: ' . $e->getMessage());
+        }
     }
     public function sendMessage($message)
     {

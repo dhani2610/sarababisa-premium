@@ -112,31 +112,58 @@ class PosController extends Controller
 
     public function CompleteOrder(Request $request)
     {
-        $rtotal = $request->sub_total;
-        $rpay = $request->pay;
-        $mtotal = $rtotal - $rpay;
-        $nama_pelanggan = Customer::find($request->customers_id);
-
-        $data = array();
-        $data['customers_id'] = $request->customers_id;
-        $data['nama_pelanggan'] = $nama_pelanggan->nama;
-        $data['users_id'] = $request->users_id;
-        $data['order_date'] = $request->order_date;
-        $data['total_products'] = $request->total_products;
-        $data['sub_total'] = $request->sub_total;
-
-        $data['invoice_no'] = '' . mt_rand(date('Ymd00'), date('Ymd99'));
-        $data['payment_method'] = $request->payment_method;
-        $data['is_approve'] = 'Setuju';
-        $data['tgl_disetujui'] = $request->tgl_disetujui;
-        $data['pay'] = $request->pay;
-        $data['due'] = $mtotal;
-        $data['created_at'] = Carbon::now();
-
-        $orders_id = Order::insertGetId($data);
         $contents = Cart::content();
+        if ($contents->isEmpty()) {
+            return redirect()->back()->with('error', 'Keranjang belanja masih kosong! Silakan masukkan produk terlebih dahulu.');
+        }
+
+        $request->validate([
+            'customers_id' => 'required',
+            'users_id' => 'required',
+            'payment_method' => 'required',
+            'pay' => 'required',
+            'sub_total' => 'required',
+        ], [
+            'customers_id.required' => 'Pelanggan wajib dipilih!',
+            'users_id.required' => 'Kasir / Sales wajib dipilih!',
+            'payment_method.required' => 'Metode pembayaran wajib dipilih!',
+            'pay.required' => 'Nominal bayar wajib diisi!',
+            'sub_total.required' => 'Sub total wajib diisi!',
+        ]);
+
+        $nama_pelanggan = Customer::find($request->customers_id);
+        if (!$nama_pelanggan) {
+            return redirect()->back()->with('error', 'Data pelanggan tidak ditemukan!');
+        }
 
         $persen_sales = User::find($request->users_id);
+        if (!$persen_sales) {
+            return redirect()->back()->with('error', 'Data sales/kasir tidak ditemukan!');
+        }
+
+        try {
+            $rtotal = (float)str_replace('.', '', $request->sub_total);
+            $rpay = (float)str_replace('.', '', $request->pay);
+            $mtotal = max(0, $rtotal - $rpay);
+
+            $data = array();
+            $data['customers_id'] = $request->customers_id;
+            $data['nama_pelanggan'] = $nama_pelanggan->nama;
+            $data['users_id'] = $request->users_id;
+            $data['order_date'] = $request->order_date ?? Carbon::today()->format('Y-m-d');
+            $data['total_products'] = $request->total_products ?? $contents->count();
+            $data['sub_total'] = $rtotal;
+
+            $data['invoice_no'] = '' . mt_rand(date('Ymd00'), date('Ymd99'));
+            $data['payment_method'] = $request->payment_method;
+            $data['is_approve'] = 'Setuju';
+            $data['tgl_disetujui'] = $request->tgl_disetujui ?? Carbon::today()->format('Y-m-d');
+            $data['pay'] = $rpay;
+            $data['due'] = $mtotal;
+            $data['cabang_id'] = getCabangId();
+            $data['created_at'] = Carbon::now();
+
+            $orders_id = Order::insertGetId($data);
 
         $pdata = array();
         foreach ($contents as $content) {
@@ -190,8 +217,13 @@ class PosController extends Controller
             $product->update();
         } // end foreach
 
-        Cart::destroy();
+            Cart::destroy();
+            toast('Transaksi POS berhasil disimpan.', 'success');
 
-        return redirect()->route('transaksi-produk.index');
+            return redirect()->route('transaksi-produk.index')->with('success', 'Transaksi POS berhasil disimpan.');
+        } catch (\Throwable $e) {
+            \Log::error('Gagal CompleteOrder POS: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memproses transaksi: ' . $e->getMessage());
+        }
     }
 }

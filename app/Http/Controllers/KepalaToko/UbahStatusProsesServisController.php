@@ -75,13 +75,23 @@ class UbahStatusProsesServisController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $item = ServiceTransaction::findOrFail($id);
+        $request->validate([
+            'status_servis' => 'required',
+        ], [
+            'status_servis.required' => 'Status servis wajib dipilih!',
+        ]);
 
-        $data = $request->all();
+        try {
+            $item = ServiceTransaction::findOrFail($id);
+            $data = $request->all();
+            $item->update($data);
 
-        $item->update($data);
-
-        return redirect()->route('transaksi-servis.index');
+            toast('Status servis berhasil diperbarui.', 'success');
+            return redirect()->route('transaksi-servis.index')->with('success', 'Status servis berhasil diperbarui.');
+        } catch (\Throwable $e) {
+            \Log::error('Gagal ubah status proses: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui status: ' . $e->getMessage());
+        }
     }
 
     /**

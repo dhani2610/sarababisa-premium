@@ -93,13 +93,22 @@ class UbahBisaDiambilController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $item = ServiceTransaction::findOrFail($id);
+        $request->validate([
+            'status_servis' => 'required',
+            'kondisi_servis' => 'required',
+        ], [
+            'status_servis.required' => 'Status servis wajib dipilih!',
+            'kondisi_servis.required' => 'Kondisi servis wajib dipilih!',
+        ]);
 
-        if ($request->users_id != null) {
-            $persen_teknisi = User::find($request->users_id)->persen;
-        } else {
-            $persen_teknisi = null;
-        }
+        try {
+            $item = ServiceTransaction::findOrFail($id);
+
+            if ($request->users_id != null) {
+                $persen_teknisi = User::find($request->users_id)->persen ?? 0;
+            } else {
+                $persen_teknisi = null;
+            }
 
         // --- BLOK LOGIKA YANG DIPERBAIKI ---
         $tindakan_servis = []; // 1. Inisialisasi sebagai array kosong
@@ -283,11 +292,30 @@ class UbahBisaDiambilController extends Controller
             \Log::error("Gagal kirim Telegram: " . $e->getMessage());
         }
 
-        return redirect()->route('transaksi-servis.index');
+        toast('Data servis berhasil diubah ke Bisa Diambil.', 'success');
+        return redirect()->route('transaksi-servis.index')->with('success', 'Data servis berhasil diubah ke Bisa Diambil.');
+    } catch (\Throwable $e) {
+        \Log::error("Gagal update UbahBisaDiambil: " . $e->getMessage());
+        return redirect()->back()->withInput()->with('error', 'Gagal memperbarui servis: ' . $e->getMessage());
     }
+}
 
     public function multiTeknisiProses(Request $request, $id)
     {
+        $request->validate([
+            'status_servis' => 'required',
+            'kondisi_servis' => 'required',
+        ], [
+            'status_servis.required' => 'Status servis wajib dipilih!',
+            'kondisi_servis.required' => 'Kondisi servis wajib dipilih!',
+        ]);
+
+        if ($request->kondisi_servis !== 'Dibatalkan') {
+            if (!$request->has('teknisi') || !is_array($request->teknisi) || empty($request->teknisi[0]['user_id'])) {
+                return redirect()->back()->withInput()->with('error', 'Silakan pilih minimal 1 Teknisi penanggung jawab!');
+            }
+        }
+
         $request->merge([
             'total_modal_sparepart' => str_replace('.', '', $request->total_modal_sparepart),
         ]);
