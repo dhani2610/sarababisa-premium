@@ -360,6 +360,27 @@
                         </div>
                     </li>
                     @if (Auth::user()->role != 'Investor')
+                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['persetujuan-hapus-transaksi'])){{ 'bg-slate-900' }}@endif">
+                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['persetujuan-hapus-transaksi'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('approval-hapus-transaksi.index') }}">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['persetujuan-hapus-transaksi'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M16 1a1 1 0 0 1 1 1v1h4a1 1 0 0 1 1 1v14a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V4a1 1 0 0 1 1-1h4V2a1 1 0 0 1 1-1h8zm-1 3H9v1h6V4zm3 3H6v11a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z" />
+                                        <path class="fill-current @if(in_array(Request::segment(1), ['persetujuan-hapus-transaksi'])){{ 'text-indigo-300' }}@else{{ 'text-slate-400' }}@endif" d="M9 10h2v6H9zm4 0h2v6h-2z" />
+                                    </svg>
+                                    <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Approval Hapus</span>
+                                </div>
+                                @php
+                                    $pendingApprovalCount = \App\Models\TransactionDeleteRequest::where('cabang_id', getCabangId())->where('status', 'pending')->count();
+                                @endphp
+                                @if($pendingApprovalCount > 0)
+                                    <span class="inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-rose-500 rounded-full">
+                                        {{ $pendingApprovalCount }}
+                                    </span>
+                                @endif
+                            </div>
+                        </a>
+                    </li>
                     <!-- Settings -->
                     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['pengaturan'])){{ 'bg-slate-900' }}@endif">
                         <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['pengaturan'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('informasi-toko') }}">

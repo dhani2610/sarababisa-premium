@@ -132,6 +132,14 @@
             <td>Bonus Reguler</td>
             <td class="text-right">Rp. {{ number_format($bonus) }}</td>
             </tr>
+            @if(!empty($bonusBreakdown) && count($bonusBreakdown) > 1)
+                @foreach($bonusBreakdown as $bItem)
+                    <tr style="font-size: 0.85em; color: #555;">
+                        <td style="padding-left: 20px;">&bull; Cabang {{ $bItem['cabang_name'] }}</td>
+                        <td class="text-right">Rp. {{ number_format($bItem['bonus']) }}</td>
+                    </tr>
+                @endforeach
+            @endif
             @if (($type ?? 'bulanan') !== 'rentang')
             <tr>
             <td>Bonus Pencapaian Target</td>
@@ -172,13 +180,13 @@
         <tbody>
             @foreach ($debts as $item)
             <tr>
-            <td>{{ $item->item }}</td>
+            <td>Kasbon: {{ $item->item }}{{ !empty($item->cabang_id) ? ' (Cabang '.getCabangName($item->cabang_id).')' : '' }}</td>
             <td class="text-right">Rp. {{ number_format($item->total) }}</td>
             </tr>
             @endforeach
             @foreach ($incidents as $item)
             <tr>
-            <td>{{ $item->name }}</td>
+            <td>Insiden: {{ $item->name }}{{ !empty($item->cabang_id) ? ' (Cabang '.getCabangName($item->cabang_id).')' : '' }}</td>
             <td class="text-right">Rp. {{ number_format($item->biaya_teknisi) }}</td>
             </tr>
             @endforeach
@@ -189,7 +197,7 @@
         <table class="table table-sm table-borderless">
             <thead>
                 <tr>
-                <th scope="col">Refund Invoice {{  $pt->ServiceTransaction->nomor_servis ?? '-' }}</th>
+                <th scope="col">Refund Invoice {{  $pt->ServiceTransaction->nomor_servis ?? '-' }}{{ !empty($pt->cabang_id) ? ' (Cabang '.getCabangName($pt->cabang_id).')' : '' }}</th>
                 <th scope="col" class="text-right text-danger">Rp. {{ number_format($pt->nominal) }}</th>
                 </tr>
             </thead>

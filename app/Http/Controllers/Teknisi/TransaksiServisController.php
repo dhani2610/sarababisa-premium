@@ -170,6 +170,16 @@ class TransaksiServisController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $item = ServiceTransaction::findOrFail($id);
+
+        if (\App\Helpers\TransactionApprovalHelper::requiresApproval()) {
+            \App\Helpers\TransactionApprovalHelper::createRequest('servis', $item);
+            toast('Permintaan hapus transaksi telah diajukan ke Kepala Toko untuk persetujuan.', 'info');
+            return redirect()->back();
+        }
+
+        $item->delete();
+
+        return redirect()->back()->with('success', 'Data transaksi berhasil dihapus.');
     }
 }

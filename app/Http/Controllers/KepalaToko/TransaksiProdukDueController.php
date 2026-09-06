@@ -123,6 +123,12 @@ class TransaksiProdukDueController extends Controller
     {
         $item = Order::findOrFail($id);
 
+        if (\App\Helpers\TransactionApprovalHelper::requiresApproval()) {
+            \App\Helpers\TransactionApprovalHelper::createRequest('pos', $item);
+            toast('Permintaan hapus transaksi POS telah diajukan ke Kepala Toko untuk persetujuan.', 'info');
+            return redirect()->back();
+        }
+
         $item->delete();
 
         OrderDetail::where('orders_id', $item->id)->delete();

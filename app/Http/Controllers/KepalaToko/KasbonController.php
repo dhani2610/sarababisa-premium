@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Worker;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Yajra\DataTables\Facades\DataTables;
 class KasbonController extends Controller
 {
@@ -246,6 +247,61 @@ class KasbonController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function cetak(Request $request)
+    {
+        if (getCabangId() == 1) {
+            $users = User::find(1);
+        } else {
+            $users = User::where('cabang_id', getCabangId())->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
+        }
+        if (empty($users)) {
+            $users = User::find(1);
+        }
+
+        $logo = $users->profile_photo_path ?? null;
+        $imagePath = $logo ? public_path('storage/' . $logo) : null;
+
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $workers_id = $request->workers_id;
+        $selectedWorker = null;
+        if ($workers_id) {
+            $selectedWorker = Worker::find($workers_id);
+        }
+
+        $query = Debt::with('worker')
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->where('cabang_id', getCabangId())
+            ->orderBy('created_at', 'asc');
+
+        if (!empty($workers_id)) {
+            $query->where('workers_id', $workers_id);
+        }
+
+        if ($request->filled('is_approve')) {
+            $query->where('is_approve', $request->is_approve);
+        }
+
+        $debts = $query->get();
+        $total_kasbon = $debts->sum('total');
+
+        $pdf = Pdf::loadView('pages.kepalatoko.kasbon.cetak-laporan-kasbon', [
+            'users' => $users,
+            'selectedWorker' => $selectedWorker,
+            'imagePath' => $imagePath,
+            'debts' => $debts,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'total_kasbon' => $total_kasbon,
+        ]);
+
+        $workerSuffix = $selectedWorker ? ' - ' . $selectedWorker->name : '';
+        $filename = 'Laporan Kasbon ' . $start_date . ' sd ' . $end_date . $workerSuffix . '.pdf';
+
+        return $pdf->stream($filename);
+    }
+
     public function destroy($id)
     {
         $item = Debt::findOrFail($id);

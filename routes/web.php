@@ -38,6 +38,7 @@ use App\Http\Controllers\Sales\KategoriController as SalesKategoriController;
 use App\Http\Controllers\Teknisi\KasbonController as TeknisiKasbonController;
 use App\Http\Controllers\Teknisi\ProdukController as TeknisiProdukController;
 use App\Http\Controllers\KepalaToko\AkunController as KepalaTokoAkunController;
+use App\Http\Controllers\KepalaToko\ApprovalHapusTransaksiController;
 use App\Http\Controllers\KepalaToko\GajiController as KepalaTokoGajiController;
 use App\Http\Controllers\KepalaToko\TermController as KepalaTokoTermController;
 use App\Http\Controllers\KepalaToko\SistemController as KepalaTokoSistemController;
@@ -590,6 +591,9 @@ Route::post('manajemen/pengeluaran/tipe-batch', [KepalaTokoExpenseController::cl
     Route::patch('/expenses/update', [KepalaTokoExpenseController::class, 'approveSelected']);
     Route::patch('/expenses/reject', [KepalaTokoExpenseController::class, 'rejectSelected']);
     Route::resource('approve-pengeluaran', KepalaTokoApprovePengeluaranController::class);
+    Route::get('persetujuan-hapus-transaksi', [ApprovalHapusTransaksiController::class, 'index'])->name('approval-hapus-transaksi.index');
+    Route::post('persetujuan-hapus-transaksi/{id}/approve', [ApprovalHapusTransaksiController::class, 'approve'])->name('approval-hapus-transaksi.approve');
+    Route::post('persetujuan-hapus-transaksi/{id}/reject', [ApprovalHapusTransaksiController::class, 'reject'])->name('approval-hapus-transaksi.reject');
     Route::get('manajemen/inventaris/data', [KepalaTokoInventarisController::class, 'getData'])->name('inventaris.data');
 Route::post('manajemen/inventaris/delete-batch', [KepalaTokoInventarisController::class, 'deleteBatch'])->name('inventaris.delete-batch');
 Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisController::class, 'printSelected'])->name('inventaris.print-selected');
@@ -694,6 +698,7 @@ Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisControll
     Route::get('cetak-laporan-pajak-servis', [KepalaTokoLaporanServisController::class, 'cetakPajak'])->name('cetak-laporan-pajak-servis');
     Route::get('cetak-laporan-teknisi', [KepalaTokoLaporanTeknisiController::class, 'cetak'])->name('cetak-laporan-teknisi');
     Route::get('cetak-laporan-pengeluaran', [KepalaTokoExpenseController::class, 'cetak'])->name('cetak-laporan-pengeluaran');
+    Route::get('cetak-laporan-kasbon', [KepalaTokoKasbonController::class, 'cetak'])->name('cetak-laporan-kasbon');
     Route::get('laporan/laporan-teknisi/data', [KepalaTokoLaporanTeknisiController::class, 'getData'])->name('laporan-teknisi-data');
     Route::get('laporan/laporan-teknisi', [KepalaTokoLaporanTeknisiController::class, 'index'])->name('laporan-teknisi');
     Route::get('laporan/laporan-penjualan', [KepalaTokoLaporanPenjualanController::class, 'index'])->name('laporan-penjualan');

@@ -20,6 +20,9 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\OrderDetail;
+use App\Models\Purchase;
+use App\Models\ServiceTransaction;
+use Carbon\Carbon;
 
 class ProdukController extends Controller
 {
@@ -128,6 +131,11 @@ class ProdukController extends Controller
                 ->get();
         }
 
+        $productIds = $query->pluck('id');
+        $purchases = Purchase::whereIn('products_id', $productIds)->orderBy('date', 'desc')->get()->groupBy('products_id');
+        $orders = OrderDetail::whereIn('products_id', $productIds)->orderBy('created_at', 'desc')->get()->groupBy('products_id');
+        $services = ServiceTransaction::whereIn('products_id', $productIds)->orderBy('created_at', 'desc')->get()->groupBy('products_id');
+
         return DataTables::of($query)
                 ->addIndexColumn()
                 // Kolom Checkbox
@@ -171,6 +179,27 @@ class ProdukController extends Controller
                 // Stok Minimal
                 ->addColumn('stok_minimal', function ($row) {
                     return '<div class="font-medium">' . e($row->stok_minimal ?? '-') . '</div>';
+                })
+                // Tgl In
+                ->addColumn('tgl_in', function ($row) use ($purchases) {
+                    if (isset($purchases[$row->id]) && $purchases[$row->id]->first()->date) {
+                        return '<div class="font-medium">' . Carbon::parse($purchases[$row->id]->first()->date)->format('d/m/Y') . '</div>';
+                    }
+                    return '<div class="font-medium">' . ($row->created_at ? Carbon::parse($row->created_at)->format('d/m/Y') : '-') . '</div>';
+                })
+                // Tgl Out
+                ->addColumn('tgl_out', function ($row) use ($orders, $services) {
+                    $outDate = null;
+                    if (isset($orders[$row->id])) {
+                        $outDate = $orders[$row->id]->first()->created_at;
+                    }
+                    if (isset($services[$row->id])) {
+                        $sDate = $services[$row->id]->first()->created_at;
+                        if (!$outDate || $sDate > $outDate) {
+                            $outDate = $sDate;
+                        }
+                    }
+                    return '<div class="font-medium">' . ($outDate ? Carbon::parse($outDate)->format('d/m/Y') : '-') . '</div>';
                 })
                 // Harga Modal (Cek Hak Akses)
                 ->addColumn('harga_modal', function ($row) use ($userRole, $tokoSetting) {
@@ -272,7 +301,7 @@ class ProdukController extends Controller
             return $html;
         })
             // Definisikan kolom yang mengandung HTML agar tidak di-escape
-            ->rawColumns(['checkbox', 'nama_produk', 'category_name', 'product_code', 'keterangan', 'stok', 'stok_minimal', 'harga_modal', 'harga_jual_toko', 'harga_jual', 'garansi', 'is_portal', 'aksi'])
+            ->rawColumns(['checkbox', 'nama_produk', 'category_name', 'product_code', 'keterangan', 'stok', 'stok_minimal', 'tgl_in', 'tgl_out', 'harga_modal', 'harga_jual_toko', 'harga_jual', 'garansi', 'is_portal', 'aksi'])
             ->make(true);
     }
 

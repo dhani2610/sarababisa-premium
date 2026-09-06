@@ -323,26 +323,35 @@ class ExpenseController extends Controller
         // Filter tanggal
         $start_date = $request->start_date;
         $end_date = $request->end_date;
+        $users_id = $request->users_id;
+        $selectedUser = null;
+        if ($users_id) {
+            $selectedUser = User::find($users_id);
+        }
 
-        if ($request->tipe) {
-            $expenses = Expense::with('user')->whereDate('created_at', '>=', $start_date)
-                ->whereDate('created_at', '<=', $end_date)
-                ->where('tipe', $request->tipe)
-                ->where('cabang_id', getCabangId())
-                ->orderBy('created_at', 'asc')
-                ->get();
-        } else {
-            // Mengambil data pengeluaran
-            $expenses = Expense::with('user')->whereDate('created_at', '>=', $start_date)
+        $query = Expense::with(['user', 'createdBy'])
+            ->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
             ->where('cabang_id', getCabangId())
-            ->orderBy('created_at', 'asc')
-            ->get();
+            ->orderBy('created_at', 'asc');
+
+        if ($request->filled('tipe') && $request->tipe !== '') {
+            $query->where('tipe', $request->tipe);
         }
+
+        if (!empty($users_id)) {
+            $query->where(function ($q) use ($users_id) {
+                $q->where('users_id', $users_id)
+                  ->orWhere('created_by', $users_id);
+            });
+        }
+
+        $expenses = $query->get();
+
         // Menghitung total pengeluaran
         $total_pengeluaran = $expenses->sum('price');
 
-        if ($request->tipe == 0) {
+        if ($request->tipe === '0' || $request->tipe === 0) {
             $tipe = 'Operasional';
         } else if ($request->tipe == 1) {
             $tipe = 'Servis';
@@ -355,6 +364,7 @@ class ExpenseController extends Controller
         $pdf = PDF::loadView('pages.kepalatoko.cetak-laporan-pengeluaran', [
             'tipe' => $tipe,
             'users' => $users,
+            'selectedUser' => $selectedUser,
             'imagePath' => $imagePath,
             'expenses' => $expenses,
             'start_date' => $start_date,
@@ -362,7 +372,8 @@ class ExpenseController extends Controller
             'total_pengeluaran' => $total_pengeluaran
         ]);
 
-        $filename = 'Laporan Pengeluaran' . ' ' . $start_date . ' ' . 'sd' . ' ' . $end_date . ' '.$tipe.'.pdf';
+        $userSuffix = $selectedUser ? ' - ' . $selectedUser->name : '';
+        $filename = 'Laporan Pengeluaran ' . $start_date . ' sd ' . $end_date . ' ' . $tipe . $userSuffix . '.pdf';
 
         return $pdf->stream($filename);
     }

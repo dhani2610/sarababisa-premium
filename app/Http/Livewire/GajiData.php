@@ -31,9 +31,15 @@ class GajiData extends Component
 
     public function render()
     {
-        $workers = Worker::where('cabang_id',getCabangId())->get();
-        $users = User::where('cabang_id',getCabangId())->whereNotIn('role', ['Kepala Toko','Investor'])->get();
-        $salaries_count = Salary::where('cabang_id',getCabangId())->get()->count();
+        $activeCabangId = getCabangId();
+        $workers = Worker::where('cabang_id', $activeCabangId)->get();
+        $users = User::where(function($q) use ($activeCabangId) {
+            $q->where('cabang_id', $activeCabangId)
+              ->orWhereHas('cabangs', function($cb) use ($activeCabangId) {
+                  $cb->where('cabangs.id', $activeCabangId);
+              });
+        })->whereNotIn('role', ['Kepala Toko','Investor'])->get();
+        $salaries_count = Salary::where('cabang_id', $activeCabangId)->get()->count();
         return view('livewire.gaji-data', [
             'workers' => $workers,
             'users' => $users,

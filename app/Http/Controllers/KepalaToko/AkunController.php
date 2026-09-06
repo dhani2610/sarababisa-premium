@@ -14,6 +14,7 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Models\TipeOs;
 use App\Models\Category;
 use App\Models\BonusLeveling;
+use App\Models\Cabang;
 
 class AkunController extends Controller
 {
@@ -61,8 +62,12 @@ class AkunController extends Controller
 
         $categories = Type::where('cabang_id',getCabangId())->get();
         $tipe_os = TipeOs::where('cabang_id',getCabangId())->get();
-
         $category = Category::where('cabang_id', getCabangId())->get();
+        if ($category->isEmpty()) {
+            $category = Category::all();
+        }
+
+        $allCabangs = Cabang::orderBy('id', 'asc')->get();
         return view('pages/kepalatoko/akun', compact(
             'users',
             'users_count',
@@ -73,6 +78,7 @@ class AkunController extends Controller
             'categories',
             'tipe_os',
             'category',
+            'allCabangs',
         ));
     }
 
@@ -82,8 +88,13 @@ class AkunController extends Controller
         $cabangId = getCabangId();
 
         $query = User::whereNull('deleted_at')
-            ->where('cabang_id', $cabangId)
-            ->with(['shift', 'type'])
+            ->where(function ($q) use ($cabangId) {
+                $q->where('cabang_id', $cabangId)
+                  ->orWhereHas('cabangs', function ($cq) use ($cabangId) {
+                      $cq->where('cabang_id', $cabangId);
+                  });
+            })
+            ->with(['shift', 'type', 'cabangs'])
             ->latest();
 
         if ($cabangId != 1) {
@@ -97,7 +108,8 @@ class AkunController extends Controller
                 return '<input type="checkbox" class="table-item form-checkbox" value="' . $row->id . '" />';
             })
             ->addColumn('cabang_name', function ($row) {
-                return getCabangName($row->cabang_id);
+                $names = $row->assigned_cabangs->pluck('nama_cabang')->toArray();
+                return !empty($names) ? implode(', ', $names) : getCabangName($row->cabang_id);
             })
             ->editColumn('name', function ($row) {
                 return '<div class="font-medium">' . e($row->name) . '</div>';
@@ -349,6 +361,9 @@ class AkunController extends Controller
         $category = Category::all();
         $shift = Shift::where('cabang_id', $cabangId)->get();
         $selectedCategories = $item->kategori_investor ? json_decode($item->kategori_investor, true) : [];
+        $allCabangs = Cabang::orderBy('id', 'asc')->get();
+        $selectedCabangIds = $item->assigned_cabang_ids;
+
         return view('pages.kepalatoko.akun-edit', [
             'types' => $types,
             'item' => $item,
@@ -360,6 +375,8 @@ class AkunController extends Controller
             'tipe_os' => $tipe_os,
             'category' => $category,
             'selectedCategories' => $selectedCategories,
+            'allCabangs' => $allCabangs,
+            'selectedCabangIds' => $selectedCabangIds,
         ]);
     }
 
@@ -480,6 +497,12 @@ class AkunController extends Controller
 
 
 
+        $selectedCabangs = $request->input('cabang_ids', [getCabangId()]);
+        if (empty($selectedCabangs)) {
+            $selectedCabangs = [getCabangId()];
+        }
+        $primaryCabang = $selectedCabangs[0] ?? getCabangId();
+
         $data = [
             'name' => $request->name,
             'email' => $request->email,
@@ -501,7 +524,7 @@ class AkunController extends Controller
             'shift_id' => $request->shift_id,
             'exp_date' => $langganan,
             'total_cabang' => $total_cabang,
-            'cabang_id' => getCabangId(),
+            'cabang_id' => $primaryCabang,
             'kategori_investor' => $request->kategori_investor ? json_encode($request->kategori_investor) : null,
         ];
 
@@ -520,6 +543,7 @@ class AkunController extends Controller
         }
 
         $user = User::create($data);
+        $user->cabangs()->sync($selectedCabangs);
 
         $karyawanData = $this->storeKaryawan($user);
 
@@ -686,6 +710,17 @@ class AkunController extends Controller
         }
 
         $item->update($data);
+
+        if ($request->has('cabang_ids')) {
+            $cabangIds = (array) $request->cabang_ids;
+            if (!empty($cabangIds)) {
+                $item->cabangs()->sync($cabangIds);
+                if (!in_array($item->cabang_id, $cabangIds)) {
+                    $item->cabang_id = $cabangIds[0];
+                    $item->save();
+                }
+            }
+        }
 
         BonusLeveling::where('id_user', $id)->delete();
 

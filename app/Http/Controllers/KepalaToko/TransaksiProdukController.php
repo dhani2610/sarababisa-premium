@@ -760,6 +760,14 @@ class TransaksiProdukController extends Controller
     public function deleteSelected(Request $request)
     {
         $selectedIds  = $request->input('selectedIds');
+        if (\App\Helpers\TransactionApprovalHelper::requiresApproval()) {
+            $orders = Order::whereIn('id', $selectedIds)->get();
+            foreach ($orders as $order) {
+                \App\Helpers\TransactionApprovalHelper::createRequest('pos', $order);
+            }
+            return response()->json(['message' => 'Permintaan hapus transaksi POS telah diajukan ke Kepala Toko untuk persetujuan.']);
+        }
+
         Order::whereIn('id', $selectedIds)->delete();
         OrderDetail::whereIn('orders_id', $selectedIds)->delete();
         return response()->json(['message' => 'Data transaksi produk berhasil dihapus.']);
@@ -1297,6 +1305,12 @@ class TransaksiProdukController extends Controller
     public function destroy($id)
     {
         $item = Order::findOrFail($id);
+
+        if (\App\Helpers\TransactionApprovalHelper::requiresApproval()) {
+            \App\Helpers\TransactionApprovalHelper::createRequest('pos', $item);
+            toast('Permintaan hapus transaksi POS telah diajukan ke Kepala Toko untuk persetujuan.', 'info');
+            return redirect()->back();
+        }
 
         $item->delete();
 

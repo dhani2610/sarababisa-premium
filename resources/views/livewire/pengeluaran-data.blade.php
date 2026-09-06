@@ -135,14 +135,23 @@
                              <div class="px-5 py-4 space-y-3">
 
                                  <div>
-                                    <label class="block text-sm font-medium mb-1">Tipe <span class="text-rose-500">*</span></label>
-                                    <select name="tipe" class="form-select text-sm py-1 w-full">
-                                        <option value="">Semua Tipe</option>
-                                        <option value="0">Operasional</option>
-                                        <option value="1">Servis</option>
-                                        <option value="2">Penjualan</option>
-                                    </select>
-                                </div>
+                                     <label class="block text-sm font-medium mb-1">Tipe</label>
+                                     <select name="tipe" class="form-select text-sm py-1 w-full">
+                                         <option value="">Semua Tipe</option>
+                                         <option value="0">Operasional</option>
+                                         <option value="1">Servis</option>
+                                         <option value="2">Penjualan</option>
+                                     </select>
+                                 </div>
+                                 <div>
+                                     <label class="block text-sm font-medium mb-1">Nama Akun</label>
+                                     <select name="users_id" class="form-select text-sm py-1 w-full">
+                                         <option value="">Semua Akun</option>
+                                         @foreach ($users as $u)
+                                             <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->role }})</option>
+                                         @endforeach
+                                     </select>
+                                 </div>
                                  <div><label class="block text-sm font-medium mb-1">Mulai tanggal <span class="text-rose-500">*</span></label><input name="start_date" class="form-input w-full py-2" type="date" required /></div>
                                  <div><label class="block text-sm font-medium mb-1">Sampai tanggal <span class="text-rose-500">*</span></label><input name="end_date" class="form-input w-full py-2" type="date" required /></div>
                              </div>

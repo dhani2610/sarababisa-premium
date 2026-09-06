@@ -47,6 +47,8 @@
                 <x-app.header />
 
                 <main>
+                    @include('sweetalert::alert')
+                    @include('layouts.messages')
                     {{ $slot }}
                 </main>
 

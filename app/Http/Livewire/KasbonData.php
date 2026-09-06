@@ -28,14 +28,22 @@ class KasbonData extends Component
 
     public function render()
     {
-        $workers = Worker::where('cabang_id',getCabangId())->get();
-        $debts_count = Debt::where('cabang_id',getCabangId())->get()->count();
+        $activeCabangId = getCabangId();
+        $assignedUserWorkerIds = \App\Models\User::whereHas('cabangs', function($cb) use ($activeCabangId) {
+            $cb->where('cabangs.id', $activeCabangId);
+        })->whereNotNull('workers_id')->pluck('workers_id')->toArray();
+
+        $workers = Worker::where('cabang_id', $activeCabangId)
+            ->orWhereIn('id', $assignedUserWorkerIds)
+            ->get();
+
+        $debts_count = Debt::where('cabang_id', $activeCabangId)->get()->count();
         return view('livewire.kasbon-data', [
             'workers' => $workers,
             'debts_count' => $debts_count,
             'debts' => $this->search === null ?
-                Debt::where('cabang_id',getCabangId())->orderByRaw('is_approve IS NULL DESC')->latest()->paginate($this->paginate) :
-                Debt::where('cabang_id',getCabangId())->orderByRaw('is_approve IS NULL DESC')->latest()->where('item', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Debt::where('cabang_id', $activeCabangId)->orderByRaw('is_approve IS NULL DESC')->latest()->paginate($this->paginate) :
+                Debt::where('cabang_id', $activeCabangId)->orderByRaw('is_approve IS NULL DESC')->latest()->where('item', 'like', '%' . $this->search . '%')->paginate($this->paginate)
         ]);
     }
 }

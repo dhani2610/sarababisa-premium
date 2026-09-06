@@ -646,6 +646,14 @@ class TransaksiServisController extends Controller
     public function deleteSelected(Request $request)
     {
         $selectedIds  = $request->input('selectedIds');
+        if (\App\Helpers\TransactionApprovalHelper::requiresApproval()) {
+            $items = ServiceTransaction::whereIn('id', $selectedIds)->get();
+            foreach ($items as $item) {
+                \App\Helpers\TransactionApprovalHelper::createRequest('servis', $item);
+            }
+            return response()->json(['message' => 'Permintaan hapus transaksi telah diajukan ke Kepala Toko untuk persetujuan.']);
+        }
+
         ServiceTransaction::whereIn('id', $selectedIds)->delete();
         return response()->json(['message' => 'Data transaksi servis berhasil dihapus.']);
     }
@@ -1291,6 +1299,12 @@ class TransaksiServisController extends Controller
     public function destroy($id)
     {
         $item = ServiceTransaction::findOrFail($id);
+
+        if (\App\Helpers\TransactionApprovalHelper::requiresApproval()) {
+            \App\Helpers\TransactionApprovalHelper::createRequest('servis', $item);
+            toast('Permintaan hapus transaksi telah diajukan ke Kepala Toko untuk persetujuan.', 'info');
+            return redirect()->back();
+        }
 
         $item->delete();
 

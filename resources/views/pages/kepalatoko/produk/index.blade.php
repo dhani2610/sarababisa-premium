@@ -112,6 +112,8 @@
                     { data: 'keterangan', name: 'keterangan' },
                     { data: 'stok', name: 'stok' },
                     { data: 'stok_minimal', name: 'stok_minimal' },
+                    { data: 'tgl_in', name: 'tgl_in' },
+                    { data: 'tgl_out', name: 'tgl_out' },
                     @if (Auth::user()->role == 'Kepala Toko' || $toko->is_modal_produk === 1)
                     { data: 'harga_modal', name: 'harga_modal' },
                     @endif

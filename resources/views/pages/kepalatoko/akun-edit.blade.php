@@ -103,6 +103,20 @@
                                 </div>
 
                                 <div>
+                                    <label class="block text-sm font-medium mb-1">Penugasan Cabang <span class="text-rose-500">*</span></label>
+                                    <div class="space-y-1 bg-slate-50 p-2.5 rounded border border-slate-200">
+                                        @foreach ($allCabangs as $cb)
+                                            <label class="flex items-center text-sm">
+                                                <input type="checkbox" name="cabang_ids[]" value="{{ $cb->id }}" class="form-checkbox"
+                                                    {{ in_array($cb->id, $selectedCabangIds ?? []) ? 'checked' : '' }} />
+                                                <span class="ml-2 text-slate-700 font-medium">{{ $cb->nama_cabang }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                    <div class="text-xs text-slate-400 mt-1">Pilih cabang mana saja yang dapat diakses oleh user ini (bisa lebih dari 1 cabang). Data bonus, kasbon, dan pengeluaran akan otomatis terakumulasi di slip gaji.</div>
+                                </div>
+
+                                <div>
                                     <label class="block text-sm font-medium mb-1" for="role">Role</label>
                                     <select id="role" name="role" class="form-select text-sm py-2 w-full">
                                         <option value="Kepala Toko" {{ $item->role == 'Kepala Toko' ? 'selected' : '' }}>Kepala Toko</option>

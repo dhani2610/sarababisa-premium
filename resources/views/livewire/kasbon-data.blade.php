@@ -63,6 +63,50 @@
                         </div>
                     </div>
                 </div>
+
+                <div x-data="{ modalCetakOpen: false }">
+                    <button class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600" @click.prevent="modalCetakOpen = true">
+                        <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16"><path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" /></svg>
+                        <span class="hidden xs:block ml-2">Cetak Laporan</span>
+                    </button>
+                    <div class="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity" x-show="modalCetakOpen" x-transition:enter="transition ease-out duration-200" x-transition:leave="transition ease-in duration-100" x-cloak></div>
+                    <div class="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6" role="dialog" aria-modal="true" x-show="modalCetakOpen" x-transition:enter="transition ease-in-out duration-200" x-cloak>
+                        <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalCetakOpen = false">
+                            <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center">
+                                <div class="font-semibold text-slate-800">Atur Pencetakan Laporan Kasbon</div>
+                                <button class="text-slate-400 hover:text-slate-500" @click="modalCetakOpen = false">&times;</button>
+                            </div>
+                            <form action="{{ route('cetak-laporan-kasbon') }}" method="get" target="_blank">
+                                @csrf
+                                <div class="px-5 py-4 space-y-3">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Nama Karyawan / Akun</label>
+                                        <select name="workers_id" class="form-select text-sm py-1 w-full">
+                                            <option value="">Semua Karyawan</option>
+                                            @foreach ($workers as $w)
+                                                <option value="{{ $w->id }}">{{ $w->name }} ({{ $w->jabatan ?? 'Karyawan' }})</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Status Persetujuan</label>
+                                        <select name="is_approve" class="form-select text-sm py-1 w-full">
+                                            <option value="">Semua Status</option>
+                                            <option value="Setuju">Disetujui</option>
+                                            <option value="Ditolak">Ditolak</option>
+                                        </select>
+                                    </div>
+                                    <div><label class="block text-sm font-medium mb-1">Mulai tanggal <span class="text-rose-500">*</span></label><input name="start_date" class="form-input w-full py-2" type="date" required /></div>
+                                    <div><label class="block text-sm font-medium mb-1">Sampai tanggal <span class="text-rose-500">*</span></label><input name="end_date" class="form-input w-full py-2" type="date" required /></div>
+                                </div>
+                                <div class="px-5 py-4 border-t border-slate-200 flex justify-end space-x-2">
+                                    <button type="button" class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" @click="modalCetakOpen = false">Batal</button>
+                                    <button type="submit" class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">Cetak</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -477,6 +477,13 @@ class KaryawanController extends Controller
             }
         }
 
+        $assignedCabangIds = $user ? $user->assigned_cabang_ids : [$items->cabang_id];
+        if (empty($assignedCabangIds)) {
+            $assignedCabangIds = [$items->cabang_id];
+        }
+
+        $bonusBreakdown = $user ? getBonusBreakdownByCabang($user, $start_date, $end_date) : [];
+
         if ($items->cabang_id == 1) {
             $users = User::find(1);
         }else{
@@ -492,43 +499,63 @@ class KaryawanController extends Controller
             ->where('is_approve', 'Setuju')
             ->whereDate('tgl_disetujui', '>=', $start_date)
             ->whereDate('tgl_disetujui', '<=', $end_date)
+            ->where(function($q) use ($assignedCabangIds) {
+                $q->whereIn('cabang_id', $assignedCabangIds)
+                  ->orWhereNull('cabang_id');
+            })
             ->get();
 
         $incidents = Incident::where('workers_id', $id)
             ->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where(function($q) use ($assignedCabangIds) {
+                $q->whereIn('cabang_id', $assignedCabangIds)
+                  ->orWhereNull('cabang_id');
+            })
             ->get();
 
         $totalkasbon = Debt::where('workers_id', $id)
             ->where('is_approve', 'Setuju')
             ->whereDate('tgl_disetujui', '>=', $start_date)
             ->whereDate('tgl_disetujui', '<=', $end_date)
+            ->where(function($q) use ($assignedCabangIds) {
+                $q->whereIn('cabang_id', $assignedCabangIds)
+                  ->orWhereNull('cabang_id');
+            })
             ->sum('total');
 
         $totalinsiden = Incident::where('workers_id', $id)
             ->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
+            ->where(function($q) use ($assignedCabangIds) {
+                $q->whereIn('cabang_id', $assignedCabangIds)
+                  ->orWhereNull('cabang_id');
+            })
             ->sum('biaya_teknisi');
 
-        $potonganServis = Refund::where('teknisi_id', $user->id)
+        $potonganServis = $user ? Refund::where('teknisi_id', $user->id)
             ->whereDate('period', '>=', $start_date)
             ->whereDate('period', '<=', $end_date)
-            ->get();
+            ->where(function($q) use ($assignedCabangIds) {
+                $q->whereIn('cabang_id', $assignedCabangIds)
+                  ->orWhereNull('cabang_id');
+            })
+            ->get() : collect();
 
         $totalPotonganServis = $potonganServis;
         $namaKaryawan = $items->name;
 
-        $izin = Izin::where('status',1)->where('user_id',$user->id)
+        $izin = $user ? Izin::where('status',1)->where('user_id',$user->id)
             ->whereDate('tanggal', '>=', $start_date)
-            ->whereDate('tanggal', '<=', $end_date)->get()->sum('nominal_potongan');
+            ->whereDate('tanggal', '<=', $end_date)->get()->sum('nominal_potongan') : 0;
 
-        $overtime = Overtime::where('id_user',$user->id)
+        $overtime = $user ? Overtime::where('id_user',$user->id)
             ->whereDate('tanggal', '>=', $start_date)
-            ->whereDate('tanggal', '<=', $end_date)->get()->sum('nominal_overtime');
+            ->whereDate('tanggal', '<=', $end_date)->get()->sum('nominal_overtime') : 0;
 
-        $potongan_telat = Attendance::where('user_id',$user->id)
+        $potongan_telat = $user ? Attendance::where('user_id',$user->id)
             ->whereDate('tanggal', '>=', $start_date)
-            ->whereDate('tanggal', '<=', $end_date)->where('telat',1)->get()->sum('nominal_potongan');
+            ->whereDate('tanggal', '<=', $end_date)->where('telat',1)->get()->sum('nominal_potongan') : 0;
 
         $shift = Shift::where('worker_id',$id)->first();
 
@@ -544,6 +571,7 @@ class KaryawanController extends Controller
             'items' => $items,
             'salaries' => $salaries,
             'bonus' => $bonus,
+            'bonusBreakdown' => $bonusBreakdown,
             'bonusTarget' => $bonusTarget, // Teruskan ke view
             'debts' => $debts,
             'incidents' => $incidents,

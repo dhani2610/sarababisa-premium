@@ -59,6 +59,26 @@ class User extends Authenticatable
     //     'profile_photo_url',
     // ];
 
+    public function cabangs()
+    {
+        return $this->belongsToMany(Cabang::class, 'user_cabang', 'user_id', 'cabang_id');
+    }
+
+    public function getAssignedCabangIdsAttribute()
+    {
+        $ids = $this->cabangs->pluck('id')->toArray();
+        if ($this->cabang_id && !in_array($this->cabang_id, $ids)) {
+            $ids[] = (int) $this->cabang_id;
+        }
+        return empty($ids) ? [(int) getCabangId()] : array_values(array_unique($ids));
+    }
+
+    public function getAssignedCabangsAttribute()
+    {
+        $ids = $this->assigned_cabang_ids;
+        return Cabang::whereIn('id', $ids)->orderBy('id', 'asc')->get();
+    }
+
     public function type()
     {
         return $this->belongsTo(

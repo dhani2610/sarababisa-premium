@@ -28,16 +28,33 @@ if (!function_exists('getCabangId')) {
 if (!function_exists('getCabang')) {
     function getCabang()
     {
+        $data = collect();
         if (Auth::check()) {
             if (Auth::user()->id == 1) {
                 $data = Cabang::orderBy('id','asc')->get();
             }else{
-                $data = Cabang::orderBy('id','asc')->where('id',Auth::user()->cabang_id)->get();
+                $data = Auth::user()->assigned_cabangs;
+                if ($data->isEmpty()) {
+                    $data = Cabang::orderBy('id','asc')->where('id', Auth::user()->cabang_id)->get();
+                }
             }
         }
 
         // Default fallback ke 1
         return $data;
+    }
+}
+
+if (!function_exists('getCabangName')) {
+    function getCabangName($cabangId)
+    {
+        static $cabangCache = [];
+        if (empty($cabangId)) return '';
+        if (!isset($cabangCache[$cabangId])) {
+            $c = Cabang::find($cabangId);
+            $cabangCache[$cabangId] = $c ? $c->nama_cabang : '';
+        }
+        return $cabangCache[$cabangId];
     }
 }
 
@@ -335,31 +352,22 @@ if (!function_exists('insertManualModelSerie')) {
         }
     }
 }
-if (!function_exists('calculateBonus')) {
-    function calculateBonus($id,$start_date = null, $end_date = null)
+if (!function_exists('calculateBonusForCabang')) {
+    function calculateBonusForCabang($user, $cabangId, $start_date, $end_date)
     {
-        $user = User::find($id);
+        if (is_numeric($user)) {
+            $user = User::find($user);
+        }
+        if (!$user) return 0;
+
         $bonus = 0;
 
-        if (empty($start_date) && empty($end_date)) {
-
-            if (request('filter_month')) {
-                $date = \Carbon\Carbon::parse(request('filter_month'));
-            } else {
-                $date = \Carbon\Carbon::now();
-            }
-            $start_date = $date->copy()->startOfMonth()->toDateString();
-            $end_date = $date->copy()->endOfMonth()->toDateString();
-        }
-
-
         if ($user->role === 'Teknisi') {
-
             // 1. Ambil transaksi menggunakan helper multi-teknisi
             $transactions = ServiceTransaction::whereIn('id', servisIdMultiTeknisi($user->id))
                 ->whereDate('tgl_disetujui', '>=', $start_date)
                 ->whereDate('tgl_disetujui', '<=', $end_date)
-                ->where('cabang_id', getCabangId())
+                ->where('cabang_id', $cabangId)
                 ->where('status_servis', 'Sudah Diambil')
                 ->where('is_approve', 'Setuju')
                 ->get();
@@ -401,38 +409,38 @@ if (!function_exists('calculateBonus')) {
                 ->sum('profit');
 
             // 4. Kalkulasi hasil akhir
-            $total_bonus_prof = ($total_profit / 100) * $user->persen;
+            $total_bonus_prof = ($total_profit / 100) * ($user->persen ?? 0);
             $bonus = $total_bonus_prof + $total_profit_interface;
 
         } elseif ($user->role === 'Sales') {
             $data = OrderDetail::where('users_id', $user->id)
-            ->whereHas('order', function ($query) use ($start_date, $end_date) {
+            ->whereHas('order', function ($query) use ($start_date, $end_date, $cabangId) {
                 $query->where('is_approve', 'Setuju')
-                    ->where('cabang_id', getCabangId())
+                    ->where('cabang_id', $cabangId)
                     ->whereDate('tgl_disetujui', '>=', $start_date)
                     ->whereDate('tgl_disetujui', '<=', $end_date);
             })->get();
 
             $bonus = $data->sum('profit') / 100;
-            $bonus *= $user->persen;
+            $bonus *= ($user->persen ?? 0);
 
         } else {
-            $tipeBonusNota = $user->tipe_bonus_admin ?? 'Persen'; // default biar aman
+            $tipeBonusNota = $user->tipe_bonus_admin ?? 'Persen';
             $persen = $user->persen ?? 0;
             $nominalBonus = $user->nominal_bonus_admin ?? 0;
 
             $service = ServiceTransaction::where('admin_id', $user->id)
             ->where('status_servis', 'Sudah Diambil')
             ->where('is_approve', 'Setuju')
-            ->where('cabang_id', getCabangId())
+            ->where('cabang_id', $cabangId)
             ->whereDate('tgl_disetujui', '>=', $start_date)
             ->whereDate('tgl_disetujui', '<=', $end_date)
             ->get();
 
             $sale = OrderDetail::where('admin_id', $user->id)
-            ->whereHas('order', function ($query) use ($start_date, $end_date) {
+            ->whereHas('order', function ($query) use ($start_date, $end_date, $cabangId) {
                 $query->where('is_approve', 'Setuju')
-                    ->where('cabang_id', getCabangId())
+                    ->where('cabang_id', $cabangId)
                     ->whereDate('tgl_disetujui', '>=', $start_date)
                     ->whereDate('tgl_disetujui', '<=', $end_date);
             })->get();
@@ -454,6 +462,68 @@ if (!function_exists('calculateBonus')) {
 
         return $bonus;
     }
+}
+
+if (!function_exists('calculateBonus')) {
+    function calculateBonus($id, $start_date = null, $end_date = null)
+    {
+        $user = User::find($id);
+        if (!$user) return 0;
+
+        if (empty($start_date) && empty($end_date)) {
+            if (request('filter_month')) {
+                $date = \Carbon\Carbon::parse(request('filter_month'));
+            } else {
+                $date = \Carbon\Carbon::now();
+            }
+            $start_date = $date->copy()->startOfMonth()->toDateString();
+            $end_date = $date->copy()->endOfMonth()->toDateString();
+        }
+
+        $cabangIds = $user->assigned_cabang_ids;
+        $totalBonus = 0;
+
+        foreach ($cabangIds as $cabangId) {
+            $totalBonus += calculateBonusForCabang($user, $cabangId, $start_date, $end_date);
+        }
+
+        return $totalBonus;
+    }
+}
+
+if (!function_exists('getBonusBreakdownByCabang')) {
+    function getBonusBreakdownByCabang($user, $start_date = null, $end_date = null)
+    {
+        if (is_numeric($user)) {
+            $user = User::find($user);
+        }
+        if (!$user) return [];
+
+        if (empty($start_date) && empty($end_date)) {
+            if (request('filter_month')) {
+                $date = \Carbon\Carbon::parse(request('filter_month'));
+            } else {
+                $date = \Carbon\Carbon::now();
+            }
+            $start_date = $date->copy()->startOfMonth()->toDateString();
+            $end_date = $date->copy()->endOfMonth()->toDateString();
+        }
+
+        $breakdown = [];
+        $cabangs = $user->assigned_cabangs;
+
+        foreach ($cabangs as $cabang) {
+            $b = calculateBonusForCabang($user, $cabang->id, $start_date, $end_date);
+            $breakdown[] = [
+                'cabang_id' => $cabang->id,
+                'cabang_name' => $cabang->nama_cabang,
+                'bonus' => $b,
+            ];
+        }
+
+        return $breakdown;
+    }
+}
 
     if (!function_exists('getMetodePembayaran')) {
         function getMetodePembayaran(){
@@ -465,5 +535,4 @@ if (!function_exists('calculateBonus')) {
             }
         }
     }
-}
 
