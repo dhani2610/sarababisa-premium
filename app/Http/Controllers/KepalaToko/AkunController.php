@@ -89,9 +89,9 @@ class AkunController extends Controller
 
         $query = User::whereNull('deleted_at')
             ->where(function ($q) use ($cabangId) {
-                $q->where('cabang_id', $cabangId)
+                $q->where('users.cabang_id', $cabangId)
                   ->orWhereHas('cabangs', function ($cq) use ($cabangId) {
-                      $cq->where('cabang_id', $cabangId);
+                      $cq->where('cabangs.id', $cabangId);
                   });
             })
             ->with(['shift', 'type', 'cabangs'])
