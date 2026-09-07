@@ -34,7 +34,7 @@ class GajiData extends Component
         $activeCabangId = getCabangId();
         $workers = Worker::where('cabang_id', $activeCabangId)->get();
         $users = User::where(function($q) use ($activeCabangId) {
-            $q->where('cabang_id', $activeCabangId)
+            $q->where('users.cabang_id', $activeCabangId)
               ->orWhereHas('cabangs', function($cb) use ($activeCabangId) {
                   $cb->where('cabangs.id', $activeCabangId);
               });
