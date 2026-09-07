@@ -45,8 +45,8 @@ class UbahBisaDiambilController extends Controller
             $teknisiServis->push($dummyTeknisi);
         }
         // return response()->json($teknisiServis);
-        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
-        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $users = User::forCabang()->where('role', 'Teknisi')->get();
+        $sales = User::forCabang()->where('role', 'Sales')->get();
         $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
         $products = Product::where('cabang_id',getCabangId())->whereHas('subCategory', function ($query) {
             $query->whereHas('category', function ($subQuery) {
@@ -66,8 +66,8 @@ class UbahBisaDiambilController extends Controller
     public function edit($id)
     {
         $item = ServiceTransaction::findOrFail($id);
-        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
-        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $users = User::forCabang()->where('role', 'Teknisi')->get();
+        $sales = User::forCabang()->where('role', 'Sales')->get();
         $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
         $products = Product::where('cabang_id',getCabangId())->whereHas('subCategory', function ($query) {
             $query->whereHas('category', function ($subQuery) {

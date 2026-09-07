@@ -68,7 +68,7 @@ class TargetTeknisiController extends Controller
     public function edit($id)
     {
         $item = TeknisiTarget::findOrFail($id);
-        $teknisi = User::where('cabang_id', getCabangId())->where('role', 'Teknisi')->get();
+        $teknisi = User::forCabang()->where('role', 'Teknisi')->get();
 
         return view('pages.kepalatoko.target-teknisi.edit', [
             'item' => $item,

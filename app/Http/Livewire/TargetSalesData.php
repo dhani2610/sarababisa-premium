@@ -29,7 +29,7 @@ class TargetSalesData extends Component
     public function render()
     {
         $targets_count = SalesTarget::where('cabang_id',getCabangId())->get()->count();
-        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $sales = User::forCabang()->where('role', 'Sales')->get();
         return view('livewire.target-sales-data', [
             'targets_count' => $targets_count,
             'sales' => $sales,

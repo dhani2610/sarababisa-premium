@@ -43,7 +43,7 @@ class TukarTambahData extends Component
         $trade_ins_count = Purchase::where('cabang_id',getCabangId())->where('keterangan', '=', 'Tukar Tambah')->count();
         $products = Product::where('cabang_id',getCabangId())->where('categories_id', '1')->get();
         $customers = Customer::where('cabang_id',getCabangId())->get();
-        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $sales = User::forCabang()->where('role', 'Sales')->get();
         $brands = Brand::where('cabang_id',getCabangId())->get();
         $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
         $capacities = Capacity::where('cabang_id',getCabangId())->get();

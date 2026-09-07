@@ -81,7 +81,7 @@ class TargetSalesController extends Controller
     public function edit($id)
     {
         $item = SalesTarget::findOrFail($id);
-        $sales = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $sales = User::forCabang()->where('role', 'Sales')->get();
 
         return view('pages.kepalatoko.target-sales.edit', [
             'item' => $item,

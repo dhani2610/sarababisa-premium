@@ -681,8 +681,8 @@ class SudahDiambilController extends Controller
         $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
         $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
         $capacities = Capacity::where('cabang_id',getCabangId())->get();
-        $penerima = User::whereNotIn('role',['Investor'])->where('cabang_id',getCabangId())->get();
-        $users = User::where('role', 'Teknisi')->where('cabang_id',getCabangId())->get();
+        $penerima = User::forCabang()->whereNotIn('role',['Investor'])->get();
+        $users = User::forCabang()->where('role', 'Teknisi')->get();
         // $workers = Worker::whereIn('id', $users->pluck('workers_id'))->where('cabang_id',getCabangId())->get();
         $workers = Worker::where('cabang_id',getCabangId())->get();
         $products = Product::whereHas('subCategory', function ($query) {
@@ -690,7 +690,7 @@ class SudahDiambilController extends Controller
                 $subQuery->where('category_name', 'Sparepart');
             });
         })->where('stok', '>=', 1)->where('cabang_id',getCabangId())->get();
-        $sales = User::where('role', 'Sales')->where('cabang_id',getCabangId())->get();
+        $sales = User::forCabang()->where('role', 'Sales')->get();
 
         // 1. Decode JSON ke Array
         $qcMasuk = $item->qc_masuk ? json_decode($item->qc_masuk, true) : [];

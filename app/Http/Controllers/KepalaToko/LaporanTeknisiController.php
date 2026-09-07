@@ -17,7 +17,7 @@ class LaporanTeknisiController extends Controller
         $cabang_id = getCabangId();
 
         // Untuk Modal Cetak Laporan
-        $users = User::where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
+        $users = User::forCabang($cabang_id)->where('role', 'Teknisi')->get();
         // $users = User::where('id',63)->where('cabang_id', $cabang_id)->where('role', 'Teknisi')->get();
 
         return view('pages/kepalatoko/laporan-teknisi', compact('users'));
@@ -27,7 +27,7 @@ class LaporanTeknisiController extends Controller
         $cabang_id = getCabangId();
 
         // --- Logika AJAX DataTables ---
-            $users = User::where('cabang_id', $cabang_id)
+            $users = User::forCabang($cabang_id)
                 ->where('role', 'Teknisi')
                 ->with(['servicetransaction', 'targetServis']);
 

@@ -574,8 +574,8 @@ class BisaDiambilController extends Controller
             });
         })->where('stok', '>=', 1)->get();
         $capacities = Capacity::where('cabang_id',getCabangId())->get();
-        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
-        $usersPenerima = User::where('cabang_id',getCabangId())->get();
+        $users = User::forCabang()->where('role', 'Teknisi')->get();
+        $usersPenerima = User::forCabang()->get();
         // dd($usersAdmin);
         $workers = Worker::where('cabang_id',getCabangId())->whereIn('id', $usersPenerima->pluck('workers_id'))->get();
         // dd($workers);
@@ -621,7 +621,7 @@ class BisaDiambilController extends Controller
 
             $teknisiServis->push($dummyTeknisi);
         }
-        $sales = User::where('role', 'Sales')->where('cabang_id',getCabangId())->get();
+        $sales = User::forCabang()->where('role', 'Sales')->get();
 
         return view('pages.kepalatoko.servis.bisa-diambil-edit', [
             'item' => $item,

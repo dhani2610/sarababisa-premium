@@ -28,7 +28,7 @@ class PengeluaranData extends Component
 
     public function render()
     {
-        $users = User::where('cabang_id',getCabangId())->get();
+        $users = User::forCabang()->get();
         if (auth()->user()->role == 'Kepala Toko' || auth()->user()->role == 'Admin Toko') {
             $expenses_count = Expense::where('cabang_id',getCabangId())->get()->count();
         }else{

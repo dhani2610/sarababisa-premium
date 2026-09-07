@@ -1226,7 +1226,7 @@ class TransaksiServisController extends Controller
         $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
         $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
         $capacities = Capacity::where('cabang_id',getCabangId())->get();
-        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
+        $users = User::forCabang()->where('role', 'Teknisi')->get();
         $workers = Worker::where('cabang_id',getCabangId())->whereIn('id', $users->pluck('workers_id'))->get();
 
         return view('pages.kepalatoko.servis.transaksi-servis-edit', [

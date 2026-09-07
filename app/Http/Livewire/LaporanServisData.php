@@ -28,7 +28,7 @@ class LaporanServisData extends Component
 
     public function render()
     {
-        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
+        $users = User::forCabang()->where('role', 'Teknisi')->get();
         $jumlah = ServiceTransaction::where('cabang_id',getCabangId())->where('is_approve', 'Setuju')->where('kondisi_servis', "Sudah jadi")->count();
         return view('livewire.laporan-servis-data', [
             'jumlah' => $jumlah,

@@ -99,11 +99,11 @@ class MasterIzin extends Component
         //     : User::where('cabang_id',getCabangId())->where('id', $user->id)->select('id', 'name')->get();
 
         if ($user->role == 'Kepala Toko') {
-            $users = User::where('cabang_id',getCabangId())->whereIn('role', ['Teknisi', 'Sales','Admin Toko'])->select('id', 'name')->get();
+            $users = User::forCabang()->whereIn('role', ['Teknisi', 'Sales','Admin Toko'])->select('id', 'name')->get();
         }else if($user->role == 'Admin Toko'){
-            $users = User::where('cabang_id',getCabangId())->whereIn('role', ['Teknisi', 'Sales','Admin Toko'])->select('id', 'name')->get();
+            $users = User::forCabang()->whereIn('role', ['Teknisi', 'Sales','Admin Toko'])->select('id', 'name')->get();
         }else{
-            $users = User::where('cabang_id',getCabangId())->where('id', $user->id)->select('id', 'name')->get();
+            $users = User::forCabang()->where('id', $user->id)->select('id', 'name')->get();
         }
         return view('livewire.master-izin', [
             'izins' => $query->paginate($this->paginate),

@@ -53,8 +53,8 @@ class SudahDiambilData extends Component
         $brands = Brand::where('cabang_id',getCabangId())->get();
         $capacities = Capacity::where('cabang_id',getCabangId())->get();
         $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
-        $users = User::where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
-        $workers = User::where('cabang_id',getCabangId())->get();
+        $users = User::forCabang()->where('role', 'Teknisi')->get();
+        $workers = User::forCabang()->get();
         $actions = ServiceAction::where('cabang_id',getCabangId())->get();
         $storeSetting = StoreSetting::where('cabang_id',getCabangId())->first();;
 

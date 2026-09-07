@@ -79,6 +79,17 @@ class User extends Authenticatable
         return Cabang::whereIn('id', $ids)->orderBy('id', 'asc')->get();
     }
 
+    public function scopeForCabang($query, $cabangId = null)
+    {
+        $cabangId = $cabangId ?? getCabangId();
+        return $query->where(function ($q) use ($cabangId) {
+            $q->where('users.cabang_id', $cabangId)
+              ->orWhereHas('cabangs', function ($cq) use ($cabangId) {
+                  $cq->where('cabangs.id', $cabangId);
+              });
+        });
+    }
+
     public function type()
     {
         return $this->belongsTo(

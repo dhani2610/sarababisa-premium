@@ -198,7 +198,7 @@ class Index extends Component
     {
         $cart_items = Cart::instance($this->cart_instance)->content();
         $toko = StoreSetting::where('cabang_id',getCabangId())->first();
-        $users = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $users = User::forCabang()->where('role', 'Sales')->get();
 
         return view('livewire.pos.index', [
             'cart_items' => $cart_items,

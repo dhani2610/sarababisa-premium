@@ -30,7 +30,7 @@ class TargetTeknisiData extends Component
     public function render()
     {
         $targets_count = TeknisiTarget::where('cabang_id',getCabangId())->where('cabang_id',getCabangId())->get()->count();
-        $teknisi = User::where('cabang_id',getCabangId())->where('cabang_id',getCabangId())->where('role', 'Teknisi')->get();
+        $teknisi = User::forCabang()->where('role', 'Teknisi')->get();
         return view('livewire.target-teknisi-data', [
             'targets_count' => $targets_count,
             'teknisi' => $teknisi,

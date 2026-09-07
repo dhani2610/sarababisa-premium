@@ -1204,7 +1204,7 @@ class TransaksiProdukController extends Controller
         $item = Order::with('detailOrders')->findOrFail($id);
         $customers = Customer::where('cabang_id',getCabangId())->get();
         $products = Product::where('cabang_id',getCabangId())->get();
-        $users = User::where('cabang_id',getCabangId())->where('role', 'Sales')->get();
+        $users = User::forCabang()->where('role', 'Sales')->get();
 
         return view('pages.kepalatoko.produk.transaksi-edit', [
             'item' => $item,
