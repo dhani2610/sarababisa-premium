@@ -733,11 +733,11 @@
                                             <div class="bg-slate-100 p-3 rounded">
                                                 <div class="mb-2">
                                                     <label class="block text-sm font-medium mb-1" for="total_modal_sparepart">Total Modal Sparepart <span class="text-rose-500">*</span></label>
-                                                    <input class="form-input w-full px-2 py-1 bg-white" type="text" name="total_modal_sparepart" id="total_modal_sparepart" required />
+                                                    <input class="form-input w-full px-2 py-1 bg-white input-currency" type="text" name="total_modal_sparepart" id="total_modal_sparepart" required readonly />
                                                 </div>
                                                 <div>
                                                     <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya Servis (Ke Pelanggan) <span class="text-rose-500">*</span></label>
-                                                    <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg" type="text" name="biaya" id="biaya" required />
+                                                    <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg input-currency" type="text" name="biaya" id="biaya" required readonly />
                                                 </div>
                                             </div>
 
@@ -2089,10 +2089,10 @@ $(document).ready(function () {
                 $(this).val(cleanVal);
             });
             // Bersihkan juga field total (readonly)
-            $('#biaya').val($('#biaya').val().replace(/\./g, ''));
-            $('#total_modal_sparepart').val($('#total_modal_spaInirepart').val().replace(/\./g, ''));
-            $('#tunai').val($('#tunai').val().replace(/\./g, ''));
-            $('#transfer').val($('#transfer').val().replace(/\./g, ''));
+            $('#biaya').val(($('#biaya').val() || '').replace(/\./g, ''));
+            $('#total_modal_sparepart').val(($('#total_modal_sparepart').val() || '').replace(/\./g, ''));
+            $('#tunai').val(($('#tunai').val() || '').replace(/\./g, ''));
+            $('#transfer').val(($('#transfer').val() || '').replace(/\./g, ''));
         });
 
         // C. LOGIC DINAMIS TEKNISI

@@ -40,15 +40,18 @@
                                 <div class="font-semibold text-left">Tindakan</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                <div class="font-semibold text-left">Cabang</div>
+                            </th>
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Biaya Servis</div>
                             </th>
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Diskon</div>
                             </th>
-                            </th><th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                            <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Pembayaran</div>
                             </th>
-                            @if ($toko->is_bonus === 1)
+                            @if ($toko && $toko->is_bonus === 1)
                             <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-semibold text-left">Bonus</div>
                             </th>
@@ -79,6 +82,9 @@
                                     </div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                    <div class="font-medium">{{ getCabangName($item->cabang_id) }}</div>
+                                </td>
+                                <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ number_format($item->biaya) }}</div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -87,34 +93,13 @@
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">{{ $item->cara_pembayaran }}</div>
                                 </td>
-                                @if ($toko->is_bonus === 1)
+                                @if ($toko && $toko->is_bonus === 1)
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="font-medium">
-                                        {{-- @dd(getTypeTeknisiMultiTransaksi($item->id),$item->id); --}}
-                                        @if (getTypeTeknisiMultiTransaksi($item->id) == null)
                                         @php
-                                            if ($item->tipe == 'Interface') {
-                                                $bonus = $item->bonus_interface;
-                                            }else{
-                                                $bonus = $item->profit/100;
-                                                $bonus *= Auth::user()->persen;
-                                            }
+                                            $bonus = getBonusTeknisiByTransaction($item->id, Auth::id());
                                         @endphp
                                         Rp. {{ number_format($bonus) }}
-                                        @else
-                                            @if (getTypeTeknisiMultiTransaksi($item->id)->tipe == 'Hardware')
-                                                @php
-                                                    $bonus = bonusTeknisiMultiHardwareByTransactionId($item->id);
-                                                @endphp
-                                                Rp. {{ number_format($bonus) }}
-                                            @else
-                                                @php
-                                                    $bonus = bonusTeknisiMultiInterfaceByTransactionId($item->id);
-                                                @endphp
-                                                Rp. {{ number_format($bonus) }}
-                                            @endif
-                                        @endif
-
                                     </div>
                                 </td>
                                 @endif

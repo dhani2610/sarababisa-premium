@@ -15,100 +15,55 @@ class LaporanTeknisiController extends Controller
     {
         $currentMonth = now()->month;
         $currentYear = now()->year;
+        $userId = Auth::id();
 
-        $services = ServiceTransaction::with('serviceaction', 'user')->where('is_approve', 'Setuju')->where('users_id', Auth::user()->id)->orderByDesc('tgl_ambil')->get();
-        $services_count = ServiceTransaction::with('serviceaction')->where('is_approve', 'Setuju')->count();
-        $servishari = ServiceTransaction::with('serviceaction')
+        $allServisIds = servisIdMultiTeknisi($userId);
+
+        $services = ServiceTransaction::with('serviceaction', 'user')
             ->where('is_approve', 'Setuju')
-            ->where('users_id', Auth::user()->id)
-            ->whereDate('tgl_disetujui', today())
-            ->count();
-        // $column = auth()->user()->bagian_teknisi == 'Teknisi Interface' ? 'bonus_interface' : 'profit';
+            ->whereIn('id', $allServisIds)
+            ->orderByDesc('tgl_ambil')
+            ->get();
 
-        $profithariInterface = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
-            ->where('users_id', Auth::user()->id)
-            ->whereDate('tgl_disetujui', today())
-            ->get()
-            ->sum('bonus_interface');
-        $profithari = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('tipe', 'Hardware')
-            ->where('users_id', Auth::user()->id)
-            ->whereDate('tgl_disetujui', today())
-            ->get()
-            ->sum('profit');
-
-        $bonusTeknisiServisInterface = TeknisiServis::where('users_id', Auth::user()->id)
-            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
-            ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
-                $query->where('is_approve', 'Setuju') // Pastikan status sudah disetujui
-                ->whereDate('tgl_disetujui', today());
-            })
-            ->sum('bonus_interface');
-
-        $bonusTeknisiServisHardware = TeknisiServis::where('users_id', Auth::user()->id)
-            ->where('tipe', 'Hardware')
-            ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
-                $query->where('is_approve', 'Setuju')
-                ->whereDate('tgl_disetujui', today());
-            })
-            ->get()
-            // Jika Anda ingin menghitung bagi hasil (profit * persen / 100):
-            ->sum(function ($item) {
-                // Rumus: Profit Barang * Persen Teknisi / 100
-                return $item->profit;
-            });
-
-        $profithari = $profithari + $profithariInterface + $bonusTeknisiServisInterface + $bonusTeknisiServisHardware;
-        // dd($bonusTeknisiServisHardware,$profithari);
-
-        $servisbulan = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('users_id', Auth::user()->id)
-            ->whereMonth('tgl_disetujui', $currentMonth)
+        $services_count = ServiceTransaction::where('is_approve', 'Setuju')
+            ->whereIn('id', $allServisIds)
             ->count();
 
-        $profitbulanInterface = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
-            ->where('users_id', Auth::user()->id)
+        // Hari ini
+        $servisHariList = ServiceTransaction::where('is_approve', 'Setuju')
+            ->whereIn('id', $allServisIds)
+            ->whereDate('tgl_disetujui', today())
+            ->get();
+        $servishari = $servisHariList->count();
+        $profithari = 0;
+        foreach ($servisHariList as $item) {
+            $profithari += getBonusTeknisiByTransaction($item->id, $userId);
+        }
+
+        // Bulan ini
+        $servisBulanList = ServiceTransaction::where('is_approve', 'Setuju')
+            ->whereIn('id', $allServisIds)
             ->whereMonth('tgl_disetujui', $currentMonth)
-            ->get()
-            ->sum('bonus_interface');
-        $profitbulan = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('tipe', 'Hardware')
-            ->where('users_id', Auth::user()->id)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->get()
-            ->sum('profit');
-        $profitbulan = $profitbulan + $profitbulanInterface;
-
-        $servistahun = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('users_id', Auth::user()->id)
             ->whereYear('tgl_disetujui', $currentYear)
-            ->count();
+            ->get();
+        $servisbulan = $servisBulanList->count();
+        $profitbulan = 0;
+        foreach ($servisBulanList as $item) {
+            $profitbulan += getBonusTeknisiByTransaction($item->id, $userId);
+        }
 
-        $profittahunInterface = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
-            ->where('users_id', Auth::user()->id)
+        // Tahun ini
+        $servisTahunList = ServiceTransaction::where('is_approve', 'Setuju')
+            ->whereIn('id', $allServisIds)
             ->whereYear('tgl_disetujui', $currentYear)
-            ->get()
-            ->sum('bonus_interface');
-        $profittahun = ServiceTransaction::with('serviceaction')
-            ->where('is_approve', 'Setuju')
-            ->where('tipe', 'Hardware')
-            ->where('users_id', Auth::user()->id)
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->get()
-            ->sum('profit');
-        $profittahun = $profittahun + $profittahunInterface;
+            ->get();
+        $servistahun = $servisTahunList->count();
+        $profittahun = 0;
+        foreach ($servisTahunList as $item) {
+            $profittahun += getBonusTeknisiByTransaction($item->id, $userId);
+        }
 
-        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $toko = StoreSetting::where('cabang_id', getCabangId())->first();
         return view('pages/teknisi/laporan-teknisi', compact('services', 'services_count', 'servishari', 'profithari', 'servisbulan', 'profitbulan', 'servistahun', 'profittahun', 'toko'));
     }
 }
