@@ -74,21 +74,24 @@ class TransaksiServisLangsungController extends Controller
             $expired = null;
         }
 
-        $modalSparepart = array_sum($request->modal_sparepart);
-        $biaya = $request->biaya ?? 0;
-        $profittransaksi = $biaya - $modalSparepart - $request->diskon;
-        $bagihasil = ($biaya - $modalSparepart - $request->diskon) / 100;
+        $modalSparepart = !empty($request->modal_sparepart) && is_array($request->modal_sparepart) ? array_sum($request->modal_sparepart) : 0;
+        $biaya = (int)preg_replace('/[^0-9]/', '', (string)($request->biaya ?? 0));
+        $diskon = (int)preg_replace('/[^0-9]/', '', (string)($request->diskon ?? 0));
+        $profittransaksi = $biaya - $modalSparepart - $diskon;
+        $bagihasil = $profittransaksi / 100;
 
         if ($request->cara_pembayaran === 'Tunai & Transfer') {
             $due = 0;
-            if ($request->tunai != 0) {
-                $transfer = $request->biaya - $request->tunai;
-                $pay = $request->biaya;
-                $tunai = $request->tunai;
+            $reqTunai = (int)preg_replace('/[^0-9]/', '', (string)($request->tunai ?? 0));
+            $reqTransfer = (int)preg_replace('/[^0-9]/', '', (string)($request->transfer ?? 0));
+            if ($reqTunai != 0) {
+                $transfer = $biaya - $reqTunai;
+                $pay = $biaya;
+                $tunai = $reqTunai;
             } else {
-                $tunai = $request->biaya - $request->transfer;
-                $pay = $request->biaya;
-                $transfer = $request->transfer;
+                $tunai = $biaya - $reqTransfer;
+                $pay = $biaya;
+                $transfer = $reqTransfer;
             }
         }
 

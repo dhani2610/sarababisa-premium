@@ -84,10 +84,11 @@ class TransaksiServisLangsungController extends Controller
             $expired = null;
         }
 
-        $modalSparepart = array_sum($request->modal_sparepart);
-        $biaya = $request->biaya ?? 0;
-        $profittransaksi = $biaya - $modalSparepart - $request->diskon;
-        $bagihasil = ($biaya - $modalSparepart - $request->diskon) / 100;
+        $modalSparepart = !empty($request->modal_sparepart) && is_array($request->modal_sparepart) ? array_sum($request->modal_sparepart) : 0;
+        $biaya = (int)preg_replace('/[^0-9]/', '', (string)($request->biaya ?? 0));
+        $diskon = (int)preg_replace('/[^0-9]/', '', (string)($request->diskon ?? 0));
+        $profittransaksi = $biaya - $modalSparepart - $diskon;
+        $bagihasil = $profittransaksi / 100;
 
 
 
@@ -132,10 +133,10 @@ class TransaksiServisLangsungController extends Controller
         }
 
         // Hitung dasar (pakai diskon kalau ada)
-        if (!empty($request->diskon) && $request->diskon > 0) {
-            $baseBiaya = $request->biaya - $request->diskon;
+        if (!empty($diskon) && $diskon > 0) {
+            $baseBiaya = $biaya - $diskon;
         } else {
-            $baseBiaya = $request->biaya;
+            $baseBiaya = $biaya;
         }
 
         // Hitung total dengan PPN

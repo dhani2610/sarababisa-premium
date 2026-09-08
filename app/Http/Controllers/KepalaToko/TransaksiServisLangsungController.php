@@ -38,10 +38,12 @@ class TransaksiServisLangsungController extends Controller
         // dd($request->all());
 
         $request->merge([
-            'total_modal_sparepart' => str_replace('.', '', $request->total_modal_sparepart),
-            'tunai' => str_replace('.', '', $request->tunai),
-            'transfer' => str_replace('.', '', $request->transfer),
-            'diskon' => str_replace('.', '', $request->diskon),
+            'biaya' => preg_replace('/[^0-9]/', '', (string)$request->biaya),
+            'total_modal_sparepart' => preg_replace('/[^0-9]/', '', (string)$request->total_modal_sparepart),
+            'tunai' => preg_replace('/[^0-9]/', '', (string)$request->tunai),
+            'transfer' => preg_replace('/[^0-9]/', '', (string)$request->transfer),
+            'diskon' => preg_replace('/[^0-9]/', '', (string)$request->diskon),
+            'pay' => preg_replace('/[^0-9]/', '', (string)$request->pay),
         ]);
 
 
@@ -266,10 +268,11 @@ class TransaksiServisLangsungController extends Controller
                 //     $expired = null;
                 // }
 
-                $modalSparepart = $request->total_modal_sparepart;
-                $biaya = $request->biaya ?? 0;
-                $profittransaksi = (int)$biaya - (int)$modalSparepart - (int)$request->diskon;
-                $bagihasil = ($biaya - $modalSparepart - (int)$request->diskon) / 100;
+                $modalSparepart = !empty($request->total_modal_sparepart) ? (int)$request->total_modal_sparepart : (int)$grandTotalModal;
+                $biaya = !empty($request->biaya) ? (int)$request->biaya : (int)$grandTotalBiaya;
+                $diskon = (int)($request->diskon ?? 0);
+                $profittransaksi = $biaya - $modalSparepart - $diskon;
+                $bagihasil = $profittransaksi / 100;
 
 
                 $ppn = 0;
@@ -279,10 +282,10 @@ class TransaksiServisLangsungController extends Controller
                 }
 
                 // Hitung dasar (pakai diskon kalau ada)
-                if (!empty($request->diskon) && $request->diskon > 0) {
-                    $baseBiaya = $request->biaya - (int)$request->diskon;
+                if (!empty($diskon) && $diskon > 0) {
+                    $baseBiaya = $biaya - $diskon;
                 } else {
-                    $baseBiaya = $request->biaya;
+                    $baseBiaya = $biaya;
                 }
 
                 // Hitung total dengan PPN
@@ -304,14 +307,16 @@ class TransaksiServisLangsungController extends Controller
 
                 if ($request->cara_pembayaran === 'Tunai & Transfer') {
                     $due = 0;
-                    if ($request->tunai != 0) {
-                        $transfer = $request->transfer;
-                        $pay = $request->biaya;
-                        $tunai = $request->tunai;
+                    $reqTunai = (int)($request->tunai ?? 0);
+                    $reqTransfer = (int)($request->transfer ?? 0);
+                    if ($reqTunai != 0) {
+                        $transfer = $reqTransfer;
+                        $pay = $biayaFinal;
+                        $tunai = $reqTunai;
                     } else {
-                        $tunai = $request->tunai;
-                        $pay = $request->biaya;
-                        $transfer = $request->transfer;
+                        $tunai = $reqTunai;
+                        $pay = $biayaFinal;
+                        $transfer = $reqTransfer;
                     }
                 }
 
@@ -331,13 +336,13 @@ class TransaksiServisLangsungController extends Controller
                 }
 
                 if ($request->cara_pembayaran === 'Kredit') {
-                    $pay = $request->pay;
-                    $due = $request->biaya - $request->pay;
+                    $pay = (int)($request->pay ?? 0);
+                    $due = max(0, $biayaFinal - $pay);
                     if ($request->tunai) {
-                        $tunai = $request->pay;
+                        $tunai = $pay;
                         $transfer = 0;
                     } elseif ($request->transfer) {
-                        $transfer = $request->pay;
+                        $transfer = $pay;
                         $tunai = 0;
                     }
                 }
@@ -355,7 +360,7 @@ class TransaksiServisLangsungController extends Controller
                 // dd($request->all(),$expired);
 
                 if ($request->kondisi_servis == 'Dibatalkan') {
-                    $finalModal = $request->total_modal_sparepart;
+                    $finalModal = !empty($request->total_modal_sparepart) ? (int)$request->total_modal_sparepart : (int)$grandTotalModal;
                 }else{
                     $finalModal = $modalSparepart;
                 }
@@ -813,10 +818,11 @@ class TransaksiServisLangsungController extends Controller
             $expired = null;
         }
 
-        $modalSparepart = array_sum($request->modal_sparepart);
-        $biaya = $request->biaya ?? 0;
-        $profittransaksi = $biaya - $modalSparepart - $request->diskon;
-        $bagihasil = ($biaya - $modalSparepart - $request->diskon) / 100;
+        $modalSparepart = !empty($request->modal_sparepart) && is_array($request->modal_sparepart) ? array_sum($request->modal_sparepart) : 0;
+        $biaya = (int)preg_replace('/[^0-9]/', '', (string)($request->biaya ?? 0));
+        $diskon = (int)preg_replace('/[^0-9]/', '', (string)($request->diskon ?? 0));
+        $profittransaksi = $biaya - $modalSparepart - $diskon;
+        $bagihasil = $profittransaksi / 100;
 
 
         $ppn = 0;
@@ -826,10 +832,10 @@ class TransaksiServisLangsungController extends Controller
         }
 
         // Hitung dasar (pakai diskon kalau ada)
-        if (!empty($request->diskon) && $request->diskon > 0) {
-            $baseBiaya = $request->biaya - $request->diskon;
+        if (!empty($diskon) && $diskon > 0) {
+            $baseBiaya = $biaya - $diskon;
         } else {
-            $baseBiaya = $request->biaya;
+            $baseBiaya = $biaya;
         }
 
         // Hitung total dengan PPN
