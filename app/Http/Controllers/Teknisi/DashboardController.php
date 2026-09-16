@@ -22,86 +22,46 @@ class DashboardController extends Controller
     {
         $currentYear = now()->year;
         $currentMonth = now()->month;
+        $userId = Auth::id();
 
-        $target = TeknisiTarget::where('users_id', Auth::user()->id)->whereYear('created_at', $currentYear)
-            ->whereMonth('created_at', $currentMonth)->sum('item');
+        $target = TeknisiTarget::where('users_id', $userId)
+            ->whereYear('created_at', $currentYear)
+            ->whereMonth('created_at', $currentMonth)
+            ->sum('item');
 
-        $result = ServiceTransaction::where('users_id', Auth::user()->id)
-            ->where('is_approve', 'Setuju')
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->get()
-            ->count();
-        $servis = ServiceTransaction::where('users_id', Auth::user()->id)
-            ->where('is_approve', 'Setuju')
+        $allServisIds = servisIdMultiTeknisi($userId);
+
+        $servisBulanList = ServiceTransaction::where('is_approve', 'Setuju')
+            ->whereIn('id', $allServisIds)
             ->whereYear('tgl_disetujui', $currentYear)
             ->whereMonth('tgl_disetujui', $currentMonth)
             ->get();
 
-        $bonusServisInterface = ServiceTransaction::with('serviceaction')
-            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
-            ->where('is_approve', 'Setuju')
-            ->where('users_id', Auth::user()->id)
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->get()
-            ->sum('bonus_interface');
+        $result = $servisBulanList->count();
 
-        // 1. Hitung Bonus Interface (Multi Teknisi)
-        $teknisiServisInterface = TeknisiServis::where('users_id', Auth::user()->id)
-            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
-            ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
-                $query->where('is_approve', 'Setuju') // Pastikan status sudah disetujui
-                    ->whereYear('tgl_disetujui', $currentYear)
-                    ->whereMonth('tgl_disetujui', $currentMonth);
-            })
-            ->sum('bonus_interface');
+        $totalbonusHardware = 0;
+        $totalbonusInterface = 0;
 
-        $teknisiServisHardware = TeknisiServis::where('users_id', Auth::user()->id)
-            ->where('tipe', 'Hardware')
-            ->whereHas('transaction', function ($query) use ($currentYear, $currentMonth) {
-                $query->where('is_approve', 'Setuju')
-                    ->whereYear('tgl_disetujui', $currentYear)
-                    ->whereMonth('tgl_disetujui', $currentMonth);
-            })
-            ->get()
-            // Jika Anda ingin menghitung bagi hasil (profit * persen / 100):
-            ->sum(function ($item) {
-                // Rumus: Profit Barang * Persen Teknisi / 100
-                return $item->profit * ($item->persen_teknisi / 100);
-            });
+        foreach ($servisBulanList as $item) {
+            $bonus = getBonusTeknisiByTransaction($item->id, $userId);
+            $relasi = TeknisiServis::where('service_transactions_id', $item->id)
+                ->where('users_id', $userId)
+                ->first();
 
-        // Debugging
-        // dd(
-        //     $teknisiServisInterface,
-        //     $teknisiServisHardware,
-        //     Auth::user()->id
-        // );
-        $bonusServisInterface = ServiceTransaction::with('serviceaction')
-            ->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])
-            ->where('is_approve', 'Setuju')
-            ->where('users_id', Auth::user()->id)
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->get()
-            ->sum('bonus_interface');
-        $profitservis = ServiceTransaction::with('serviceaction')
-            ->where('tipe', 'Hardware')
-            ->where('is_approve', 'Setuju')
-            ->where('users_id', Auth::user()->id)
-            ->whereYear('tgl_disetujui', $currentYear)
-            ->whereMonth('tgl_disetujui', $currentMonth)
-            ->get()
-            ->sum('profit');
-        $bonusservis = ($profitservis / 100) * Auth::user()->persen;
+            $tipe = $relasi ? $relasi->tipe : $item->tipe;
+            if ($tipe === 'Hardware') {
+                $totalbonusHardware += $bonus;
+            } else {
+                $totalbonusInterface += $bonus;
+            }
+        }
 
-        $totalbonusHardware = $bonusservis + $teknisiServisHardware;
-        $totalbonusInterface = $bonusServisInterface + $teknisiServisInterface;
-        // dd($totalbonusInterface);
-        $totalbonus = $bonusservis + $bonusServisInterface;
+        $totalbonus = $totalbonusHardware + $totalbonusInterface;
 
         // Ambil data transaksi servis yang memiliki status "Belum cek"
-        $transactions = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Belum cek')->get();
+        $transactions = ServiceTransaction::where('cabang_id', getCabangId())
+            ->where('status_servis', 'Belum cek')
+            ->get();
 
         // Cek apakah ada transaksi yang lebih dari 7 hari dari data dibuat
         $currentDate = Carbon::now();
@@ -116,7 +76,7 @@ class DashboardController extends Controller
             $reward = 0; // Atau nilai default lainnya
         }
 
-        $toko = StoreSetting::where('cabang_id',getCabangId())->first();
+        $toko = StoreSetting::where('cabang_id', getCabangId())->first();
 
         return view('pages/teknisi/dashboard', compact(
             'totalbonus',
