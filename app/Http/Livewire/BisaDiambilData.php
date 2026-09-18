@@ -77,17 +77,50 @@ class BisaDiambilData extends Component
         $actions = ServiceAction::where('cabang_id',getCabangId())->get();
         $storeSetting = StoreSetting::where('cabang_id',getCabangId())->first();;
 
-        $processes_count = ServiceTransaction::where('cabang_id',getCabangId())->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
-        $jumlah_bisa_diambil = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Bisa Diambil')->count();
-        $jumlah_sudah_diambil = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Sudah Diambil')->count();
-        $jumlah_belum_disetujui = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Sudah Diambil')->where('is_approve', '=', null)->count();
+        $isTeknisi = auth()->check() && auth()->user()->role === 'Teknisi';
+        $teknisiServisIds = $isTeknisi ? servisIdMultiTeknisi(auth()->id()) : [];
 
-        $bisadiambil = ServiceTransaction::where('cabang_id',getCabangId())->when($this->search, function ($q) {
-                $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('tindakan_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('nama_barang', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil')->orWhere('imei', 'like', '%' . $this->search . '%')->where('status_servis', 'Bisa Diambil');
+        $processes_count = ServiceTransaction::where('cabang_id',getCabangId())
+            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
+                $q->whereIn('id', $teknisiServisIds);
+            })
+            ->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
+
+        $jumlah_bisa_diambil = ServiceTransaction::where('cabang_id',getCabangId())
+            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
+                $q->whereIn('id', $teknisiServisIds);
+            })
+            ->where('status_servis', 'Bisa Diambil')->count();
+
+        $jumlah_sudah_diambil = ServiceTransaction::where('cabang_id',getCabangId())
+            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
+                $q->whereIn('id', $teknisiServisIds);
+            })
+            ->where('status_servis', 'Sudah Diambil')->count();
+
+        $jumlah_belum_disetujui = ServiceTransaction::where('cabang_id',getCabangId())
+            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
+                $q->whereIn('id', $teknisiServisIds);
+            })
+            ->where('status_servis', 'Sudah Diambil')->where('is_approve', '=', null)->count();
+
+        $bisadiambil = ServiceTransaction::where('cabang_id',getCabangId())
+            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
+                $q->whereIn('id', $teknisiServisIds);
+            })
+            ->where('status_servis', 'Bisa Diambil')
+            ->when($this->search, function ($q) {
+                $q->where(function ($sq) {
+                    $sq->where('nama_pelanggan', 'like', '%' . $this->search . '%')
+                       ->orWhere('nomor_servis', 'like', '%' . $this->search . '%')
+                       ->orWhere('tindakan_servis', 'like', '%' . $this->search . '%')
+                       ->orWhere('nama_barang', 'like', '%' . $this->search . '%')
+                       ->orWhere('imei', 'like', '%' . $this->search . '%');
+                });
             })->when($this->type, function ($q) {
                 $q->whereIn('types_id', $this->type);
             })->when($this->kondisi, function ($q) {
-                $q->whereIn('kondisi_servis', $this->kondisi)->where('status_servis', 'Bisa Diambil');
+                $q->whereIn('kondisi_servis', $this->kondisi);
             })->orderBy('created_at','desc')->paginate($this->paginate);
         return view('livewire.bisa-diambil-data', [
             'toko' => $toko,

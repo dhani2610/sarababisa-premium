@@ -58,10 +58,32 @@ class SudahDiambilData extends Component
         $actions = ServiceAction::where('cabang_id',getCabangId())->get();
         $storeSetting = StoreSetting::where('cabang_id',getCabangId())->first();;
 
-        $processes_count = ServiceTransaction::where('cabang_id',getCabangId())->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
-        $jumlah_bisa_diambil = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Bisa Diambil')->count();
-        $jumlah_sudah_diambil = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Sudah Diambil')->count();
-        $jumlah_belum_disetujui = ServiceTransaction::where('cabang_id',getCabangId())->where('status_servis', 'Sudah Diambil')->where('is_approve', '=', null)->count();
+        $isTeknisi = auth()->check() && auth()->user()->role === 'Teknisi';
+        $teknisiServisIds = $isTeknisi ? servisIdMultiTeknisi(auth()->id()) : [];
+
+        $processes_count = ServiceTransaction::where('cabang_id',getCabangId())
+            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
+                $q->whereIn('id', $teknisiServisIds);
+            })
+            ->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
+
+        $jumlah_bisa_diambil = ServiceTransaction::where('cabang_id',getCabangId())
+            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
+                $q->whereIn('id', $teknisiServisIds);
+            })
+            ->where('status_servis', 'Bisa Diambil')->count();
+
+        $jumlah_sudah_diambil = ServiceTransaction::where('cabang_id',getCabangId())
+            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
+                $q->whereIn('id', $teknisiServisIds);
+            })
+            ->where('status_servis', 'Sudah Diambil')->count();
+
+        $jumlah_belum_disetujui = ServiceTransaction::where('cabang_id',getCabangId())
+            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
+                $q->whereIn('id', $teknisiServisIds);
+            })
+            ->where('status_servis', 'Sudah Diambil')->where('is_approve', '=', null)->count();
 
         return view('livewire.sudah-diambil-data', [
             'toko' => $toko,
@@ -78,13 +100,25 @@ class SudahDiambilData extends Component
             'jumlah_bisa_diambil' => $jumlah_bisa_diambil,
             'jumlah_sudah_diambil' => $jumlah_sudah_diambil,
             'jumlah_belum_disetujui' => $jumlah_belum_disetujui,
-            'service_transactions' => ServiceTransaction::where('cabang_id',getCabangId())->orderBy('tgl_ambil', 'desc')->when($this->search, function ($q) {
-                $q->where('nama_pelanggan', 'like', '%' . $this->search . '%')->where('status_servis', 'Sudah Diambil')->orWhere('nomor_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Sudah Diambil')->orWhere('tindakan_servis', 'like', '%' . $this->search . '%')->where('status_servis', 'Sudah Diambil')->orWhere('nama_barang', 'like', '%' . $this->search . '%')->where('status_servis', 'Sudah Diambil')->orWhere('imei', 'like', '%' . $this->search . '%')->where('status_servis', 'Sudah Diambil');
-            })->when($this->type, function ($q) {
-                $q->whereIn('types_id', $this->type);
-            })->when($this->kondisi, function ($q) {
-                $q->whereIn('kondisi_servis', $this->kondisi)->where('status_servis', 'Sudah Diambil');
-            })->paginate($this->paginate),
+            'service_transactions' => ServiceTransaction::where('cabang_id',getCabangId())
+                ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
+                    $q->whereIn('id', $teknisiServisIds);
+                })
+                ->where('status_servis', 'Sudah Diambil')
+                ->orderBy('tgl_ambil', 'desc')
+                ->when($this->search, function ($q) {
+                    $q->where(function ($sq) {
+                        $sq->where('nama_pelanggan', 'like', '%' . $this->search . '%')
+                           ->orWhere('nomor_servis', 'like', '%' . $this->search . '%')
+                           ->orWhere('tindakan_servis', 'like', '%' . $this->search . '%')
+                           ->orWhere('nama_barang', 'like', '%' . $this->search . '%')
+                           ->orWhere('imei', 'like', '%' . $this->search . '%');
+                    });
+                })->when($this->type, function ($q) {
+                    $q->whereIn('types_id', $this->type);
+                })->when($this->kondisi, function ($q) {
+                    $q->whereIn('kondisi_servis', $this->kondisi);
+                })->paginate($this->paginate),
         ]);
     }
 }

@@ -70,7 +70,11 @@ class HistoryGaransiTable extends Component
          *  ROLE TEKNISI → hanya lihat servis miliknya
          *  -------------------------------------------------------*/
         if ($user->role === 'Teknisi') {
-            $query->where('teknisi_id', $user->id);
+            $teknisiServisIds = servisIdMultiTeknisi($user->id);
+            $query->where(function ($q) use ($user, $teknisiServisIds) {
+                $q->where('teknisi_id', $user->id)
+                  ->orWhereIn('service_id', $teknisiServisIds);
+            });
             $users = User::where('cabang_id', $cabang)
                 ->where('id', $user->id)
                 ->where('role', '!=', 'Investor')
@@ -103,6 +107,13 @@ class HistoryGaransiTable extends Component
          *  COUNTER (lebih cepat)
          *  -------------------------------------------------------*/
         $baseCounter = HistoryGaransi::where('cabang_id', $cabang);
+        if ($user->role === 'Teknisi') {
+            $teknisiServisIds = servisIdMultiTeknisi($user->id);
+            $baseCounter->where(function ($q) use ($user, $teknisiServisIds) {
+                $q->where('teknisi_id', $user->id)
+                  ->orWhereIn('service_id', $teknisiServisIds);
+            });
+        }
 
         return view('livewire.history-garansi', [
             'data'          => $query->paginate($this->paginate),

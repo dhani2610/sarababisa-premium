@@ -42,9 +42,15 @@ class BisaDiambilController extends Controller
         $limit = $request->get('limit', 200);
         $offset = $request->get('offset', 0);
 
+        $isTeknisi = auth()->check() && auth()->user()->role === 'Teknisi';
+        $teknisiServisIds = $isTeknisi ? servisIdMultiTeknisi(auth()->id()) : [];
+
         $query = ServiceTransaction::with(['customer', 'user'])
             ->where('status_servis', 'Bisa Diambil')
             ->where('cabang_id', getCabangId())
+            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
+                $q->whereIn('id', $teknisiServisIds);
+            })
             ->orderBy('created_at', 'desc')
             ->latest()
             ->skip($offset)

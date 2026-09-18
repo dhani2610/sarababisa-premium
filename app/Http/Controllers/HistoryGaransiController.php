@@ -39,7 +39,11 @@ class HistoryGaransiController extends Controller
 
         // Filter Role Teknisi
         if ($user->role === 'Teknisi') {
-            $query->where('teknisi_id', $user->id);
+            $teknisiServisIds = servisIdMultiTeknisi($user->id);
+            $query->where(function ($q) use ($user, $teknisiServisIds) {
+                $q->where('teknisi_id', $user->id)
+                  ->orWhereIn('service_id', $teknisiServisIds);
+            });
         }
 
         // Filter Status dari Tab
