@@ -34,6 +34,11 @@
                     <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Transaksi Produk Belum Lunas✨</h1>
                 </div>
 
+                <!-- Right: Actions -->
+                <div class="flex items-center gap-2">
+                    <x-kepalatoko.data-management-modal module="transaksi-produk" />
+                </div>
+
             </div>
 
             <!-- More actions -->

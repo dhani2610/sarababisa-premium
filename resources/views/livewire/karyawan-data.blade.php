@@ -12,7 +12,8 @@
 
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
             @if (auth()->user()->role == 'Kepala Toko')
-                {{-- <x-search-form placeholder="Cari nama karyawan..." /> --}}
+                <!-- Backup & Kelola Data Modal (Khusus Kepala Toko) -->
+                <x-kepalatoko.data-management-modal module="gaji" buttonText="Kelola & Backup Data Gaji" />
 
                 <div x-data="{ modalOpen: false }">
                     <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">

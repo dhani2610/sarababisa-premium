@@ -11,6 +11,10 @@
             </div>
 
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+
+                <!-- Backup & Kelola Data Modal (Khusus Kepala Toko) -->
+                <x-kepalatoko.data-management-modal module="insiden" />
+
                 <div x-data="{ modalOpen: false }">
                     <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">
                         <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">

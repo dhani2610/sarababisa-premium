@@ -20,6 +20,10 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- SweetAlert2 CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <link rel="stylesheet" href="{{ asset('css/sweetalert2-custom.css') }}?v={{ time() }}">
     </head>
     <body
         class="font-inter antialiased bg-slate-100 text-slate-600"

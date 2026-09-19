@@ -755,6 +755,25 @@ Route::post('manajemen/inventaris/print-selected', [KepalaTokoInventarisControll
     Route::post('/impor-aksesoris', [KepalaTokoProdukAksesorisController::class, 'import'])->name('impor-aksesoris');
     Route::get('ekspor-tool', [KepalaTokoProdukToolController::class, 'export'])->name('ekspor-tool');
     Route::post('/impor-tool', [KepalaTokoProdukToolController::class, 'import'])->name('impor-tool');
+
+    // Fitur Arsip Data & Manajemen Data (Backup, Hapus, Restore)
+    Route::get('/arsip-data', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'indexArsip'])->name('arsip-data.index');
+    Route::get('/arsip-data/data', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'getArsipData'])->name('arsip-data.data');
+    Route::get('/arsip-data/download/{id}', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'downloadArsip'])->name('arsip-data.download');
+    Route::delete('/arsip-data/{id}', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'deleteArsip'])->name('arsip-data.destroy');
+
+    Route::post('/data-management/backup', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'backup'])->name('data-management.backup');
+    Route::get('/data-management/download/{fileName}', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'downloadDirect'])->name('data-management.download');
+    Route::post('/data-management/check-archive', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'checkArchiveStatus'])->name('data-management.check-archive');
+    Route::post('/data-management/verify-file-delete', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'verifyFileForDelete'])->name('data-management.verify-file-delete');
+    Route::post('/data-management/delete', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'deleteData'])->name('data-management.delete');
+    Route::post('/data-management/preview', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'preview'])->name('data-management.preview');
+    Route::post('/data-management/restore-chunk', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'restoreChunk'])->name('data-management.restore-chunk');
+    Route::post('/data-management/log-restore', [\App\Http\Controllers\KepalaToko\DataManagementController::class, 'logRestore'])->name('data-management.log-restore');
+
+    // Fitur Audit Log Data
+    Route::get('/audit-log-data', [\App\Http\Controllers\KepalaToko\DataAuditLogController::class, 'index'])->name('audit-log-data.index');
+    Route::get('/audit-log-data/data', [\App\Http\Controllers\KepalaToko\DataAuditLogController::class, 'getData'])->name('audit-log-data.data');
 });
 
 // Route::get('izin', [MasterIzinController::class, 'cetakinkjet/{id}'])->name('kepalatoko-cetak-inkjet');
@@ -934,5 +953,7 @@ Route::get('admin-transaksi-produk-termal/{orders_id}', [AdminTokoTransaksiProdu
 
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-    Route::get('/old-dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/old-dashboard', function () {
+        return redirect()->route('kepalatoko-dashboard');
+    })->name('dashboard');
 });

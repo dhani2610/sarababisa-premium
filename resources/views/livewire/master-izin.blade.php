@@ -24,7 +24,8 @@
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Statistik Izin</h2>
                 </div>
-                <div>
+                <div class="flex items-center gap-2">
+                    <x-kepalatoko.data-management-modal module="izin" />
                     <button type="button" class="btn bg-slate-500 hover:bg-slate-600 text-white"
                         @click="$dispatch('open-filter-modal')">
                         <i class="fa fa-filter mr-2"></i>Filter \ Export

@@ -21,9 +21,12 @@
 
         <div class="flex justify-between mb-4">
             <h1 class="text-2xl font-bold text-slate-800">Data Lembur ✨</h1>
-            <button @click="modalOpen = true" class="btn bg-indigo-500 hover:bg-indigo-600 text-white">
-                + Tambah Lembur
-            </button>
+            <div class="flex items-center gap-2">
+                <x-kepalatoko.data-management-modal module="lembur" />
+                <button @click="modalOpen = true" class="btn bg-indigo-500 hover:bg-indigo-600 text-white">
+                    + Tambah Lembur
+                </button>
+            </div>
         </div>
 
         {{-- Statistik --}}

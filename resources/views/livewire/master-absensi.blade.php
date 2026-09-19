@@ -143,7 +143,8 @@
             }
         }" x-init="$watch('modalOpen', value => { if (value) { $nextTick(() => startCamera()) } else { stopCamera() } })">
 
-            <div class="flex justify-end mb-4">
+            <div class="flex justify-end mb-4 gap-2">
+                <x-kepalatoko.data-management-modal module="absensi" />
                 <button onclick="openFilterModal()" class="btn bg-blue-500 text-white flex items-center px-3 py-2 rounded-lg shadow hover:bg-blue-600 transition">
                     <i class="fas fa-filter mr-1"></i> Filter Tanggal
                 </button>

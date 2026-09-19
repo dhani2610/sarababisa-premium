@@ -11,7 +11,9 @@
             </div>
 
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-                {{-- <x-search-form placeholder="Cari pengeluaran..." /> --}}
+
+                <!-- Backup & Kelola Data Modal (Khusus Kepala Toko) -->
+                <x-kepalatoko.data-management-modal module="pengeluaran" />
 
                 <div x-data="{ modalOpen: false }">
                     <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true">

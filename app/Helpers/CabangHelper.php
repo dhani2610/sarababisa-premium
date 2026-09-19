@@ -50,6 +50,11 @@ if (!function_exists('getCabangName')) {
     {
         static $cabangCache = [];
         if (empty($cabangId)) return '';
+        if (is_object($cabangId)) {
+            $cabangId = $cabangId->id ?? null;
+            if (empty($cabangId)) return '';
+        }
+        if (is_array($cabangId)) return '';
         if (!isset($cabangCache[$cabangId])) {
             $c = Cabang::find($cabangId);
             $cabangCache[$cabangId] = $c ? $c->nama_cabang : '';
@@ -82,6 +87,9 @@ if (!function_exists('getStoreSettingByCabang')) {
 if (!function_exists('getCabangNameUser')) {
     function getCabangNameUser()
     {
+        if (!Auth::check() || !isset(Auth::user()->cabang_id)) {
+            return '-';
+        }
         $cbg = Cabang::find(Auth::user()->cabang_id);
         if (!empty($cbg)) {
             $data = $cbg->nama_cabang ?? '-';

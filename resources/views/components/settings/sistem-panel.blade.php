@@ -15,8 +15,8 @@
             <livewire:toggle-modal></livewire:toggle-modal> --}}
             <livewire:toggle-financial-settings />
             <livewire:toggle-edit-transaksi></livewire:toggle-edit-transaksi>
-            <livewire:toggle-approval-hapus-transaksi />
             <livewire:toggle-edit-produk></livewire:toggle-edit-produk>
+            <livewire:toggle-backup-email />
             <livewire:toggle-telegram-bot />
             <livewire:toggle-store-hours />
             {{-- <livewire:toggle-setting-overtime /> --}}

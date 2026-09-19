@@ -24,8 +24,8 @@
         <!-- Right: Actions -->
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
-            <!-- Search form -->
-            {{-- <x-search-form placeholder="Pelanggan/Nomor Servis/Barang/Tindakan/IMEI" /> --}}
+            <!-- Backup & Kelola Data Modal (Khusus Kepala Toko) -->
+            <x-kepalatoko.data-management-modal module="transaksi-servis-sudah-diambil" />
 
             @if (Auth::user()->role != 'Investor')
             <!-- Create invoice button -->

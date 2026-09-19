@@ -40,6 +40,7 @@ class StoreSetting extends Model
         'is_profit_produk',
         'is_modal_produk',
         'is_bonus_produk',
+        'backup_email',
     ];
 
 }

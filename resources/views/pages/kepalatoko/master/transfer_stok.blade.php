@@ -11,6 +11,9 @@
 
             <div class="grid grid-flow-col sm:auto-cols-max gap-2">
 
+                <!-- Backup & Kelola Data Modal (Khusus Kepala Toko) -->
+                <x-kepalatoko.data-management-modal module="transfer-stok" />
+
                 {{-- Button Cetak --}}
                 <div x-data="{ modalOpen: false }">
                     <button

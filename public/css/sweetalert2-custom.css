@@ -1,0 +1,233 @@
+/* ==========================================================================
+   SweetAlert2 Global Styling & Tailwind CSS Preflight Override
+   Ensures all SweetAlert2 popups, action buttons (Confirm, Cancel, Deny),
+   inputs, and icons are consistently styled and 100% visible across the app.
+   ========================================================================== */
+
+/* 1. Modal Dialog Container & Backdrop */
+.swal2-container {
+    z-index: 999999 !important;
+}
+
+.swal2-container.swal2-backdrop-show,
+.swal2-container.swal2-noanimation {
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(4px) !important;
+}
+
+/* 2. Modal Dialog Card (Popup) */
+.swal2-popup {
+    border-radius: 16px !important;
+    padding: 26px 24px !important;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    max-width: 460px !important;
+}
+
+/* 3. Title & Content Text */
+.swal2-title {
+    font-size: 19px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin: 12px 0 8px 0 !important;
+    line-height: 1.35 !important;
+    padding: 0 !important;
+}
+
+.swal2-html-container {
+    font-size: 13.5px !important;
+    color: #475569 !important;
+    line-height: 1.6 !important;
+    margin: 8px 0 20px 0 !important;
+    padding: 0 8px !important;
+}
+
+/* 4. Action Buttons Container */
+.swal2-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    margin: 22px 0 0 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+/* 5. BASE BUTTON OVERRIDES (CRITICAL: Beat Tailwind Preflight button reset) */
+.swal2-actions button,
+.swal2-styled,
+button.swal2-styled,
+.swal2-popup .swal2-actions button,
+.swal2-popup .swal2-actions .swal2-confirm,
+.swal2-popup .swal2-actions .swal2-cancel,
+.swal2-popup .swal2-actions .swal2-deny {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 40px !important;
+    min-width: 100px !important;
+    padding: 9px 22px !important;
+    margin: 0 !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+    transition: all 0.15s ease-in-out !important;
+    outline: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    line-height: 1.4 !important;
+    text-shadow: none !important;
+    border: 1px solid transparent !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 6. CONFIRM BUTTON (Default: Indigo 600) */
+.swal2-styled.swal2-confirm,
+button.swal2-confirm,
+.swal2-actions .swal2-confirm {
+    background-color: #4f46e5 !important;
+    color: #ffffff !important;
+    border-color: #4338ca !important;
+}
+
+.swal2-styled.swal2-confirm:hover,
+button.swal2-confirm:hover,
+.swal2-actions .swal2-confirm:hover {
+    background-color: #4338ca !important;
+    color: #ffffff !important;
+    border-color: #3730a3 !important;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.25), 0 2px 4px -2px rgba(79, 70, 229, 0.15) !important;
+}
+
+.swal2-styled.swal2-confirm:focus,
+button.swal2-confirm:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4) !important;
+}
+
+/* 7. CONFIRM BUTTON DANGER / ROSE / RED (When used for deletion or warning) */
+.swal2-styled.swal2-confirm[style*="225, 29, 72"],
+.swal2-styled.swal2-confirm[style*="e11d48"],
+.swal2-styled.swal2-confirm[style*="220, 38, 38"],
+.swal2-styled.swal2-confirm[style*="dc2626"],
+.swal2-styled.swal2-confirm[style*="239, 68, 68"],
+.swal2-styled.swal2-confirm[style*="ef4444"],
+.swal2-styled.swal2-confirm[style*="190, 18, 60"],
+.swal2-styled.swal2-confirm[style*="be123c"],
+.swal2-icon-warning ~ .swal2-actions .swal2-confirm,
+.swal2-popup.swal2-danger .swal2-confirm {
+    background-color: #e11d48 !important;
+    color: #ffffff !important;
+    border-color: #be123c !important;
+}
+
+.swal2-styled.swal2-confirm[style*="225, 29, 72"]:hover,
+.swal2-styled.swal2-confirm[style*="e11d48"]:hover,
+.swal2-styled.swal2-confirm[style*="220, 38, 38"]:hover,
+.swal2-styled.swal2-confirm[style*="dc2626"]:hover,
+.swal2-styled.swal2-confirm[style*="239, 68, 68"]:hover,
+.swal2-styled.swal2-confirm[style*="ef4444"]:hover,
+.swal2-icon-warning ~ .swal2-actions .swal2-confirm:hover,
+.swal2-popup.swal2-danger .swal2-confirm:hover {
+    background-color: #be123c !important;
+    color: #ffffff !important;
+    border-color: #9f1239 !important;
+    box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.25), 0 2px 4px -2px rgba(225, 29, 72, 0.15) !important;
+}
+
+/* 8. CANCEL BUTTON (Slate 500) */
+.swal2-styled.swal2-cancel,
+button.swal2-cancel,
+.swal2-actions .swal2-cancel {
+    background-color: #64748b !important;
+    color: #ffffff !important;
+    border-color: #475569 !important;
+}
+
+.swal2-styled.swal2-cancel:hover,
+button.swal2-cancel:hover,
+.swal2-actions .swal2-cancel:hover {
+    background-color: #475569 !important;
+    color: #ffffff !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 6px -1px rgba(100, 116, 139, 0.2), 0 2px 4px -2px rgba(100, 116, 139, 0.1) !important;
+}
+
+.swal2-styled.swal2-cancel:focus,
+button.swal2-cancel:focus {
+    box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.4) !important;
+}
+
+/* 9. DENY BUTTON (Amber 600) */
+.swal2-styled.swal2-deny,
+button.swal2-deny,
+.swal2-actions .swal2-deny {
+    background-color: #d97706 !important;
+    color: #ffffff !important;
+    border-color: #b45309 !important;
+}
+
+.swal2-styled.swal2-deny:hover,
+button.swal2-deny:hover,
+.swal2-actions .swal2-deny:hover {
+    background-color: #b45309 !important;
+    color: #ffffff !important;
+    border-color: #92400e !important;
+    box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.25), 0 2px 4px -2px rgba(217, 119, 6, 0.15) !important;
+}
+
+.swal2-styled.swal2-deny:focus,
+button.swal2-deny:focus {
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4) !important;
+}
+
+/* 10. SweetAlert2 Input Elements */
+.swal2-input,
+.swal2-file,
+.swal2-textarea,
+.swal2-select,
+.swal2-radio,
+.swal2-checkbox {
+    margin: 14px auto !important;
+    font-size: 13.5px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    box-sizing: border-box !important;
+    color: #1e293b !important;
+    background: #ffffff !important;
+}
+
+.swal2-input:focus,
+.swal2-textarea:focus,
+.swal2-select:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+    outline: none !important;
+}
+
+/* 11. SweetAlert2 Close Button (Top right 'X') */
+.swal2-close {
+    font-size: 24px !important;
+    color: #94a3b8 !important;
+    transition: color 0.15s ease !important;
+    outline: none !important;
+}
+
+.swal2-close:hover {
+    color: #ef4444 !important;
+}
+
+/* 12. SweetAlert2 Icon Enhancements */
+.swal2-icon {
+    margin: 16px auto 8px auto !important;
+}

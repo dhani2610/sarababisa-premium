@@ -5,6 +5,10 @@
         </div>
 
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+
+            <!-- Backup & Kelola Data Modal (Khusus Kepala Toko) -->
+            <x-kepalatoko.data-management-modal module="target-teknisi" />
+
             <x-search-form placeholder="Cari berdasarkan nama" />
 
             <div x-data="{ modalOpen: false }">

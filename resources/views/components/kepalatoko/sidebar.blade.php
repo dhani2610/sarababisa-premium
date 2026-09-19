@@ -395,6 +395,31 @@
                             </div>
                         </a>
                     </li>
+                    <!-- Arsip Data -->
+                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['arsip-data'])){{ 'bg-slate-900' }}@endif">
+                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['arsip-data'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('arsip-data.index') }}">
+                            <div class="flex items-center">
+                                <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['arsip-data'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M4 4c0-1.1.9-2 2-2h12a2 2 0 012 2v2H4V4z" />
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['arsip-data'])){{ 'text-indigo-400' }}@else{{ 'text-slate-500' }}@endif" d="M4 8h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2V8z" />
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['arsip-data'])){{ 'text-indigo-200' }}@else{{ 'text-slate-300' }}@endif" d="M10 12h4v2h-4z" />
+                                </svg>
+                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Arsip Data</span>
+                            </div>
+                        </a>
+                    </li>
+                    <!-- Audit Log Data -->
+                    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 @if(in_array(Request::segment(1), ['audit-log-data'])){{ 'bg-slate-900' }}@endif">
+                        <a class="block text-slate-200 hover:text-white truncate transition duration-150 @if(in_array(Request::segment(1), ['audit-log-data'])){{ 'hover:text-slate-200' }}@endif" href="{{ route('audit-log-data.index') }}">
+                            <div class="flex items-center">
+                                <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['audit-log-data'])){{ 'text-indigo-500' }}@else{{ 'text-slate-600' }}@endif" d="M12 2L3 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-9-4z" />
+                                    <path class="fill-current @if(in_array(Request::segment(1), ['audit-log-data'])){{ 'text-indigo-200' }}@else{{ 'text-slate-400' }}@endif" d="M10 15.5l-3.5-3.5 1.4-1.4 2.1 2.1 5.6-5.6 1.4 1.4L10 15.5z" />
+                                </svg>
+                                <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Audit Log Data</span>
+                            </div>
+                        </a>
+                    </li>
                     @endif
 
                 </ul>

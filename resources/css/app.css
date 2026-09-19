@@ -11,6 +11,7 @@
 @import 'additional-styles/theme.css';
 
 @import 'tailwindcss/utilities';
+@import 'sweetalert2-custom.css';
 
 /* See Alpine.js: https://github.com/alpinejs/alpine#x-cloak */
 [x-cloak=""] {

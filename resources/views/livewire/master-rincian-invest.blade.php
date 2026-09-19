@@ -44,7 +44,8 @@
 
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
-
+                <!-- Backup & Kelola Data Modal (Khusus Kepala Toko) -->
+                <x-kepalatoko.data-management-modal module="rincian-invest" />
 
                 @if (Auth::user()->role != 'Investor')
                     <div>

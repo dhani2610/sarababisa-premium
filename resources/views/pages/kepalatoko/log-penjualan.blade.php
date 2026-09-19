@@ -16,9 +16,10 @@
                 <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">Riwayat Aktivitas Penjualan </h1>
             </div>
 
-            <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end">
+            <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
-                {{-- Pastikan route delete untuk penjualan sudah dibuat di controller, jika belum bisa di-comment dulu --}}
+                <!-- Backup & Kelola Data Modal (Khusus Kepala Toko) -->
+                <x-kepalatoko.data-management-modal module="log-penjualan" />
 
                 <div x-data="{ modalOpen: false }">
                     <a href="{{ route('log-penjualan-destroy')  }}" class="btn bg-rose-500 hover:bg-rose-600 text-white" >

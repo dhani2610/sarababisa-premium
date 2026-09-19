@@ -14,7 +14,10 @@
             </div>
 
             <!-- Right: Actions -->
-            <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end">
+            <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+
+                <!-- Backup & Kelola Data Modal (Khusus Kepala Toko) -->
+                <x-kepalatoko.data-management-modal module="log-servis" />
 
                 <!-- Start Delete-->
                 <div x-data="{ modalOpen: false }">

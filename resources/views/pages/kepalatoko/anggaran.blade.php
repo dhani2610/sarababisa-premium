@@ -13,6 +13,9 @@
 
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
+                <!-- Backup & Kelola Data Modal (Khusus Kepala Toko) -->
+                <x-kepalatoko.data-management-modal module="anggaran" />
+
                 <a href="{{ route('target.index') }}" class="btn bg-white border-blue-200 hover:border-blue-300 text-blue-600">
                     Hasil Target Bulanan
                 </a>

@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="{{ asset('css/sweetalert2-custom.css') }}?v={{ time() }}">
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 @if ($errors->any())

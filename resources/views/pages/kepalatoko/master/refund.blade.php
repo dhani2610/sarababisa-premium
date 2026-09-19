@@ -13,6 +13,10 @@
             </div>
 
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+
+                <!-- Backup & Kelola Data Modal (Khusus Kepala Toko) -->
+                <x-kepalatoko.data-management-modal module="refund" />
+
                 @if (Auth::user()->role == 'Kepala Toko' || Auth::user()->role == 'Admin Toko')
                     <div class="relative inline-flex" x-data="{ modalOpen: false }">
                         <button class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600 mb-2 md:mb-0" @click.prevent="modalOpen = true" aria-controls="tambah-modal">
