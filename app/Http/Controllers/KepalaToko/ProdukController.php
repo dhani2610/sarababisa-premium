@@ -217,7 +217,10 @@ class ProdukController extends Controller
                     return '<div class="font-medium">Rp. ' . number_format($row->harga_jual) . '</div>';
                 })
                 // Garansi
-                ->addColumn('garansi', function ($row) {
+                ->addColumn('garansi', function ($row) use ($idCat) {
+                    if ($idCat == 1) {
+                        return '<div class="font-medium">' . ($row->garansi ? $row->garansi . ' hari' : '-') . '</div>';
+                    }
                     $text = 'Tidak ada';
                     if ($row->garansi && $row->garansi_imei) {
                         $text = $row->garansi . ' hari / ' . $row->garansi_imei . ' hari';
@@ -227,6 +230,30 @@ class ProdukController extends Controller
                         $text = '- / ' . $row->garansi_imei . ' hari';
                     }
                     return '<div class="font-medium">' . $text . '</div>';
+                })
+                // Garansi IMEI
+                ->addColumn('garansi_imei', function ($row) {
+                    return '<div class="font-medium">' . ($row->garansi_imei ? $row->garansi_imei . ' hari' : '-') . '</div>';
+                })
+                // Nomor Seri / IMEI
+                ->addColumn('nomor_seri', function ($row) {
+                    return '<div class="font-medium">' . e($row->nomor_seri ?? '-') . '</div>';
+                })
+                // RAM
+                ->addColumn('ram', function ($row) {
+                    return '<div class="font-medium">' . e($row->ram ?? '-') . '</div>';
+                })
+                // Warna
+                ->addColumn('warna', function ($row) {
+                    return '<div class="font-medium">' . e($row->warna ?? '-') . '</div>';
+                })
+                // Model Seri
+                ->addColumn('model.name', function ($row) {
+                    return '<div class="font-medium">' . e($row->model->name ?? '-') . '</div>';
+                })
+                // Capacity Name
+                ->addColumn('capacity.name', function ($row) {
+                    return '<div class="font-medium">' . e($row->capacity->name ?? '-') . '</div>';
                 })
                 // Portal Status
                 ->addColumn('is_portal', function ($row) {
@@ -301,7 +328,7 @@ class ProdukController extends Controller
             return $html;
         })
             // Definisikan kolom yang mengandung HTML agar tidak di-escape
-            ->rawColumns(['checkbox', 'nama_produk', 'category_name', 'product_code', 'keterangan', 'stok', 'stok_minimal', 'tgl_in', 'tgl_out', 'harga_modal', 'harga_jual_toko', 'harga_jual', 'garansi', 'is_portal', 'aksi'])
+            ->rawColumns(['checkbox', 'nama_produk', 'category_name', 'product_code', 'keterangan', 'stok', 'stok_minimal', 'tgl_in', 'tgl_out', 'harga_modal', 'harga_jual_toko', 'harga_jual', 'garansi', 'garansi_imei', 'nomor_seri', 'ram', 'warna', 'model.name', 'capacity.name', 'is_portal', 'aksi'])
             ->make(true);
     }
 

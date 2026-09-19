@@ -110,6 +110,8 @@
                     { data: 'product_code', name: 'product_code' },
                     { data: 'model.name', name: 'model.name' },
                     { data: 'stok', name: 'stok' },
+                    { data: 'tgl_in', name: 'tgl_in' },
+                    { data: 'tgl_out', name: 'tgl_out' },
                     @if (Auth::user()->role == 'Kepala Toko' || $toko->is_modal_produk === 1)
                     { data: 'harga_modal', name: 'harga_modal' },
                     @endif

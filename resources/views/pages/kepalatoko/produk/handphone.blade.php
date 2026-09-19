@@ -114,13 +114,15 @@
                     { data: 'warna', name: 'warna' },
                     { data: 'keterangan', name: 'keterangan' },
                     { data: 'stok', name: 'stok' },
+                    { data: 'tgl_in', name: 'tgl_in' },
+                    { data: 'tgl_out', name: 'tgl_out' },
                     @if (Auth::user()->role == 'Kepala Toko' || $toko->is_modal_produk === 1)
                     { data: 'harga_modal', name: 'harga_modal' },
                     @endif
                     { data: 'harga_jual_toko', name: 'harga_jual_toko' },
                     { data: 'harga_jual', name: 'harga_jual' },
-                    { data: 'garansi_imei', name: 'garansi_imei' },
                     { data: 'garansi', name: 'garansi' },
+                    { data: 'garansi_imei', name: 'garansi_imei' },
                     { data: 'is_portal', name: 'is_portal' },
                     @if (Auth::user()->role != 'Sales')
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
