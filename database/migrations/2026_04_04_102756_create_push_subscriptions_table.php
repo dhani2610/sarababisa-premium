@@ -13,15 +13,20 @@ class CreatePushSubscriptionsTable extends Migration
      */
     public function up()
     {
-        Schema::connection(config('webpush.database_connection'))->create(config('webpush.table_name'), function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->morphs('subscribable');
-            $table->string('endpoint', 500)->unique();
-            $table->string('public_key')->nullable();
-            $table->string('auth_token')->nullable();
-            $table->string('content_encoding')->nullable();
-            $table->timestamps();
-        });
+        $tableName = config('webpush.table_name') ?: 'push_subscriptions';
+        $connection = config('webpush.database_connection') ?: config('database.default');
+
+        if (!Schema::connection($connection)->hasTable($tableName)) {
+            Schema::connection($connection)->create($tableName, function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->morphs('subscribable');
+                $table->string('endpoint', 500)->unique();
+                $table->string('public_key')->nullable();
+                $table->string('auth_token')->nullable();
+                $table->string('content_encoding')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -31,6 +36,9 @@ class CreatePushSubscriptionsTable extends Migration
      */
     public function down()
     {
-        Schema::connection(config('webpush.database_connection'))->dropIfExists(config('webpush.table_name'));
+        $tableName = config('webpush.table_name') ?: 'push_subscriptions';
+        $connection = config('webpush.database_connection') ?: config('database.default');
+
+        Schema::connection($connection)->dropIfExists($tableName);
     }
 }

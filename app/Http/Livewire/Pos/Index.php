@@ -210,12 +210,11 @@ class Index extends Component
     public function store(): void
     {
         DB::transaction(function () {
+            $this->paid_amount = (int) preg_replace('/\D/', '', (string) ($this->paid_amount ?? '0'));
+            $this->tunai       = (int) preg_replace('/\D/', '', (string) ($this->tunai ?? '0'));
+            $this->transfer    = (int) preg_replace('/\D/', '', (string) ($this->transfer ?? '0'));
+
             $this->validate();
-
-            $this->paid_amount = (int) preg_replace('/\D/', '', $this->paid_amount);
-            $this->tunai       = (int) preg_replace('/\D/', '', $this->tunai);
-            $this->transfer    = (int) preg_replace('/\D/', '', $this->transfer);
-
 
             if ($this->is_manual_customer) {
                 $newCustomer = Customer::create([
@@ -247,32 +246,32 @@ class Index extends Component
 
             $nama_pelanggan = Customer::find($this->customer_id);
 
-            $this->transfer = $this->paid_amount;
-
             if ($this->payment_method === 'Tunai & Transfer') {
                 if ($this->tunai != 0) {
                     $this->transfer = $this->total_amount - $this->tunai;
                 } else {
                     $this->tunai = $this->total_amount - $this->transfer;
                 }
-            }
-
-            if ($this->payment_method === 'Tunai') {
+            } elseif ($this->payment_method === 'Tunai') {
                 $this->tunai = $this->paid_amount;
-            }
-
-            if ($this->payment_method === 'Transfer') {
+                $this->transfer = 0;
+            } elseif ($this->payment_method === 'Transfer') {
                 $this->transfer = $this->paid_amount;
-            }
-
-            if ($this->payment_method === 'Kredit') {
+                $this->tunai = 0;
+            } elseif ($this->payment_method === 'Kredit') {
                 if ($this->tunai) {
                     $this->tunai = $this->paid_amount;
                     $this->transfer = 0;
                 } elseif ($this->transfer) {
                     $this->transfer = $this->paid_amount;
                     $this->tunai = 0;
+                } else {
+                    $this->tunai = 0;
+                    $this->transfer = 0;
                 }
+            } else {
+                $this->tunai = $this->paid_amount;
+                $this->transfer = 0;
             }
 
             $waktu = Carbon::today();
@@ -369,13 +368,13 @@ class Index extends Component
 
             Cart::instance('sale')->destroy();
 
-            if ($sale->paid_amount > 0) {
+            if ($this->paid_amount > 0) {
                 SalePayment::create([
                     'date'           => date('Y-m-d'),
-                    'amount'         => $sale->paid_amount,
-                    'orders_id'        => $sale->id,
+                    'amount'         => $this->paid_amount,
+                    'orders_id'      => $sale->id,
                     'payment_method' => $this->users_id,
-                    'users_id'        => Auth::user()->id,
+                    'users_id'       => Auth::user()->id,
                     'cabang_id'      => getCabangId(),
                 ]);
             }
@@ -401,14 +400,14 @@ class Index extends Component
                         'parse_mode' => 'Markdown',
                     ]);
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 \Log::error("Gagal kirim Telegram: " . $e->getMessage());
             }
 
             try {
                 $kepalaToko = User::find(1);
 
-                if($kepalaToko) {
+                if ($kepalaToko && \Illuminate\Support\Facades\Schema::hasTable('push_subscriptions')) {
                     $judulNotif = 'Penjualan Baru Masuk! 📦';
                     $isiNotif   = "No Invoice: {$sale->invoice_no}\nPelanggan: {$nama_pelanggan->nama}";
                     $linkNotif  = url('produk/transaksi-produk');
@@ -417,7 +416,7 @@ class Index extends Component
                     Notification::send($kepalaToko, new TransaksiBaruNotification($judulNotif, $isiNotif, $linkNotif));
                 }
 
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 \Log::error("Gagal kirim notifikasi: " . $e->getMessage());
             }
 
