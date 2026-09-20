@@ -11,7 +11,6 @@ use App\Models\Product;
 use Livewire\Component;
 use App\Models\Customer;
 use App\Models\OrderDetail;
-use App\Models\SalePayment;
 use App\Enums\PaymentStatus;
 use App\Models\StoreSetting;
 use Illuminate\Support\Facades\DB;
@@ -367,17 +366,6 @@ class Index extends Component
             }
 
             Cart::instance('sale')->destroy();
-
-            if ($this->paid_amount > 0) {
-                SalePayment::create([
-                    'date'           => date('Y-m-d'),
-                    'amount'         => $this->paid_amount,
-                    'orders_id'      => $sale->id,
-                    'payment_method' => $this->users_id,
-                    'users_id'       => Auth::user()->id,
-                    'cabang_id'      => getCabangId(),
-                ]);
-            }
 
             // === 📢 Kirim Notifikasi Telegram ===
             try {
