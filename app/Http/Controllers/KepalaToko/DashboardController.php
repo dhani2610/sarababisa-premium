@@ -250,16 +250,14 @@ class DashboardController extends Controller
         $worker = Worker::where('cabang_id', $cabang)->get();
         $total_bonus_karyawan = 0;
         foreach ($worker as $w) {
-            $user = User::where('workers_id', $w->id)->first();
+            $user = $w->user_account;
 
             $start_date = $date->startOfMonth()->toDateString();
             $end_date = $date->endOfMonth()->toDateString();
             $bonusKryawan = 0;
             if (!empty($user)) {
-                $bonusKryawan = $this->calculateBonus($user->id, $start_date, $end_date);
+                $bonusKryawan = calculateBonusForCabang($user, $cabang, $start_date, $end_date);
             }
-            // dd($bonus);
-
             $total_bonus_karyawan += $bonusKryawan;
         }
 

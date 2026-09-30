@@ -27,6 +27,14 @@ class Worker extends Model
         return $this->hasOne(User::class, 'workers_id');
     }
 
+    public function getUserAccountAttribute()
+    {
+        return User::where('workers_id', $this->id)->first()
+            ?? User::where('name', $this->name)->where('cabang_id', $this->cabang_id)->first()
+            ?? User::forCabang($this->cabang_id)->where('name', $this->name)->first()
+            ?? User::where('name', $this->name)->first();
+    }
+
     // one to many
     public function salary()
     {

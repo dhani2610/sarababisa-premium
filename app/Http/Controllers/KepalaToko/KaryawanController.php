@@ -81,13 +81,11 @@ class KaryawanController extends Controller
                 $periodeLabel = $dateObj->format('F Y'); // Contoh: Januari 2025
                 $periodeValue = $dateObj->format('Y-m'); // Untuk value input: 2025-01
 
-                // 4. Hitung Bonus
+                // 4. Hitung Bonus (sinkron per cabang dengan Laporan)
                 $bonus = 0;
-                $user = User::where('workers_id', $worker->id)->first();
-                // return response()->json([$startDate, $endDate]);
+                $user = $worker->user_account;
                 if ($user) {
-                    $bonus = calculateBonus($user->id, $startDate, $endDate);
-                    // return response()->json([$bonus,$startDate, $endDate]);
+                    $bonus = calculateBonusForCabang($user, $worker->cabang_id, $startDate, $endDate);
                 }
                 // dd($worker,$user, $startDate, $endDate,$bonus);
 
@@ -463,27 +461,24 @@ class KaryawanController extends Controller
             ->whereDate('created_at', '<=', $end_date)
             ->sum('bonus');
 
-        $user = User::where('workers_id', $id)->first();
+        $user = $items->user_account;
 
         $bonus = 0;
         $bonusTarget = 0; // Inisialisasi bonus target
 
         if($user) {
-            $bonus = calculateBonus($user->id, $start_date, $end_date);
+            $bonus = calculateBonusForCabang($user, $items->cabang_id, $start_date, $end_date);
 
             // Bonus Pencapaian Target hanya berlaku untuk mode Bulanan (targetnya per bulan kalender)
             if ($type !== 'rentang') {
-                $targetStats = $user->getTargetTeknisiStats($bonus);
-                $bonusTarget = $targetStats['reward']; // Ambil nominal dari array
+                $targetStats = $user->getTargetTeknisiStats($bonus, $items->cabang_id, $start_date, $end_date);
+                $bonusTarget = $targetStats['reward'] ?? 0;
             }
         }
 
-        $assignedCabangIds = $user ? $user->assigned_cabang_ids : [$items->cabang_id];
-        if (empty($assignedCabangIds)) {
-            $assignedCabangIds = [$items->cabang_id];
-        }
+        $assignedCabangIds = [$items->cabang_id];
 
-        $bonusBreakdown = $user ? getBonusBreakdownByCabang($user, $start_date, $end_date) : [];
+        $bonusBreakdown = [];
 
         if ($items->cabang_id == 1) {
             $users = User::find(1);
