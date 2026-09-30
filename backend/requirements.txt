@@ -1,0 +1,48 @@
+# FastAPI Core
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+
+# Database
+sqlalchemy==2.0.35
+alembic==1.13.3
+pymysql==1.1.1
+cryptography==43.0.1
+
+# Auth
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.2.0
+
+# Validation
+pydantic==2.9.2
+pydantic-settings==2.5.2
+email-validator==2.2.0
+
+# PDF Generation
+weasyprint==62.3
+jinja2==3.1.4
+
+# Excel
+openpyxl==3.1.5
+pandas==2.2.3
+
+# Queue / Cache
+celery==5.4.0
+redis==5.1.1
+
+# HTTP Client
+httpx==0.27.2
+
+# Utils
+python-dateutil==2.9.0
+pillow==10.4.0
+qrcode==7.4.2
+barcode==1.0.1
+python-barcode==0.15.1
+
+# CORS
+starlette==0.41.2
+
+# Environment
+python-dotenv==1.0.1
