@@ -340,16 +340,40 @@ class User extends Authenticatable
             ->whereMonth('created_at', $date->month);
     }
 
+    public function getFilteredServicesMulti($cabangId = null, $startDate = null, $endDate = null)
+    {
+        $cabangId = $cabangId ?? getCabangId();
+        if (empty($startDate) || empty($endDate)) {
+            $date = request('filter_month') ? \Carbon\Carbon::parse(request('filter_month')) : now();
+            $startDate = $date->copy()->startOfMonth()->toDateString();
+            $endDate = $date->copy()->endOfMonth()->toDateString();
+        }
+
+        return ServiceTransaction::whereIn('id', servisIdMultiTeknisi($this->id))
+            ->where('cabang_id', $cabangId)
+            ->where('status_servis', 'Sudah Diambil')
+            ->where('is_approve', 'Setuju')
+            ->where(function($q) use ($startDate, $endDate) {
+                $q->where(function($sub) use ($startDate, $endDate) {
+                    $sub->whereNotNull('tgl_ambil')
+                        ->whereDate('tgl_ambil', '>=', $startDate)
+                        ->whereDate('tgl_ambil', '<=', $endDate);
+                })->orWhere(function($sub) use ($startDate, $endDate) {
+                    $sub->whereNull('tgl_ambil')
+                        ->whereDate('tgl_disetujui', '>=', $startDate)
+                        ->whereDate('tgl_disetujui', '<=', $endDate);
+                });
+            })
+            ->get();
+    }
+
     /**
-     * Fungsi baru untuk menghitung progres dan bonus target teknisi
+     * Fungsi untuk menghitung progres dan bonus target teknisi
      */
-    /**
-     * Fungsi baru untuk menghitung progres dan bonus target teknisi
-     */
-    public function getTargetTeknisiStats($totalBonus)
+    public function getTargetTeknisiStats($totalBonus = 0, $cabangId = null, $startDate = null, $endDate = null)
     {
         $targets = $this->filteredTargetServis;
-        $services = $this->filteredServiceTransaction;
+        $services = $this->getFilteredServicesMulti($cabangId, $startDate, $endDate);
 
         // Jika teknisi tidak punya target bulan ini
         if ($targets->isEmpty()) {
@@ -391,10 +415,6 @@ class User extends Authenticatable
         } else {
             // Jika target belum 100%, bonus = 0.
             $reward = 0;
-
-            // NOTE: Jika kamu ingin bonus tetap diberikan secara proporsional
-            // walau belum 100%, hapus angka 0 di atas dan gunakan kode di bawah ini:
-            // $reward = $targetBonusNominal * ($progresLimit / 100);
         }
 
         return [

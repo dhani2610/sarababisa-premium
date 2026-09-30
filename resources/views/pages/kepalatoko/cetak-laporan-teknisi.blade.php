@@ -36,14 +36,13 @@
 			padding: 4px 0 4px 0;
 			text-align: left;
 		}
- /* ✅ Fokus di sini: perkecil font hanya untuk tabel Detail Servis */
     #detail td,
     #detail th {
         border: 1px solid #000;
         border-collapse: collapse;
-        font-size: 9px;        /* kecilkan font */
+        font-size: 8px;        /* kecilkan font agar muat layout portrait */
         line-height: 0.9em;    /* rapatkan jarak antar baris */
-        padding: 2px 3px;      /* kecilkan padding */
+        padding: 2px 2px;      /* kecilkan padding */
         text-align: center;
         word-wrap: break-word; /* pecah teks panjang biar tidak keluar */
         white-space: normal;   /* biar bisa turun ke baris baru */
@@ -121,30 +120,30 @@
 	<table id="detail">
 		<thead>
 			<tr>
-				<th>No.</th>
-				<th>Tanggal</th>
-				<th>No. Servis</th>
-				<th>Pelanggan</th>
-				<th>Model Seri</th>
+				<th style="width: 18px;">No.</th>
+				<th style="width: 52px;">Tanggal</th>
+				<th style="width: 65px;">No. Servis</th>
+				<th style="width: 70px;">Pelanggan</th>
+				<th style="width: 70px;">Model Seri</th>
 				<th>Tindakan</th>
-				<th>Modal Sparepart</th>
-				<th>Biaya Servis</th>
-				<th>Diskon</th>
-				<th>Profit</th>
-				<th>Bonus</th>
+				<th style="width: 52px;">Modal</th>
+				<th style="width: 52px;">Biaya</th>
+				<th style="width: 40px;">Diskon</th>
+				<th style="width: 52px;">Profit</th>
+				<th style="width: 52px;">Bonus</th>
 			</tr>
 		</thead>
 		<tbody>
 			@php
-				$i = 1
+				$i = 1;
 			@endphp
 			@foreach ($services as $item)
 				<tr>
-					<td style="width: 10px;">{{ $i++ }}</td>
-					<td class="text-center" style="width: 60px;">{{ \Carbon\Carbon::parse($item->tgl_ambil)->format('d-m-Y') }}</td>
-					<td class="text-center" style="width: 60px;">{{ $item->nomor_servis }}</td>
-					<td style="text-align: left; width: 90px;" class="capital">{{ $item->nama_pelanggan }}</td>
-					<td style="text-align: left; width: 80px;">{{ $item->modelserie->name ?? '-' ?? '-' }}</td>
+					<td style="width: 18px;">{{ $i++ }}</td>
+					<td class="text-center" style="width: 52px;">{{ $item->tgl_ambil ? \Carbon\Carbon::parse($item->tgl_ambil)->format('d-m-Y') : ($item->tgl_disetujui ? \Carbon\Carbon::parse($item->tgl_disetujui)->format('d-m-Y') : '-') }}</td>
+					<td class="text-center" style="width: 65px;">{{ $item->nomor_servis }}</td>
+					<td style="text-align: left; width: 70px;" class="capital">{{ $item->nama_pelanggan }}</td>
+					<td style="text-align: left; width: 70px;">{{ $item->modelserie->name ?? '-' }}</td>
 					<td class="capital" style="text-align: left;">
 						@if ($item->kondisi_servis != 'Sudah jadi')
 							{{ $item->kondisi_servis }}
@@ -152,44 +151,12 @@
 							{{ $item->tindakan_servis }}
 						@endif
 					</td>
-					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->modal_sparepart) }}</td>
-					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->biaya) }}</td>
-					<td style="width: 60px; text-align: right;">Rp. {{ number_format($item->diskon) }}</td>
-					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
-					<td style="width: 70px; text-align: right;">
-                        {{-- @dd($item->id,getTypeTeknisiMultiTransaksi($item->id,$item->users_id)); --}}
-
-						{{-- @if ($item->tipe == 'Interface')
-						Rp. {{ number_format($item->bonus_interface) }}
-						@else
-						Rp. {{ number_format($item->profit / 100 * $item->persen_teknisi) }}
-						@endif --}}
-
-                        @if (getTypeTeknisiMultiTransaksi($item->id,$item->users_id) == null)
-                        @php
-                            if ($item->tipe == 'Interface') {
-                                $bonus = $item->bonus_interface;
-                            }else{
-                                $bonus = $item->profit/100;
-                                $bonus *= $item->persen_teknisi;
-                            }
-                        @endphp
-                        Rp. {{ number_format($bonus) }}
-                        @else
-                            @if (getTypeTeknisiMultiTransaksi($item->id,$item->users_id)->tipe == 'Hardware')
-                                @php
-                                    $bonus = bonusTeknisiMultiHardwareByTransactionId($item->id,$item->users_id);
-                                @endphp
-                                {{-- @dd(bonusTeknisiMultiHardwareByTransactionId($item->id,$item->users_id)->tipe,$bonus) --}}
-
-                                Rp. {{ number_format($bonus) }}
-                            @else
-                                @php
-                                    $bonus = bonusTeknisiMultiInterfaceByTransactionId($item->id,$item->users_id);
-                                @endphp
-                                Rp. {{ number_format($bonus) }}
-                            @endif
-                        @endif
+					<td style="width: 52px; text-align: right;">{{ number_format($item->modal_sparepart) }}</td>
+					<td style="width: 52px; text-align: right;">{{ number_format($item->biaya) }}</td>
+					<td style="width: 40px; text-align: right;">{{ number_format($item->diskon) }}</td>
+					<td style="width: 52px; text-align: right;">{{ number_format($item->profit) }}</td>
+					<td style="width: 52px; text-align: right; font-weight: bold;">
+						{{ number_format($item->bonus ?? getBonusTeknisiByTransaction($item->id, $teknisi->id)) }}
 					</td>
 				</tr>
 			@endforeach

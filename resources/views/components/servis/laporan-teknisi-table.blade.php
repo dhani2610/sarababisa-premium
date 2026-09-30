@@ -51,11 +51,19 @@
             <tbody class="text-sm divide-y divide-slate-200">
                 @foreach ($users as $item)
                     @php
-                        // Hitung bonus dasar menggunakan fungsi helper yang sudah ada
-                        $bonus = calculateBonus($item->id);
+                        $cabangId = getCabangId();
+                        $filterMonth = request('filter_month') ? \Carbon\Carbon::parse(request('filter_month')) : now();
+                        $startDate = $filterMonth->copy()->startOfMonth()->toDateString();
+                        $endDate = $filterMonth->copy()->endOfMonth()->toDateString();
 
-                        // Panggil fungsi baru dari Model untuk mendapatkan data target
-                        $targetStats = $item->getTargetTeknisiStats($bonus);
+                        // Hitung bonus dasar per cabang aktif yang sedang dibuka
+                        $bonus = calculateBonusForCabang($item, $cabangId, $startDate, $endDate);
+
+                        // Ambil servis multi-teknisi per cabang ini
+                        $services = $item->getFilteredServicesMulti($cabangId, $startDate, $endDate);
+
+                        // Panggil fungsi Model untuk mendapatkan data target
+                        $targetStats = $item->getTargetTeknisiStats($bonus, $cabangId, $startDate, $endDate);
                     @endphp
 
                     <tr>
@@ -63,7 +71,7 @@
                             <div class="font-medium">{{ $item->name }}</div>
                         </td>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                            <div class="font-medium">{{ $item->filteredServicetransaction->count() }}</div>
+                            <div class="font-medium">{{ $services->count() }}</div>
                         </td>
                         <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                             <div class="font-medium text-indigo-600">

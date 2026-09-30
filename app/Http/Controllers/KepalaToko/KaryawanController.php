@@ -116,13 +116,9 @@ class KaryawanController extends Controller
                 $row->periode_value = $periodeValue; // Data hidden untuk Modal
                 $row->bonus = $bonus;
 
-                // Logic Gaji Pokok (Sama seperti sebelumnya)
-                $gajiPokok = 0;
-                // if ($user) {
-                    $shift = \App\Models\Shift::where('worker_id',$worker->id)->first();
-                    // dd($shift);
-                    $gajiPokok = $shift->nominal_gaji ?? 0;
-                // }
+                // Logic Gaji Pokok (Fallback ke worker->gaji jika shift kosong)
+                $shift = \App\Models\Shift::where('worker_id', $worker->id)->first();
+                $gajiPokok = (!empty($shift->nominal_gaji) && $shift->nominal_gaji > 0) ? $shift->nominal_gaji : ($worker->gaji ?? 0);
                 $row->gaji = $gajiPokok;
 
                 $row->absen = $worker->absen;

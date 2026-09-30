@@ -22,10 +22,9 @@ class Worker extends Model
         'status_shift',
     ];
 
-    // many to many
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->hasOne(User::class, 'workers_id');
     }
 
     // one to many

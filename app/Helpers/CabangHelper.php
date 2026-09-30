@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\TeknisiServis;
 use App\Models\OrderDetail;
 use App\Models\ServiceTransaction;
+use App\Models\BonusLeveling;
 use Carbon\Carbon;
 if (!function_exists('getCabangId')) {
     function getCabangId()
@@ -196,44 +197,66 @@ if (!function_exists('getBonusTeknisiByTransaction')) {
         $user = User::find($userId);
         if (!$user) return 0;
 
-        // 1. Cek dari relasi TeknisiServis terlebih dahulu (multi-teknisi / detail tindakan servis)
         $relasi = TeknisiServis::where('service_transactions_id', $transactionId)
             ->where('users_id', $userId)
             ->first();
 
-        if ($relasi) {
-            // Jika ada bonus_interface nominal tetap yang diset dan > 0
-            if (!empty($relasi->bonus_interface) && (float)$relasi->bonus_interface > 0) {
-                return (float)$relasi->bonus_interface;
-            }
-
-            // Hitung berdasarkan persentase
-            $persen = !empty($relasi->persen_teknisi) ? (float)$relasi->persen_teknisi : (!empty($user->persen) ? (float)$user->persen : 0);
-            $profit = (float)($relasi->profit ?? 0);
-
-            if ($profit > 0 && $persen > 0) {
-                return ($profit / 100) * $persen;
-            }
-
-            // Fallback jika ada selisih profit dengan profittoko
-            if (!empty($relasi->profittoko) && $profit > (float)$relasi->profittoko) {
-                return $profit - (float)$relasi->profittoko;
-            }
-
-            return 0;
-        }
-
-        // 2. Fallback jika tidak ada record di TeknisiServis (transaksi single langsung di ServiceTransaction)
         $tx = ServiceTransaction::find($transactionId);
         if (!$tx) return 0;
 
-        if (!empty($tx->bonus_interface) && (float)$tx->bonus_interface > 0) {
-            return (float)$tx->bonus_interface;
+        $tipe = $relasi ? $relasi->tipe : $tx->tipe;
+        $bonusInterface = $relasi ? (float)$relasi->bonus_interface : (float)$tx->bonus_interface;
+        $profit = $relasi ? (float)$relasi->profit : (float)$tx->profit;
+        $persen = $relasi ? (float)$relasi->persen_teknisi : (float)$tx->persen_teknisi;
+        if ($persen <= 0) $persen = (float)($user->persen ?? 0);
+
+        // 1. Tipe Interface Leveling
+        if ($tipe === 'Interface Leveling' || ($user->bagian_teknisi === 'Teknisi Interface' && in_array($tipe, ['Interface Leveling', null, '']))) {
+            if ($bonusInterface > 0) {
+                return $bonusInterface;
+            }
+            // Fallback dynamic lookup leveling
+            $model = ModelSerie::find($tx->model_series_id);
+            $tipe_os_id = $model ? $model->id_tipe_os : null;
+            $jenis_barang_id = $tx->types_id;
+            $biaya = (int)($relasi && $relasi->biaya ? $relasi->biaya : $tx->biaya);
+
+            $leveling = BonusLeveling::where('id_user', $userId)
+                ->where('id_jenis_barang', $jenis_barang_id)
+                ->where('id_tipe_os', $tipe_os_id)
+                ->where('start_rate', '<=', $biaya)
+                ->where('end_rate', '>=', $biaya)
+                ->first();
+
+            if ($leveling && !empty($leveling->nominal_bonus)) {
+                return (float)$leveling->nominal_bonus;
+            }
+            return (float)($model ? ($model->nominal_bonus ?? 0) : 0);
         }
 
-        $persen = !empty($tx->persen_teknisi) ? (float)$tx->persen_teknisi : (!empty($user->persen) ? (float)$user->persen : 0);
-        $profit = (float)($tx->profit ?? 0);
-        return ($profit / 100) * $persen;
+        // 2. Tipe Interface (Flat)
+        if ($tipe === 'Interface') {
+            if ($bonusInterface > 0) return $bonusInterface;
+            $model = ModelSerie::find($tx->model_series_id);
+            return (float)($model ? ($model->nominal_bonus ?? 0) : 0);
+        }
+
+        // 3. Tipe Interface Persentase
+        if ($tipe === 'Interface Persentase' || $user->bagian_teknisi === 'Teknisi Persentase Interface') {
+            $pInterface = (float)($user->persen_bonus_interface ?? 0);
+            return ($profit / 100) * $pInterface;
+        }
+
+        // 4. Default: Hardware (Persentase dari profit)
+        if ($profit > 0 && $persen > 0) {
+            return ($profit / 100) * $persen;
+        }
+
+        if ($relasi && !empty($relasi->profittoko) && $profit > (float)$relasi->profittoko) {
+            return $profit - (float)$relasi->profittoko;
+        }
+
+        return 0;
     }
 }
 
@@ -350,8 +373,17 @@ if (!function_exists('calculateBonusForCabang')) {
         if ($user->role === 'Teknisi') {
             // 1. Ambil transaksi menggunakan helper multi-teknisi
             $transactions = ServiceTransaction::whereIn('id', servisIdMultiTeknisi($user->id))
-                ->whereDate('tgl_disetujui', '>=', $start_date)
-                ->whereDate('tgl_disetujui', '<=', $end_date)
+                ->where(function($q) use ($start_date, $end_date) {
+                    $q->where(function($sub) use ($start_date, $end_date) {
+                        $sub->whereNotNull('tgl_ambil')
+                            ->whereDate('tgl_ambil', '>=', $start_date)
+                            ->whereDate('tgl_ambil', '<=', $end_date);
+                    })->orWhere(function($sub) use ($start_date, $end_date) {
+                        $sub->whereNull('tgl_ambil')
+                            ->whereDate('tgl_disetujui', '>=', $start_date)
+                            ->whereDate('tgl_disetujui', '<=', $end_date);
+                    });
+                })
                 ->where('cabang_id', $cabangId)
                 ->where('status_servis', 'Sudah Diambil')
                 ->where('is_approve', 'Setuju')
