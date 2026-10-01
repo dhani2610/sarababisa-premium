@@ -7,8 +7,13 @@
     <title>Laporan Teknisi</title>
 	<style>
 		@page {
-            margin: 3mm 4mm 10mm 3mm; /* Atur margin atas, kanan, bawah, dan kiri */
+            margin: 5mm 6mm 10mm 6mm;
         }
+
+		body {
+			font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+			color: #333;
+		}
 
 		.text-center {
 			text-align: center;
@@ -26,47 +31,41 @@
 			text-transform: uppercase;
 		}
 
-		#ringkasan td,
-		th,
-		tr,
-		table {
-			border-collapse: collapse;
-			font-size: 12px;
-			line-height: 1em;
-			padding: 4px 0 4px 0;
-			text-align: left;
-		}
-    #detail td,
-    #detail th {
-        border: 1px solid #000;
-        border-collapse: collapse;
-        font-size: 8px;        /* kecilkan font agar muat layout portrait */
-        line-height: 0.9em;    /* rapatkan jarak antar baris */
-        padding: 2px 2px;      /* kecilkan padding */
-        text-align: center;
-        word-wrap: break-word; /* pecah teks panjang biar tidak keluar */
-        white-space: normal;   /* biar bisa turun ke baris baru */
-    }
-
-    #detail {
-        width: 100%;
-        table-layout: fixed;   /* pastikan tabel menyesuaikan lebar halaman */
-    }
-
-		#analisis td,
-		th,
-		tr,
-		table {
-			border-collapse: collapse;
-			font-size: 14px;
-			line-height: 1em;
+		#ringkasan {
 			width: 100%;
-			padding: 4px 0 4px 0;
+			border-collapse: collapse;
+			margin-bottom: 8px;
+		}
+
+		#ringkasan th,
+		#ringkasan td {
+			font-size: 11px;
+			line-height: 1.2em;
+			padding: 3px 2px;
 			text-align: left;
 		}
 
-		#data {
-			border-bottom: 1px solid #ddd;
+		#detail {
+			width: 100%;
+			border-collapse: collapse;
+			table-layout: fixed;
+		}
+
+		#detail th {
+			border: 1px solid #333;
+			background-color: #f0f0f0;
+			font-size: 8px;
+			font-weight: bold;
+			padding: 4px 2px;
+			text-align: center;
+		}
+
+		#detail td {
+			border: 1px solid #666;
+			font-size: 7.5px;
+			line-height: 1.15em;
+			padding: 3px 2px;
+			word-wrap: break-word;
 		}
 	</style>
 </head>
@@ -115,22 +114,21 @@
 	<h4 style="margin-top: 8px; margin-bottom: 6px; text-decoration: underline;">
 		Detail Servis
 	</h4>
-            {{-- @dd($services); --}}
 
 	<table id="detail">
 		<thead>
 			<tr>
-				<th style="width: 18px;">No.</th>
-				<th style="width: 52px;">Tanggal</th>
-				<th style="width: 65px;">No. Servis</th>
-				<th style="width: 70px;">Pelanggan</th>
-				<th style="width: 70px;">Model Seri</th>
-				<th>Tindakan</th>
-				<th style="width: 52px;">Modal</th>
-				<th style="width: 52px;">Biaya</th>
-				<th style="width: 40px;">Diskon</th>
-				<th style="width: 52px;">Profit</th>
-				<th style="width: 52px;">Bonus</th>
+				<th style="width: 4%;">No.</th>
+				<th style="width: 10%;">Tanggal</th>
+				<th style="width: 12%;">No. Servis</th>
+				<th style="width: 12%;">Pelanggan</th>
+				<th style="width: 11%;">Model Seri</th>
+				<th style="width: 17%;">Tindakan</th>
+				<th style="width: 8%;">Modal</th>
+				<th style="width: 8%;">Biaya</th>
+				<th style="width: 5%;">Diskon</th>
+				<th style="width: 7%;">Profit</th>
+				<th style="width: 6%;">Bonus</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -139,11 +137,11 @@
 			@endphp
 			@foreach ($services as $item)
 				<tr>
-					<td style="width: 18px;">{{ $i++ }}</td>
-					<td class="text-center" style="width: 52px;">{{ $item->tgl_ambil ? \Carbon\Carbon::parse($item->tgl_ambil)->format('d-m-Y') : ($item->tgl_disetujui ? \Carbon\Carbon::parse($item->tgl_disetujui)->format('d-m-Y') : '-') }}</td>
-					<td class="text-center" style="width: 65px;">{{ $item->nomor_servis }}</td>
-					<td style="text-align: left; width: 70px;" class="capital">{{ $item->nama_pelanggan }}</td>
-					<td style="text-align: left; width: 70px;">{{ $item->modelserie->name ?? '-' }}</td>
+					<td style="text-align: center;">{{ $i++ }}</td>
+					<td style="text-align: center;">{{ $item->tgl_ambil ? \Carbon\Carbon::parse($item->tgl_ambil)->format('d-m-Y') : ($item->tgl_disetujui ? \Carbon\Carbon::parse($item->tgl_disetujui)->format('d-m-Y') : '-') }}</td>
+					<td style="text-align: center;">{{ $item->nomor_servis }}</td>
+					<td style="text-align: left;" class="capital">{{ $item->nama_pelanggan }}</td>
+					<td style="text-align: left;">{{ $item->modelserie->name ?? '-' }}</td>
 					<td class="capital" style="text-align: left;">
 						@if ($item->kondisi_servis != 'Sudah jadi')
 							{{ $item->kondisi_servis }}
@@ -151,11 +149,11 @@
 							{{ $item->tindakan_servis }}
 						@endif
 					</td>
-					<td style="width: 52px; text-align: right;">{{ number_format($item->modal_sparepart) }}</td>
-					<td style="width: 52px; text-align: right;">{{ number_format($item->biaya) }}</td>
-					<td style="width: 40px; text-align: right;">{{ number_format($item->diskon) }}</td>
-					<td style="width: 52px; text-align: right;">{{ number_format($item->profit) }}</td>
-					<td style="width: 52px; text-align: right; font-weight: bold;">
+					<td style="text-align: right;">{{ number_format($item->modal_sparepart) }}</td>
+					<td style="text-align: right;">{{ number_format($item->biaya) }}</td>
+					<td style="text-align: right;">{{ number_format($item->diskon) }}</td>
+					<td style="text-align: right;">{{ number_format($item->profit) }}</td>
+					<td style="text-align: right; font-weight: bold;">
 						{{ number_format($item->bonus ?? getBonusTeknisiByTransaction($item->id, $teknisi->id)) }}
 					</td>
 				</tr>
