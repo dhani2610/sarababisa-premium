@@ -174,12 +174,6 @@ async def create_overtime(body: dict, db: AsyncSession = Depends(get_db), cu=Dep
     return {"id": ov.id, "nominal": nominal}
 
 
-@router.post("/master/overtime/{id}/approve")
-async def approve_overtime(id: int, db: AsyncSession = Depends(get_db), cu=Depends(require_kepala_toko)):
-    await db.execute(update(Overtime).where(Overtime.id == id).values(status="disetujui", updated_at=datetime.utcnow()))
-    return {"message": "Overtime disetujui"}
-
-
 @router.post("/master/overtime/batch/approve")
 async def approve_overtime_batch(body: dict, db: AsyncSession = Depends(get_db), cu=Depends(require_kepala_toko)):
     await db.execute(update(Overtime).where(Overtime.id.in_(body.get("ids", []))).values(status="disetujui"))
@@ -190,6 +184,12 @@ async def approve_overtime_batch(body: dict, db: AsyncSession = Depends(get_db),
 async def reject_overtime_batch(body: dict, db: AsyncSession = Depends(get_db), cu=Depends(require_kepala_toko)):
     await db.execute(update(Overtime).where(Overtime.id.in_(body.get("ids", []))).values(status="ditolak"))
     return {"message": "Overtime batch ditolak"}
+
+
+@router.post("/master/overtime/{id}/approve")
+async def approve_overtime(id: int, db: AsyncSession = Depends(get_db), cu=Depends(require_kepala_toko)):
+    await db.execute(update(Overtime).where(Overtime.id == id).values(status="disetujui", updated_at=datetime.utcnow()))
+    return {"message": "Overtime disetujui"}
 
 
 # ─── Gaji Karyawan ────────────────────────────────────────

@@ -27,6 +27,23 @@ export default function TransaksiProdukPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
+  const [counts, setCounts] = useState<{ semua: number; lunas: number; belum_lunas: number }>({
+    semua: 0,
+    lunas: 0,
+    belum_lunas: 0,
+  });
+
+  const fetchCounts = async () => {
+    try {
+      const res = await api.get('/produk/transaksi-produk/summary/counts');
+      if (res.data) {
+        setCounts(res.data);
+      }
+    } catch (e) {
+      console.error('Failed to load transaction counts', e);
+    }
+  };
+
   const fetchTransaksi = async () => {
     setIsLoading(true);
     try {
@@ -55,6 +72,10 @@ export default function TransaksiProdukPage() {
   };
 
   useEffect(() => {
+    fetchCounts();
+  }, []);
+
+  useEffect(() => {
     fetchTransaksi();
   }, [page, status]);
 
@@ -77,6 +98,12 @@ export default function TransaksiProdukPage() {
       minimumFractionDigits: 0,
     }).format(val);
   };
+
+  const tabs = [
+    { key: '', label: 'Semua Transaksi', count: counts.semua },
+    { key: 'lunas', label: 'Lunas', count: counts.lunas },
+    { key: 'belum_lunas', label: 'Belum Lunas / Piutang', count: counts.belum_lunas },
+  ];
 
   return (
     <div className="space-y-5">
@@ -110,6 +137,38 @@ export default function TransaksiProdukPage() {
         </div>
       </div>
 
+      {/* Status Tab Navigation */}
+      <div className="flex items-center space-x-2 overflow-x-auto pb-1">
+        {tabs.map((tab) => {
+          const isActive = status === tab.key;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => {
+                setStatus(tab.key);
+                setPage(1);
+              }}
+              className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer select-none ${
+                isActive
+                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
+                  : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80 shadow-2xs'
+              }`}
+            >
+              <span>{tab.label}</span>
+              <span
+                className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+                  isActive
+                    ? 'bg-white/20 text-white'
+                    : 'bg-slate-100 text-slate-700 border border-slate-200'
+                }`}
+              >
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Filter and Search Bar */}
       <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
         <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-80">
@@ -124,19 +183,9 @@ export default function TransaksiProdukPage() {
         </form>
 
         <div className="flex items-center space-x-2">
-          <select
-            value={status}
-            onChange={(e) => {
-              setStatus(e.target.value);
-              setPage(1);
-            }}
-            className="px-3 py-1.5 border border-slate-200 rounded-xl text-xs bg-white focus:outline-hidden"
-          >
-            <option value="">Semua Status</option>
-            <option value="lunas">Lunas</option>
-            <option value="belum_lunas">Belum Lunas / Piutang</option>
-          </select>
-          <span className="text-xs text-slate-400">Total: <b className="text-slate-800">{totalCount}</b></span>
+          <span className="text-xs text-slate-500">
+            Ditemukan: <b className="text-slate-900 font-bold">{totalCount}</b> transaksi
+          </span>
         </div>
       </div>
 

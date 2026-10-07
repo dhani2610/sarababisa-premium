@@ -1,21 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { DataTable, Column } from '@/components/ui/DataTable';
 import Swal from 'sweetalert2';
 import {
-  Sparkles,
   Plus,
   Printer,
   FileSpreadsheet,
   Edit2,
   MessageCircle,
   Copy,
-  CheckCircle,
-  Wrench,
 } from 'lucide-react';
 
 interface ServisRow {
@@ -42,78 +39,113 @@ interface ServisRow {
   status_servis?: string;
   pin?: string;
   pola?: string;
+  teknisi_nama?: string;
 }
+
+type TabKey = 'proses' | 'bisa_diambil' | 'sudah_diambil' | 'belum_disetujui';
+
+const TAB_CONFIG: { key: TabKey; label: string; endpoint: string; statusParam?: string }[] = [
+  { key: 'proses',          label: 'Proses',          endpoint: '/servis/transaksi-servis', statusParam: 'proses' },
+  { key: 'bisa_diambil',   label: 'Bisa Diambil',    endpoint: '/servis/bisa-diambil' },
+  { key: 'sudah_diambil',  label: 'Sudah Diambil',   endpoint: '/servis/sudah-diambil' },
+  { key: 'belum_disetujui',label: 'Belum Disetujui', endpoint: '/servis/belum-disetujui' },
+];
 
 export default function ServisPage() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'proses' | 'bisa_diambil' | 'sudah_diambil' | 'belum_disetujui'>('proses');
+  const [activeTab, setActiveTab] = useState<TabKey>('proses');
   const [servisList, setServisList] = useState<ServisRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<(number | string)[]>([]);
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(15);
+  const [totalPages, setTotalPages] = useState(1);
 
-  // Tab counts
-  const [counts, setCounts] = useState({
-    proses: 13,
-    bisa_diambil: 2,
-    sudah_diambil: 625,
-    belum_disetujui: 6,
+  // Real tab counts from API — initialized to null (loading state)
+  const [counts, setCounts] = useState<Record<TabKey, number | null>>({
+    proses: null,
+    bisa_diambil: null,
+    sudah_diambil: null,
+    belum_disetujui: null,
   });
 
-  const fetchServisData = async () => {
+  // ── Fetch all tab counts in a single fast request ─────────
+  const fetchAllCounts = useCallback(async () => {
+    try {
+      const res = await api.get('/servis/summary/counts');
+      if (res.data) {
+        setCounts({
+          proses: res.data.proses ?? 0,
+          bisa_diambil: res.data.bisa_diambil ?? 0,
+          sudah_diambil: res.data.sudah_diambil ?? 0,
+          belum_disetujui: res.data.belum_disetujui ?? 0,
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load tab counts', err);
+    }
+  }, []);
+
+  // ── Fetch active tab data with pagination ──────────────────
+  const fetchServisData = useCallback(async () => {
     setIsLoading(true);
     try {
-      let endpoint = '/servis/transaksi-servis';
-      if (activeTab === 'belum_disetujui') endpoint = '/servis/belum-disetujui';
-      else if (activeTab === 'bisa_diambil') endpoint = '/servis/bisa-diambil';
-      else if (activeTab === 'sudah_diambil') endpoint = '/servis/sudah-diambil';
-
-      const res = await api.get(endpoint, {
+      const tabCfg = TAB_CONFIG.find((t) => t.key === activeTab)!;
+      const res = await api.get(tabCfg.endpoint, {
         params: {
-          per_page: 100,
-          status: activeTab === 'proses' ? 'Proses' : undefined,
+          page,
+          per_page: perPage,
+          ...(tabCfg.statusParam ? { status: tabCfg.statusParam } : {}),
+          ...(search ? { search } : {}),
         },
       });
 
-      const list: ServisRow[] = Array.isArray(res.data)
-        ? res.data
-        : (res.data?.data || []);
-
+      const d = res.data;
+      const list: ServisRow[] = Array.isArray(d) ? d : (d?.data || []);
       setServisList(list);
+      setTotalPages(d?.total_pages ?? 1);
 
-      // Update count for active tab
-      if (res.data?.total !== undefined) {
-        setCounts((prev) => ({ ...prev, [activeTab]: res.data.total }));
-      } else if (list.length > 0) {
-        setCounts((prev) => ({ ...prev, [activeTab]: list.length }));
-      }
+      // Update this tab's count from the paginated response
+      const total = d?.total ?? (Array.isArray(d) ? d.length : list.length);
+      setCounts((prev) => ({ ...prev, [activeTab]: total }));
     } catch (err) {
       console.error('Failed to load servis', err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activeTab, page, perPage, search]);
 
+  // On mount: fetch all counts
+  useEffect(() => {
+    fetchAllCounts();
+  }, [fetchAllCounts]);
+
+  // On tab / page / perPage change: fetch data
   useEffect(() => {
     fetchServisData();
-  }, [activeTab]);
+  }, [fetchServisData]);
 
-  const formatRupiah = (val: number = 0) => {
-    return new Intl.NumberFormat('id-ID', {
+  // Reset page to 1 when tab changes
+  const handleTabChange = (tab: TabKey) => {
+    setActiveTab(tab);
+    setPage(1);
+    setSearch('');
+    setSelectedIds([]);
+  };
+
+  const formatRupiah = (val: number = 0) =>
+    new Intl.NumberFormat('id-ID', {
       style: 'currency',
       currency: 'IDR',
       minimumFractionDigits: 0,
     }).format(val);
-  };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'success',
-      title: 'Tersalin ke clipboard',
-      showConfirmButton: false,
-      timer: 1500,
+      toast: true, position: 'top-end', icon: 'success',
+      title: 'Tersalin ke clipboard', showConfirmButton: false, timer: 1500,
     });
   };
 
@@ -124,19 +156,24 @@ export default function ServisPage() {
     }
     const cleanPhone = phone.replace(/^0/, '62').replace(/\D/g, '');
     const msg = encodeURIComponent(
-      `Halo Kak ${name || ''}, kami dari Hairil iDevice mengabarkan mengenai unit servis Anda dengan no nota #${nota}.`
+      `Halo Kak ${name || ''}, kami mengabarkan mengenai unit servis Anda dengan no nota #${nota}.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
   };
 
-  // Columns definition matching user screenshot
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(1);
+    fetchServisData();
+  };
+
   const columns: Column<ServisRow>[] = [
     {
       key: 'no',
       label: 'NO.',
       sortable: false,
       className: 'w-12 text-center text-slate-500 font-semibold',
-      render: (_, index) => <span>{index}</span>,
+      render: (_, index) => <span>{(page - 1) * perPage + index}</span>,
     },
     {
       key: 'no_nota',
@@ -165,7 +202,7 @@ export default function ServisPage() {
       key: 'penerima',
       label: 'PENERIMA',
       className: 'font-semibold text-slate-800 uppercase text-[11px]',
-      render: (item) => item.penerima_nama || 'ANGGUN EVI ZAHRA',
+      render: (item) => item.penerima_nama || user?.nama || '-',
     },
     {
       key: 'pelanggan',
@@ -180,7 +217,7 @@ export default function ServisPage() {
       className: 'whitespace-nowrap',
       render: (item) => {
         const phone = item.pelanggan_no_hp || '';
-        const name = item.nama_pelanggan || '';
+        const name = item.nama_pelanggan || item.pelanggan_nama || '';
         const nota = item.no_nota || String(item.id);
         return (
           <div className="flex items-center space-x-1.5">
@@ -208,7 +245,8 @@ export default function ServisPage() {
       className: 'font-bold text-slate-800 uppercase text-[11px]',
       render: (item) =>
         item.nama_barang ||
-        `${item.merek_nama || 'APPLE'} ${item.model_seri_nama || 'IPHONE'}`,
+        [item.merek_nama, item.model_seri_nama].filter(Boolean).join(' ') ||
+        '-',
     },
     {
       key: 'kelengkapan',
@@ -265,28 +303,28 @@ export default function ServisPage() {
       label: 'STATUS',
       className: 'text-center whitespace-nowrap',
       render: (item) => {
-        const s = item.status || item.status_servis || 'Proses';
+        const s = item.status || item.status_servis || 'proses';
+        const colorMap: Record<string, string> = {
+          proses: 'bg-amber-100 text-amber-800',
+          bisa_diambil: 'bg-emerald-100 text-emerald-800',
+          sudah_diambil: 'bg-slate-100 text-slate-700',
+          belum_disetujui: 'bg-rose-100 text-rose-700',
+        };
         return (
-          <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">
-            {s}
+          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${colorMap[s] || 'bg-slate-100 text-slate-700'}`}>
+            {s.replace(/_/g, ' ')}
           </span>
         );
       },
     },
   ];
 
-  const currentTabLabel =
-    activeTab === 'proses'
-      ? `Proses ${counts.proses}`
-      : activeTab === 'bisa_diambil'
-      ? `Bisa Diambil ${counts.bisa_diambil}`
-      : activeTab === 'sudah_diambil'
-      ? `Sudah Diambil ${counts.sudah_diambil}`
-      : `Belum Disetujui ${counts.belum_disetujui}`;
+  const activeTabCfg = TAB_CONFIG.find((t) => t.key === activeTab)!;
+  const countLabel = counts[activeTab] !== null ? counts[activeTab] : '…';
 
   return (
     <div className="space-y-4">
-      {/* Header Title & Top Actions matching screenshot */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-1.5">
           <span>Transaksi Servis</span>
@@ -294,16 +332,14 @@ export default function ServisPage() {
         </h1>
 
         <div className="flex items-center flex-wrap gap-2">
-          {/* Kelola & Backup Data Button */}
           <Link
             href="/arsip"
             className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 shadow-2xs transition-colors cursor-pointer"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-slate-500" />
-            <span>Kelola & Backup Data</span>
+            <span>Kelola &amp; Backup Data</span>
           </Link>
 
-          {/* Print Icon Button */}
           <button
             onClick={() => window.print()}
             title="Cetak Halaman"
@@ -312,7 +348,6 @@ export default function ServisPage() {
             <Printer className="w-4 h-4 text-blue-600" />
           </button>
 
-          {/* + Tambah Transaksi Baru Button */}
           <Link
             href="/servis/tambah"
             className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-md bg-[#5051F9] hover:bg-[#4344db] text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer"
@@ -323,71 +358,100 @@ export default function ServisPage() {
         </div>
       </div>
 
-      {/* Status Filter Tab Pills matching screenshot */}
+      {/* Status Tab Pills — real counts from API */}
       <div className="flex items-center flex-wrap gap-2">
-        {/* Tab 1: Proses */}
-        <button
-          onClick={() => setActiveTab('proses')}
-          className={`px-3 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer ${
-            activeTab === 'proses'
-              ? 'bg-[#5051F9] text-white shadow-2xs'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-          }`}
-        >
-          Proses <span className="ml-1 opacity-90">{counts.proses}</span>
-        </button>
-
-        {/* Tab 2: Bisa Diambil */}
-        <button
-          onClick={() => setActiveTab('bisa_diambil')}
-          className={`px-3 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer ${
-            activeTab === 'bisa_diambil'
-              ? 'bg-[#5051F9] text-white shadow-2xs'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-          }`}
-        >
-          Bisa Diambil <span className="ml-1 opacity-90">{counts.bisa_diambil}</span>
-        </button>
-
-        {/* Tab 3: Sudah Diambil */}
-        <button
-          onClick={() => setActiveTab('sudah_diambil')}
-          className={`px-3 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer ${
-            activeTab === 'sudah_diambil'
-              ? 'bg-[#5051F9] text-white shadow-2xs'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-          }`}
-        >
-          Sudah Diambil <span className="ml-1 opacity-90">{counts.sudah_diambil}</span>
-        </button>
-
-        {/* Tab 4: Belum Disetujui */}
-        <button
-          onClick={() => setActiveTab('belum_disetujui')}
-          className={`px-3 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer ${
-            activeTab === 'belum_disetujui'
-              ? 'bg-[#5051F9] text-white shadow-2xs'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-          }`}
-        >
-          Belum Disetujui <span className="ml-1 opacity-90">{counts.belum_disetujui}</span>
-        </button>
+        {TAB_CONFIG.map((tab) => {
+          const cnt = counts[tab.key];
+          const isActive = activeTab === tab.key;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => handleTabChange(tab.key)}
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
+                isActive
+                  ? 'bg-[#5051F9] text-white shadow-2xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              {tab.label}
+              <span
+                className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black ${
+                  isActive
+                    ? 'bg-white/20 text-white'
+                    : 'bg-white text-slate-600 border border-slate-200'
+                }`}
+              >
+                {cnt !== null ? cnt : '…'}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* The DataTable Component with search, sort, pagination, and entries selector */}
+      {/* Search Bar */}
+      <div className="flex items-center gap-2">
+        <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-72">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari no nota, pelanggan, kerusakan..."
+            className="w-full pl-3 pr-4 py-1.5 text-xs bg-white border border-slate-200 rounded-md focus:outline-hidden focus:border-blue-500 transition-all shadow-2xs"
+          />
+        </form>
+        <button
+          onClick={handleSearchSubmit}
+          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md border border-slate-200 transition-colors cursor-pointer"
+        >
+          Cari
+        </button>
+        {search && (
+          <button
+            onClick={() => { setSearch(''); setPage(1); }}
+            className="px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-md transition-colors cursor-pointer"
+          >
+            Reset
+          </button>
+        )}
+      </div>
+
+      {/* DataTable with pagination */}
       <DataTable<ServisRow>
         columns={columns}
         data={servisList}
         isLoading={isLoading}
-        title={currentTabLabel}
+        title={`${activeTabCfg.label} (${countLabel})`}
         selectable={true}
         selectedIds={selectedIds}
         onSelectChange={setSelectedIds}
         idKey="id"
-        defaultPerPage={10}
-        perPageOptions={[10, 25, 50, 100]}
-        emptyMessage={`Tidak ada data servis dalam kategori ${activeTab}.`}
+        defaultPerPage={perPage}
+        perPageOptions={[15, 25, 50, 100]}
+        emptyMessage={`Tidak ada data servis dalam kategori ${activeTabCfg.label}.`}
       />
+
+      {/* Manual pagination if DataTable doesn't handle it */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between text-xs text-slate-500 bg-white border border-slate-200 rounded-md px-4 py-2.5 shadow-2xs">
+          <span>Halaman <b className="text-slate-800">{page}</b> dari <b className="text-slate-800">{totalPages}</b></span>
+          <div className="flex items-center gap-1">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage(page - 1)}
+              className="px-2.5 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+            >
+              ‹ Prev
+            </button>
+            <button
+              disabled={page >= totalPages}
+              onClick={() => setPage(page + 1)}
+              className="px-2.5 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+            >
+              Next ›
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

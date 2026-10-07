@@ -419,17 +419,6 @@ async def update_produk(
 
 
 # ─── DELETE PRODUK ─────────────────────────────────────────
-@router.delete("/produk/item/{id}")
-async def delete_produk(id: int, db: AsyncSession = Depends(get_db), current_user=Depends(require_admin_toko)):
-    await db.execute(
-        update(Produk)
-        .where(Produk.id == id, Produk.cabang_id == current_user.cabang_id)
-        .values(deleted_at=datetime.utcnow())
-    )
-    await cache_delete_pattern(f"produk:{current_user.cabang_id}:*")
-    return {"message": "Produk dihapus"}
-
-
 @router.delete("/produk/item/batch")
 async def batch_delete_produk(
     body: dict, db: AsyncSession = Depends(get_db), current_user=Depends(require_admin_toko)
@@ -442,6 +431,17 @@ async def batch_delete_produk(
     )
     await cache_delete_pattern(f"produk:{current_user.cabang_id}:*")
     return {"message": f"{len(ids)} produk dihapus"}
+
+
+@router.delete("/produk/item/{id}")
+async def delete_produk(id: int, db: AsyncSession = Depends(get_db), current_user=Depends(require_admin_toko)):
+    await db.execute(
+        update(Produk)
+        .where(Produk.id == id, Produk.cabang_id == current_user.cabang_id)
+        .values(deleted_at=datetime.utcnow())
+    )
+    await cache_delete_pattern(f"produk:{current_user.cabang_id}:*")
+    return {"message": "Produk dihapus"}
 
 
 # ─── UPLOAD FOTO PRODUK ────────────────────────────────────

@@ -140,6 +140,218 @@ async def list_servis(
     return await paginate(db, data_q, count_q, page, per_page)
 
 
+
+# --- SERVIS SUMMARY COUNTS ---
+@router.get("/servis/summary/counts")
+async def get_servis_tab_counts(
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(require_any),
+):
+    cid = current_user.cabang_id
+    base = and_(TransaksiServis.cabang_id == cid, TransaksiServis.deleted_at.is_(None))
+    c_proses = await db.scalar(select(func.count(TransaksiServis.id)).where(base, TransaksiServis.status == "proses"))
+    c_bisa = await db.scalar(select(func.count(TransaksiServis.id)).where(base, TransaksiServis.status == "bisa_diambil"))
+    c_sudah = await db.scalar(select(func.count(TransaksiServis.id)).where(base, TransaksiServis.status == "sudah_diambil"))
+    c_belum_setuju = await db.scalar(select(func.count(TransaksiServis.id)).where(base, or_(TransaksiServis.status == "belum_disetujui", TransaksiServis.is_approved.is_(False))))
+    c_semua = await db.scalar(select(func.count(TransaksiServis.id)).where(base))
+
+    return {
+        "semua": c_semua or 0,
+        "proses": c_proses or 0,
+        "bisa_diambil": c_bisa or 0,
+        "sudah_diambil": c_sudah or 0,
+        "belum_disetujui": c_belum_setuju or 0,
+    }
+
+@router.get("/servis/bisa-diambil")
+async def list_bisa_diambil(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(15, ge=1, le=100),
+    search: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(require_any),
+):
+    return await list_servis(page=page, per_page=per_page, status="bisa_diambil", search=search, db=db, current_user=current_user)
+
+
+@router.get("/servis/sudah-diambil")
+async def list_sudah_diambil(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(15, ge=1, le=100),
+    search: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(require_any),
+):
+    return await list_servis(page=page, per_page=per_page, status="sudah_diambil", search=search, db=db, current_user=current_user)
+
+
+@router.get("/servis/belum-lunas")
+async def list_belum_lunas(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(15, ge=1, le=100),
+    search: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(require_any),
+):
+    cabang_id = current_user.cabang_id
+    base = and_(
+        TransaksiServis.cabang_id == cabang_id,
+        TransaksiServis.deleted_at.is_(None),
+        TransaksiServis.sisa_bayar > 0,
+    )
+    q = (
+        select(
+            TransaksiServis.id, TransaksiServis.no_nota, TransaksiServis.status,
+            TransaksiServis.kerusakan, TransaksiServis.total_biaya, TransaksiServis.dp,
+            TransaksiServis.sisa_bayar, TransaksiServis.tgl_masuk, TransaksiServis.created_at,
+            Pelanggan.nama.label("pelanggan_nama"), Pelanggan.no_hp.label("pelanggan_no_hp"),
+            Merek.nama.label("merek_nama"), ModelSeri.nama.label("model_seri_nama"),
+            User.nama.label("teknisi_nama"),
+        )
+        .outerjoin(Pelanggan, Pelanggan.id == TransaksiServis.pelanggan_id)
+        .outerjoin(Merek, Merek.id == TransaksiServis.merek_id)
+        .outerjoin(ModelSeri, ModelSeri.id == TransaksiServis.model_seri_id)
+        .outerjoin(User, User.id == TransaksiServis.teknisi_id)
+        .where(base)
+        .order_by(TransaksiServis.created_at.desc())
+    )
+    cq = select(func.count(TransaksiServis.id)).where(base)
+    if search:
+        t = f"%{search}%"
+        cond = or_(TransaksiServis.no_nota.ilike(t), Pelanggan.nama.ilike(t), Pelanggan.no_hp.ilike(t))
+        q = q.where(cond)
+        cq = cq.where(cond)
+    return await paginate(db, q, cq, page, per_page)
+
+
+@router.get("/servis/belum-disetujui")
+async def list_belum_disetujui(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(15, ge=1, le=100),
+    search: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(require_any),
+):
+    cabang_id = current_user.cabang_id
+    base = and_(
+        TransaksiServis.cabang_id == cabang_id,
+        TransaksiServis.deleted_at.is_(None),
+        or_(TransaksiServis.status == "belum_disetujui", TransaksiServis.is_approved.is_(False)),
+    )
+    q = (
+        select(
+            TransaksiServis.id, TransaksiServis.no_nota, TransaksiServis.status,
+            TransaksiServis.kerusakan, TransaksiServis.total_biaya, TransaksiServis.dp,
+            TransaksiServis.sisa_bayar, TransaksiServis.tgl_masuk, TransaksiServis.created_at,
+            Pelanggan.nama.label("pelanggan_nama"), Pelanggan.no_hp.label("pelanggan_no_hp"),
+            Merek.nama.label("merek_nama"), ModelSeri.nama.label("model_seri_nama"),
+            User.nama.label("teknisi_nama"),
+        )
+        .outerjoin(Pelanggan, Pelanggan.id == TransaksiServis.pelanggan_id)
+        .outerjoin(Merek, Merek.id == TransaksiServis.merek_id)
+        .outerjoin(ModelSeri, ModelSeri.id == TransaksiServis.model_seri_id)
+        .outerjoin(User, User.id == TransaksiServis.teknisi_id)
+        .where(base)
+        .order_by(TransaksiServis.created_at.desc())
+    )
+    cq = select(func.count(TransaksiServis.id)).where(base)
+    if search:
+        t = f"%{search}%"
+        cond = or_(TransaksiServis.no_nota.ilike(t), Pelanggan.nama.ilike(t))
+        q = q.where(cond)
+        cq = cq.where(cond)
+    return await paginate(db, q, cq, page, per_page)
+
+
+# ─── SERVIS LANGSUNG ───────────────────────────────────────
+
+@router.get("/servis/tindakan-servis")
+async def list_tindakan(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(50, ge=1, le=200),
+    search: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(require_any),
+):                                                                    
+    base = and_(
+        TindakanServis.cabang_id == current_user.cabang_id,
+        TindakanServis.deleted_at.is_(None),
+    )
+    q = select(TindakanServis.id, TindakanServis.nama, TindakanServis.harga).where(base)
+    cq = select(func.count(TindakanServis.id)).where(base)
+    if search:
+        t = f"%{search}%"
+        q = q.where(TindakanServis.nama.ilike(t))
+        cq = cq.where(TindakanServis.nama.ilike(t))
+    return await paginate(db, q, cq, page, per_page)
+
+
+# ─── HELPER: DATA UNTUK PDF NOTA SERVIS ─────────────────────
+
+@router.get("/servis/log-servis")
+async def list_log_servis(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(30, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+    cu=Depends(require_any),
+):
+    base = and_(AuditLog.cabang_id == cu.cabang_id, AuditLog.model == "TransaksiServis")
+    q = (
+        select(AuditLog, User.nama.label("user_nama"))
+        .outerjoin(User, User.id == AuditLog.user_id)
+        .where(base)
+        .order_by(AuditLog.created_at.desc())
+    )
+    cq = select(func.count(AuditLog.id)).where(base)
+    return await paginate(db, q, cq, page, per_page)
+
+
+
+@router.get("/servis/garansi")
+async def list_garansi(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(15, ge=1, le=100),
+    search: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(require_any),
+):
+    base = HistoryGaransi.cabang_id == current_user.cabang_id
+    q = (
+        select(
+            HistoryGaransi.id,
+            HistoryGaransi.date.label("tgl_klaim"),
+            HistoryGaransi.service_id,
+            HistoryGaransi.catatan,
+            HistoryGaransi.status,
+            HistoryGaransi.total_biaya,
+            HistoryGaransi.tindakan,
+            HistoryGaransi.sparepart,
+            TransaksiServis.no_nota.label("no_nota_servis"),
+            Pelanggan.nama.label("pelanggan_nama"),
+            Pelanggan.no_hp.label("pelanggan_no_hp"),
+            User.nama.label("teknisi_nama"),
+        )
+        .outerjoin(TransaksiServis, TransaksiServis.id == HistoryGaransi.service_id)
+        .outerjoin(Pelanggan, Pelanggan.id == HistoryGaransi.id_customer)
+        .outerjoin(User, User.id == HistoryGaransi.teknisi_id)
+        .where(base)
+        .order_by(HistoryGaransi.id.desc())
+    )
+    cq = select(func.count(HistoryGaransi.id)).where(base)
+    if search:
+        t = f"%{search}%"
+        cond = or_(
+            TransaksiServis.no_nota.ilike(t),
+            Pelanggan.nama.ilike(t),
+            HistoryGaransi.catatan.ilike(t),
+        )
+        q = q.where(cond)
+        cq = cq.where(cond)
+
+    return await paginate(db, q, cq, page, per_page)
+
+
+
 @router.get("/servis/{id}")
 @router.get("/servis/transaksi-servis/{id}")
 async def get_servis(
@@ -386,6 +598,24 @@ async def ubah_status_servis(
     return {"message": f"Status diubah ke {status_baru}"}
 
 
+@router.delete("/servis/transaksi-servis/batch")
+async def batch_delete_servis(
+    body: dict,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(require_kepala_toko),
+):
+    ids = body.get("ids", [])
+    await db.execute(
+        update(TransaksiServis)
+        .where(TransaksiServis.id.in_(ids), TransaksiServis.cabang_id == current_user.cabang_id)
+        .values(deleted_at=datetime.utcnow())
+    )
+    await cache_delete_pattern(f"servis:{current_user.cabang_id}:*")
+    return {"message": f"{len(ids)} transaksi servis dihapus"}
+
+
+# ─── SUB STATUS LISTINGS ───────────────────────────────────
+
 @router.delete("/servis/transaksi-servis/{id}")
 async def delete_servis(
     id: int,
@@ -420,28 +650,6 @@ async def delete_servis(
 
 
 # ── Tindakan Servis ──
-@router.get("/servis/tindakan-servis")
-async def list_tindakan(
-    page: int = Query(1, ge=1),
-    per_page: int = Query(50, ge=1, le=200),
-    search: Optional[str] = Query(None),
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(require_any),
-):                                                                    
-    base = and_(
-        TindakanServis.cabang_id == current_user.cabang_id,
-        TindakanServis.deleted_at.is_(None),
-    )
-    q = select(TindakanServis.id, TindakanServis.nama, TindakanServis.harga).where(base)
-    cq = select(func.count(TindakanServis.id)).where(base)
-    if search:
-        t = f"%{search}%"
-        q = q.where(TindakanServis.nama.ilike(t))
-        cq = cq.where(TindakanServis.nama.ilike(t))
-    return await paginate(db, q, cq, page, per_page)
-
-
-# ─── HELPER: DATA UNTUK PDF NOTA SERVIS ─────────────────────
 async def _get_servis_pdf_data(db: AsyncSession, id: int, cabang_id: int):
     q = (
         select(TransaksiServis, Pelanggan, Merek, ModelSeri, JenisBarang, User)
@@ -599,124 +807,6 @@ async def update_servis(
 
 
 # ─── BATCH DELETE SERVIS ───────────────────────────────────
-@router.delete("/servis/transaksi-servis/batch")
-async def batch_delete_servis(
-    body: dict,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(require_kepala_toko),
-):
-    ids = body.get("ids", [])
-    await db.execute(
-        update(TransaksiServis)
-        .where(TransaksiServis.id.in_(ids), TransaksiServis.cabang_id == current_user.cabang_id)
-        .values(deleted_at=datetime.utcnow())
-    )
-    await cache_delete_pattern(f"servis:{current_user.cabang_id}:*")
-    return {"message": f"{len(ids)} transaksi servis dihapus"}
-
-
-# ─── SUB STATUS LISTINGS ───────────────────────────────────
-@router.get("/servis/bisa-diambil")
-async def list_bisa_diambil(
-    page: int = Query(1, ge=1),
-    per_page: int = Query(15, ge=1, le=100),
-    search: Optional[str] = Query(None),
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(require_any),
-):
-    return await list_servis(page=page, per_page=per_page, status="bisa_diambil", search=search, db=db, current_user=current_user)
-
-
-@router.get("/servis/sudah-diambil")
-async def list_sudah_diambil(
-    page: int = Query(1, ge=1),
-    per_page: int = Query(15, ge=1, le=100),
-    search: Optional[str] = Query(None),
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(require_any),
-):
-    return await list_servis(page=page, per_page=per_page, status="sudah_diambil", search=search, db=db, current_user=current_user)
-
-
-@router.get("/servis/belum-lunas")
-async def list_belum_lunas(
-    page: int = Query(1, ge=1),
-    per_page: int = Query(15, ge=1, le=100),
-    search: Optional[str] = Query(None),
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(require_any),
-):
-    cabang_id = current_user.cabang_id
-    base = and_(
-        TransaksiServis.cabang_id == cabang_id,
-        TransaksiServis.deleted_at.is_(None),
-        TransaksiServis.sisa_bayar > 0,
-    )
-    q = (
-        select(
-            TransaksiServis.id, TransaksiServis.no_nota, TransaksiServis.status,
-            TransaksiServis.kerusakan, TransaksiServis.total_biaya, TransaksiServis.dp,
-            TransaksiServis.sisa_bayar, TransaksiServis.tgl_masuk, TransaksiServis.created_at,
-            Pelanggan.nama.label("pelanggan_nama"), Pelanggan.no_hp.label("pelanggan_no_hp"),
-            Merek.nama.label("merek_nama"), ModelSeri.nama.label("model_seri_nama"),
-            User.nama.label("teknisi_nama"),
-        )
-        .outerjoin(Pelanggan, Pelanggan.id == TransaksiServis.pelanggan_id)
-        .outerjoin(Merek, Merek.id == TransaksiServis.merek_id)
-        .outerjoin(ModelSeri, ModelSeri.id == TransaksiServis.model_seri_id)
-        .outerjoin(User, User.id == TransaksiServis.teknisi_id)
-        .where(base)
-        .order_by(TransaksiServis.created_at.desc())
-    )
-    cq = select(func.count(TransaksiServis.id)).where(base)
-    if search:
-        t = f"%{search}%"
-        cond = or_(TransaksiServis.no_nota.ilike(t), Pelanggan.nama.ilike(t), Pelanggan.no_hp.ilike(t))
-        q = q.where(cond)
-        cq = cq.where(cond)
-    return await paginate(db, q, cq, page, per_page)
-
-
-@router.get("/servis/belum-disetujui")
-async def list_belum_disetujui(
-    page: int = Query(1, ge=1),
-    per_page: int = Query(15, ge=1, le=100),
-    search: Optional[str] = Query(None),
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(require_any),
-):
-    cabang_id = current_user.cabang_id
-    base = and_(
-        TransaksiServis.cabang_id == cabang_id,
-        TransaksiServis.deleted_at.is_(None),
-        or_(TransaksiServis.status == "belum_disetujui", TransaksiServis.is_approved.is_(False)),
-    )
-    q = (
-        select(
-            TransaksiServis.id, TransaksiServis.no_nota, TransaksiServis.status,
-            TransaksiServis.kerusakan, TransaksiServis.total_biaya, TransaksiServis.dp,
-            TransaksiServis.sisa_bayar, TransaksiServis.tgl_masuk, TransaksiServis.created_at,
-            Pelanggan.nama.label("pelanggan_nama"), Pelanggan.no_hp.label("pelanggan_no_hp"),
-            Merek.nama.label("merek_nama"), ModelSeri.nama.label("model_seri_nama"),
-            User.nama.label("teknisi_nama"),
-        )
-        .outerjoin(Pelanggan, Pelanggan.id == TransaksiServis.pelanggan_id)
-        .outerjoin(Merek, Merek.id == TransaksiServis.merek_id)
-        .outerjoin(ModelSeri, ModelSeri.id == TransaksiServis.model_seri_id)
-        .outerjoin(User, User.id == TransaksiServis.teknisi_id)
-        .where(base)
-        .order_by(TransaksiServis.created_at.desc())
-    )
-    cq = select(func.count(TransaksiServis.id)).where(base)
-    if search:
-        t = f"%{search}%"
-        cond = or_(TransaksiServis.no_nota.ilike(t), Pelanggan.nama.ilike(t))
-        q = q.where(cond)
-        cq = cq.where(cond)
-    return await paginate(db, q, cq, page, per_page)
-
-
-# ─── SERVIS LANGSUNG ───────────────────────────────────────
 @router.post("/servis/transaksi-servis-langsung", status_code=201)
 async def create_servis_langsung(
     body: dict,
@@ -799,36 +889,6 @@ async def kembali_bisa_diambil(
     return {"message": "Status servis dikembalikan ke bisa diambil"}
 
 
-@router.patch("/servis/{id}/approve")
-async def approve_servis(
-    id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(require_admin_toko),
-):
-    await db.execute(
-        update(TransaksiServis)
-        .where(TransaksiServis.id == id, TransaksiServis.cabang_id == current_user.cabang_id)
-        .values(is_approved=True, status="proses", updated_at=datetime.utcnow())
-    )
-    await cache_delete_pattern(f"servis:{current_user.cabang_id}:*")
-    return {"message": "Servis disetujui"}
-
-
-@router.patch("/servis/{id}/reject")
-async def reject_servis(
-    id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(require_admin_toko),
-):
-    await db.execute(
-        update(TransaksiServis)
-        .where(TransaksiServis.id == id, TransaksiServis.cabang_id == current_user.cabang_id)
-        .values(status="batal", updated_at=datetime.utcnow())
-    )
-    await cache_delete_pattern(f"servis:{current_user.cabang_id}:*")
-    return {"message": "Servis ditolak"}
-
-
 @router.patch("/servis/batch/approve")
 async def batch_approve_servis(
     body: dict,
@@ -862,6 +922,37 @@ async def batch_reject_servis(
 
 
 # ─── MULTI TEKNISI ENDPOINTS ───────────────────────────────
+
+@router.patch("/servis/{id}/approve")
+async def approve_servis(
+    id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(require_admin_toko),
+):
+    await db.execute(
+        update(TransaksiServis)
+        .where(TransaksiServis.id == id, TransaksiServis.cabang_id == current_user.cabang_id)
+        .values(is_approved=True, status="proses", updated_at=datetime.utcnow())
+    )
+    await cache_delete_pattern(f"servis:{current_user.cabang_id}:*")
+    return {"message": "Servis disetujui"}
+
+
+@router.patch("/servis/{id}/reject")
+async def reject_servis(
+    id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(require_admin_toko),
+):
+    await db.execute(
+        update(TransaksiServis)
+        .where(TransaksiServis.id == id, TransaksiServis.cabang_id == current_user.cabang_id)
+        .values(status="batal", updated_at=datetime.utcnow())
+    )
+    await cache_delete_pattern(f"servis:{current_user.cabang_id}:*")
+    return {"message": "Servis ditolak"}
+
+
 @router.get("/servis/{id}/multi-teknisi")
 async def get_multi_teknisi(
     id: int,
@@ -1080,24 +1171,6 @@ async def get_history_garansi(id: int, db: AsyncSession = Depends(get_db), cu=De
 
 
 # ─── LOG SERVIS ────────────────────────────────────────────
-@router.get("/servis/log-servis")
-async def list_log_servis(
-    page: int = Query(1, ge=1),
-    per_page: int = Query(30, ge=1, le=100),
-    db: AsyncSession = Depends(get_db),
-    cu=Depends(require_any),
-):
-    base = and_(AuditLog.cabang_id == cu.cabang_id, AuditLog.model == "TransaksiServis")
-    q = (
-        select(AuditLog, User.nama.label("user_nama"))
-        .outerjoin(User, User.id == AuditLog.user_id)
-        .where(base)
-        .order_by(AuditLog.created_at.desc())
-    )
-    cq = select(func.count(AuditLog.id)).where(base)
-    return await paginate(db, q, cq, page, per_page)
-
-
 @router.delete("/servis/log-servis/{id}")
 async def delete_log_servis(
     id: int, db: AsyncSession = Depends(get_db), cu=Depends(require_kepala_toko)
@@ -1133,17 +1206,6 @@ async def update_tindakan(
     return {"message": "Tindakan servis diperbarui"}
 
 
-@router.delete("/servis/tindakan-servis/{id}")
-async def delete_tindakan(
-    id: int, db: AsyncSession = Depends(get_db), cu=Depends(require_admin_toko)
-):
-    await db.execute(
-        update(TindakanServis)
-        .where(TindakanServis.id == id, TindakanServis.cabang_id == cu.cabang_id)
-        .values(deleted_at=datetime.utcnow())
-    )
-    return {"message": "Tindakan servis dihapus"}
-
 
 @router.delete("/servis/tindakan-servis/batch")
 async def batch_delete_tindakan(
@@ -1156,6 +1218,18 @@ async def batch_delete_tindakan(
         .values(deleted_at=datetime.utcnow())
     )
     return {"message": f"{len(ids)} tindakan servis dihapus"}
+
+
+@router.delete("/servis/tindakan-servis/{id}")
+async def delete_tindakan(
+    id: int, db: AsyncSession = Depends(get_db), cu=Depends(require_admin_toko)
+):
+    await db.execute(
+        update(TindakanServis)
+        .where(TindakanServis.id == id, TindakanServis.cabang_id == cu.cabang_id)
+        .values(deleted_at=datetime.utcnow())
+    )
+    return {"message": "Tindakan servis dihapus"}
 
 
 # ─── CETAK NOTA QC PDF ──────────────────────────────────────
@@ -1176,50 +1250,6 @@ async def cetak_qc_endpoint(
 
 
 # ─── RIWAYAT GARANSI ENDPOINTS ─────────────────────────────
-@router.get("/servis/garansi")
-async def list_garansi(
-    page: int = Query(1, ge=1),
-    per_page: int = Query(15, ge=1, le=100),
-    search: Optional[str] = Query(None),
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(require_any),
-):
-    base = HistoryGaransi.cabang_id == current_user.cabang_id
-    q = (
-        select(
-            HistoryGaransi.id,
-            HistoryGaransi.date.label("tgl_klaim"),
-            HistoryGaransi.service_id,
-            HistoryGaransi.catatan,
-            HistoryGaransi.status,
-            HistoryGaransi.total_biaya,
-            HistoryGaransi.tindakan,
-            HistoryGaransi.sparepart,
-            TransaksiServis.no_nota.label("no_nota_servis"),
-            Pelanggan.nama.label("pelanggan_nama"),
-            Pelanggan.no_hp.label("pelanggan_no_hp"),
-            User.nama.label("teknisi_nama"),
-        )
-        .outerjoin(TransaksiServis, TransaksiServis.id == HistoryGaransi.service_id)
-        .outerjoin(Pelanggan, Pelanggan.id == HistoryGaransi.id_customer)
-        .outerjoin(User, User.id == HistoryGaransi.teknisi_id)
-        .where(base)
-        .order_by(HistoryGaransi.id.desc())
-    )
-    cq = select(func.count(HistoryGaransi.id)).where(base)
-    if search:
-        t = f"%{search}%"
-        cond = or_(
-            TransaksiServis.no_nota.ilike(t),
-            Pelanggan.nama.ilike(t),
-            HistoryGaransi.catatan.ilike(t),
-        )
-        q = q.where(cond)
-        cq = cq.where(cond)
-
-    return await paginate(db, q, cq, page, per_page)
-
-
 @router.post("/servis/garansi", status_code=201)
 async def create_garansi(
     body: dict,

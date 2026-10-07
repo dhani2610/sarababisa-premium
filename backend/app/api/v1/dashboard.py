@@ -169,3 +169,89 @@ async def dashboard(
 
     await cache_set(cache_key, result, CacheTTL.SHORT)
     return result
+
+
+@router.get("/dashboard/grafik-cabang")
+async def dashboard_grafik_cabang(
+    bulan: Optional[str] = Query(None, description="YYYY-MM"),
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(require_any),
+):
+    from app.models.models import Cabang
+    now = datetime.now()
+    if bulan:
+        try:
+            dt = datetime.strptime(bulan, "%Y-%m")
+            bln, thn = dt.month, dt.year
+        except ValueError:
+            bln, thn = now.month, now.year
+    else:
+        bln, thn = now.month, now.year
+
+    r_cabang = await db.execute(select(Cabang.id, Cabang.nama).where(Cabang.deleted_at.is_(None)).order_by(Cabang.id))
+    cabangs = r_cabang.mappings().all()
+
+    comparison = []
+    for c in cabangs:
+        cid = c["id"]
+        # Omzet servis
+        q_s = await db.execute(
+            select(func.sum(TransaksiServis.total_biaya), func.count(TransaksiServis.id))
+            .where(
+                TransaksiServis.cabang_id == cid,
+                TransaksiServis.deleted_at.is_(None),
+                func.month(TransaksiServis.created_at) == bln,
+                func.year(TransaksiServis.created_at) == thn,
+            )
+        )
+        s_row = q_s.first()
+        omzet_s = float(s_row[0] or 0)
+        unit_s = int(s_row[1] or 0)
+
+        # Omzet penjualan
+        q_p = await db.execute(
+            select(func.sum(Order.total), func.count(Order.id))
+            .where(
+                Order.cabang_id == cid,
+                Order.deleted_at.is_(None),
+                Order.status == "lunas",
+                func.month(Order.created_at) == bln,
+                func.year(Order.created_at) == thn,
+            )
+        )
+        p_row = q_p.first()
+        omzet_p = float(p_row[0] or 0)
+        order_p = int(p_row[1] or 0)
+
+        # Pengeluaran
+        q_e = await db.execute(
+            select(func.sum(Pengeluaran.jumlah))
+            .where(
+                Pengeluaran.cabang_id == cid,
+                Pengeluaran.deleted_at.is_(None),
+                func.month(Pengeluaran.tgl_pengeluaran) == bln,
+                func.year(Pengeluaran.tgl_pengeluaran) == thn,
+            )
+        )
+        pengeluaran = float(q_e.scalar() or 0)
+
+        total_omzet = omzet_s + omzet_p
+        net_profit = total_omzet - pengeluaran
+
+        comparison.append({
+            "cabang_id": cid,
+            "cabang_nama": c["nama"],
+            "omzet_servis": omzet_s,
+            "unit_servis": unit_s,
+            "omzet_penjualan": omzet_p,
+            "total_penjualan": order_p,
+            "total_omzet": total_omzet,
+            "pengeluaran": pengeluaran,
+            "profit": net_profit,
+        })
+
+    return {
+        "bulan": f"{thn}-{bln:02d}",
+        "data": comparison,
+    }
+

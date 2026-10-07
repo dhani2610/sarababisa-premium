@@ -56,6 +56,19 @@ async def list_transaksi_produk(
     return await paginate(db, q, cq, page, per_page)
 
 
+@router.get("/produk/transaksi-produk/summary/counts")
+async def get_transaksi_counts(db: AsyncSession = Depends(get_db), cu=Depends(require_any)):
+    base = and_(Order.cabang_id == cu.cabang_id, Order.deleted_at.is_(None))
+    c_semua = await db.scalar(select(func.count(Order.id)).where(base))
+    c_lunas = await db.scalar(select(func.count(Order.id)).where(base, Order.status == "lunas"))
+    c_belum_lunas = await db.scalar(select(func.count(Order.id)).where(base, Order.status == "belum_lunas"))
+    return {
+        "semua": c_semua or 0,
+        "lunas": c_lunas or 0,
+        "belum_lunas": c_belum_lunas or 0,
+    }
+
+
 @router.get("/produk/transaksi-produk/{id}")
 async def get_transaksi_produk(id: int, db: AsyncSession = Depends(get_db), cu=Depends(require_any)):
     from sqlalchemy.orm import selectinload
