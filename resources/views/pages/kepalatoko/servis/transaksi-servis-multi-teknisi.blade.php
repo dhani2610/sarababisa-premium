@@ -247,7 +247,7 @@
         // TEMPLATES
         const teknisiOptions = `
             <option selected value="">Pilih Teknisi</option>
-            @foreach ($users as $user) <option value="{{ $user->id }}">{{ $user->name }}</option> @endforeach
+            @foreach ($users as $user) <option value="{{ $user->id }}" data-bagian="{{ $user->bagian_teknisi }}">{{ $user->name }}</option> @endforeach
         `;
         const actionOptions = `
             <option selected value="">Pilih Tindakan</option>
@@ -413,6 +413,19 @@
         });
         $(document).on('click', '.remove-group', function() {
             if(confirm('Hapus Teknisi?')) { $(this).closest('.technician-group').remove(); recalculateAll(); }
+        });
+
+        // Event Select Teknisi -> Auto set Tipe Bagi Hasil
+        $(document).on('change', '.selectUser', function() {
+            const bagian = $(this).find(':selected').data('bagian');
+            const $typeSelect = $(this).closest('.technician-group').find('.selectType');
+            if (bagian === 'Teknisi Interface') {
+                $typeSelect.val('Interface Leveling');
+            } else if (bagian === 'Teknisi Persentase Interface') {
+                $typeSelect.val('Interface Persentase');
+            } else if (bagian === 'Teknisi Hardware' || !bagian) {
+                $typeSelect.val('Hardware');
+            }
         });
 
         // Event Select Action

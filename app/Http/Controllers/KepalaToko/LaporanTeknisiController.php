@@ -34,11 +34,14 @@ class LaporanTeknisiController extends Controller
             return DataTables::of($users)
                 ->addIndexColumn()
                 ->addColumn('servis_ditangani', function($row) {
-                    return $row->servicetransaction->count();
+                    return count(servisIdMultiTeknisi($row->id));
                 })
                 ->addColumn('bonus', function($row) {
-                    $bonus_cek = ($row->servicetransaction->where('tipe', 'Hardware')->sum('profit') / 100) * $row->persen;
-                    $bonus = $bonus_cek + $row->servicetransaction->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])->sum('bonus_interface');
+                    $ids = servisIdMultiTeknisi($row->id);
+                    $bonus = 0;
+                    foreach ($ids as $id) {
+                        $bonus += getBonusTeknisiByTransaction($id, $row->id);
+                    }
                     return 'Rp. ' . number_format($bonus);
                 })
                 ->addColumn('target_servis', function($row) {
@@ -48,7 +51,8 @@ class LaporanTeknisiController extends Controller
                 ->addColumn('progres', function($row) {
                     $target = $row->targetServis->sum('item');
                     if ($target != 0) {
-                        $progres = ($row->servicetransaction->count() / $target) * 100;
+                        $ids = servisIdMultiTeknisi($row->id);
+                        $progres = (count($ids) / $target) * 100;
                         return round($progres, 2) . '%';
                     }
                     return '-';
@@ -56,10 +60,13 @@ class LaporanTeknisiController extends Controller
                 ->addColumn('bonus_pencapaian', function($row) {
                     $target = $row->targetServis->sum('item');
                     if ($target != 0) {
-                        $bonus_cek = ($row->servicetransaction->where('tipe', 'Hardware')->sum('profit') / 100) * $row->persen;
-                        $bonus = $bonus_cek + $row->servicetransaction->whereIn('tipe', ['Interface','Interface Leveling','Interface Persentase'])->sum('bonus_interface');
+                        $ids = servisIdMultiTeknisi($row->id);
+                        $bonus = 0;
+                        foreach ($ids as $id) {
+                            $bonus += getBonusTeknisiByTransaction($id, $row->id);
+                        }
 
-                        $count = $row->servicetransaction->count();
+                        $count = count($ids);
                         $reward = $bonus * (($count / $target) * 100) / 100;
 
                         return $count < $target ? 'Rp. ' . number_format($reward) : 'Rp. ' . number_format($bonus);

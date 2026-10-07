@@ -210,8 +210,10 @@ if (!function_exists('getBonusTeknisiByTransaction')) {
         $persen = $relasi ? (float)$relasi->persen_teknisi : (float)$tx->persen_teknisi;
         if ($persen <= 0) $persen = (float)($user->persen ?? 0);
 
-        // 1. Tipe Interface Leveling
-        if ($tipe === 'Interface Leveling' || ($user->bagian_teknisi === 'Teknisi Interface' && in_array($tipe, ['Interface Leveling', null, '']))) {
+        $bagian = $user->bagian_teknisi ?? '';
+
+        // 1. Tipe Interface Leveling (Khusus Teknisi Interface)
+        if ($bagian === 'Teknisi Interface' && ($tipe === 'Interface Leveling' || empty($tipe))) {
             if ($bonusInterface > 0) {
                 return $bonusInterface;
             }
@@ -231,27 +233,40 @@ if (!function_exists('getBonusTeknisiByTransaction')) {
             if ($leveling && !empty($leveling->nominal_bonus)) {
                 return (float)$leveling->nominal_bonus;
             }
-            return (float)($model ? ($model->nominal_bonus ?? 0) : 0);
+            if ($model && !empty($model->nominal_bonus)) {
+                return (float)$model->nominal_bonus;
+            }
         }
 
-        // 2. Tipe Interface (Flat)
-        if ($tipe === 'Interface') {
+        // 2. Tipe Interface Tetap (Khusus Teknisi Interface)
+        if ($bagian === 'Teknisi Interface' && $tipe === 'Interface') {
             if ($bonusInterface > 0) return $bonusInterface;
             $model = ModelSerie::find($tx->model_series_id);
-            return (float)($model ? ($model->nominal_bonus ?? 0) : 0);
+            if ($model && !empty($model->nominal_bonus)) {
+                return (float)$model->nominal_bonus;
+            }
         }
 
         // 3. Tipe Interface Persentase
-        if ($tipe === 'Interface Persentase' || $user->bagian_teknisi === 'Teknisi Persentase Interface') {
+        if ($bagian === 'Teknisi Persentase Interface' || $tipe === 'Interface Persentase') {
             $pInterface = (float)($user->persen_bonus_interface ?? 0);
-            return ($profit / 100) * $pInterface;
+            if ($pInterface <= 0) $pInterface = $persen;
+            if ($pInterface > 0 && $profit > 0) {
+                return ($profit / 100) * $pInterface;
+            }
         }
 
-        // 4. Default: Hardware (Persentase dari profit)
+        // 4. Jika ada bonus_interface nominal khusus tersimpan > 0
+        if ($bonusInterface > 0) {
+            return $bonusInterface;
+        }
+
+        // 5. Default / Teknisi Hardware (Persentase dari profit)
         if ($profit > 0 && $persen > 0) {
             return ($profit / 100) * $persen;
         }
 
+        // 6. Fallback jika ada selisih profit dengan profittoko
         if ($relasi && !empty($relasi->profittoko) && $profit > (float)$relasi->profittoko) {
             return $profit - (float)$relasi->profittoko;
         }

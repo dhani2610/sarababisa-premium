@@ -473,7 +473,7 @@ class UbahBisaDiambilController extends Controller
 
                             // Default: Teknisi Hardware / Persentase biasa
                             $potongan_teknisi = ($profitTransaksi / 100) * $persen_teknisi;
-
+                            $tipeTeknisi = 'Hardware';
                         }
                     }
 
