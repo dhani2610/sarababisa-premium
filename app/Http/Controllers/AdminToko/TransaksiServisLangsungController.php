@@ -264,7 +264,7 @@ class TransaksiServisLangsungController extends Controller
             'biaya' => $request->biaya,
             'catatan' => $request->catatan,
             'persen_teknisi' => $persen_teknisi,
-            'omzet' => $request->biaya,
+            'omzet' => max(0, (int)$biaya - (int)$diskon),
             'profit' => $profittransaksi,
             'profittoko' => $profittransaksi - ($bagihasil *= Auth::user()->persen + $persen_teknisi),
             'qc_keluar' => $request->qc_keluar,

@@ -204,17 +204,20 @@ class ProdukController extends Controller
                 // Harga Modal (Cek Hak Akses)
                 ->addColumn('harga_modal', function ($row) use ($userRole, $tokoSetting) {
                     if ($userRole == 'Kepala Toko' || ($tokoSetting->is_modal_produk ?? 0) == 1) {
-                        return '<div class="font-medium">Rp. ' . number_format($row->harga_modal) . '</div>';
+                        $val = is_numeric($row->harga_modal) ? (float)$row->harga_modal : 0;
+                        return '<div class="font-medium">Rp. ' . number_format($val) . '</div>';
                     }
                     return ''; // Kosong jika tidak ada akses
                 })
                 // Harga Jual Toko
                 ->addColumn('harga_jual_toko', function ($row) {
-                    return '<div class="font-medium">Rp. ' . number_format((int)$row->harga_jual_toko ?? 0) . '</div>';
+                    $val = is_numeric($row->harga_jual_toko) ? (float)$row->harga_jual_toko : 0;
+                    return '<div class="font-medium">Rp. ' . number_format($val) . '</div>';
                 })
                 // Harga Jual Pelanggan
                 ->addColumn('harga_jual', function ($row) {
-                    return '<div class="font-medium">Rp. ' . number_format($row->harga_jual) . '</div>';
+                    $val = is_numeric($row->harga_jual) ? (float)$row->harga_jual : 0;
+                    return '<div class="font-medium">Rp. ' . number_format($val) . '</div>';
                 })
                 // Garansi
                 ->addColumn('garansi', function ($row) use ($idCat) {

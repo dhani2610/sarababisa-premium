@@ -50,7 +50,7 @@ class Worker extends Model
         return $this->hasMany(Debt::class, 'workers_id')
             ->where('is_approve', 'Setuju')
             ->whereYear('created_at', now()->year)
-            ->whereMonth('tgl_disetujui', $currentMonth);
+            ->whereMonth('created_at', $currentMonth);
     }
 
     public function incident()

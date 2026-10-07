@@ -159,7 +159,7 @@
                                 </div>
                                 @endif
                                 @if ($item->kondisi_servis != "Sudah jadi")
-
+                                    <input type="hidden" name="cara_pembayaran" value="-">
                                 @else
                                 <div x-data="{ caraPembayaran: 'Tunai' }">
                                     <label class="block text-sm font-medium mb-1" for="cara_pembayaran">Cara Pembayaran</label>

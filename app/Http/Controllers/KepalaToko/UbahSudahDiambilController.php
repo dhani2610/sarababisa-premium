@@ -159,18 +159,25 @@ class UbahSudahDiambilController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'cara_pembayaran' => 'required',
-        ], [
-            'cara_pembayaran.required' => 'Cara pembayaran wajib dipilih!',
-        ]);
+        $item = ServiceTransaction::findOrFail($id);
+
+        if ($item->kondisi_servis === 'Sudah jadi') {
+            $request->validate([
+                'cara_pembayaran' => 'required',
+            ], [
+                'cara_pembayaran.required' => 'Cara pembayaran wajib dipilih!',
+            ]);
+        } else {
+            $request->merge([
+                'cara_pembayaran' => $request->cara_pembayaran ?? '-',
+            ]);
+        }
 
         try {
             $request->merge([
-                'tunai' => str_replace('.', '', $request->tunai),
-                'transfer' => str_replace('.', '', $request->transfer),
+                'tunai' => str_replace('.', '', (string)($request->tunai ?? 0)),
+                'transfer' => str_replace('.', '', (string)($request->transfer ?? 0)),
             ]);
-            $item = ServiceTransaction::findOrFail($id);
             $profittransaksi = $request->biaya - $request->modal_sparepart - $request->diskon;
             $bagihasil = ($request->biaya - $request->modal_sparepart - $request->diskon) / 100;
 

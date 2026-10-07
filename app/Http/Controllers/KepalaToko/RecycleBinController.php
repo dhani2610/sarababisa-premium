@@ -460,10 +460,12 @@ HTML;
                     return $row->category_name ?? ($row->category->name ?? '-');
                 })
                 ->editColumn('harga_modal', function($row){
-                    return 'Rp. ' . number_format($row->harga_modal);
+                    $val = is_numeric($row->harga_modal) ? (float)$row->harga_modal : 0;
+                    return 'Rp. ' . number_format($val);
                 })
                 ->editColumn('harga_jual', function($row){
-                    return 'Rp. ' . number_format($row->harga_jual);
+                    $val = is_numeric($row->harga_jual) ? (float)$row->harga_jual : 0;
+                    return 'Rp. ' . number_format($val);
                 })
                 ->addColumn('action', function($row){
                     // URL Routes
@@ -600,7 +602,8 @@ HTML;
                     return Carbon::parse($row->deleted_at)->format('d/m/Y');
                 })
                 ->editColumn('price', function($row){
-                    return 'Rp. ' . number_format($row->price);
+                    $val = is_numeric($row->price) ? (float)$row->price : 0;
+                    return 'Rp. ' . number_format($val);
                 })
                 ->addColumn('worker_name', function($row){
                     // Menampilkan nama teknisi, jika user terhapus atau null tampilkan '-'
@@ -744,7 +747,8 @@ HTML;
                     return Carbon::parse($row->created_at)->format('d/m/Y');
                 })
                 ->editColumn('nominal', function($row){
-                    return 'Rp. ' . number_format($row->nominal);
+                    $val = is_numeric($row->nominal) ? (float)$row->nominal : 0;
+                    return 'Rp. ' . number_format($val);
                 })
                 ->addColumn('worker_name', function($row){
                     return $row->worker->name ?? '-';
@@ -892,7 +896,8 @@ HTML;
                     return '<span class="text-rose-600 font-medium">Akun sudah dihapus</span>';
                 })
                 ->editColumn('price', function($row){
-                    return 'Rp. ' . number_format($row->price);
+                    $val = is_numeric($row->price) ? (float)$row->price : 0;
+                    return 'Rp. ' . number_format($val);
                 })
                 ->addColumn('action', function($row){
                     // URL Routes
@@ -1047,10 +1052,13 @@ public function order(Request $request)
                     return $row->customer->nama ?? '-';
                 })
                 ->editColumn('total_modal', function($row){
-                    return 'Rp. ' . number_format($row->modal * $row->quantity);
+                    $modal = is_numeric($row->modal) ? (float)$row->modal : 0;
+                    $qty = is_numeric($row->quantity) ? (float)$row->quantity : 0;
+                    return 'Rp. ' . number_format($modal * $qty);
                 })
                 ->editColumn('sub_total', function($row){
-                    return 'Rp. ' . number_format($row->sub_total);
+                    $val = is_numeric($row->sub_total) ? (float)$row->sub_total : 0;
+                    return 'Rp. ' . number_format($val);
                 })
                 ->addColumn('action', function($row){
                     // URL Routes

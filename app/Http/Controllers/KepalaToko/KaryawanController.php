@@ -95,8 +95,9 @@ class KaryawanController extends Controller
                 $kasbonBulanIni = $worker->debt
                     ->where('is_approve', 'Setuju')
                     ->filter(function ($d) use ($filterYear, $m) {
-                        return Carbon::parse($d->tgl_disetujui)->year == $filterYear &&
-                            Carbon::parse($d->tgl_disetujui)->month == $m;
+                        $dt = $d->created_at ?? $d->tgl_disetujui;
+                        return Carbon::parse($dt)->year == $filterYear &&
+                            Carbon::parse($dt)->month == $m;
                     })->sum('total');
 
                 $insidenBulanIni = $worker->incident
@@ -493,8 +494,17 @@ class KaryawanController extends Controller
 
         $debts = Debt::where('workers_id', $id)
             ->where('is_approve', 'Setuju')
-            ->whereDate('tgl_disetujui', '>=', $start_date)
-            ->whereDate('tgl_disetujui', '<=', $end_date)
+            ->where(function($q) use ($start_date, $end_date) {
+                $q->where(function($sub) use ($start_date, $end_date) {
+                    $sub->whereNotNull('created_at')
+                        ->whereDate('created_at', '>=', $start_date)
+                        ->whereDate('created_at', '<=', $end_date);
+                })->orWhere(function($sub) use ($start_date, $end_date) {
+                    $sub->whereNull('created_at')
+                        ->whereDate('tgl_disetujui', '>=', $start_date)
+                        ->whereDate('tgl_disetujui', '<=', $end_date);
+                });
+            })
             ->where(function($q) use ($assignedCabangIds) {
                 $q->whereIn('cabang_id', $assignedCabangIds)
                   ->orWhereNull('cabang_id');
@@ -512,8 +522,17 @@ class KaryawanController extends Controller
 
         $totalkasbon = Debt::where('workers_id', $id)
             ->where('is_approve', 'Setuju')
-            ->whereDate('tgl_disetujui', '>=', $start_date)
-            ->whereDate('tgl_disetujui', '<=', $end_date)
+            ->where(function($q) use ($start_date, $end_date) {
+                $q->where(function($sub) use ($start_date, $end_date) {
+                    $sub->whereNotNull('created_at')
+                        ->whereDate('created_at', '>=', $start_date)
+                        ->whereDate('created_at', '<=', $end_date);
+                })->orWhere(function($sub) use ($start_date, $end_date) {
+                    $sub->whereNull('created_at')
+                        ->whereDate('tgl_disetujui', '>=', $start_date)
+                        ->whereDate('tgl_disetujui', '<=', $end_date);
+                });
+            })
             ->where(function($q) use ($assignedCabangIds) {
                 $q->whereIn('cabang_id', $assignedCabangIds)
                   ->orWhereNull('cabang_id');

@@ -416,16 +416,34 @@ if (!function_exists('calculateBonusForCabang')) {
             ->where('status_servis', 'Sudah Diambil')
             ->where('is_approve', 'Setuju')
             ->where('cabang_id', $cabangId)
-            ->whereDate('tgl_disetujui', '>=', $start_date)
-            ->whereDate('tgl_disetujui', '<=', $end_date)
+            ->where(function($q) use ($start_date, $end_date) {
+                $q->where(function($sub) use ($start_date, $end_date) {
+                    $sub->whereNotNull('tgl_ambil')
+                        ->whereDate('tgl_ambil', '>=', $start_date)
+                        ->whereDate('tgl_ambil', '<=', $end_date);
+                })->orWhere(function($sub) use ($start_date, $end_date) {
+                    $sub->whereNull('tgl_ambil')
+                        ->whereDate('tgl_disetujui', '>=', $start_date)
+                        ->whereDate('tgl_disetujui', '<=', $end_date);
+                });
+            })
             ->get();
 
             $sale = OrderDetail::where('admin_id', $user->id)
             ->whereHas('order', function ($query) use ($start_date, $end_date, $cabangId) {
                 $query->where('is_approve', 'Setuju')
                     ->where('cabang_id', $cabangId)
-                    ->whereDate('tgl_disetujui', '>=', $start_date)
-                    ->whereDate('tgl_disetujui', '<=', $end_date);
+                    ->where(function($q) use ($start_date, $end_date) {
+                        $q->where(function($sub) use ($start_date, $end_date) {
+                            $sub->whereNotNull('tgl_disetujui')
+                                ->whereDate('tgl_disetujui', '>=', $start_date)
+                                ->whereDate('tgl_disetujui', '<=', $end_date);
+                        })->orWhere(function($sub) use ($start_date, $end_date) {
+                            $sub->whereNull('tgl_disetujui')
+                                ->whereDate('created_at', '>=', $start_date)
+                                ->whereDate('created_at', '<=', $end_date);
+                        });
+                    });
             })->get();
 
             $totalProfitService = $service->sum('profit');

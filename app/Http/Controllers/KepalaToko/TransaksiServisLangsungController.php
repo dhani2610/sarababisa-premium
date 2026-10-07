@@ -258,20 +258,11 @@ class TransaksiServisLangsungController extends Controller
                 // dd($request->all(),$mainTechDetails);
 
 
-                $grandProfit = $grandTotalBiaya - $grandTotalModal;
-                // $garansi = Carbon::now();
-                // if ($request->garansi != null) {
-                //     $expired = $garansi->addDays(
-                //         $request->garansi
-                //     );
-                // } else {
-                //     $expired = null;
-                // }
-
                 $modalSparepart = !empty($request->total_modal_sparepart) ? (int)$request->total_modal_sparepart : (int)$grandTotalModal;
                 $biaya = !empty($request->biaya) ? (int)$request->biaya : (int)$grandTotalBiaya;
                 $diskon = (int)($request->diskon ?? 0);
-                $profittransaksi = $biaya - $modalSparepart - $diskon;
+                $profittransaksi = max(0, $biaya - $modalSparepart - $diskon);
+                $grandProfit = $profittransaksi;
                 $bagihasil = $profittransaksi / 100;
 
 
@@ -421,7 +412,7 @@ class TransaksiServisLangsungController extends Controller
                     'biaya' => $grandTotalBiaya,
                     'catatan' => $request->catatan,
                     'persen_teknisi' => $persen_teknisi,
-                    'omzet' => $grandTotalBiaya,
+                    'omzet' => max(0, $grandTotalBiaya - $diskon),
                     'profit' => $grandProfit,
                     'profittoko' => $profittransaksi - ($bagihasil * $persen_teknisi),
                     'qc_keluar' => $qc_keluar_final,
@@ -561,7 +552,8 @@ class TransaksiServisLangsungController extends Controller
                         }
 
                         // --- 4. HITUNG PROFIT PER TEKNISI ---
-                        $profitTransaksi = $subTotalBiaya - $subTotalModal;
+                        $subTotalDiskon = $grandTotalBiaya > 0 ? round(($subTotalBiaya / $grandTotalBiaya) * $diskon) : $diskon;
+                        $profitTransaksi = max(0, $subTotalBiaya - $subTotalModal - $subTotalDiskon);
                         $nilaiBagiHasil = ($profitTransaksi) / 100;
                         // $profitToko = $profitTransaksi - ($nilaiBagiHasil * $persen_teknisi);
 
@@ -990,7 +982,7 @@ class TransaksiServisLangsungController extends Controller
             'biaya' => $request->biaya,
             'catatan' => $request->catatan,
             'persen_teknisi' => $persen_teknisi,
-            'omzet' => $request->biaya,
+            'omzet' => max(0, $biaya - $diskon),
             'profit' => $profittransaksi,
             'profittoko' => $profittransaksi - ($bagihasil * $persen_teknisi),
             'qc_keluar' => $qc_keluar_final,
