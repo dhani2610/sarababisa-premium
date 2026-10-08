@@ -17,6 +17,16 @@ use Yajra\DataTables\Facades\DataTables; // Tambahkan ini
 use Carbon\Carbon;
 class RecycleBinController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (auth()->check() && !in_array(auth()->user()->role, ['Kepala Toko', 'Super Admin'])) {
+                abort(403, 'Akses ditolak. Keranjang sampah hanya dapat diakses oleh Kepala Toko.');
+            }
+            return $next($request);
+        });
+    }
+
     /**
      * Display a listing of the resource.
      *

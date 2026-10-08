@@ -22,12 +22,10 @@ class ToggleApprovalHapusTransaksi extends Component
 
     public function saveSetting()
     {
-        $storeSettings = StoreSetting::where('cabang_id', getCabangId())->first();
-        if ($storeSettings) {
-            $storeSettings->update([
-                'approval_hapus_transaksi' => $this->approval_hapus_transaksi,
-            ]);
-        }
+        StoreSetting::updateOrCreate(
+            ['cabang_id' => getCabangId()],
+            ['approval_hapus_transaksi' => $this->approval_hapus_transaksi ? 1 : 0]
+        );
     }
 
     public function updatedApprovalHapusTransaksi()

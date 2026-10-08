@@ -12,7 +12,7 @@ class TransactionApprovalHelper
     {
         $setting = StoreSetting::where('cabang_id', getCabangId())->first();
         $isToggleOn = $setting && (int) ($setting->approval_hapus_transaksi ?? 0) === 1;
-        $isNotKepalaToko = Auth::check() && Auth::user()->role !== 'Kepala Toko';
+        $isNotKepalaToko = Auth::check() && !in_array(Auth::user()->role, ['Kepala Toko', 'Super Admin']);
 
         return $isToggleOn && $isNotKepalaToko;
     }
