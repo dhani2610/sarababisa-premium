@@ -80,21 +80,21 @@
                                     <label class="block text-sm font-medium mb-1" for="customers_id">Pelanggan</label>
                                     <input id="customers_id" name="customers_id"
                                         class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
-                                        type="text" value="{{ $item->customer->nama }}" disabled />
+                                        type="text" value="{{ $item->customer?->nama ?? ($item->nama_pelanggan ?? '-') }}" disabled />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Nama Barang</label>
                                     <input
                                         class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                                         type="text"
-                                        value="{{ $item->type->name }} {{ $item->brand->name }} {{ $item->modelserie->name ?? '-' }}"
+                                        value="{{ $item->type?->name ?? '' }} {{ $item->brand?->name ?? '' }} {{ $item->modelserie?->name ?? ($item->nama_barang ?? '-') }}"
                                         disabled />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Warna & Kapasitas Barang</label>
                                     <input
                                         class="form-input w-full px-2 py-1 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
-                                        type="text" value="{{ $item->warna }} - {{ $item->capacity->name }}"
+                                        type="text" value="{{ $item->warna ?? '-' }} - {{ $item->capacity?->name ?? '-' }}"
                                         disabled />
                                 </div>
                                 <div>

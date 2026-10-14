@@ -104,13 +104,14 @@
                                         <option value="">Pilih Brand</option>
 
                                         @foreach ($brands as $brand)
-                                            <option value="{{ $brand->id }}" {{ $item->brand->id == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
+                                            <option value="{{ $brand->id }}" {{ (($item->brands_id ?? $item->brand?->id) == $brand->id) ? 'selected' : '' }}>{{ $brand->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-1" for="brands_id">Tipe OS</label>
+                                    <label class="block text-sm font-medium mb-1" for="id_tipe_os">Tipe OS</label>
                                     <select id="id_tipe_os" name="id_tipe_os" class="form-select text-sm w-full">
+                                        <option value="">Pilih Tipe OS</option>
                                         @foreach ($tipe as $tp)
                                             <option value="{{ $tp->id }}" {{ $item->id_tipe_os == $tp->id ? 'selected' : '' }}>{{ $tp->nama }}</option>
                                         @endforeach

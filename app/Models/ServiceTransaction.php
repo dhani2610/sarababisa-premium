@@ -103,7 +103,7 @@ class ServiceTransaction extends Model
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class, 'customers_id', 'id');
+        return $this->belongsTo(Customer::class, 'customers_id', 'id')->withTrashed();
     }
 
     public function product()
@@ -118,12 +118,12 @@ class ServiceTransaction extends Model
 
     public function brand()
     {
-        return $this->belongsTo(Brand::class, 'brands_id', 'id');
+        return $this->belongsTo(Brand::class, 'brands_id', 'id')->withTrashed();
     }
 
     public function modelserie()
     {
-        return $this->belongsTo(ModelSerie::class, 'model_series_id', 'id');
+        return $this->belongsTo(ModelSerie::class, 'model_series_id', 'id')->withTrashed();
     }
 
     public function capacity()

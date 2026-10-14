@@ -20,7 +20,7 @@ class ModelSerie extends Model
 
     public function brand()
     {
-        return $this->belongsTo(Brand::class, 'brands_id', 'id');
+        return $this->belongsTo(Brand::class, 'brands_id', 'id')->withTrashed();
     }
 
     public function relasiService()
