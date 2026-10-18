@@ -40,14 +40,45 @@ class BelumLunasController extends Controller
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
 
+        $customer = Customer::find($request->customers_id);
+        if (!$customer) {
+            return back()->with('error', 'Pelanggan tidak ditemukan.');
+        }
+
+        // Cari semua ID customer yang identik (no tlp sama atau nama sama) di cabang ini
+        $customerIds = [$customer->id];
+        $cleanPhone = preg_replace('/[^0-9]/', '', $customer->nomor_hp ?? '');
+        if (str_starts_with($cleanPhone, '62')) $cleanPhone = substr($cleanPhone, 2);
+        if (str_starts_with($cleanPhone, '0')) $cleanPhone = substr($cleanPhone, 1);
+
+        if (!empty($cleanPhone)) {
+            $matchedIds = Customer::where('cabang_id', getCabangId())
+                ->get()
+                ->filter(function($c) use ($cleanPhone) {
+                    $p = preg_replace('/[^0-9]/', '', $c->nomor_hp ?? '');
+                    if (str_starts_with($p, '62')) $p = substr($p, 2);
+                    if (str_starts_with($p, '0')) $p = substr($p, 1);
+                    return !empty($p) && $p === $cleanPhone;
+                })
+                ->pluck('id')
+                ->toArray();
+            $customerIds = array_unique(array_merge($customerIds, $matchedIds));
+        } else if (!empty($customer->nama)) {
+            $matchedIds = Customer::where('cabang_id', getCabangId())
+                ->where('nama', $customer->nama)
+                ->pluck('id')
+                ->toArray();
+            $customerIds = array_unique(array_merge($customerIds, $matchedIds));
+        }
+
         // Query untuk data yang BELUM LUNAS saja (tipe_status_pembayaran = 0)
         $services = ServiceTransaction::where('cabang_id', getCabangId())
-            ->where('customers_id', $request->customers_id)
+            ->whereIn('customers_id', $customerIds)
             ->where('tipe_status_pembayaran', 0)
-            ->with('brand', 'modelserie', 'user')
+            ->with('brand', 'modelserie', 'user', 'customer')
             ->get();
 
-        $customerName  = Customer::find($request->customers_id)->nama;
+        $customerName = $customer->nama;
         if ($services->isEmpty()) {
             return back()->with('error', 'Tidak ada data transaksi belum lunas untuk pelanggan ini.');
         }

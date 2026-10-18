@@ -304,12 +304,44 @@ if (!function_exists('getTypeTeknisiMultiTransaksi')) {
 if (!function_exists('insertManualPelanggan')) {
     function insertManualPelanggan($data,$tlp,$kategori,$alamat){
         try {
+            $cabangId = getCabangId();
+
+            // Cek apakah customer sudah ada di cabang ini berdasarkan nomor HP (atau nama jika tanpa nomor HP)
+            $cleanTlp = preg_replace('/[^0-9]/', '', $tlp ?? '');
+            if (str_starts_with($cleanTlp, '62')) $cleanTlp = substr($cleanTlp, 2);
+            if (str_starts_with($cleanTlp, '0')) $cleanTlp = substr($cleanTlp, 1);
+
+            if (!empty($cleanTlp)) {
+                $existing = Customer::where('cabang_id', $cabangId)
+                    ->get()
+                    ->first(function($c) use ($cleanTlp) {
+                        $p = preg_replace('/[^0-9]/', '', $c->nomor_hp ?? '');
+                        if (str_starts_with($p, '62')) $p = substr($p, 2);
+                        if (str_starts_with($p, '0')) $p = substr($p, 1);
+                        return !empty($p) && $p === $cleanTlp;
+                    });
+                if ($existing) {
+                    if (empty($existing->alamat) && !empty($alamat)) {
+                        $existing->alamat = $alamat;
+                        $existing->save();
+                    }
+                    return $existing->id;
+                }
+            } elseif (!empty($data)) {
+                $existing = Customer::where('cabang_id', $cabangId)
+                    ->where('nama', $data)
+                    ->first();
+                if ($existing) {
+                    return $existing->id;
+                }
+            }
+
             $new = new Customer();
             $new->nama = $data;
             $new->kategori = $kategori;
             $new->nomor_hp = $tlp;
             $new->alamat = $alamat;
-            $new->cabang_id = getCabangId();
+            $new->cabang_id = $cabangId;
 
             if ($new->save()) {
                 return $new->id;

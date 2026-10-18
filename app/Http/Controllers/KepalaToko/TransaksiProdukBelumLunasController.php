@@ -22,11 +22,21 @@ class TransaksiProdukBelumLunasController extends Controller
         $jumlah_tidaklunas = Order::where('cabang_id', getCabangId())->where('due', '>', '0')->count();
         $storeSettings = StoreSetting::where('cabang_id', getCabangId())->first();
 
-        $customers = Customer::where('cabang_id', getCabangId())
-        ->whereHas('sale', function ($query) {
-            $query->where('tipe_status_pembayaran', 0);
-        })
-        ->get();
+        $rawCustomers = Customer::where('cabang_id', getCabangId())
+            ->whereHas('sale', function ($query) {
+                $query->where('tipe_status_pembayaran', 0);
+            })
+            ->get();
+
+        $customers = $rawCustomers->unique(function ($item) {
+            $p = preg_replace('/[^0-9]/', '', $item->nomor_hp ?? '');
+            if (str_starts_with($p, '62')) $p = substr($p, 2);
+            if (str_starts_with($p, '0')) $p = substr($p, 1);
+            if (!empty($p)) {
+                return 'phone_' . $p;
+            }
+            return 'name_' . strtolower(trim($item->nama));
+        })->values();
         // Arahkan ke file blade yang baru
         return view('pages.kepalatoko.produk.transaksi-belum-lunas', compact(
             'jumlah_semua',
@@ -61,8 +71,38 @@ class TransaksiProdukBelumLunasController extends Controller
         $logo = $users->profile_photo_path;
         $imagePath = public_path('storage/' . $logo);
 
+        $customer = Customer::find($request->customers_id);
+        if (!$customer) {
+            return back()->with('error', 'Pelanggan tidak ditemukan.');
+        }
+
+        // Cari semua ID customer yang identik (no tlp sama atau nama sama) di cabang ini
+        $customerIds = [$customer->id];
+        $cleanPhone = preg_replace('/[^0-9]/', '', $customer->nomor_hp ?? '');
+        if (str_starts_with($cleanPhone, '62')) $cleanPhone = substr($cleanPhone, 2);
+        if (str_starts_with($cleanPhone, '0')) $cleanPhone = substr($cleanPhone, 1);
+
+        if (!empty($cleanPhone)) {
+            $matchedIds = Customer::where('cabang_id', getCabangId())
+                ->get()
+                ->filter(function($c) use ($cleanPhone) {
+                    $p = preg_replace('/[^0-9]/', '', $c->nomor_hp ?? '');
+                    if (str_starts_with($p, '62')) $p = substr($p, 2);
+                    if (str_starts_with($p, '0')) $p = substr($p, 1);
+                    return !empty($p) && $p === $cleanPhone;
+                })
+                ->pluck('id')
+                ->toArray();
+            $customerIds = array_unique(array_merge($customerIds, $matchedIds));
+        } else if (!empty($customer->nama)) {
+            $matchedIds = Customer::where('cabang_id', getCabangId())
+                ->where('nama', $customer->nama)
+                ->pluck('id')
+                ->toArray();
+            $customerIds = array_unique(array_merge($customerIds, $matchedIds));
+        }
+
         // 2. Filter Input
-        $customers_id = $request->customers_id;
         $tipe       = $request->tipe; // Ambil input tipe (Sudah Disetujui / Belum Disetujui)
 
         $detailQuery = OrderDetail::with('order')
@@ -70,13 +110,12 @@ class TransaksiProdukBelumLunasController extends Controller
 
         $orderQuery = Order::where('cabang_id', getCabangId());
 
-        $detailQuery->whereHas('order', function ($q) use ($customers_id) {
-            $q->where('customers_id', $customers_id);
+        $detailQuery->whereHas('order', function ($q) use ($customerIds) {
+            $q->whereIn('customers_id', $customerIds);
             $q->where('tipe_status_pembayaran', 0);
-
         });
 
-        $orderQuery->where('customers_id', $customers_id);
+        $orderQuery->whereIn('customers_id', $customerIds);
 
 
         $orders = (clone $detailQuery)->orderBy('created_at', 'asc')->get();
@@ -95,7 +134,7 @@ class TransaksiProdukBelumLunasController extends Controller
             array_push($dataOtherMetodePembayaran,$dt);
         }
 
-        $customerName  = Customer::find($request->customers_id)->nama;
+        $customerName  = $customer->nama;
 
         // 6. RENDER PDF
         $pdf = \PDF::loadView('pages.kepalatoko.cetak-laporan-penjualan-belum-lunas', [

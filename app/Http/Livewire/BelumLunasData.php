@@ -46,11 +46,21 @@ class BelumLunasData extends Component
         $actions = ServiceAction::where('cabang_id',getCabangId())->get();
         $storeSetting = StoreSetting::where('cabang_id',getCabangId())->first();
 
-         $customers = Customer::where('cabang_id', getCabangId())
-        ->whereHas('servicetransaction', function ($query) {
-            $query->where('tipe_status_pembayaran', 0);
-        })
-        ->get();
+        $rawCustomers = Customer::where('cabang_id', getCabangId())
+            ->whereHas('servicetransaction', function ($query) {
+                $query->where('tipe_status_pembayaran', 0);
+            })
+            ->get();
+
+        $customers = $rawCustomers->unique(function ($item) {
+            $p = preg_replace('/[^0-9]/', '', $item->nomor_hp ?? '');
+            if (str_starts_with($p, '62')) $p = substr($p, 2);
+            if (str_starts_with($p, '0')) $p = substr($p, 1);
+            if (!empty($p)) {
+                return 'phone_' . $p;
+            }
+            return 'name_' . strtolower(trim($item->nama));
+        })->values();
         // Hitung khusus untuk badge Belum Lunas
         $jumlah_belum_lunas = ServiceTransaction::where('cabang_id',getCabangId())->where('tipe_status_pembayaran', '0')->count();
 
