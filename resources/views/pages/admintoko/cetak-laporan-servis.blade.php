@@ -321,8 +321,15 @@
 
                             {{-- PREPARE VALUE HARGA --}}
                             @php
-                                $val_modal = $group['modals'][$index] ?? 0;
-                                $val_biaya = $group['biayas'][$index] ?? 0;
+                                if ($item->kondisi_servis == 'Dibatalkan') {
+                                    $val_modal = 0;
+                                    $val_biaya = 0;
+                                    $val_profit = 0;
+                                } else {
+                                    $val_modal = $group['modals'][$index] ?? 0;
+                                    $val_biaya = $group['biayas'][$index] ?? 0;
+                                    $val_profit = $val_biaya - $val_modal - ($isFirstRowTransaction ? $item->diskon : 0);
+                                }
                             @endphp
 
                             {{-- KOLOM MODAL & BIAYA (Selalu muncul per baris) --}}
@@ -339,7 +346,7 @@
                             {{-- KOLOM DISKON (Rowspan Utama - Diskon biasanya per transaksi) --}}
                             @if ($isFirstRowTransaction)
                                 <td style="width: 50px; text-align: right;" rowspan="{{ $total_rows_transaksi }}">
-                                    Rp. {{ number_format($item->diskon) }}
+                                    Rp. {{ number_format($item->kondisi_servis == 'Dibatalkan' ? 0 : $item->diskon) }}
                                 </td>
                             @endif
 
@@ -348,7 +355,7 @@
 
                             {{-- Note: Rumus asli user dikurangi diskon per item. Hati-hati jika diskon global --}}
                             <td style="width: 60px; text-align: right;">
-                                Rp. {{ number_format($val_biaya - $val_modal - ($isFirstRowTransaction ? $item->diskon : 0)) }}
+                                Rp. {{ number_format($val_profit) }}
                                 {{-- Logic Profit diatas: Diskon hanya mengurangi baris pertama agar tidak double counting pengurangan profit, atau sesuaikan dengan logika bisnis Anda --}}
                             </td>
                             @endif
@@ -356,44 +363,22 @@
                             {{-- KOLOM PEMBAYARAN (Rowspan Utama) --}}
                             @if ($isFirstRowTransaction)
                                 <td class="" rowspan="{{ $total_rows_transaksi }}" style="text-align: left; width: 80px;">
-                                    @php
-                                        $metode = [];
-                                        if (in_array($item->cara_pembayaran, $listNamaMetode)) {
-                                            $metode[] = '<div><strong>'.$item->cara_pembayaran.':</strong><br>Rp.' . number_format($item->transfer, 0, ',', '.') . '</div>';
-                                        } else {
-                                            # code...
-                                            if ($item->tunai > 0) {
-                                                $metode[] = '<div><strong>Tunai:</strong><br>Rp.' . number_format($item->tunai, 0, ',', '.') . '</div>';
-                                            }
-                                            if ($item->transfer > 0) {
-                                                $metode[] = '<div><strong>Transfer:</strong><br>Rp.' . number_format($item->transfer, 0, ',', '.') . '</div>';
-                                            }
-                                        }
-
-                                    @endphp
-
                                     @if ($item->kondisi_servis == 'Dibatalkan')
+                                        <div><strong>Status:</strong><br>Dibatalkan</div>
+                                    @else
                                         @php
-                                            $label = ''; $nilai = 0;
-                                            if ($item->uang_muka > 0 && $item->modal_sparepart > 0) {
-                                                $label = 'Modal - DP:';
-                                                $nilai = $item->uang_muka - $item->modal_sparepart;
-                                            } elseif ($item->uang_muka > 0 && $item->biaya > 0) {
-                                                $label = 'Modal - DP:';
-                                                $nilai = $item->uang_muka - $item->biaya;
-                                            } elseif ($item->uang_muka > 0) {
-                                                $label = 'Uang Muka:';
-                                                $nilai = $item->uang_muka;
-                                            } elseif ($item->modal_sparepart > 0) {
-                                                $label = 'Modal:';
-                                                $nilai = $item->modal_sparepart;
+                                            $metode = [];
+                                            if (in_array($item->cara_pembayaran, $listNamaMetode)) {
+                                                $metode[] = '<div><strong>'.$item->cara_pembayaran.':</strong><br>Rp.' . number_format($item->transfer, 0, ',', '.') . '</div>';
+                                            } else {
+                                                if ($item->tunai > 0) {
+                                                    $metode[] = '<div><strong>Tunai:</strong><br>Rp.' . number_format($item->tunai, 0, ',', '.') . '</div>';
+                                                }
+                                                if ($item->transfer > 0) {
+                                                    $metode[] = '<div><strong>Transfer:</strong><br>Rp.' . number_format($item->transfer, 0, ',', '.') . '</div>';
+                                                }
                                             }
                                         @endphp
-                                        <div>
-                                            <strong>{{ $label }}</strong><br>
-                                            Rp.-{{ number_format($nilai, 0, ',', '.') }}
-                                        </div>
-                                    @else
                                         {!! implode('<hr style="margin: 4px 0;">', $metode) !!}
                                     @endif
                                 </td>

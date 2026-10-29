@@ -301,8 +301,14 @@ class LaporanServisController extends Controller
         // Ambil semua servis utama
         $services = (clone $serviceQuery)->orderBy($dateColumn, 'asc')->get();
 
-        // Servis yang ada DP
-        $servicesDP = (clone $serviceQuery)
+        // Query khusus untuk nominal keuangan (tidak menghitung yang dibatalkan)
+        $nominalQuery = (clone $serviceQuery)->where(function($q) {
+            $q->where('kondisi_servis', '!=', 'Dibatalkan')
+              ->orWhereNull('kondisi_servis');
+        });
+
+        // Servis yang ada DP (tidak dibatalkan)
+        $servicesDP = (clone $nominalQuery)
             ->whereNotNull('uang_muka')
             ->where('uang_muka', '!=', '0')
             ->orderBy($dateColumn, 'asc')
@@ -345,17 +351,17 @@ class LaporanServisController extends Controller
             ->limit(3)
             ->get();
 
-        // Hitung Keuangan (Menggunakan clone agar sesuai filter tipe di atas)
-        $total_modal    = (clone $serviceQuery)->sum('modal_sparepart');
-        $total_biaya    = (clone $serviceQuery)->sum('biaya');
-        $total_diskon   = (clone $serviceQuery)->sum('diskon');
-        $total_profit   = (clone $serviceQuery)->sum('profit'); // Pastikan kolom profit benar
-        $total_dp       = (clone $serviceQuery)->sum('uang_muka');
+        // Hitung Keuangan (Menggunakan nominalQuery agar yang dibatalkan tidak dihitung)
+        $total_modal    = (clone $nominalQuery)->sum('modal_sparepart');
+        $total_biaya    = (clone $nominalQuery)->sum('biaya');
+        $total_diskon   = (clone $nominalQuery)->sum('diskon');
+        $total_profit   = (clone $nominalQuery)->sum('profit'); // Pastikan kolom profit benar
+        $total_dp       = (clone $nominalQuery)->sum('uang_muka');
 
         // Total Pembayaran
-        $total_tunai    = (clone $serviceQuery)->sum('tunai');
-        $total_transfer = (clone $serviceQuery)->whereNotIn('cara_pembayaran',getMetodePembayaran()->pluck('nama'))->sum('transfer');
-        $total_kredit   = (clone $serviceQuery)->sum('due'); // due biasanya sisa tagihan/kredit
+        $total_tunai    = (clone $nominalQuery)->sum('tunai');
+        $total_transfer = (clone $nominalQuery)->whereNotIn('cara_pembayaran',getMetodePembayaran()->pluck('nama'))->sum('transfer');
+        $total_kredit   = (clone $nominalQuery)->sum('due'); // due biasanya sisa tagihan/kredit
 
         // --- DATA PENGELUARAN & INSIDEN (Tetap created_at karena tidak ada status ambil/setuju) ---
 

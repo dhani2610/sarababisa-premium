@@ -443,21 +443,27 @@ class LaporanServisController extends Controller
             ->orderBy($dateColumn, 'asc')
             ->get();
 
+        // Query khusus untuk nominal / keuangan (tidak menghitung yang dibatalkan)
+        $nominalQuery = (clone $serviceQuery)->where(function($q) {
+            $q->where('kondisi_servis', '!=', 'Dibatalkan')
+              ->orWhereNull('kondisi_servis');
+        });
+
         // 2. Menghitung total pembayaran (Tunai, DP, Transfer, Kredit)
-        $total_tunai    = (clone $serviceQuery)->sum('tunai');
-        $total_dp       = (clone $serviceQuery)->sum('uang_muka');
-        $total_transfer = (clone $serviceQuery)->whereNotIn('cara_pembayaran',getMetodePembayaran()->pluck('nama'))->sum('transfer');
-            $total_kredit   = (clone $serviceQuery)->sum('due');
+        $total_tunai    = (clone $nominalQuery)->sum('tunai');
+        $total_dp       = (clone $nominalQuery)->sum('uang_muka');
+        $total_transfer = (clone $nominalQuery)->whereNotIn('cara_pembayaran',getMetodePembayaran()->pluck('nama'))->sum('transfer');
+        $total_kredit   = (clone $nominalQuery)->sum('due');
 
         // 3. Menghitung Keuangan (Modal, Biaya, Diskon, Profit)
-        $total_modal    = (clone $serviceQuery)->sum('modal_sparepart');
-        $total_biaya    = (clone $serviceQuery)->sum('biaya');
-        $total_diskon   = (clone $serviceQuery)->sum('diskon');
-        $total_profit   = (clone $serviceQuery)->sum('profit');
+        $total_modal    = (clone $nominalQuery)->sum('modal_sparepart');
+        $total_biaya    = (clone $nominalQuery)->sum('biaya');
+        $total_diskon   = (clone $nominalQuery)->sum('diskon');
+        $total_profit   = (clone $nominalQuery)->sum('profit');
 
 
-        // 7. Data Services DP (Khusus yg ada DP)
-        $servicesDP = (clone $serviceQuery)
+        // 7. Data Services DP (Khusus yg ada DP dan tidak dibatalkan)
+        $servicesDP = (clone $nominalQuery)
             ->with('brand', 'modelserie', 'user')
             ->whereNotNull('uang_muka')
             ->where('uang_muka', '!=', '0')
@@ -500,7 +506,7 @@ class LaporanServisController extends Controller
         $dataOtherMetodePembayaran = [];
         foreach (getMetodePembayaran() as $key => $value) {
             $dt['metode'] = $value->nama;
-            $dt['total']    = (clone $serviceQuery)->where('cara_pembayaran',$value->nama)->sum('transfer');
+            $dt['total']    = (clone $nominalQuery)->where('cara_pembayaran',$value->nama)->sum('transfer');
             array_push($dataOtherMetodePembayaran,$dt);
         }
         // return response()->json($dataOtherMetodePembayaran);
