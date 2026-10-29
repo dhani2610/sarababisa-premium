@@ -21,12 +21,12 @@ class CheckSubscription
             // Periksa apakah berlangganan telah kadaluarsa
             if (Auth::user()->exp_date < now()) {
                 // Berlangganan telah kadaluarsa, arahkan pengguna ke halaman pembayaran
-                return redirect()->route('payment'); // Gantilah 'payment' dengan nama rute halaman pembayaran Anda
+                return redirect('pembayaran'); // Gantilah 'pembayaran' dengan nama rute halaman pembayaran Anda
             }
         }else{
             if (date('Y-m-d') > expiredDateCabang()) {
                 // Berlangganan telah kadaluarsa, arahkan pengguna ke halaman pembayaran
-                return redirect()->route('payment'); // Gantilah 'payment' dengan nama rute halaman pembayaran Anda
+                return redirect('pembayaran'); // Gantilah 'pembayaran' dengan nama rute halaman pembayaran Anda
             }
         }
 
