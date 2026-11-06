@@ -468,7 +468,7 @@ class KaryawanController extends Controller
         $bonusTarget = 0; // Inisialisasi bonus target
 
         if($user) {
-            $bonus = calculateBonusForCabang($user, $items->cabang_id, $start_date, $end_date);
+            $bonus = calculateBonus($user->id, $start_date, $end_date);
 
             // Bonus Pencapaian Target hanya berlaku untuk mode Bulanan (targetnya per bulan kalender)
             if ($type !== 'rentang') {
@@ -477,9 +477,12 @@ class KaryawanController extends Controller
             }
         }
 
-        $assignedCabangIds = [$items->cabang_id];
+        $assignedCabangIds = $user ? $user->assigned_cabang_ids : [$items->cabang_id];
+        if (empty($assignedCabangIds)) {
+            $assignedCabangIds = [$items->cabang_id];
+        }
 
-        $bonusBreakdown = [];
+        $bonusBreakdown = $user ? getBonusBreakdownByCabang($user, $start_date, $end_date) : [];
 
         if ($items->cabang_id == 1) {
             $users = User::find(1);
