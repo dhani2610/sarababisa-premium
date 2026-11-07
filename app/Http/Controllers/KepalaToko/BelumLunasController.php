@@ -417,12 +417,6 @@ class BelumLunasController extends Controller
                 $destroyBase = route('transaksi-servis-sudah-diambil.destroy', '');
                 $termalBase  = route('kepalatoko-nota-pengambilan-termal', '');
                 $inkjetBase  = route('kepalatoko-pengambilan-cetak-inkjet', '');
-                if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || auth()->user()->role == 'Kepala Toko'){
-                    $styleHide = '';
-                }else{
-                    $styleHide = 'display:none!important';
-                }
-                $urlMultiTeknisi = route('multi-teknisi', $row->id);
 
                 return '
                 <div class="space-x-1 flex">

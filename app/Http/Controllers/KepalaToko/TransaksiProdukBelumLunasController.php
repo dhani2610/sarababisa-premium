@@ -168,7 +168,7 @@ class TransaksiProdukBelumLunasController extends Controller
         $userRole = Auth::user()->role ?? '';
 
         $query = Order::select('orders.*')
-            ->with(['user', 'customer', 'detailOrders.product'])
+            ->with(['user:id,name', 'customer:id,nama,nomor_hp', 'detailOrders.product.capacity'])
             ->where('orders.cabang_id', $cabangId)
             ->where('orders.tipe_status_pembayaran', 0)
             ->when($userRole == 'Sales', function ($q) {

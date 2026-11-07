@@ -54,7 +54,7 @@ class TransaksiProdukController extends Controller
         $userRole = Auth::user()->role ?? '';
 
         $query = Order::select('orders.*')
-            ->with(['user', 'customer', 'detailOrders.product'])
+            ->with(['user:id,name', 'customer:id,nama,nomor_hp', 'detailOrders.product.capacity'])
             ->where('orders.cabang_id', $cabangId)
             ->orderByRaw('orders.is_approve IS NULL DESC')
             ->orderByDesc('orders.created_at');
@@ -306,7 +306,7 @@ class TransaksiProdukController extends Controller
 
         $orders = Order::select('orders.*')
             ->where('orders.cabang_id', $cabangId)
-            ->with(['user', 'customer', 'detailOrders.product'])
+            ->with(['user:id,name', 'customer:id,nama,nomor_hp', 'detailOrders.product.capacity'])
             ->where('orders.due', '0')
             ->when($userRole == 'Sales', function ($q) {
                 $q->where('orders.users_id', Auth::user()->id);
@@ -554,7 +554,7 @@ class TransaksiProdukController extends Controller
         $userRole = Auth::user()->role ?? '';
 
         $orders = Order::select('orders.*')
-            ->with(['user', 'customer', 'detailOrders.product'])
+            ->with(['user:id,name', 'customer:id,nama,nomor_hp', 'detailOrders.product.capacity'])
             ->where('orders.cabang_id', $cabangId)
             ->where('orders.due', '>', '0')
             ->when($userRole == 'Sales', function ($q) {
