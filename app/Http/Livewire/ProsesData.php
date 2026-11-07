@@ -21,11 +21,11 @@ class ProsesData extends Component
 
     public $paginate = 10;
     public $search;
-    public $type;
+    public $type = [];
 
     public function mount()
     {
-        $this->type = Type::where('cabang_id',getCabangId())->pluck('id')->toArray();
+        //
     }
 
     public $status = [
@@ -69,66 +69,43 @@ class ProsesData extends Component
     }
     public function render()
     {
+        $cabangId = getCabangId();
         $toko = User::find(1);
-        $customers = Customer::where('cabang_id',getCabangId())->get();
-        $types = Type::where('cabang_id',getCabangId())->get();
-        $brands = Brand::where('cabang_id',getCabangId())->get();
-        $capacities = Capacity::where('cabang_id',getCabangId())->get();
-        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
-        // dd($brands,$model_series);
+        $customers = collect();
+        $types = Type::select('id', 'name')->where('cabang_id', $cabangId)->get();
+        $brands = Brand::select('id', 'name')->where('cabang_id', $cabangId)->get();
+        $capacities = Capacity::select('id', 'name')->where('cabang_id', $cabangId)->get();
+        $model_series = collect();
 
-        $users = User::forCabang()->where('role', 'Teknisi')->get();
-        $sales = User::forCabang()->where('role', 'Sales')->get();
-        $penerima = User::forCabang()->whereNotIn('role',['Investor','Kepala Toko'])->get();
-        $service_actions = ServiceAction::where('cabang_id',getCabangId())->get();
-        $products = Product::where('cabang_id',getCabangId())->whereHas('subCategory', function ($query) {
-            $query->whereHas('category', function ($subQuery) {
-                $subQuery->where('category_name', 'Sparepart');
-            });
-        })->where('stok', '>=', 1)->get();
+        $allUsers = User::forCabang()->select('id', 'name', 'role')->get();
+        $users = $allUsers->where('role', 'Teknisi')->values();
+        $sales = $allUsers->where('role', 'Sales')->values();
+        $penerima = $allUsers->whereNotIn('role', ['Investor', 'Kepala Toko'])->values();
+
+        $service_actions = ServiceAction::select('id', 'nama_tindakan')->where('cabang_id', $cabangId)->get();
+        $products = Product::select('id', 'product_name', 'stok', 'harga_modal', 'sub_categories_id')
+            ->where('cabang_id', $cabangId)
+            ->whereHas('subCategory', function ($query) {
+                $query->whereHas('category', function ($subQuery) {
+                    $subQuery->where('category_name', 'Sparepart');
+                });
+            })->where('stok', '>=', 1)->get();
+
         $isTeknisi = auth()->check() && auth()->user()->role === 'Teknisi';
         $teknisiServisIds = $isTeknisi ? servisIdMultiTeknisi(auth()->id()) : [];
 
-        $processes_count = ServiceTransaction::where('cabang_id',getCabangId())
+        $counts = ServiceTransaction::where('cabang_id', $cabangId)
             ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
                 $q->whereIn('id', $teknisiServisIds);
             })
-            ->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
+            ->selectRaw("
+                SUM(CASE WHEN status_servis NOT IN ('Bisa Diambil', 'Sudah Diambil') THEN 1 ELSE 0 END) as processes_count,
+                SUM(CASE WHEN status_servis = 'Bisa Diambil' THEN 1 ELSE 0 END) as jumlah_bisa_diambil,
+                SUM(CASE WHEN status_servis = 'Sudah Diambil' THEN 1 ELSE 0 END) as jumlah_sudah_diambil,
+                SUM(CASE WHEN status_servis = 'Sudah Diambil' AND is_approve IS NULL THEN 1 ELSE 0 END) as jumlah_belum_disetujui
+            ")
+            ->first();
 
-        $jumlah_bisa_diambil = ServiceTransaction::where('cabang_id',getCabangId())
-            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
-                $q->whereIn('id', $teknisiServisIds);
-            })
-            ->where('status_servis', 'Bisa Diambil')->count();
-
-        $jumlah_sudah_diambil = ServiceTransaction::where('cabang_id',getCabangId())
-            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
-                $q->whereIn('id', $teknisiServisIds);
-            })
-            ->where('status_servis', 'Sudah Diambil')->count();
-
-        $jumlah_belum_disetujui = ServiceTransaction::where('cabang_id',getCabangId())
-            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
-                $q->whereIn('id', $teknisiServisIds);
-            })
-            ->where('status_servis', 'Sudah Diambil')->where('is_approve', '=', null)->count();
-
-        $process = ServiceTransaction::where('cabang_id',getCabangId())
-            ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
-                $q->whereIn('id', $teknisiServisIds);
-            })
-            ->when($this->search, function ($q) {
-                $q->where(function ($sq) {
-                    $sq->where('nama_pelanggan', 'like', '%' . $this->search . '%')
-                       ->orWhere('nomor_servis', 'like', '%' . $this->search . '%')
-                       ->orWhere('nama_barang', 'like', '%' . $this->search . '%')
-                       ->orWhere('imei', 'like', '%' . $this->search . '%');
-                });
-            })->when($this->type, function ($q) {
-                $q->whereIn('types_id', $this->type);
-            })->when($this->status, function ($q) {
-                $q->whereIn('status_servis', $this->status);
-            })->orderBy('created_at','desc')->paginate($this->paginate);
         return view('livewire.proses-data', [
             'toko' => $toko,
             'users' => $users,
@@ -141,11 +118,11 @@ class ProsesData extends Component
             'capacities' => $capacities,
             'service_actions' => $service_actions,
             'products' => $products,
-            'processes_count' => $processes_count,
-            'jumlah_bisa_diambil' => $jumlah_bisa_diambil,
-            'jumlah_sudah_diambil' => $jumlah_sudah_diambil,
-            'jumlah_belum_disetujui' => $jumlah_belum_disetujui,
-            'processes' => $process,
+            'processes_count' => (int) ($counts->processes_count ?? 0),
+            'jumlah_bisa_diambil' => (int) ($counts->jumlah_bisa_diambil ?? 0),
+            'jumlah_sudah_diambil' => (int) ($counts->jumlah_sudah_diambil ?? 0),
+            'jumlah_belum_disetujui' => (int) ($counts->jumlah_belum_disetujui ?? 0),
+            'processes' => collect(),
         ]);
     }
 }

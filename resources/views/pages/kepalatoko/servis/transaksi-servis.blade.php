@@ -54,8 +54,11 @@
             $(document).ready(function() {
 
                  var table = $('#transaksi-servis-table').DataTable({
-                    processing: false,
-                    serverSide: false,
+                    processing: true,
+                    serverSide: true,
+                    deferRender: true,
+                    searchDelay: 400,
+                    ajax: '{{ route('transaksi-servis.data') }}',
                     columns: [
                         @if (Auth::user()->role == 'Kepala Toko')
                             { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
@@ -69,7 +72,7 @@
                         { data: 'nama_barang', name: 'nama_barang' },
                         { data: 'kelengkapan', name: 'kelengkapan' },
                         { data: 'kerusakan', name: 'kerusakan' },
-                        { data: 'qc_masuk', name: 'qc_masuk' },
+                        { data: 'qc_masuk', name: 'qc_masuk', orderable: false, searchable: false },
                         { data: 'uang_muka', name: 'uang_muka' },
                         { data: 'estimasi_biaya', name: 'estimasi_biaya' },
                         { data: 'estimasi_pengerjaan', name: 'estimasi_pengerjaan' },
@@ -86,33 +89,6 @@
                         attachCheckboxHandlers();
                     }
                 });
-
-                // --- custom pagination load bertahap ---
-                let batchSize = 20;
-                let offset = 0;
-                let loading = false;
-
-                function loadBatch() {
-                    if (loading) return;
-                    loading = true;
-
-                    $.ajax({
-                        url: '{{ route('transaksi-servis.data') }}?offset=' + offset + '&limit=' + batchSize,
-                        success: function(response) {
-                            if (response.data.length > 0) {
-                                table.rows.add(response.data).draw(false); // tambahkan data batch
-                                offset += batchSize;
-                                loading = false;
-                                setTimeout(loadBatch, 100); // lanjut batch berikutnya
-                            } else {
-                                console.log('Semua data sudah dimuat');
-                            }
-                        }
-                    });
-                }
-
-                // mulai load pertama
-                loadBatch();
 
                 function attachCheckboxHandlers() {
                     $('#parent-checkbox').off('click').on('click', function() {
@@ -282,9 +258,6 @@
                 $('.selectjs2').select2({
                     width: '100%'
                 });
-                $('.selectjs3').select2({
-                    width: '100%'
-                });
                 $('.selectjs4').select2({
                     width: '100%'
                 });
@@ -295,9 +268,30 @@
                     width: '100%'
                 });
 
-                $('#selectjs3').select2();
                 $('#selectjs5').select2();
                 $('#selectjs6').select2();
+
+                $('#customers_select, .selectjs3, #selectjs3').select2({
+                    width: '100%',
+                    placeholder: 'Pilih Pelanggan',
+                    allowClear: true,
+                    ajax: {
+                        url: "{{ route('get-customers') }}",
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                q: params.term || ''
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.results || []
+                            };
+                        },
+                        cache: true
+                    }
+                });
             });
         </script>
         {{-- Model Seri --}}

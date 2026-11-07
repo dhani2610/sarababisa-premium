@@ -272,13 +272,16 @@
             <script>
                 $(document).ready(function() {
                     $('#transaksiTable').DataTable({
-                        processing: false,
-                        serverSide: false,
+                        processing: true,
+                        serverSide: true,
+                        deferRender: true,
+                        searchDelay: 400,
                         ajax: '{{ route('transaksi-produk.data.due') }}',
                         columns: [
                             @if (Auth::user()->role == 'Kepala Toko')
                             {
                                 data: 'checkbox',
+                                name: 'checkbox',
                                 orderable: false,
                                 searchable: false,
                                 render: function(data, type, row) {
@@ -288,50 +291,69 @@
                             @endif
                             {
                                 data: 'DT_RowIndex',
+                                name: 'DT_RowIndex',
                                 orderable: false,
                                 searchable: false
                             },
                             {
-                                data: 'invoice_no'
+                                data: 'invoice_no',
+                                name: 'invoice_no'
                             },
                             {
                                 data: 'item',
+                                name: 'item',
+                                orderable: false,
                                 render: function(data) {
                                     return data ?? '';
                                 }
                             },
                             {
-                                data: 'tgl_transaksi'
+                                data: 'tgl_transaksi',
+                                name: 'created_at'
                             },
                             {
-                                data: 'sales'
+                                data: 'sales',
+                                name: 'sales',
+                                orderable: false
                             },
                             {
-                                data: 'pelanggan'
+                                data: 'pelanggan',
+                                name: 'pelanggan',
+                                orderable: false
                             },
                             {
-                                data: 'pembayaran'
+                                data: 'pembayaran',
+                                name: 'payment_method'
                             },
                             @if (Auth::user()->role != 'Investor')
                                 @if (Auth::user()->role == 'Kepala Toko' || $storeSettings->is_modal_produk == 1)
                                 {
-                                    data: 'modal'
+                                    data: 'modal',
+                                    name: 'modal',
+                                    orderable: false,
+                                    searchable: false
                                 },
                                 @endif
                             @endif {
-                                data: 'sub_total'
+                                data: 'sub_total',
+                                name: 'sub_total'
                             },
                             {
-                                data: 'pay'
+                                data: 'pay',
+                                name: 'pay'
                             },
                             {
                                 data: 'sisa',
+                                name: 'due',
+                                searchable: false,
                                 render: function(data) {
                                     return data ?? '';
                                 }
                             },
                             {
                                 data: 'status_pembayaran',
+                                name: 'tipe_status_pembayaran',
+                                searchable: false,
                                 render: function(data) {
                                     return data ?? '';
                                 }
@@ -339,11 +361,14 @@
                             @if (Auth::user()->role != 'Investor')
                                 {
                                     data: 'status',
+                                    name: 'is_approve',
+                                    searchable: false,
                                     render: function(data) {
                                         return data ?? '';
                                     }
                                 }, {
                                     data: 'aksi',
+                                    name: 'aksi',
                                     orderable: false,
                                     searchable: false,
                                     render: function(data, type, row) {

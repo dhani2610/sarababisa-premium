@@ -20,13 +20,13 @@ class BelumLunasData extends Component
 
     public $paginate = 10;
     public $search;
-    public $type;
+    public $type = [];
     public $kondisi = ['Sudah jadi', 'Tidak bisa', 'Dibatalkan', 'Menunggu konfirmasi'];
     public $queryString = ['search' => ['except' => '']];
 
     public function mount()
     {
-        $this->type = Type::pluck('id')->toArray();
+        //
     }
 
     public function updatedKondisi($value, $index)
@@ -36,17 +36,19 @@ class BelumLunasData extends Component
 
     public function render()
     {
+        $cabangId = getCabangId();
         $toko = User::find(1);
-        $types = Type::where('cabang_id',getCabangId())->get();
-        $brands = Brand::where('cabang_id',getCabangId())->get();
-        $capacities = Capacity::where('cabang_id',getCabangId())->get();
-        $model_series = ModelSerie::where('cabang_id',getCabangId())->get();
-        $users = User::forCabang()->where('role', 'Teknisi')->get();
-        $workers = User::forCabang()->get();
-        $actions = ServiceAction::where('cabang_id',getCabangId())->get();
-        $storeSetting = StoreSetting::where('cabang_id',getCabangId())->first();
+        $types = Type::select('id', 'name')->where('cabang_id', $cabangId)->get();
+        $brands = Brand::select('id', 'name')->where('cabang_id', $cabangId)->get();
+        $capacities = Capacity::select('id', 'name')->where('cabang_id', $cabangId)->get();
+        $model_series = collect();
+        $workers = User::forCabang()->select('id', 'name', 'role')->get();
+        $users = $workers->where('role', 'Teknisi')->values();
+        $actions = ServiceAction::select('id', 'nama_tindakan')->where('cabang_id', $cabangId)->get();
+        $storeSetting = StoreSetting::where('cabang_id', $cabangId)->first();
 
-        $rawCustomers = Customer::where('cabang_id', getCabangId())
+        $rawCustomers = Customer::select('id', 'nama', 'nomor_hp')
+            ->where('cabang_id', $cabangId)
             ->whereHas('servicetransaction', function ($query) {
                 $query->where('tipe_status_pembayaran', 0);
             })
@@ -62,7 +64,7 @@ class BelumLunasData extends Component
             return 'name_' . strtolower(trim($item->nama));
         })->values();
         // Hitung khusus untuk badge Belum Lunas
-        $jumlah_belum_lunas = ServiceTransaction::where('cabang_id',getCabangId())->where('tipe_status_pembayaran', '0')->count();
+        $jumlah_belum_lunas = ServiceTransaction::where('cabang_id', $cabangId)->where('tipe_status_pembayaran', '0')->count();
 
         return view('livewire.belum-lunas-data', [
             'toko' => $toko,

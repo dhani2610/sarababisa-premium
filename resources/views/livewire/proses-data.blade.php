@@ -225,7 +225,7 @@
                                             </label>
 
                                             <select name="customers_id" id="customers_select"
-                                                class="form-select text-sm selectjs2 py-1 w-full" required>
+                                                class="form-select text-sm selectjs-customer py-1 w-full" required>
                                                 <option value="">Pilih Pelanggan</option>
                                                 @foreach ($customers as $item)
                                                     <option value="{{ $item->id }}">{{ $item->nama }} {{ $item->nomor_hp }}</option>
@@ -2113,7 +2113,7 @@ $(document).ready(function () {
         `;
         const sparepartOptions = `
             <option selected value="">Pilih Sparepart</option>
-            @foreach (App\Models\Product::where('cabang_id',getCabangId())->get() as $item)
+            @foreach ($products as $item)
                 <option value="{{ $item->id }}" data-harga_modal="{{ $item->harga_modal }}">{{ addslashes($item->product_name) }}</option>
             @endforeach
         `;
@@ -2349,6 +2349,29 @@ $(document).ready(function () {
             // Trigger input agar kalkulasi diskon/tunai di bawah ikut update
             $('#biaya').trigger('input');
         }
+
+        // Inisialisasi Select2 AJAX untuk Pelanggan agar ringan & cepat
+        $('#customers_select, .selectjs3').select2({
+            width: '100%',
+            placeholder: 'Pilih Pelanggan',
+            allowClear: true,
+            ajax: {
+                url: "{{ route('get-customers') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term || ''
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results || []
+                    };
+                },
+                cache: true
+            }
+        });
     });
     document.addEventListener('DOMContentLoaded', function() {
         // Seleksi semua input dengan class "input-currency"

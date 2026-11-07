@@ -204,6 +204,7 @@ Route::get('/get-product/{products_id}', [AutoHargaJualController::class, 'getPr
 Route::controller(DefaultController::class)->group(function () {
     Route::get('/get-modelserie', 'GetModelSerie')->name('get-modelserie');
     Route::get('/get-product', 'GetProduct')->name('get-product');
+    Route::get('/get-customers', 'GetCustomers')->name('get-customers');
 });
 
 Route::get('/test-mail', function () {

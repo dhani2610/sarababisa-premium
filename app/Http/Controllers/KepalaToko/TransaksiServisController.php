@@ -36,22 +36,7 @@ class TransaksiServisController extends Controller
      */
     public function index()
     {
-        $processes = ServiceTransaction::with('customer')->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->orderByDesc('updated_at')->paginate(10);
-        $processes_count = ServiceTransaction::whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])->count();
-        $bisadiambil = ServiceTransaction::with('customer', 'serviceaction')->where('status_servis', 'Bisa Diambil')->paginate(10);
-        $jumlahbisadiambil = ServiceTransaction::with('customer', 'serviceaction')->where('status_servis', 'Bisa Diambil')->count();
-        $jumlah_bisa_diambil = ServiceTransaction::where('status_servis', 'Bisa Diambil')->count();
-        $jumlah_sudah_diambil = ServiceTransaction::where('status_servis', 'Sudah Diambil')->count();
-        $jumlah_semua = ServiceTransaction::all()->count();
-        return view('pages/kepalatoko/servis/transaksi-servis', compact(
-            'processes',
-            'processes_count',
-            'jumlah_bisa_diambil',
-            'jumlah_sudah_diambil',
-            'jumlah_semua',
-            'bisadiambil',
-            'jumlahbisadiambil'
-        ));
+        return view('pages/kepalatoko/servis/transaksi-servis');
     }
 
 
@@ -164,32 +149,52 @@ class TransaksiServisController extends Controller
 
     public function getData(Request $request)
     {
-        $limit = $request->get('limit', 200);
-        $offset = $request->get('offset', 0);
-        $query = ServiceTransaction::where('cabang_id',getCabangId())->with(['customer'])
-        ->whereNotIn('status_servis', ['Bisa Diambil', 'Sudah Diambil'])
-        ->orderByDesc('updated_at')
-        ->latest()
-        ->skip($offset)
-        ->take($limit)
-        ->get();
+        $cabangId = getCabangId();
+        $tokoSetting = StoreSetting::where('cabang_id', $cabangId)->first();
+        $fonteeToken = $tokoSetting->fonnte ?? null;
+        $isEditTransaksi = (int) ($tokoSetting->is_edit_transaksi ?? 0) === 1;
+        $hariIni = Carbon::today();
+        $userRole = Auth::user()->role ?? '';
+
+        if ($cabangId == 1) {
+            $kp = User::find(1);
+        } else {
+            $kp = User::where('cabang_id', $cabangId)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first() ?? User::find(1);
+        }
+        $banks = json_decode($kp->banks ?? '[]', true) ?: [];
+        $trackingLink = env('APP_URL') . '/tracking';
+
+        $query = ServiceTransaction::where('service_transactions.cabang_id', $cabangId)
+            ->with(['customer'])
+            ->whereNotIn('service_transactions.status_servis', ['Bisa Diambil', 'Sudah Diambil'])
+            ->orderByDesc('service_transactions.updated_at')
+            ->orderByDesc('service_transactions.created_at');
 
         return DataTables::of($query)
         ->addIndexColumn()
+        ->filterColumn('pelanggan', function ($q, $keyword) {
+            $q->where(function ($sub) use ($keyword) {
+                $sub->where('service_transactions.nama_pelanggan', 'like', "%{$keyword}%")
+                    ->orWhereHas('customer', function ($cq) use ($keyword) {
+                        $cq->where('nama', 'like', "%{$keyword}%")
+                           ->orWhere('nomor_hp', 'like', "%{$keyword}%");
+                    });
+            });
+        })
+        ->filterColumn('status', function ($q, $keyword) {
+            $q->where('service_transactions.status_servis', 'like', "%{$keyword}%");
+        })
 
         // Checkbox untuk bulk action
          ->addColumn('checkbox', function ($row) {
-            // hanya tampilkan checkbox bila bukan investor (cek auth di blade juga)
             return '<input type="checkbox" class="table-item form-checkbox" value="' . $row->id . '" />';
         })
 
         // Nomor Servis (link edit kalau bukan investor)
-        ->addColumn('nomor_servis', function ($row) {
-            if (auth()->user()->role != 'Investor') {
-                $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
-                $hariIni = \Carbon\Carbon::today();
-                $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
-                if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
+        ->addColumn('nomor_servis', function ($row) use ($userRole, $isEditTransaksi, $hariIni) {
+            if ($userRole != 'Investor') {
+                $tanggalTransaksi = Carbon::parse($row->created_at);
+                if ($isEditTransaksi || $tanggalTransaksi->isSameDay($hariIni) || $userRole == 'Kepala Toko'){
                     $link = route('transaksi-servis.edit', $row->id);
                     return '<a href="' . $link . '">
                                 <div class="flex items-center text-blue-600">
@@ -217,24 +222,15 @@ class TransaksiServisController extends Controller
         // Pelanggan dengan fallback bila dihapus
         ->addColumn('pelanggan', function ($row) {
             if ($row->customer) {
-                // jika model customer masih ada
                 return '<div class="font-medium">' . e($row->customer->nama) . '</div>';
             }
             return '<div class="font-medium text-rose-600">Data pelanggan telah dihapus</div>';
         })
 
         // Hubungi (WA tombol + kirim Fontee)
-        ->addColumn('hubungi', function ($row) {
+        ->addColumn('hubungi', function ($row) use ($fonteeToken, $kp, $banks, $trackingLink) {
             $nomor = $row->customer->nomor_hp ?? null;
             $nomorwa = $nomor ? preg_replace('/^08/', '628', preg_replace('/\D+/', '', $nomor)) : null;
-            $fonteeToken = StoreSetting::where('cabang_id',$row->cabang_id)->first()->fonnte ?? null;
-            $toko = optional($row->customer)->nama ?? config('app.name');
-
-            if ($row->cabang_id == 1) {
-                $kp = User::find(1);
-            } else {
-                $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
-            }
 
             $html = '<div class="flex space-x-1">';
             if ($nomorwa) {
@@ -250,23 +246,9 @@ class TransaksiServisController extends Controller
                     </div>';
             }
             // Kirim Fontee / manual WA button — gunakan JS function kirimFontee(...) di blade
-            $tokoName = e($kp->nama_toko);
+            $tokoName = e($kp->nama_toko ?? '');
             $notaLink = route('kepalatoko-cetak-inkjet', $row->id);
             $notaQc = route('kepalatoko-cetak-qc', $row->id);
-            $trackingLink = env('APP_URL') . '/tracking';
-            // $message = rawurlencode("*Notifikasi Service*\n" . $tokoName . "\n\n" .
-            //     "No. Service : " . $row->nomor_servis . "\n" .
-            //     "Nama user : *" . $row->nama_pelanggan . "*\n" .
-            //     "Unit : " . $row->nama_barang . "\n" .
-            //     "Diterima : " . $row->penerima . "\n" .
-            //     "Tanggal : " . Carbon::parse($row->created_at)->translatedFormat('d F Y h:i') . "\n" .
-            //     "Kerusakan : " . $row->kerusakan . "\n\n" .
-            //     "Link tracking : " . $trackingLink . "\n" .
-            //     "Link nota : " . $notaLink . "\n" .
-            //     "Link QC : " . $notaQc . "\n\n" .
-            //     "Terimakasih");
-
-            $banks = old('banks', json_decode($kp->banks ?? '[]', true));
 
             // 1. Definisikan bagian awal pesan
             $text = "*Notifikasi Service*\n" . $tokoName . "\n\n" .
@@ -283,15 +265,15 @@ class TransaksiServisController extends Controller
 
             $text .= 'Informasi Pembayaran :' ."\n";
 
-            $text .= 'Bank : '. $kp->bank . "\n";
-            $text .= 'Norek : '. $kp->rekening . "\n";
-            $text .= 'a.n : '. $kp->pemilik_rekening . "\n";
+            $text .= 'Bank : '. ($kp->bank ?? '') . "\n";
+            $text .= 'Norek : '. ($kp->rekening ?? '') . "\n";
+            $text .= 'a.n : '. ($kp->pemilik_rekening ?? '') . "\n";
 
             if (!empty($banks)) {
                 foreach ($banks as $bank) {
-                    $text .= 'Bank : '. $bank['bank'] . "\n";
-                    $text .= 'Norek : '. $bank['rekening'] . "\n";
-                    $text .= 'a.n : '. $bank['pemilik'] . "\n";
+                    $text .= 'Bank : '. ($bank['bank'] ?? '') . "\n";
+                    $text .= 'Norek : '. ($bank['rekening'] ?? '') . "\n";
+                    $text .= 'a.n : '. ($bank['pemilik'] ?? '') . "\n";
                 }
             }
 

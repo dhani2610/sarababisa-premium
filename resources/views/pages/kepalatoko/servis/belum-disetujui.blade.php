@@ -44,9 +44,11 @@
             $(document).ready(function() {
 
                 var table = $('#transaksi-servis-table').DataTable({
-                    processing: false,
-                    serverSide: false,
-                    // ajax: '{{ route('transaksi-servis-belum-disetujui.data') }}',
+                    processing: true,
+                    serverSide: true,
+                    deferRender: true,
+                    searchDelay: 400,
+                    ajax: '{{ route('transaksi-servis-belum-disetujui.data') }}',
                     columns: [
                         @if (Auth::user()->role != 'Investor')
                             {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},
@@ -55,18 +57,16 @@
                         {data: 'nomor_servis', name: 'nomor_servis'},
                         {data: 'created_at', name: 'created_at'},
                         {data: 'penerima', name: 'penerima'},
-                        {data: 'pelanggan', name: 'pelanggan'},
+                        {data: 'pelanggan', name: 'pelanggan', orderable: false},
                         @if (Auth::user()->role != 'Investor')
                             {data: 'hubungi', name: 'hubungi', orderable: false, searchable: false},
                         @endif
                         {data: 'nama_barang', name: 'nama_barang'},
                         {data: 'kerusakan', name: 'kerusakan'},
-                        // {data: 'qc_masuk', name: 'qc_masuk'},
-                        // {data: 'qc_keluar', name: 'qc_keluar'},
-                        {data: 'fungsi', name: 'fungsi'},
+                        {data: 'fungsi', name: 'fungsi', orderable: false, searchable: false},
                         {data: 'kondisi_servis', name: 'kondisi_servis'},
-                        {data: 'tindakan_servis', name: 'tindakan_servis'},
-                        {data: 'teknisi', name: 'teknisi'},
+                        {data: 'tindakan_servis', name: 'tindakan_servis', orderable: false},
+                        {data: 'teknisi', name: 'teknisi', orderable: false},
                         @if (Auth::user()->role != 'Investor')
                             {data: 'modal_sparepart', name: 'modal_sparepart'},
                         @endif
@@ -91,33 +91,6 @@
                         attachCheckboxHandlers();
                     }
                 });
-
-                // --- custom pagination load bertahap ---
-                let batchSize = 20;
-                let offset = 0;
-                let loading = false;
-
-                function loadBatch() {
-                    if (loading) return;
-                    loading = true;
-                    $.ajax({
-                        url: '{{ route('transaksi-servis-belum-disetujui.data') }}?offset=' + offset + '&limit=' + batchSize,
-                        success: function(response) {
-                            if (response.data.length > 0) {
-                                table.rows.add(response.data).draw(false);
-                                offset += batchSize;
-                                loading = false;
-                                // lanjut load batch berikutnya
-                                setTimeout(loadBatch, 100);
-                            } else {
-                                console.log('semua data sudah dimuat');
-                            }
-                        }
-                    });
-                }
-
-                // mulai load pertama
-                loadBatch();
 
                 function attachCheckboxHandlers() {
                     $('#parent-checkbox').off('click').on('click', function() {

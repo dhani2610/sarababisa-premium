@@ -35,24 +35,47 @@ class ServisBelumDisetujuiController extends Controller
 
     public function getData(Request $request)
     {
-        $limit = $request->get('limit', 200);
-        $offset = $request->get('offset', 0);
+        $cabangId = getCabangId();
+        $tokoSetting = StoreSetting::where('cabang_id', $cabangId)->first();
+        $fonnteToken = $tokoSetting->fonnte ?? null;
+        $hasToken = !empty($fonnteToken);
+        $userRole = auth()->user()->role ?? '';
+
+        if ($cabangId == 1) {
+            $kp = User::find(1);
+        } else {
+            $kp = User::where('cabang_id', $cabangId)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first() ?? User::find(1);
+        }
+        $banks = json_decode($kp->banks ?? '[]', true) ?: [];
+        $pgMethods = MetodePembayaran::where('cabang_id', $cabangId)->pluck('nama')->flip()->all();
+        $trackingUrl = env('APP_URL') . '/tracking';
 
         $query = ServiceTransaction::with(['customer', 'user'])
-            ->where('status_servis', 'Sudah Diambil')->where('is_approve', null)
-            ->where('cabang_id', getCabangId())
-            ->orderBy('created_at', 'desc')
-            ->latest()
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+            ->where('service_transactions.status_servis', 'Sudah Diambil')
+            ->whereNull('service_transactions.is_approve')
+            ->where('service_transactions.cabang_id', $cabangId)
+            ->orderBy('service_transactions.created_at', 'desc');
 
         return DataTables::of($query)
             ->addIndexColumn()
+            ->filterColumn('pelanggan', function ($q, $keyword) {
+                $q->where(function ($sub) use ($keyword) {
+                    $sub->where('service_transactions.nama_pelanggan', 'like', "%{$keyword}%")
+                        ->orWhereHas('customer', function ($cq) use ($keyword) {
+                            $cq->where('nama', 'like', "%{$keyword}%")
+                               ->orWhere('nomor_hp', 'like', "%{$keyword}%");
+                        });
+                });
+            })
+            ->filterColumn('teknisi', function ($q, $keyword) {
+                $q->whereHas('user', function ($uq) use ($keyword) {
+                    $uq->where('name', 'like', "%{$keyword}%");
+                });
+            })
 
             // ✅ Checkbox
-            ->addColumn('checkbox', function ($row) {
-                if (auth()->user()->role == 'Investor') return '';
+            ->addColumn('checkbox', function ($row) use ($userRole) {
+                if ($userRole == 'Investor') return '';
                 return '
                     <div class="flex items-center">
                         <label class="inline-flex">
@@ -63,9 +86,9 @@ class ServisBelumDisetujuiController extends Controller
             })
 
             // ✅ Nomor Servis (link edit kalau bukan investor)
-            ->addColumn('nomor_servis', function ($row) {
+            ->addColumn('nomor_servis', function ($row) use ($userRole) {
                 $url = route('transaksi-servis-belum-disetujui.edit', $row->id);
-                if (auth()->user()->role == 'Kepala Toko') {
+                if ($userRole == 'Kepala Toko') {
                     return '
                         <a href="'.$url.'" class="text-blue-600 flex items-center">
                             <svg class="w-5 h-5 mr-1 fill-current" viewBox="0 0 32 32"><path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4z"/></svg>
@@ -88,29 +111,13 @@ class ServisBelumDisetujuiController extends Controller
             ->addColumn('pelanggan', fn($row) => $row->customer?->nama ?? '')
 
             // ✅ Hubungi (whatsapp + fonnte)
-            ->addColumn('hubungi', function ($row) {
+            ->addColumn('hubungi', function ($row) use ($fonnteToken, $hasToken, $kp, $banks, $pgMethods, $trackingUrl) {
                  if (!$row->customer) return '';
-                    $toko = StoreSetting::where('cabang_id',$row->cabang_id)->first();
-
                     $nomor = $row->customer->nomor_hp;
                     $nomorwa = preg_replace('/^08/', '628', $nomor);
-                    $fonnteToken = $toko->fonnte ?? null;
-                    $hasToken = !empty($fonnteToken);
+                    $is_pg = isset($pgMethods[$row->cara_pembayaran]);
 
-                    if ($row->cabang_id == 1) {
-                        $kp = User::find(1);
-                    } else {
-                        $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
-                    }
-                    $banks = old('banks', json_decode($kp->banks ?? '[]', true));
-
-                    $metodePembayaranPaymentGateway = MetodePembayaran::where('cabang_id',getCabangId())->where('nama',$row->cara_pembayaran)->first();
-                    if (!empty($metodePembayaranPaymentGateway)) {
-                        $is_pg = true;
-                    }else{
-                        $is_pg = false;
-                    }
-                    $message = "*Notifikasi Service*\n{$kp->nama_toko}\n\n"
+                    $message = "*Notifikasi Service*\n" . ($kp->nama_toko ?? '') . "\n\n"
                         . "No. Service : {$row->nomor_servis}\n"
                         . "Nama user : *{$row->nama_pelanggan}*\n"
                         . "Unit : {$row->nama_barang}\n"
@@ -119,28 +126,25 @@ class ServisBelumDisetujuiController extends Controller
                         . "Status : {$row->kondisi_servis}\n"
                         . "Garansi sampai : " . ($row->exp_garansi ? Carbon::parse($row->exp_garansi)->translatedFormat('d F Y') : 'Tidak ada garansi') . "\n"
                         . "Pembayaran : {$row->cara_pembayaran}\n\n"
-                        . "Link tracking : " . env('APP_URL') . "/tracking\n"
+                        . "Link tracking : " . $trackingUrl . "\n"
                         . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $row->id)  . "\n";
                         if ($is_pg) {
                             $message .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n";
-
                             $message .= "Link Pembayaran : " . route('payment', $row->id) . "\n\n";
                         } else {
                             $message .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n\n";
                         }
 
                     $message .= 'Informasi Pembayaran :' ."\n";
-
-                    $message .= 'Bank : '. $kp->bank . "\n";
-                    $message .= 'Norek : '. $kp->rekening . "\n";
-                    $message .= 'a.n : '. $kp->pemilik_rekening . "\n";
+                    $message .= 'Bank : '. ($kp->bank ?? '') . "\n";
+                    $message .= 'Norek : '. ($kp->rekening ?? '') . "\n";
+                    $message .= 'a.n : '. ($kp->pemilik_rekening ?? '') . "\n";
 
                     if (!empty($banks)) {
-
                         foreach ($banks as $bank) {
-                            $message .= 'Bank : '. $bank['bank'] . "\n";
-                            $message .= 'Norek : '. $bank['rekening'] . "\n";
-                            $message .= 'a.n : '. $bank['pemilik'] . "\n";
+                            $message .= 'Bank : '. ($bank['bank'] ?? '') . "\n";
+                            $message .= 'Norek : '. ($bank['rekening'] ?? '') . "\n";
+                            $message .= 'a.n : '. ($bank['pemilik'] ?? '') . "\n";
                         }
                     }
 

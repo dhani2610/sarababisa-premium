@@ -27,17 +27,26 @@ class TransaksiProdukPaidData extends Component
 
     public function render()
     {
-        $jumlah_semua = Order::where('cabang_id',getCabangId())->get()->count();
-        $jumlah_lunas = Order::where('cabang_id',getCabangId())->where('due', '0')->count();
-        $jumlah_tidaklunas = Order::where('cabang_id',getCabangId())->where('due', '>', '0')->count();
+        $cabangId = getCabangId();
+        $counts = Order::where('cabang_id', $cabangId)
+            ->selectRaw("
+                COUNT(*) as jumlah_semua,
+                SUM(CASE WHEN due = 0 THEN 1 ELSE 0 END) as jumlah_lunas,
+                SUM(CASE WHEN due > 0 THEN 1 ELSE 0 END) as jumlah_tidaklunas
+            ")
+            ->first();
 
         return view('livewire.transaksi-produk-paid-data', [
-            'jumlah_semua' => $jumlah_semua,
-            'jumlah_lunas' => $jumlah_lunas,
-            'jumlah_tidaklunas' => $jumlah_tidaklunas,
+            'jumlah_semua' => (int) ($counts->jumlah_semua ?? 0),
+            'jumlah_lunas' => (int) ($counts->jumlah_lunas ?? 0),
+            'jumlah_tidaklunas' => (int) ($counts->jumlah_tidaklunas ?? 0),
             'orders' => $this->search === null ?
-                Order::where('cabang_id',getCabangId())->orderByRaw('is_approve IS NULL DESC')->latest()->where('due', '0')->paginate($this->paginate) :
-                Order::where('cabang_id',getCabangId())->orderByRaw('is_approve IS NULL DESC')->latest()->where('due', '0')->where('invoice_no', 'like', '%' . $this->search . '%')->orWhere('nama_pelanggan', 'like', '%' . $this->search . '%')->paginate($this->paginate)
+                Order::where('cabang_id', $cabangId)->orderByRaw('is_approve IS NULL DESC')->latest()->where('due', '0')->paginate($this->paginate) :
+                Order::where('cabang_id', $cabangId)->orderByRaw('is_approve IS NULL DESC')->latest()->where('due', '0')
+                ->where(function ($q) {
+                    $q->where('invoice_no', 'like', '%' . $this->search . '%')
+                      ->orWhere('nama_pelanggan', 'like', '%' . $this->search . '%');
+                })->paginate($this->paginate)
         ]);
     }
 }

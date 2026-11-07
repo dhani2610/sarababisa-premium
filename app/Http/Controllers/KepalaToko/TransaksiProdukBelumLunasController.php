@@ -17,12 +17,21 @@ class TransaksiProdukBelumLunasController extends Controller
 {
     public function index()
     {
-        $jumlah_semua = Order::where('cabang_id', getCabangId())->where('tipe_status_pembayaran',0)->count();
-        $jumlah_lunas = Order::where('cabang_id', getCabangId())->where('due', '0')->count();
-        $jumlah_tidaklunas = Order::where('cabang_id', getCabangId())->where('due', '>', '0')->count();
-        $storeSettings = StoreSetting::where('cabang_id', getCabangId())->first();
+        $cabangId = getCabangId();
+        $counts = Order::where('cabang_id', $cabangId)
+            ->selectRaw("
+                SUM(CASE WHEN tipe_status_pembayaran = 0 THEN 1 ELSE 0 END) as jumlah_semua,
+                SUM(CASE WHEN due = 0 THEN 1 ELSE 0 END) as jumlah_lunas,
+                SUM(CASE WHEN due > 0 THEN 1 ELSE 0 END) as jumlah_tidaklunas
+            ")
+            ->first();
+        $jumlah_semua = (int) ($counts->jumlah_semua ?? 0);
+        $jumlah_lunas = (int) ($counts->jumlah_lunas ?? 0);
+        $jumlah_tidaklunas = (int) ($counts->jumlah_tidaklunas ?? 0);
+        $storeSettings = StoreSetting::where('cabang_id', $cabangId)->first();
 
-        $rawCustomers = Customer::where('cabang_id', getCabangId())
+        $rawCustomers = Customer::select('id', 'nama', 'nomor_hp')
+            ->where('cabang_id', $cabangId)
             ->whereHas('sale', function ($query) {
                 $query->where('tipe_status_pembayaran', 0);
             })
@@ -155,25 +164,46 @@ class TransaksiProdukBelumLunasController extends Controller
 
     public function data(Request $request)
     {
-        $limit = $request->get('limit', 200);
-        $offset = $request->get('offset', 0);
+        $cabangId = getCabangId();
+        $userRole = Auth::user()->role ?? '';
 
         $query = Order::select('orders.*')
-        ->selectRaw('(SELECT SUM(modal) FROM order_details WHERE order_details.orders_id = orders.id) as modal')
-        ->with(['user', 'customer'])
-        ->where('orders.cabang_id', getCabangId())
-        ->where('orders.tipe_status_pembayaran', 0)
-        ->orderByRaw('is_approve IS NULL DESC')
-        ->latest();
+            ->with(['user', 'customer', 'detailOrders.product'])
+            ->where('orders.cabang_id', $cabangId)
+            ->where('orders.tipe_status_pembayaran', 0)
+            ->when($userRole == 'Sales', function ($q) {
+                $q->where('orders.users_id', Auth::user()->id);
+            })
+            ->orderByRaw('orders.is_approve IS NULL DESC')
+            ->orderByDesc('orders.created_at');
 
-        if (Auth::user()->role == 'Sales') {
-            $query->where('orders.users_id', Auth::user()->id);
-        }
-
-        $orders = $query->skip($offset)->take($limit)->get();
-
-        return DataTables::of($orders)
+        return DataTables::of($query)
             ->addIndexColumn()
+            ->filterColumn('pelanggan', function ($q, $keyword) {
+                $q->where(function ($sub) use ($keyword) {
+                    $sub->where('orders.nama_pelanggan', 'like', "%{$keyword}%")
+                        ->orWhereHas('customer', function ($cq) use ($keyword) {
+                            $cq->where('nama', 'like', "%{$keyword}%")
+                               ->orWhere('nomor_hp', 'like', "%{$keyword}%");
+                        });
+                });
+            })
+            ->filterColumn('sales', function ($q, $keyword) {
+                $q->whereHas('user', function ($uq) use ($keyword) {
+                    $uq->where('name', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('pembayaran', function ($q, $keyword) {
+                $q->where('orders.payment_method', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('item', function ($q, $keyword) {
+                $q->whereHas('detailOrders', function ($dq) use ($keyword) {
+                    $dq->where('product_name', 'like', "%{$keyword}%")
+                       ->orWhereHas('product', function ($pq) use ($keyword) {
+                           $pq->where('nomor_seri', 'like', "%{$keyword}%");
+                       });
+                });
+            })
             ->addColumn('checkbox', fn($row) => '
                 <div class="flex items-center">
                     <label class="inline-flex">
@@ -182,10 +212,9 @@ class TransaksiProdukBelumLunasController extends Controller
                     </label>
                 </div>
             ')
-            ->addColumn('invoice_no', function ($row) {
+            ->addColumn('invoice_no', function ($row) use ($userRole) {
                 $link = route('transaksi-produk.edit', $row->id);
-                if (auth()->user()->role != 'Investor') {
-                    // return '<a href="'.$link.'" class="text-blue-600">'.$row->invoice_no.'</a>';
+                if ($userRole != 'Investor') {
                     return '
                         <div class="flex items-center text-blue-600">
                             <a href="'.$link.'" class="text-blue-600">
@@ -203,7 +232,6 @@ class TransaksiProdukBelumLunasController extends Controller
                             </a>
                         </div>';
                 }
-                return $row->invoice_no;
             })
             ->addColumn('tgl_transaksi', fn($row) => \Carbon\Carbon::parse($row->created_at)->locale('id')->translatedFormat('d F Y'))
             ->addColumn('sales', fn($row) => $row->user ? $row->user->name : '<span class="text-red-500">Akun dihapus</span>')
@@ -215,7 +243,7 @@ class TransaksiProdukBelumLunasController extends Controller
                 }
                 return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-600">Lunas</div>';
             })
-            ->addColumn('modal', fn($row) => 'Rp. '.number_format($row->modal))
+            ->addColumn('modal', fn($row) => 'Rp. '.number_format($row->detailOrders->sum('modal')))
             ->addColumn('sub_total', fn($row) => 'Rp. '.number_format($row->sub_total))
             ->addColumn('pay', fn($row) => 'Rp. '.number_format($row->pay))
             ->addColumn('sisa', function ($row) {
@@ -226,14 +254,11 @@ class TransaksiProdukBelumLunasController extends Controller
                 return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-600">Lunas</div>';
             })
             ->addColumn('item', function ($row) {
-                $orderItem = OrderDetail::with('product')
-                    ->where('orders_id', $row->id)
-                    ->orderBy('id', 'DESC')
-                    ->get();
+                $orderItem = $row->detailOrders->sortByDesc('id');
 
                 $produkDetails = '<ul class="list-disc pl-5 m-0">';
                 foreach ($orderItem as $item) {
-                    if ($item->product->categories_id === 1) {
+                    if ($item->product && $item->product->categories_id === 1) {
                         $produkDetails .= '<li>'
                             . $item->product_name
                             . ' IMEI: ' . $item->product->nomor_seri

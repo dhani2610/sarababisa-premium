@@ -39,28 +39,60 @@ class BisaDiambilController extends Controller
 
     public function getData(Request $request)
     {
-        $limit = $request->get('limit', 200);
-        $offset = $request->get('offset', 0);
+        $cabangId = getCabangId();
+        $tokoSetting = StoreSetting::where('cabang_id', $cabangId)->first();
+        $fonteeToken = $tokoSetting->fonnte ?? null;
+        $isEditTransaksi = (int) ($tokoSetting->is_edit_transaksi ?? 0) === 1;
+        $hariIni = Carbon::today();
+        $userRole = Auth::user()->role ?? '';
 
-        $isTeknisi = auth()->check() && auth()->user()->role === 'Teknisi';
+        if ($cabangId == 1) {
+            $kp = User::find(1);
+        } else {
+            $kp = User::where('cabang_id', $cabangId)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first() ?? User::find(1);
+        }
+        $banks = json_decode($kp->banks ?? '[]', true) ?: [];
+        $pgMethods = MetodePembayaran::where('cabang_id', $cabangId)->pluck('nama')->flip()->all();
+
+        $isTeknisi = $userRole === 'Teknisi';
         $teknisiServisIds = $isTeknisi ? servisIdMultiTeknisi(auth()->id()) : [];
 
-        $query = ServiceTransaction::with(['customer', 'user'])
-            ->where('status_servis', 'Bisa Diambil')
-            ->where('cabang_id', getCabangId())
+        $query = ServiceTransaction::with(['customer', 'user', 'teknisi_tambahan.teknisi'])
+            ->where('service_transactions.status_servis', 'Bisa Diambil')
+            ->where('service_transactions.cabang_id', $cabangId)
             ->when($isTeknisi, function ($q) use ($teknisiServisIds) {
-                $q->whereIn('id', $teknisiServisIds);
+                $q->whereIn('service_transactions.id', $teknisiServisIds);
             })
-            ->orderBy('created_at', 'desc')
-            ->latest()
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+            ->orderBy('service_transactions.created_at', 'desc');
 
         return DataTables::of($query)
             ->addIndexColumn()
-            ->addColumn('checkbox', function ($row) {
-                if (auth()->user()->role === 'Investor') return '';
+            ->filterColumn('pelanggan', function ($q, $keyword) {
+                $q->where(function ($sub) use ($keyword) {
+                    $sub->where('service_transactions.nama_pelanggan', 'like', "%{$keyword}%")
+                        ->orWhereHas('customer', function ($cq) use ($keyword) {
+                            $cq->where('nama', 'like', "%{$keyword}%")
+                               ->orWhere('nomor_hp', 'like', "%{$keyword}%");
+                        });
+                });
+            })
+            ->filterColumn('kondisi', function ($q, $keyword) {
+                $q->where('service_transactions.kondisi_servis', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('tindakan', function ($q, $keyword) {
+                $q->where('service_transactions.tindakan_servis', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('teknisi', function ($q, $keyword) {
+                $q->where(function ($sub) use ($keyword) {
+                    $sub->whereHas('user', function ($uq) use ($keyword) {
+                        $uq->where('name', 'like', "%{$keyword}%");
+                    })->orWhereHas('teknisi_tambahan.teknisi', function ($tq) use ($keyword) {
+                        $tq->where('name', 'like', "%{$keyword}%");
+                    });
+                });
+            })
+            ->addColumn('checkbox', function ($row) use ($userRole) {
+                if ($userRole === 'Investor') return '';
                 return '
                     <div class="flex items-center">
                         <label class="inline-flex">
@@ -70,12 +102,10 @@ class BisaDiambilController extends Controller
                     </div>
                 ';
             })
-            ->addColumn('nomor_servis', function ($row) {
-                if (auth()->user()->role !== 'Investor') {
-                    $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
-                    $hariIni = \Carbon\Carbon::today();
-                    $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
-                    if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
+            ->addColumn('nomor_servis', function ($row) use ($userRole, $isEditTransaksi, $hariIni) {
+                if ($userRole !== 'Investor') {
+                    $tanggalTransaksi = Carbon::parse($row->created_at);
+                    if ($isEditTransaksi || $tanggalTransaksi->isSameDay($hariIni) || $userRole == 'Kepala Toko'){
                         return '
                             <a href="'.route('transaksi-servis-bisa-diambil.edit', $row->id).'">
                                 <div class="flex items-center text-blue-600">
@@ -96,86 +126,57 @@ class BisaDiambilController extends Controller
                     return '<div class="font-medium text-rose-600">Data pelanggan telah dihapus</div>';
                 return '<div class="font-medium">'.e($row->customer->nama).'</div>';
             })
-            ->addColumn('hubungi', function ($row) {
-                if (auth()->user()->role === 'Investor') return '';
+            ->addColumn('hubungi', function ($row) use ($userRole, $kp, $banks, $pgMethods, $fonteeToken) {
+                if ($userRole === 'Investor') return '';
 
                 $nomor = $row->customer->nomor_hp ?? null;
                 if (!$nomor) return '-';
 
                 // Format nomor ke 628...
                 $nomorwa = preg_replace('/^08/', '628', $nomor);
+                $is_pg = isset($pgMethods[$row->cara_pembayaran]);
 
-                // Ambil data toko & token
-                if ($row->cabang_id == 1) {
-                    $kp = User::find(1);
-                } else {
-                    $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
-                }
-
-                $metodePembayaranPaymentGateway = MetodePembayaran::where('cabang_id',getCabangId())->where('nama',$row->cara_pembayaran)->first();
-                if (!empty($metodePembayaranPaymentGateway)) {
-                    $is_pg = true;
-                }else{
-                    $is_pg = false;
-                }
-                $banks = old('banks', json_decode($kp->banks ?? '[]', true));
-
-                $fonteeToken = StoreSetting::where('cabang_id',getCabangId())->first()->fonnte ?? null;
-                $notaQc = route('kepalatoko-cetak-qc', $row->id);
-
-                $rawPesan = "*Notifikasi | {$kp->nama_toko}*\n" .
+                $rawPesan = "*Notifikasi | " . ($kp->nama_toko ?? '') . "*\n" .
                             "Barang Servis: *{$row->nama_barang}*\n" .
                             "No. Servis: *{$row->nomor_servis}*\n" .
                             "Kondisi: *{$row->kondisi_servis}*\n" .
                             "Tanggal: " . Carbon::parse($row->tgl_selesai)->translatedFormat('d F Y') . "\n" .
                             "Status: *{$row->status_servis}*\n" .
                             "Biaya: Rp. " . number_format($row->biaya) . "\n\n";
-                            // "Link QC: {$notaQc}\n\n" ;
 
-                        if ($is_pg) {
-                            $rawPesan .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n";
-
-                            $rawPesan .= "Link Pembayaran : " . route('payment', $row->id) . "\n\n";
-                        } else {
-                            $rawPesan .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n\n";
-                        }
-
+                if ($is_pg) {
+                    $rawPesan .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n";
+                    $rawPesan .= "Link Pembayaran : " . route('payment', $row->id) . "\n\n";
+                } else {
+                    $rawPesan .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n\n";
+                }
 
                 $rawPesan .= 'Informasi Pembayaran :' ."\n";
-
-                $rawPesan .= 'Bank : '. $kp->bank . "\n";
-                $rawPesan .= 'Norek : '. $kp->rekening . "\n";
-                $rawPesan .= 'a.n : '. $kp->pemilik_rekening . "\n";
+                $rawPesan .= 'Bank : '. ($kp->bank ?? '') . "\n";
+                $rawPesan .= 'Norek : '. ($kp->rekening ?? '') . "\n";
+                $rawPesan .= 'a.n : '. ($kp->pemilik_rekening ?? '') . "\n";
 
                 if (!empty($banks)) {
                     foreach ($banks as $bank) {
-                        $rawPesan .= 'Bank : '. $bank['bank'] . "\n";
-                        $rawPesan .= 'Norek : '. $bank['rekening'] . "\n";
-                        $rawPesan .= 'a.n : '. $bank['pemilik'] . "\n";
+                        $rawPesan .= 'Bank : '. ($bank['bank'] ?? '') . "\n";
+                        $rawPesan .= 'Norek : '. ($bank['rekening'] ?? '') . "\n";
+                        $rawPesan .= 'a.n : '. ($bank['pemilik'] ?? '') . "\n";
                     }
                 }
 
                 $rawPesan .= "Terimakasih";
-
-                // $pesan = rawurlencode("*Notifikasi | {$toko->nama_toko}*%0ABarang Servis *{$row->nama_barang}*%0A"
-                //     ."No. Servis *{$row->nomor_servis}*%0AKondisi: *{$row->kondisi_servis}*%0A"
-                //     ."Tanggal: ".Carbon::parse($row->tgl_selesai)->translatedFormat('d F Y')."%0A"
-                //     ."Status: *{$row->status_servis}*%0ABiaya: Rp. ".number_format($row->biaya)."%0A%0ALink QC: {$notaQc}%0A"."%0A%0ATerima Kasih.");
 
                 // Encode untuk Link WA Biasa (mengubah spasi jadi %20, enter jadi %0A, dll)
                 $waLinkPesan = rawurlencode($rawPesan);
 
                 // Escape untuk Javascript (Fonnte) agar kutip/enter tidak bikin error JS
                 $jsPesan = json_encode($rawPesan);
-                // Kita trim kutip dua di awal/akhir dari hasil json_encode agar pas masuk ke function JS
                 $jsPesan = trim($jsPesan, '"');
 
                 // --- LOGIKA TOMBOL NOTIFIKASI (TOMBOL KE-2) ---
                 if ($fonteeToken) {
-                    // Jika pakai Fonnte
                     $btnNotif = '<a href="javascript:void(0)" onclick="kirimFontee(\''.$fonteeToken.'\', \''.$nomorwa.'\', \''.$jsPesan.'\')" title="Kirim Notifikasi (Fonnte)">';
                 } else {
-                    // Jika pakai WA API Biasa (Gratis)
                     $btnNotif = '<a href="https://wa.me/'.$nomorwa.'?text='.$waLinkPesan.'" target="_blank" title="Kirim Notifikasi (WA Biasa)">';
                 }
 
@@ -209,7 +210,6 @@ class BisaDiambilController extends Controller
                     </a>
                 ';
             })
-            // ->addColumn('fungsi', fn($r) => '<div class="font-medium">'.e($r->qc_masuk).'</div>')
             ->addColumn('kondisi', function ($row) {
                 $color = match ($row->kondisi_servis) {
                     'Sudah jadi' => 'bg-emerald-100 text-emerald-600',
@@ -220,7 +220,7 @@ class BisaDiambilController extends Controller
                 return '<div class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 '.$color.'">'.e($row->kondisi_servis).'</div>';
             })
             ->addColumn('tindakan', function ($row) {
-                $teknisiServis = TeknisiServis::where('service_transactions_id', $row->id)->get();
+                $teknisiServis = $row->teknisi_tambahan;
 
                 if ($teknisiServis->isEmpty()) {
                     return '<div class="font-medium">'.implode(', ', json_decode($row->tindakan_servis) ?? []).'</div>';
@@ -242,13 +242,10 @@ class BisaDiambilController extends Controller
                     return '<div class="font-medium">'.implode(', ', $tindakanArr).'</div>';
                 }
             })
-            // ->addColumn('tindakan', fn($r) => '<div class="font-medium">'.implode(', ', json_decode($r->tindakan_servis) ?? []).'</div>')
             ->addColumn('teknisi', function ($row) {
-
-                $teknisiServis = TeknisiServis::where('service_transactions_id', $row->id)->get();
+                $teknisiServis = $row->teknisi_tambahan;
 
                 if ($teknisiServis->isEmpty()) {
-                    // return '<div class="font-medium">'.e($row->user->name).'</div>';
                     return $row->user
                         ? '<div class="font-medium">'.e($row->user->name).'</div>'
                         : '<div class="font-medium text-red-600">-</div>';
@@ -262,30 +259,16 @@ class BisaDiambilController extends Controller
 
                     return '<div class="font-medium">'.implode(', ', $tindakanArr).'</div>';
                 }
-
-                // return $r->user
-                //     ? '<div class="font-medium">'.e($r->user->name).'</div>'
-                //     : '<div class="font-medium text-red-600">-</div>';
             })
-            ->addColumn('modal_sparepart', function ($r) {
-                if (auth()->user()->role === 'Investor') return '';
+            ->addColumn('modal_sparepart', function ($r) use ($userRole) {
+                if ($userRole === 'Investor') return '';
                 return '<div class="font-medium">Rp. '.number_format($r->modal_sparepart).'</div>';
             })
             ->addColumn('biaya', fn($r) => '<div class="font-medium">Rp. '.number_format($r->biaya).'</div>')
             ->addColumn('tgl_selesai', fn($r) => Carbon::parse($r->tgl_selesai)->format('d/m/Y'))
-            ->addColumn('aksi', function ($row) {
+            ->addColumn('aksi', function ($row) use ($userRole) {
                 $delurl = route('transaksi-servis-bisa-diambil.destroy', $row->id);
-                if (auth()->user()->role === 'Investor') return '';
-
-                $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
-                $hariIni = \Carbon\Carbon::today();
-                $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
-                if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || auth()->user()->role == 'Kepala Toko'){
-                    $styleHide = '';
-                }else{
-                    $styleHide = 'display:none!important';
-                }
-                $urlMultiTeknisi = route('multi-teknisi', $row->id);
+                if ($userRole === 'Investor') return '';
 
                 return '
                     <div class="space-x-1 flex">

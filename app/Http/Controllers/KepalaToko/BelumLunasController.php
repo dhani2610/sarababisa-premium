@@ -115,25 +115,53 @@ class BelumLunasController extends Controller
 
     public function getData(Request $request)
     {
-        $limit = $request->get('limit', 200);
-        $offset = $request->get('offset', 0);
+        $cabangId = getCabangId();
+        $tokoSetting = StoreSetting::where('cabang_id', $cabangId)->first();
+        $fonnteToken = $tokoSetting->fonnte ?? null;
+        $hasToken = !empty($fonnteToken);
+        $isEditTransaksi = (int) ($tokoSetting->is_edit_transaksi ?? 0) === 1;
+        $hariIni = Carbon::today();
+        $userRole = Auth::user()->role ?? '';
 
-        $query = ServiceTransaction::with(['customer', 'user'])
-            ->where('status_servis', 'Sudah Diambil')
-            ->where('tipe_status_pembayaran', '0')
-            ->where('cabang_id', getCabangId())
-            ->orderBy('created_at', 'desc')
-            ->latest()
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        if ($cabangId == 1) {
+            $kp = User::find(1);
+        } else {
+            $kp = User::where('cabang_id', $cabangId)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first() ?? User::find(1);
+        }
+        $banks = json_decode($kp->banks ?? '[]', true) ?: [];
+        $pgMethods = MetodePembayaran::where('cabang_id', $cabangId)->pluck('nama')->flip()->all();
+        $trackingUrl = env('APP_URL') . '/tracking';
+
+        $query = ServiceTransaction::with(['customer', 'user', 'teknisi_tambahan.teknisi'])
+            ->where('service_transactions.status_servis', 'Sudah Diambil')
+            ->where('service_transactions.tipe_status_pembayaran', '0')
+            ->where('service_transactions.cabang_id', $cabangId)
+            ->orderBy('service_transactions.created_at', 'desc');
 
         return DataTables::of($query)
             ->addIndexColumn()
+            ->filterColumn('pelanggan', function ($q, $keyword) {
+                $q->where(function ($sub) use ($keyword) {
+                    $sub->where('service_transactions.nama_pelanggan', 'like', "%{$keyword}%")
+                        ->orWhereHas('customer', function ($cq) use ($keyword) {
+                            $cq->where('nama', 'like', "%{$keyword}%")
+                               ->orWhere('nomor_hp', 'like', "%{$keyword}%");
+                        });
+                });
+            })
+            ->filterColumn('teknisi', function ($q, $keyword) {
+                $q->where(function ($sub) use ($keyword) {
+                    $sub->whereHas('user', function ($uq) use ($keyword) {
+                        $uq->where('name', 'like', "%{$keyword}%");
+                    })->orWhereHas('teknisi_tambahan.teknisi', function ($tq) use ($keyword) {
+                        $tq->where('name', 'like', "%{$keyword}%");
+                    });
+                });
+            })
 
             // ✅ Checkbox
-            ->addColumn('checkbox', function ($row) {
-                if (auth()->user()->role == 'Investor') return '';
+            ->addColumn('checkbox', function ($row) use ($userRole) {
+                if ($userRole == 'Investor') return '';
                 return '
                     <div class="flex items-center">
                         <label class="inline-flex">
@@ -144,13 +172,11 @@ class BelumLunasController extends Controller
             })
 
             // ✅ Nomor Servis (link edit kalau bukan investor)
-            ->addColumn('nomor_servis', function ($row) {
+            ->addColumn('nomor_servis', function ($row) use ($userRole, $isEditTransaksi, $hariIni) {
                 $url = route('transaksi-servis-sudah-diambil.edit', $row->id);
-                if (auth()->user()->role != 'Investor') {
-                    $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
-                    $hariIni = \Carbon\Carbon::today();
-                    $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
-                    if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || Auth::user()->role == 'Kepala Toko'){
+                if ($userRole != 'Investor') {
+                    $tanggalTransaksi = Carbon::parse($row->created_at);
+                    if ($isEditTransaksi || $tanggalTransaksi->isSameDay($hariIni) || $userRole == 'Kepala Toko'){
                         return '
                             <a href="'.$url.'" class="text-blue-600 flex items-center">
                                 <svg class="w-5 h-5 mr-1 fill-current" viewBox="0 0 32 32"><path d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4z"/></svg>
@@ -173,30 +199,16 @@ class BelumLunasController extends Controller
             ->addColumn('pelanggan', fn($row) => $row->customer?->nama ?? '')
 
             // ✅ Hubungi (whatsapp + fonnte)
-            ->addColumn('hubungi', function ($row) {
+            ->addColumn('hubungi', function ($row) use ($fonnteToken, $hasToken, $kp, $banks, $pgMethods, $trackingUrl) {
                  if (!$row->customer) return '';
-                    $toko = StoreSetting::where('cabang_id',$row->cabang_id)->first();
                     $nomor = $row->customer->nomor_hp;
                     $nomorClean = preg_replace('/[^0-9]/', '', $nomor);
 
                     // 2. Baru ubah 08 menjadi 628
                     $nomorwa = preg_replace('/^08/', '628', $nomorClean);
-                    $fonnteToken = $toko->fonnte ?? null;
-                    $hasToken = !empty($fonnteToken);
+                    $is_pg = isset($pgMethods[$row->cara_pembayaran]);
 
-                    if ($row->cabang_id == 1) {
-                        $kp = User::find(1);
-                    } else {
-                        $kp = User::where('cabang_id', $row->cabang_id)->where('id', '!=', 1)->where('role', 'Kepala Toko')->orderBy('id', 'asc')->first();
-                    }
-                    $metodePembayaranPaymentGateway = MetodePembayaran::where('cabang_id',getCabangId())->where('nama',$row->cara_pembayaran)->first();
-                    if (!empty($metodePembayaranPaymentGateway)) {
-                        $is_pg = true;
-                    }else{
-                        $is_pg = false;
-                    }
-
-                    $message = "*Notifikasi Service*\n{$kp->nama_toko}\n\n"
+                    $message = "*Notifikasi Service*\n" . ($kp->nama_toko ?? '') . "\n\n"
                         . "No. Service : {$row->nomor_servis}\n"
                         . "Nama user : *{$row->nama_pelanggan}*\n"
                         . "Unit : {$row->nama_barang}\n"
@@ -205,30 +217,25 @@ class BelumLunasController extends Controller
                         . "Status : {$row->kondisi_servis}\n"
                         . "Garansi sampai : " . ($row->exp_garansi ? Carbon::parse($row->exp_garansi)->translatedFormat('d F Y') : 'Tidak ada garansi') . "\n"
                         . "Pembayaran : {$row->cara_pembayaran}\n\n"
-                        . "Link tracking : " . env('APP_URL') . "/tracking\n"
+                        . "Link tracking : " . $trackingUrl . "\n"
                         . "Link Nota : " . route('kepalatoko-pengambilan-cetak-inkjet', $row->id)  . "\n";
                         if ($is_pg) {
                             $message .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n";
-
                             $message .= "Link Pembayaran : " . route('payment', $row->id) . "\n\n";
                         } else {
                             $message .= "Link QC : " . route('kepalatoko-cetak-qc', $row->id) . "\n\n";
                         }
 
-                    $banks = old('banks', json_decode($kp->banks ?? '[]', true));
-
                     $message .= 'Informasi Pembayaran :' ."\n";
-
-                    $message .= 'Bank : '. $kp->bank . "\n";
-                    $message .= 'Norek : '. $kp->rekening . "\n";
-                    $message .= 'a.n : '. $kp->pemilik_rekening . "\n";
+                    $message .= 'Bank : '. ($kp->bank ?? '') . "\n";
+                    $message .= 'Norek : '. ($kp->rekening ?? '') . "\n";
+                    $message .= 'a.n : '. ($kp->pemilik_rekening ?? '') . "\n";
 
                     if (!empty($banks)) {
-
                         foreach ($banks as $bank) {
-                            $message .= 'Bank : '. $bank['bank'] . "\n";
-                            $message .= 'Norek : '. $bank['rekening'] . "\n";
-                            $message .= 'a.n : '. $bank['pemilik'] . "\n";
+                            $message .= 'Bank : '. ($bank['bank'] ?? '') . "\n";
+                            $message .= 'Norek : '. ($bank['rekening'] ?? '') . "\n";
+                            $message .= 'a.n : '. ($bank['pemilik'] ?? '') . "\n";
                         }
                     }
 
@@ -240,7 +247,6 @@ class BelumLunasController extends Controller
                     <div class="flex space-x-1">
                         <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                     ';
-
 
                     if ($hasToken) {
                         // ✅ Kirim otomatis via Fonnte
@@ -327,14 +333,8 @@ class BelumLunasController extends Controller
                 return '<div class="inline-flex rounded-full px-2.5 py-0.5 '.$color.'">'.$row->kondisi_servis.'</div>';
             })
 
-            // ✅ Tindakan Servis
-            // ->addColumn('tindakan_servis', fn($row) => implode(', ', json_decode($row->tindakan_servis) ?? []))
-
-            // // ✅ Teknisi
-            // ->addColumn('teknisi', fn($row) => $row->user?->name ?? '<span class="text-red-600">Akun dihapus</span>')
-
             ->addColumn('tindakan_servis', function ($row) {
-                $teknisiServis = TeknisiServis::where('service_transactions_id', $row->id)->get();
+                $teknisiServis = $row->teknisi_tambahan;
 
                 if ($teknisiServis->isEmpty()) {
                     return '<div class="font-medium">'.implode(', ', json_decode($row->tindakan_servis) ?? []).'</div>';
@@ -356,13 +356,10 @@ class BelumLunasController extends Controller
                     return '<div class="font-medium">'.implode(', ', $tindakanArr).'</div>';
                 }
             })
-            // ->addColumn('tindakan', fn($r) => '<div class="font-medium">'.implode(', ', json_decode($r->tindakan_servis) ?? []).'</div>')
             ->addColumn('teknisi', function ($row) {
-
-                $teknisiServis = TeknisiServis::where('service_transactions_id', $row->id)->get();
+                $teknisiServis = $row->teknisi_tambahan;
 
                 if ($teknisiServis->isEmpty()) {
-                    // return '<div class="font-medium">'.e($row->user->name).'</div>';
                     return $row->user
                         ? '<div class="font-medium">'.e($row->user->name).'</div>'
                         : '<div class="font-medium text-red-600">-</div>';
@@ -376,10 +373,6 @@ class BelumLunasController extends Controller
 
                     return '<div class="font-medium">'.implode(', ', $tindakanArr).'</div>';
                 }
-
-                // return $r->user
-                //     ? '<div class="font-medium">'.e($r->user->name).'</div>'
-                //     : '<div class="font-medium text-red-600">-</div>';
             })
             // ✅ Modal, Biaya, Diskon
             ->addColumn('modal_sparepart', fn($row) => 'Rp. '.number_format($row->modal_sparepart))
@@ -404,8 +397,8 @@ class BelumLunasController extends Controller
             })
 
             // ✅ Status Approve
-            ->addColumn('status', function ($row) {
-                $url = auth()->user()->role == 'Kepala Toko'
+            ->addColumn('status', function ($row) use ($userRole) {
+                $url = $userRole == 'Kepala Toko'
                     ? route('transaksi-servis-approve.edit', $row->id)
                     : '#';
 
@@ -424,10 +417,6 @@ class BelumLunasController extends Controller
                 $destroyBase = route('transaksi-servis-sudah-diambil.destroy', '');
                 $termalBase  = route('kepalatoko-nota-pengambilan-termal', '');
                 $inkjetBase  = route('kepalatoko-pengambilan-cetak-inkjet', '');
-
-                $tanggalTransaksi = \Carbon\Carbon::parse($row->created_at);
-                $hariIni = \Carbon\Carbon::today();
-                $tokoSetting = \App\Models\StoreSetting::where('cabang_id',getCabangId())->first();
                 if ((int) ($tokoSetting->is_edit_transaksi ?? 0) == 1 || $tanggalTransaksi->isSameDay($hariIni) || auth()->user()->role == 'Kepala Toko'){
                     $styleHide = '';
                 }else{

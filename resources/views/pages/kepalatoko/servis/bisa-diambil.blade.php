@@ -43,9 +43,11 @@
             $(document).ready(function() {
 
                 var table = $('#transaksi-servis-table').DataTable({
-                    processing: false,
-                    serverSide: false,
-                    // ajax: '{{ route('transaksi-servis-bisa-diambil.data') }}',
+                    processing: true,
+                    serverSide: true,
+                    deferRender: true,
+                    searchDelay: 400,
+                    ajax: '{{ route('transaksi-servis-bisa-diambil.data') }}',
                     columns: [
                         @if (Auth::user()->role != 'Investor')
                             {
@@ -66,7 +68,7 @@
                         },
                         {
                             data: 'tgl_terima',
-                            name: 'tgl_terima'
+                            name: 'created_at'
                         },
                         {
                             data: 'penerima',
@@ -74,7 +76,8 @@
                         },
                         {
                             data: 'pelanggan',
-                            name: 'pelanggan'
+                            name: 'pelanggan',
+                            orderable: false
                         },
                         @if (Auth::user()->role != 'Investor')
                             {
@@ -93,21 +96,25 @@
                         },
                         {
                             data: 'fungsi',
-                            name: 'fungsi'
+                            name: 'fungsi',
+                            orderable: false,
+                            searchable: false
                         },
                         {
                             data: 'kondisi',
                             name: 'kondisi',
                             orderable: false,
-                            searchable: false
+                            searchable: true
                         },
                         {
                             data: 'tindakan',
-                            name: 'tindakan'
+                            name: 'tindakan',
+                            orderable: false
                         },
                         {
                             data: 'teknisi',
-                            name: 'teknisi'
+                            name: 'teknisi',
+                            orderable: false
                         },
                         @if (Auth::user()->role == 'Kepala Toko' || $storeSetting->is_modal == 1)
                             {
@@ -139,33 +146,6 @@
                         attachCheckboxHandlers();
                     }
                 });
-
-                // --- custom pagination load bertahap ---
-                let batchSize = 20;
-                let offset = 0;
-                let loading = false;
-
-                function loadBatch() {
-                    if (loading) return;
-                    loading = true;
-                    $.ajax({
-                        url: '{{ route('transaksi-servis-bisa-diambil.data') }}?offset=' + offset + '&limit=' + batchSize,
-                        success: function(response) {
-                            if (response.data.length > 0) {
-                                table.rows.add(response.data).draw(false);
-                                offset += batchSize;
-                                loading = false;
-                                // lanjut load batch berikutnya
-                                setTimeout(loadBatch, 100);
-                            } else {
-                                console.log('semua data sudah dimuat');
-                            }
-                        }
-                    });
-                }
-
-                    // mulai load pertama
-                loadBatch();
 
                 function attachCheckboxHandlers() {
                     $('#parent-checkbox').off('click').on('click', function() {

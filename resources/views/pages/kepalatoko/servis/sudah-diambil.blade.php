@@ -44,9 +44,11 @@
             $(document).ready(function() {
 
                 var table = $('#transaksi-servis-table').DataTable({
-                    processing: true, // Loading indicator bawaan
-                    serverSide: false, // Client-side processing (karena kita inject data manual)
-                    deferRender: true, // Optimasi render untuk data banyak
+                    processing: true,
+                    serverSide: true,
+                    deferRender: true,
+                    searchDelay: 400,
+                    ajax: '{{ route('transaksi-servis-sudah-diambil.data') }}',
                     columns: [
                         @if (Auth::user()->role != 'Investor')
                             {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},
@@ -55,16 +57,16 @@
                         {data: 'nomor_servis', name: 'nomor_servis'},
                         {data: 'created_at', name: 'created_at'},
                         {data: 'penerima', name: 'penerima'},
-                        {data: 'pelanggan', name: 'pelanggan'},
+                        {data: 'pelanggan', name: 'pelanggan', orderable: false},
                         @if (Auth::user()->role != 'Investor')
                             {data: 'hubungi', name: 'hubungi', orderable: false, searchable: false},
                         @endif
                         {data: 'nama_barang', name: 'nama_barang'},
                         {data: 'kerusakan', name: 'kerusakan'},
-                        {data: 'fungsi', name: 'fungsi'},
+                        {data: 'fungsi', name: 'fungsi', orderable: false, searchable: false},
                         {data: 'kondisi_servis', name: 'kondisi_servis'},
-                        {data: 'tindakan_servis', name: 'tindakan_servis'},
-                        {data: 'teknisi', name: 'teknisi'},
+                        {data: 'tindakan_servis', name: 'tindakan_servis', orderable: false},
+                        {data: 'teknisi', name: 'teknisi', orderable: false},
                         @if (Auth::user()->role == 'Kepala Toko' || $storeSetting->is_modal == 1)
                             {data: 'modal_sparepart', name: 'modal_sparepart'},
                         @endif
@@ -81,7 +83,7 @@
                             {data: 'aksi', name: 'aksi', orderable: false, searchable: false},
                         @endif
                     ],
-                    order: [], // Matikan default sorting agar data masuk sesuai urutan fetch
+                    order: [],
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
                     },
@@ -89,55 +91,6 @@
                         attachCheckboxHandlers();
                     }
                 });
-
-                // 2. Logic Load Bertahap (Batch Loading)
-                let batchSize = 50; // Jumlah data per request
-                let offset = 0;
-                let isLoading = false;
-                let isFinished = false;
-
-                function loadBatch() {
-                    // Cegah request ganda atau jika data sudah habis
-                    if (isLoading || isFinished) return;
-
-                    isLoading = true;
-
-                    $.ajax({
-                        url: '{{ route('transaksi-servis-sudah-diambil.data') }}',
-                        type: 'GET',
-                        data: {
-                            offset: offset,
-                            limit: batchSize
-                        },
-                        success: function(response) {
-                            // Pastikan response.data ada dan berupa array
-                            if (response.data && response.data.length > 0) {
-
-                                // Tambahkan data ke tabel dan redraw
-                                table.rows.add(response.data).draw(false);
-
-                                // Update offset
-                                offset += batchSize;
-                                isLoading = false;
-
-                                // Lanjut load batch berikutnya dengan jeda kecil
-                                setTimeout(loadBatch, 100);
-                            } else {
-                                // Data habis, stop looping
-                                isFinished = true;
-                                isLoading = false;
-                                console.log('Semua data berhasil dimuat.');
-                            }
-                        },
-                        error: function() {
-                            isLoading = false;
-                            console.error('Gagal memuat data.');
-                        }
-                    });
-                }
-
-                // 3. Panggil fungsi load pertama kali
-                loadBatch();
 
                 function attachCheckboxHandlers() {
                     $('#parent-checkbox').off('click').on('click', function() {

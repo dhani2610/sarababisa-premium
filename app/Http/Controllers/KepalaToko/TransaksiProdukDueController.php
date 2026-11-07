@@ -18,10 +18,18 @@ class TransaksiProdukDueController extends Controller
      */
     public function index()
     {
-        $jumlah_semua = Order::where('cabang_id',getCabangId())->get()->count();
-        $jumlah_lunas = Order::where('cabang_id',getCabangId())->where('due', '0')->count();
-        $jumlah_tidaklunas = Order::where('cabang_id',getCabangId())->where('due', '>', '0')->count();
-        $storeSettings = StoreSetting::where('cabang_id', getCabangId())->first();
+        $cabangId = getCabangId();
+        $counts = Order::where('cabang_id', $cabangId)
+            ->selectRaw("
+                COUNT(*) as jumlah_semua,
+                SUM(CASE WHEN due = 0 THEN 1 ELSE 0 END) as jumlah_lunas,
+                SUM(CASE WHEN due > 0 THEN 1 ELSE 0 END) as jumlah_tidaklunas
+            ")
+            ->first();
+        $jumlah_semua = (int) ($counts->jumlah_semua ?? 0);
+        $jumlah_lunas = (int) ($counts->jumlah_lunas ?? 0);
+        $jumlah_tidaklunas = (int) ($counts->jumlah_tidaklunas ?? 0);
+        $storeSettings = StoreSetting::where('cabang_id', $cabangId)->first();
 
         return view('pages/kepalatoko/produk/transaksi-tidak-lunas', compact(
             'jumlah_semua',
