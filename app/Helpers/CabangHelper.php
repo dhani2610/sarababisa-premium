@@ -669,21 +669,22 @@ if (!function_exists('calculateTotalWorkerBonusForCabang')) {
 
         $totalBonus = 0;
 
+        $startTime = $start_date . ' 00:00:00';
+        $endTime   = $end_date . ' 23:59:59';
+
         // 1. Bulk Teknisi Bonus
         if (!empty($teknisiUsers)) {
             $tekIds = array_keys($teknisiUsers);
             $txs = ServiceTransaction::where('cabang_id', $cabangId)
                 ->where('status_servis', 'Sudah Diambil')
                 ->where('is_approve', 'Setuju')
-                ->where(function ($q) use ($start_date, $end_date) {
-                    $q->where(function ($sub) use ($start_date, $end_date) {
+                ->where(function ($q) use ($start_date, $end_date, $endTime) {
+                    $q->where(function ($sub) use ($start_date, $endTime) {
                         $sub->whereNotNull('tgl_ambil')
-                            ->whereDate('tgl_ambil', '>=', $start_date)
-                            ->whereDate('tgl_ambil', '<=', $end_date);
+                            ->whereBetween('tgl_ambil', [$start_date, $endTime]);
                     })->orWhere(function ($sub) use ($start_date, $end_date) {
                         $sub->whereNull('tgl_ambil')
-                            ->whereDate('tgl_disetujui', '>=', $start_date)
-                            ->whereDate('tgl_disetujui', '<=', $end_date);
+                            ->whereBetween('tgl_disetujui', [$start_date, $end_date]);
                     });
                 })
                 ->where(function ($q) use ($tekIds) {
@@ -745,8 +746,7 @@ if (!function_exists('calculateTotalWorkerBonusForCabang')) {
                 ->whereIn('order_details.users_id', $salesIds)
                 ->where('orders.is_approve', 'Setuju')
                 ->where('orders.cabang_id', $cabangId)
-                ->whereDate('orders.tgl_disetujui', '>=', $start_date)
-                ->whereDate('orders.tgl_disetujui', '<=', $end_date)
+                ->whereBetween('orders.tgl_disetujui', [$start_date, $end_date])
                 ->groupBy('order_details.users_id')
                 ->selectRaw('order_details.users_id, COALESCE(SUM(order_details.profit), 0) as total_profit')
                 ->pluck('total_profit', 'users_id');
@@ -770,15 +770,13 @@ if (!function_exists('calculateTotalWorkerBonusForCabang')) {
                 ->where('status_servis', 'Sudah Diambil')
                 ->where('is_approve', 'Setuju')
                 ->where('cabang_id', $cabangId)
-                ->where(function ($q) use ($start_date, $end_date) {
-                    $q->where(function ($sub) use ($start_date, $end_date) {
+                ->where(function ($q) use ($start_date, $end_date, $endTime) {
+                    $q->where(function ($sub) use ($start_date, $endTime) {
                         $sub->whereNotNull('tgl_ambil')
-                            ->whereDate('tgl_ambil', '>=', $start_date)
-                            ->whereDate('tgl_ambil', '<=', $end_date);
+                            ->whereBetween('tgl_ambil', [$start_date, $endTime]);
                     })->orWhere(function ($sub) use ($start_date, $end_date) {
                         $sub->whereNull('tgl_ambil')
-                            ->whereDate('tgl_disetujui', '>=', $start_date)
-                            ->whereDate('tgl_disetujui', '<=', $end_date);
+                            ->whereBetween('tgl_disetujui', [$start_date, $end_date]);
                     });
                 })
                 ->groupBy('admin_id')
@@ -793,15 +791,13 @@ if (!function_exists('calculateTotalWorkerBonusForCabang')) {
                 ->whereIn('order_details.admin_id', $adminIds)
                 ->where('orders.is_approve', 'Setuju')
                 ->where('orders.cabang_id', $cabangId)
-                ->where(function ($q) use ($start_date, $end_date) {
+                ->where(function ($q) use ($start_date, $end_date, $startTime, $endTime) {
                     $q->where(function ($sub) use ($start_date, $end_date) {
                         $sub->whereNotNull('orders.tgl_disetujui')
-                            ->whereDate('orders.tgl_disetujui', '>=', $start_date)
-                            ->whereDate('orders.tgl_disetujui', '<=', $end_date);
-                    })->orWhere(function ($sub) use ($start_date, $end_date) {
+                            ->whereBetween('orders.tgl_disetujui', [$start_date, $end_date]);
+                    })->orWhere(function ($sub) use ($startTime, $endTime) {
                         $sub->whereNull('orders.tgl_disetujui')
-                            ->whereDate('orders.created_at', '>=', $start_date)
-                            ->whereDate('orders.created_at', '<=', $end_date);
+                            ->whereBetween('orders.created_at', [$startTime, $endTime]);
                     });
                 })
                 ->groupBy('order_details.admin_id')

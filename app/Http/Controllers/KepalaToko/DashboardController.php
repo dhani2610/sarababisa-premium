@@ -54,14 +54,13 @@ class DashboardController extends Controller
         $todayStartTime = $todayStr . ' 00:00:00';
         $todayEndTime = $todayStr . ' 23:59:59';
 
-        // TYPES & PROFIT SERVIS PER TYPE (1 grouped query instead of N+1 + eager loading)
+        // TYPES & PROFIT SERVIS PER TYPE (1 grouped query using index-friendly date range)
         $types = Type::where('cabang_id', $cabang)->get();
         $typeProfits = DB::table('service_transactions')
             ->whereNull('deleted_at')
             ->where('cabang_id', $cabang)
             ->where('is_approve', 'Setuju')
-            ->whereYear('tgl_disetujui', $year)
-            ->whereMonth('tgl_disetujui', $month)
+            ->whereBetween('tgl_disetujui', [$monthStart, $monthEnd])
             ->whereNotNull('types_id')
             ->groupBy('types_id')
             ->selectRaw('types_id, COALESCE(SUM(profit), 0) as total_profit')
@@ -71,7 +70,7 @@ class DashboardController extends Controller
             $t->filtered_profit = (float) ($typeProfits[$t->id] ?? 0);
         }
 
-        // CATEGORIES & CATEGORY SALES (1 grouped query instead of N+1 whereHas)
+        // CATEGORIES & CATEGORY SALES (1 grouped query using index-friendly date range)
         $categories = Category::get();
         $catSalesMap = DB::table('order_details')
             ->join('orders', 'order_details.orders_id', '=', 'orders.id')
@@ -81,8 +80,7 @@ class DashboardController extends Controller
             ->whereNull('products.deleted_at')
             ->where('orders.cabang_id', $cabang)
             ->where('orders.is_approve', 'Setuju')
-            ->whereYear('orders.tgl_disetujui', $year)
-            ->whereMonth('orders.tgl_disetujui', $month)
+            ->whereBetween('orders.tgl_disetujui', [$monthStart, $monthEnd])
             ->groupBy('products.categories_id')
             ->selectRaw('products.categories_id as cat_id, COALESCE(SUM(order_details.profit_toko), 0) as total_sales')
             ->pluck('total_sales', 'cat_id');
@@ -100,12 +98,12 @@ class DashboardController extends Controller
             ->whereNull('deleted_at')
             ->where('cabang_id', $cabang)
             ->selectRaw("
-                COALESCE(SUM(CASE WHEN is_approve = 'Setuju' AND YEAR(created_at) = ? AND MONTH(created_at) = ? THEN price ELSE 0 END), 0) as total_pengeluaran,
+                COALESCE(SUM(CASE WHEN is_approve = 'Setuju' AND created_at BETWEEN ? AND ? THEN price ELSE 0 END), 0) as total_pengeluaran,
                 COUNT(CASE WHEN is_approve IS NULL THEN 1 END) as approve_pengeluaran,
-                COALESCE(SUM(CASE WHEN tipe = 0 AND DATE(created_at) = ? THEN price ELSE 0 END), 0) as hari_toko,
-                COALESCE(SUM(CASE WHEN tipe = 1 AND DATE(created_at) = ? THEN price ELSE 0 END), 0) as hari_servis,
-                COALESCE(SUM(CASE WHEN tipe = 2 AND is_approve = 'Setuju' AND DATE(created_at) = ? THEN price ELSE 0 END), 0) as hari_penjualan
-            ", [$year, $month, $todayStr, $todayStr, $todayStr])
+                COALESCE(SUM(CASE WHEN tipe = 0 AND created_at BETWEEN ? AND ? THEN price ELSE 0 END), 0) as hari_toko,
+                COALESCE(SUM(CASE WHEN tipe = 1 AND created_at BETWEEN ? AND ? THEN price ELSE 0 END), 0) as hari_servis,
+                COALESCE(SUM(CASE WHEN tipe = 2 AND is_approve = 'Setuju' AND created_at BETWEEN ? AND ? THEN price ELSE 0 END), 0) as hari_penjualan
+            ", [$monthStartTime, $monthEndTime, $todayStartTime, $todayEndTime, $todayStartTime, $todayEndTime, $todayStartTime, $todayEndTime])
             ->first();
 
         $totalpengeluaran = (float) ($expenseStats->total_pengeluaran ?? 0);
@@ -115,17 +113,16 @@ class DashboardController extends Controller
         $haripengeluaranPenjualan = (float) ($expenseStats->hari_penjualan ?? 0);
 
         $totalinsiden = Incident::where('cabang_id', $cabang)
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
+            ->whereBetween('created_at', [$monthStartTime, $monthEndTime])
             ->sum('biaya_toko');
 
         // PEMBELIAN (Bulanan & Harian dalam 1 query)
         $purchaseStats = DB::table('purchases')
             ->where('cabang_id', $cabang)
             ->selectRaw("
-                COALESCE(SUM(CASE WHEN YEAR(created_at) = ? AND MONTH(created_at) = ? THEN total_price ELSE 0 END), 0) as bulan_pembelian,
-                COALESCE(SUM(CASE WHEN DATE(created_at) = ? THEN total_price ELSE 0 END), 0) as hari_pembelian
-            ", [$year, $month, $todayStr])
+                COALESCE(SUM(CASE WHEN created_at BETWEEN ? AND ? THEN total_price ELSE 0 END), 0) as bulan_pembelian,
+                COALESCE(SUM(CASE WHEN created_at BETWEEN ? AND ? THEN total_price ELSE 0 END), 0) as hari_pembelian
+            ", [$monthStartTime, $monthEndTime, $todayStartTime, $todayEndTime])
             ->first();
 
         $totalpembelian = (float) ($purchaseStats->bulan_pembelian ?? 0);
@@ -139,10 +136,10 @@ class DashboardController extends Controller
             ->selectRaw("
                 COUNT(CASE WHEN status_servis = 'Belum cek' AND created_at < ? THEN 1 END) as reminders,
                 COUNT(CASE WHEN is_approve IS NULL AND status_servis = 'Sudah Diambil' THEN 1 END) as approve_servis,
-                COALESCE(SUM(CASE WHEN is_approve = 'Setuju' AND YEAR(tgl_disetujui) = ? AND MONTH(tgl_disetujui) = ? THEN profit ELSE 0 END), 0) as bulan_profit,
-                COALESCE(SUM(CASE WHEN status_servis = 'Sudah Diambil' AND DATE(tgl_ambil) = ? THEN omzet ELSE 0 END), 0) as hari_omzet,
-                COALESCE(SUM(CASE WHEN status_servis = 'Sudah Diambil' AND DATE(tgl_ambil) = ? THEN profit ELSE 0 END), 0) as hari_profit
-            ", [$reminderCutoff, $year, $month, $todayStr, $todayStr])
+                COALESCE(SUM(CASE WHEN is_approve = 'Setuju' AND tgl_disetujui BETWEEN ? AND ? THEN profit ELSE 0 END), 0) as bulan_profit,
+                COALESCE(SUM(CASE WHEN status_servis = 'Sudah Diambil' AND tgl_ambil BETWEEN ? AND ? THEN omzet ELSE 0 END), 0) as hari_omzet,
+                COALESCE(SUM(CASE WHEN status_servis = 'Sudah Diambil' AND tgl_ambil BETWEEN ? AND ? THEN profit ELSE 0 END), 0) as hari_profit
+            ", [$reminderCutoff, $monthStart, $monthEnd, $todayStr, $todayEndTime, $todayStr, $todayEndTime])
             ->first();
 
         $reminders = (int) ($servisStats->reminders ?? 0);
@@ -165,14 +162,13 @@ class DashboardController extends Controller
         // TOTAL BUDGET
         $totalbudgets = Budget::where('cabang_id', $cabang)->sum('total');
 
-        // PROFIT PENJUALAN BULANAN (Bersih & Kotor dalam 1 query JOIN tanpa Eloquent hydration)
+        // PROFIT PENJUALAN BULANAN (Bersih & Kotor dalam 1 query JOIN dengan index-friendly BETWEEN)
         $orderProfitStats = DB::table('order_details')
             ->join('orders', 'order_details.orders_id', '=', 'orders.id')
             ->whereNull('order_details.deleted_at')
             ->whereNull('orders.deleted_at')
             ->where('orders.cabang_id', $cabang)
-            ->whereYear('orders.tgl_disetujui', $year)
-            ->whereMonth('orders.tgl_disetujui', $month)
+            ->whereBetween('orders.tgl_disetujui', [$monthStart, $monthEnd])
             ->selectRaw("
                 COALESCE(SUM(CASE WHEN orders.is_approve = 'Setuju' THEN order_details.profit_toko ELSE 0 END), 0) as profit_bersih,
                 COALESCE(SUM(order_details.profit), 0) as profit_kotor
@@ -185,11 +181,11 @@ class DashboardController extends Controller
         $bulantotalprofitbersih = $bulanprofitbersihservis + $bulanprofitbersihpenjualan;
         $bulantotalprofitkotor = $bulanprofitkotorservis + $bulanprofitkotorpenjualan;
 
-        // OMZET & PROFIT PENJUALAN HARIAN (1 query)
+        // OMZET & PROFIT PENJUALAN HARIAN (1 query dengan index-friendly BETWEEN)
         $hariPenjualanStats = DB::table('order_details')
             ->whereNull('deleted_at')
             ->where('cabang_id', $cabang)
-            ->whereDate('created_at', $todayStr)
+            ->whereBetween('created_at', [$todayStartTime, $todayEndTime])
             ->selectRaw('COALESCE(SUM(total), 0) as hari_omzet, COALESCE(SUM(profit), 0) as hari_profit')
             ->first();
 
