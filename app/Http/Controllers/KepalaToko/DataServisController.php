@@ -62,9 +62,9 @@ class DataServisController extends ApiController
             $labels[] = $month;
 
             $ymKey = sprintf('%04d-%02d', (int) $data->year, (int) $data->month);
-            $bulanprofitkotorservis = $data->total_profit_kotor ?? 0;
-            $operasionalServis = $expenseByYm[$ymKey] ?? 0;
-            $omzetservis = $omzetByYm[$ymKey] ?? 0;
+            $bulanprofitkotorservis = ($data->year && $data->month) ? ($data->total_profit_kotor ?? 0) : 0;
+            $operasionalServis = ($data->year && $data->month) ? ($expenseByYm[$ymKey] ?? 0) : 0;
+            $omzetservis = ($data->year && $data->month) ? ($omzetByYm[$ymKey] ?? 0) : 0;
 
             $omzet[] = $omzetservis;
             $profitkotor[] = $bulanprofitkotorservis;

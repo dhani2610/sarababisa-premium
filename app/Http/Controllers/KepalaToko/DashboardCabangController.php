@@ -238,14 +238,14 @@ class DashboardCabangController extends Controller
 
                 // 2. Pencapaian
                 $servisProfit = $srv ? $srv->sum_profit : 0;
-                $penjualanProfitBersih = $ord ? (int) $ord->sum_profit_toko : 0;
+                $penjualanProfitBersih = $ord ? ($ord->sum_profit_toko + 0) : 0;
                 $totalProfitUntukPencapaian = $servisProfit + $penjualanProfitBersih;
                 $percent = $totalbudgets != 0 ? round(($totalProfitUntukPencapaian / $totalbudgets) * 100) : 0;
                 $dataPencapaian[$cabName][$ym] = $percent;
 
                 // 3. Omset & Omset Service
                 $servisOmset = $srv ? $srv->sum_omzet : 0;
-                $penjualanOmset = $ord ? (int) $ord->sum_total : 0;
+                $penjualanOmset = $ord ? ($ord->sum_total + 0) : 0;
                 $dataOmset[$cabName][$ym] = [
                     'omset' => $servisOmset + $penjualanOmset,
                 ];
@@ -273,8 +273,8 @@ class DashboardCabangController extends Controller
                             $kategoriOmset[$catId]['total_omset'] = 0;
                             $kategoriProfit[$catId]['total_profit'] = 0;
                         }
-                        $kategoriOmset[$catId]['total_omset'] += (int) $catRow->sum_sub_total;
-                        $kategoriProfit[$catId]['total_profit'] += (int) $catRow->sum_profit_toko;
+                        $kategoriOmset[$catId]['total_omset'] += ($catRow->sum_sub_total + 0);
+                        $kategoriProfit[$catId]['total_profit'] += ($catRow->sum_profit_toko + 0);
                     }
                 }
 
@@ -291,9 +291,9 @@ class DashboardCabangController extends Controller
                 ];
 
                 // 6. Pengeluaran, Insiden, Refund
-                $dataPengeluaran[$cabName][$ym] = isset($expenseMap[$cabId][$ym]) ? (int) $expenseMap[$cabId][$ym] : 0;
-                $dataInsiden[$cabName][$ym] = isset($incidentMap[$cabId][$ym]) ? (int) $incidentMap[$cabId][$ym] : 0;
-                $dataRefund[$cabName][$ym] = isset($refundMap[$cabId][$ym]) ? (int) $refundMap[$cabId][$ym] : 0;
+                $dataPengeluaran[$cabName][$ym] = isset($expenseMap[$cabId][$ym]) ? ($expenseMap[$cabId][$ym] + 0) : 0;
+                $dataInsiden[$cabName][$ym] = isset($incidentMap[$cabId][$ym]) ? ($incidentMap[$cabId][$ym] + 0) : 0;
+                $dataRefund[$cabName][$ym] = isset($refundMap[$cabId][$ym]) ? ($refundMap[$cabId][$ym] + 0) : 0;
             }
         }
 

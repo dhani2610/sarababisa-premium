@@ -62,8 +62,8 @@ class DataPenjualanController extends ApiController
             $pRow = $profitByYm->get($ymKey);
 
             $omzet[] = $data->total_omzet;
-            $profitkotor[] = $pRow ? (int) $pRow->profit_kotor : 0;
-            $profitbersih[] = $pRow ? (int) $pRow->profit_bersih : 0;
+            $profitkotor[] = $pRow ? ($pRow->profit_kotor + 0) : 0;
+            $profitbersih[] = $pRow ? ($pRow->profit_bersih + 0) : 0;
         }
 
         $data = [
