@@ -16,16 +16,38 @@ class DataPenjualanController extends ApiController
      */
     public function getDataPenjualan()
     {
+        $cabangId = getCabangId();
+
         $monthlyData = DB::table('order_details')
             ->join('orders', 'order_details.orders_id', '=', 'orders.id')
-            ->select(DB::raw('MONTH(order_details.created_at) as month'), DB::raw('YEAR(order_details.created_at) as year'), DB::raw('SUM(order_details.total) as total_omzet'), DB::raw('SUM(order_details.profit_toko) as total_profit_bersih'), DB::raw('SUM(order_details.profit) as total_profit_kotor'))
+            ->select(
+                DB::raw('MONTH(order_details.created_at) as month'),
+                DB::raw('YEAR(order_details.created_at) as year'),
+                DB::raw('SUM(order_details.total) as total_omzet')
+            )
             ->where('orders.is_approve', 'Setuju')
-            ->where('orders.cabang_id',getCabangId())
-            ->whereNull('order_details.deleted_at') // Menambahkan kondisi where untuk memfilter data yang deleted_at-nya NULL
+            ->where('orders.cabang_id', $cabangId)
+            ->whereNull('order_details.deleted_at')
             ->groupBy(DB::raw('MONTH(order_details.created_at)'), DB::raw('YEAR(order_details.created_at)'))
             ->orderBy(DB::raw('YEAR(order_details.created_at)'), 'asc')
             ->orderBy(DB::raw('MONTH(order_details.created_at)'), 'asc')
             ->get();
+
+        // Bulk aggregate profit_kotor and profit_bersih by YEAR/MONTH of orders.tgl_disetujui
+        $profitByYm = DB::table('order_details')
+            ->join('orders', 'order_details.orders_id', '=', 'orders.id')
+            ->whereNull('order_details.deleted_at')
+            ->whereNull('orders.deleted_at')
+            ->where('orders.cabang_id', $cabangId)
+            ->whereNotNull('orders.tgl_disetujui')
+            ->groupBy(DB::raw('YEAR(orders.tgl_disetujui)'), DB::raw('MONTH(orders.tgl_disetujui)'))
+            ->selectRaw("
+                CONCAT(YEAR(orders.tgl_disetujui), '-', LPAD(MONTH(orders.tgl_disetujui), 2, '0')) as ym,
+                COALESCE(SUM(order_details.profit), 0) as profit_kotor,
+                COALESCE(SUM(CASE WHEN orders.is_approve = 'Setuju' THEN order_details.profit_toko ELSE 0 END), 0) as profit_bersih
+            ")
+            ->get()
+            ->keyBy('ym');
 
         $labels = [];
         $omzet = [];
@@ -36,40 +58,12 @@ class DataPenjualanController extends ApiController
             $month = date('Y-m-d', mktime(0, 0, 0, $data->month, 1, $data->year));
             $labels[] = $month;
 
-            $bulanprofitkotorpenjualan = Order::where('cabang_id', getCabangId())
-            ->whereHas('detailOrders', function ($q) use ($data) {
-                $q->whereYear('tgl_disetujui', $data->year)
-                ->whereMonth('tgl_disetujui', $data->month);
-            })
-            ->with(['detailOrders' => function ($q) {
-                $q->select('orders_id', DB::raw('SUM(profit) as total_profit'))
-                ->groupBy('orders_id');
-            }])
-            ->get()
-            ->sum(fn($order) => $order->detailOrders->sum('total_profit'));
-
-
-            // PROFIT PENJUALAN BULANAN
-            $profitpenjualan = Order::where('cabang_id', getCabangId())
-                ->whereHas('detailOrders', function ($q) use ($data)  {
-                    $q->whereYear('tgl_disetujui', $data->year)
-                    ->whereMonth('tgl_disetujui', $data->month)
-                    ->where('is_approve', 'Setuju');
-                })
-                ->with(['detailOrders' => function ($q) {
-                    $q->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
-                    ->groupBy('orders_id');
-                }])
-                ->get();
-
-            $bulanprofitbersihpenjualan = $profitpenjualan->sum(
-                fn($order) => $order->detailOrders->sum('total_profit')
-            );
-
+            $ymKey = sprintf('%04d-%02d', (int) $data->year, (int) $data->month);
+            $pRow = $profitByYm->get($ymKey);
 
             $omzet[] = $data->total_omzet;
-            $profitkotor[] = $bulanprofitkotorpenjualan;
-            $profitbersih[] = $bulanprofitbersihpenjualan;
+            $profitkotor[] = $pRow ? (int) $pRow->profit_kotor : 0;
+            $profitbersih[] = $pRow ? (int) $pRow->profit_bersih : 0;
         }
 
         $data = [
@@ -79,6 +73,6 @@ class DataPenjualanController extends ApiController
             'profitbersih' => $profitbersih,
         ];
 
-        return response()->json($data); // Mengembalikan data dalam format JSON
+        return response()->json($data);
     }
 }

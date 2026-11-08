@@ -45,75 +45,117 @@ class DashboardController extends Controller
 
         $year = $date->year;
         $month = $date->month;
-        // TYPES & CATEGORIES
-        $types = Type::with('service')
+        $monthStart = $date->copy()->startOfMonth()->toDateString();
+        $monthEnd = $date->copy()->endOfMonth()->toDateString();
+        $monthStartTime = $monthStart . ' 00:00:00';
+        $monthEndTime = $monthEnd . ' 23:59:59';
+
+        $todayStr = today()->toDateString();
+        $todayStartTime = $todayStr . ' 00:00:00';
+        $todayEndTime = $todayStr . ' 23:59:59';
+
+        // TYPES & PROFIT SERVIS PER TYPE (1 grouped query instead of N+1 + eager loading)
+        $types = Type::where('cabang_id', $cabang)->get();
+        $typeProfits = DB::table('service_transactions')
+            ->whereNull('deleted_at')
             ->where('cabang_id', $cabang)
-            ->get();
-        // return response()->json($types);
+            ->where('is_approve', 'Setuju')
+            ->whereYear('tgl_disetujui', $year)
+            ->whereMonth('tgl_disetujui', $month)
+            ->whereNotNull('types_id')
+            ->groupBy('types_id')
+            ->selectRaw('types_id, COALESCE(SUM(profit), 0) as total_profit')
+            ->pluck('total_profit', 'types_id');
 
-        // $categories = Category::where('cabang_id', $cabang)->get();
+        foreach ($types as $t) {
+            $t->filtered_profit = (float) ($typeProfits[$t->id] ?? 0);
+        }
+
+        // CATEGORIES & CATEGORY SALES (1 grouped query instead of N+1 whereHas)
         $categories = Category::get();
+        $catSalesMap = DB::table('order_details')
+            ->join('orders', 'order_details.orders_id', '=', 'orders.id')
+            ->join('products', 'order_details.products_id', '=', 'products.id')
+            ->whereNull('order_details.deleted_at')
+            ->whereNull('orders.deleted_at')
+            ->whereNull('products.deleted_at')
+            ->where('orders.cabang_id', $cabang)
+            ->where('orders.is_approve', 'Setuju')
+            ->whereYear('orders.tgl_disetujui', $year)
+            ->whereMonth('orders.tgl_disetujui', $month)
+            ->groupBy('products.categories_id')
+            ->selectRaw('products.categories_id as cat_id, COALESCE(SUM(order_details.profit_toko), 0) as total_sales')
+            ->pluck('total_sales', 'cat_id');
 
-        // CATEGORY SALES
         $categorySales = [];
-       foreach ($categories as $category) {
-            $totalSales = OrderDetail::query()
-                ->whereHas('product', function ($q) use ($category) {
-                    $q->where('categories_id', $category->id);
-                })
-                ->whereHas('order', function ($q) use ($cabang, $year, $month) {
-                    $q->where('cabang_id', $cabang)
-                      ->whereYear('tgl_disetujui', $year)
-                      ->whereMonth('tgl_disetujui', $month)
-                      ->where('is_approve', 'Setuju');
-                })
-                ->sum('profit_toko');
-
+        foreach ($categories as $category) {
             $categorySales[] = [
                 'category' => $category->category_name,
-                'total_sales' => $totalSales,
+                'total_sales' => (float) ($catSalesMap[$category->id] ?? 0),
             ];
         }
 
-        // PENGELUARAN
-        $totalpengeluaran = Expense::where('cabang_id', $cabang)
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->where('is_approve', 'Setuju')
-            ->sum('price');
+        // PENGELUARAN (Bulanan, Harian, dan Approval dalam 1 query agregat)
+        $expenseStats = DB::table('expenses')
+            ->whereNull('deleted_at')
+            ->where('cabang_id', $cabang)
+            ->selectRaw("
+                COALESCE(SUM(CASE WHEN is_approve = 'Setuju' AND YEAR(created_at) = ? AND MONTH(created_at) = ? THEN price ELSE 0 END), 0) as total_pengeluaran,
+                COUNT(CASE WHEN is_approve IS NULL THEN 1 END) as approve_pengeluaran,
+                COALESCE(SUM(CASE WHEN tipe = 0 AND DATE(created_at) = ? THEN price ELSE 0 END), 0) as hari_toko,
+                COALESCE(SUM(CASE WHEN tipe = 1 AND DATE(created_at) = ? THEN price ELSE 0 END), 0) as hari_servis,
+                COALESCE(SUM(CASE WHEN tipe = 2 AND is_approve = 'Setuju' AND DATE(created_at) = ? THEN price ELSE 0 END), 0) as hari_penjualan
+            ", [$year, $month, $todayStr, $todayStr, $todayStr])
+            ->first();
+
+        $totalpengeluaran = (float) ($expenseStats->total_pengeluaran ?? 0);
+        $approvepengeluaran = (int) ($expenseStats->approve_pengeluaran ?? 0);
+        $haripengeluaranToko = (float) ($expenseStats->hari_toko ?? 0);
+        $haripengeluaranServis = (float) ($expenseStats->hari_servis ?? 0);
+        $haripengeluaranPenjualan = (float) ($expenseStats->hari_penjualan ?? 0);
 
         $totalinsiden = Incident::where('cabang_id', $cabang)
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->sum('biaya_toko');
 
-        $totalpembelian = Purchase::where('cabang_id', $cabang)
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->sum('total_price');
+        // PEMBELIAN (Bulanan & Harian dalam 1 query)
+        $purchaseStats = DB::table('purchases')
+            ->where('cabang_id', $cabang)
+            ->selectRaw("
+                COALESCE(SUM(CASE WHEN YEAR(created_at) = ? AND MONTH(created_at) = ? THEN total_price ELSE 0 END), 0) as bulan_pembelian,
+                COALESCE(SUM(CASE WHEN DATE(created_at) = ? THEN total_price ELSE 0 END), 0) as hari_pembelian
+            ", [$year, $month, $todayStr])
+            ->first();
 
-        // REMINDER SERVIS
-        $transactions = ServiceTransaction::where('cabang_id', $cabang)
-            ->where('status_servis', 'Belum cek')
-            ->get();
+        $totalpembelian = (float) ($purchaseStats->bulan_pembelian ?? 0);
+        $haripembelian = (float) ($purchaseStats->hari_pembelian ?? 0);
 
-        $reminders = $transactions->filter(function ($transaction) use ($currentDate) {
-            return $transaction->created_at->addDays(7)->isPast();
-        })->count();
+        // REMINDER SERVIS, APPROVAL SERVIS, PROFIT BULANAN & HARIAN SERVIS (1 query agregat)
+        $reminderCutoff = $currentDate->copy()->subDays(7)->toDateTimeString();
+        $servisStats = DB::table('service_transactions')
+            ->whereNull('deleted_at')
+            ->where('cabang_id', $cabang)
+            ->selectRaw("
+                COUNT(CASE WHEN status_servis = 'Belum cek' AND created_at < ? THEN 1 END) as reminders,
+                COUNT(CASE WHEN is_approve IS NULL AND status_servis = 'Sudah Diambil' THEN 1 END) as approve_servis,
+                COALESCE(SUM(CASE WHEN is_approve = 'Setuju' AND YEAR(tgl_disetujui) = ? AND MONTH(tgl_disetujui) = ? THEN profit ELSE 0 END), 0) as bulan_profit,
+                COALESCE(SUM(CASE WHEN status_servis = 'Sudah Diambil' AND DATE(tgl_ambil) = ? THEN omzet ELSE 0 END), 0) as hari_omzet,
+                COALESCE(SUM(CASE WHEN status_servis = 'Sudah Diambil' AND DATE(tgl_ambil) = ? THEN profit ELSE 0 END), 0) as hari_profit
+            ", [$reminderCutoff, $year, $month, $todayStr, $todayStr])
+            ->first();
 
-        // APPROVAL
-        $approveservis = ServiceTransaction::where('cabang_id', $cabang)
-            ->where('is_approve', null)
-            ->where('status_servis', 'Sudah Diambil')
-            ->count();
+        $reminders = (int) ($servisStats->reminders ?? 0);
+        $approveservis = (int) ($servisStats->approve_servis ?? 0);
+        $bulanprofitbersihservis = (float) ($servisStats->bulan_profit ?? 0);
+        $bulanprofitkotorservis = $bulanprofitbersihservis;
+        $hariomzetservis = (float) ($servisStats->hari_omzet ?? 0);
+        $hariprofitkotorservis = (float) ($servisStats->hari_profit ?? 0);
 
         $approvepenjualan = Order::where('cabang_id', $cabang)
             ->where('is_approve', null)->count();
 
         $approvekasbon = Debt::where('cabang_id', $cabang)
-            ->where('is_approve', null)->count();
-
-        $approvepengeluaran = Expense::where('cabang_id', $cabang)
             ->where('is_approve', null)->count();
 
         // STOK HABIS
@@ -123,121 +165,40 @@ class DashboardController extends Controller
         // TOTAL BUDGET
         $totalbudgets = Budget::where('cabang_id', $cabang)->sum('total');
 
-        // PROFIT SERVIS BULANAN
-        $bulanprofitbersihservis = ServiceTransaction::where('cabang_id', $cabang)
-            ->whereYear('tgl_disetujui', $year)
-            ->whereMonth('tgl_disetujui', $month)
-            ->where('is_approve', 'Setuju')
-            ->sum('profit');
+        // PROFIT PENJUALAN BULANAN (Bersih & Kotor dalam 1 query JOIN tanpa Eloquent hydration)
+        $orderProfitStats = DB::table('order_details')
+            ->join('orders', 'order_details.orders_id', '=', 'orders.id')
+            ->whereNull('order_details.deleted_at')
+            ->whereNull('orders.deleted_at')
+            ->where('orders.cabang_id', $cabang)
+            ->whereYear('orders.tgl_disetujui', $year)
+            ->whereMonth('orders.tgl_disetujui', $month)
+            ->selectRaw("
+                COALESCE(SUM(CASE WHEN orders.is_approve = 'Setuju' THEN order_details.profit_toko ELSE 0 END), 0) as profit_bersih,
+                COALESCE(SUM(order_details.profit), 0) as profit_kotor
+            ")
+            ->first();
 
-        // PROFIT PENJUALAN BULANAN
-        $profitpenjualan = Order::where('cabang_id', $cabang)
-            ->whereHas('detailOrders', function ($q) use ($year, $month) {
-                $q->whereYear('tgl_disetujui', $year)
-                ->whereMonth('tgl_disetujui', $month)
-                ->where('is_approve', 'Setuju');
-            })
-            ->with(['detailOrders' => function ($q) {
-                $q->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
-                ->groupBy('orders_id');
-            }])
-            ->get();
-
-        $bulanprofitbersihpenjualan = $profitpenjualan->sum(
-            fn($order) => $order->detailOrders->sum('total_profit')
-        );
-
-        // return response()->json([$categorySales,$bulanprofitbersihpenjualan]);
+        $bulanprofitbersihpenjualan = (float) ($orderProfitStats->profit_bersih ?? 0);
+        $bulanprofitkotorpenjualan = (float) ($orderProfitStats->profit_kotor ?? 0);
 
         $bulantotalprofitbersih = $bulanprofitbersihservis + $bulanprofitbersihpenjualan;
-
-        // PROFIT KOTOR SERVIS
-        $bulanprofitkotorservis = ServiceTransaction::where('cabang_id', $cabang)
-            ->whereYear('tgl_disetujui', $year)
-            ->whereMonth('tgl_disetujui', $month)
-            ->where('is_approve', 'Setuju')
-            ->sum('profit');
-
-        // PROFIT KOTOR PENJUALAN
-        $bulanprofitkotorpenjualan = Order::where('cabang_id', $cabang)
-            ->whereHas('detailOrders', function ($q) use ($year, $month) {
-                $q->whereYear('tgl_disetujui', $year)
-                ->whereMonth('tgl_disetujui', $month);
-            })
-            ->with(['detailOrders' => function ($q) {
-                $q->select('orders_id', DB::raw('SUM(profit) as total_profit'))
-                ->groupBy('orders_id');
-            }])
-            ->get()
-            ->sum(fn($order) => $order->detailOrders->sum('total_profit'));
-
         $bulantotalprofitkotor = $bulanprofitkotorservis + $bulanprofitkotorpenjualan;
 
-        // DATA HARIAN
-        $haripembelian = Purchase::where('cabang_id', $cabang)
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
-            ->whereDate('created_at', today())
-            ->sum('total_price');
+        // OMZET & PROFIT PENJUALAN HARIAN (1 query)
+        $hariPenjualanStats = DB::table('order_details')
+            ->whereNull('deleted_at')
+            ->where('cabang_id', $cabang)
+            ->whereDate('created_at', $todayStr)
+            ->selectRaw('COALESCE(SUM(total), 0) as hari_omzet, COALESCE(SUM(profit), 0) as hari_profit')
+            ->first();
 
-        $haripengeluaranToko = Expense::where('cabang_id', $cabang)
-            ->where('tipe', 0)
-            // ->where('is_approve', 'Setuju')
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
-            ->whereDate('created_at', today())
-            ->sum('price');
-            // ->get();
-            // return response()->json($haripengeluaranToko);
+        $hariomzetpenjualan = (float) ($hariPenjualanStats->hari_omzet ?? 0);
+        $hariprofitkotorpenjualan = (float) ($hariPenjualanStats->hari_profit ?? 0);
 
-        $haripengeluaranServis = Expense::where('cabang_id', $cabang)
-            ->where('tipe', 1)
-            // ->where('is_approve', 'Setuju')
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
-            ->whereDate('created_at', today())
-            ->sum('price');
-        $haripengeluaranPenjualan = Expense::where('cabang_id', $cabang)
-            ->where('tipe', 2)
-            ->where('is_approve', 'Setuju')
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
-            ->whereDate('created_at', today())
-            ->sum('price');
-
-        $hariomzetservis = ServiceTransaction::where('cabang_id', $cabang)
-            // ->where('is_approve', 'Setuju')
-            ->where('status_servis', 'Sudah Diambil')
-            ->whereYear('tgl_ambil', now()->year)
-            ->whereMonth('tgl_ambil', now()->month)
-            ->whereDate('tgl_ambil', today())
-            ->sum('omzet');
-
-        $hariomzetpenjualan = OrderDetail::where('cabang_id', $cabang)
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
-            ->whereDate('created_at', today())
-            ->sum('total');
-
-        // return response()->json([$hariomzetservis,$hariomzetpenjualan]);
         $haritotalomzet = $hariomzetservis + $hariomzetpenjualan;
-
-        $hariprofitkotorservis = ServiceTransaction::where('cabang_id', $cabang)
-            ->where('status_servis', 'Sudah Diambil')
-            // ->where('is_approve', 'Setuju')
-            ->whereYear('tgl_ambil', now()->year)
-            ->whereMonth('tgl_ambil', now()->month)
-            ->whereDate('tgl_ambil', today())
-            ->sum('profit');
-
-        $hariprofitkotorpenjualan = OrderDetail::where('cabang_id', $cabang)
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
-            ->whereDate('created_at', today())
-            ->sum('profit');
-
         $haritotalprofitkotor = $hariprofitkotorservis + $hariprofitkotorpenjualan;
-        // dd($bulantotalprofitkotor, $bulantotalprofitbersih);
+
         // TARGET & INVENTORY
         $targets = Target::where('cabang_id', $cabang)->get();
         $hasData = $targets->isNotEmpty();
@@ -245,21 +206,10 @@ class DashboardController extends Controller
         $inventories = Inventory::where('cabang_id', $cabang)
             ->where('masa_penggantian', '<', $currentDate)
             ->count();
-                    // @dd($totalbudgets);
 
+        // TOTAL BONUS KARYAWAN (Bulk calculation instead of N+1 per worker per transaction)
         $worker = Worker::where('cabang_id', $cabang)->get();
-        $total_bonus_karyawan = 0;
-        foreach ($worker as $w) {
-            $user = $w->user_account;
-
-            $start_date = $date->startOfMonth()->toDateString();
-            $end_date = $date->endOfMonth()->toDateString();
-            $bonusKryawan = 0;
-            if (!empty($user)) {
-                $bonusKryawan = calculateBonusForCabang($user, $cabang, $start_date, $end_date);
-            }
-            $total_bonus_karyawan += $bonusKryawan;
-        }
+        $total_bonus_karyawan = calculateTotalWorkerBonusForCabang($worker, $cabang, $monthStart, $monthEnd);
 
         // dd($total_bonus_karyawan);
         return view('pages/kepalatoko/dashboard', compact(

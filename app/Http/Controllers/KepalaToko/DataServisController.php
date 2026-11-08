@@ -16,15 +16,41 @@ class DataServisController extends ApiController
      */
     public function getDataServis()
     {
+        $cabangId = getCabangId();
+
         $monthlyData = DB::table('service_transactions')
-            ->select(DB::raw('MONTH(tgl_disetujui) as month'), DB::raw('YEAR(tgl_disetujui) as year'), DB::raw('SUM(omzet) as total_omzet'), DB::raw('SUM(profittoko) as total_profit_bersih'), DB::raw('SUM(profit) as total_profit_kotor'))
+            ->select(
+                DB::raw('MONTH(tgl_disetujui) as month'),
+                DB::raw('YEAR(tgl_disetujui) as year'),
+                DB::raw('SUM(profit) as total_profit_kotor')
+            )
             ->where('is_approve', 'Setuju')
-            ->where('cabang_id',getCabangId())
-            ->whereNull('deleted_at') // Menambahkan kondisi where untuk memfilter data yang deleted_at-nya NULL
+            ->where('cabang_id', $cabangId)
+            ->whereNull('deleted_at')
             ->groupBy(DB::raw('MONTH(tgl_disetujui)'), DB::raw('YEAR(tgl_disetujui)'))
             ->orderBy(DB::raw('YEAR(tgl_disetujui)'), 'asc')
             ->orderBy(DB::raw('MONTH(tgl_disetujui)'), 'asc')
             ->get();
+
+        // Bulk aggregate omzet where status_servis = 'Sudah Diambil' by year/month of tgl_disetujui
+        $omzetByYm = DB::table('service_transactions')
+            ->whereNull('deleted_at')
+            ->where('cabang_id', $cabangId)
+            ->where('status_servis', 'Sudah Diambil')
+            ->whereNotNull('tgl_disetujui')
+            ->groupBy(DB::raw('YEAR(tgl_disetujui)'), DB::raw('MONTH(tgl_disetujui)'))
+            ->selectRaw("CONCAT(YEAR(tgl_disetujui), '-', LPAD(MONTH(tgl_disetujui), 2, '0')) as ym, SUM(omzet) as total_omzet")
+            ->pluck('total_omzet', 'ym');
+
+        // Bulk aggregate expense tipe=1 by year/month of created_at
+        $expenseByYm = DB::table('expenses')
+            ->whereNull('deleted_at')
+            ->where('cabang_id', $cabangId)
+            ->where('tipe', 1)
+            ->whereNotNull('created_at')
+            ->groupBy(DB::raw('YEAR(created_at)'), DB::raw('MONTH(created_at)'))
+            ->selectRaw("CONCAT(YEAR(created_at), '-', LPAD(MONTH(created_at), 2, '0')) as ym, SUM(price) as total_price")
+            ->pluck('total_price', 'ym');
 
         $labels = [];
         $omzet = [];
@@ -35,30 +61,10 @@ class DataServisController extends ApiController
             $month = date('Y-m-d', mktime(0, 0, 0, $data->month, 1, $data->year));
             $labels[] = $month;
 
-            $bulanprofitbersihservis = ServiceTransaction::where('cabang_id', getCabangId())
-            ->whereYear('tgl_disetujui', $data->year)
-            ->whereMonth('tgl_disetujui', $data->month)
-            ->where('is_approve', 'Setuju')
-            ->sum('profit');
-
-            $bulanprofitkotorservis = ServiceTransaction::where('cabang_id', getCabangId())
-            ->whereYear('tgl_disetujui', $data->year)
-            ->whereMonth('tgl_disetujui', $data->month)
-            ->where('is_approve', 'Setuju')
-            ->sum('profit');
-
-            $operasionalServis = Expense::where('cabang_id', getCabangId())
-                ->where('tipe',1)
-                ->whereYear('created_at', $data->year)
-                ->whereMonth('created_at', $data->month)
-                ->sum('price');
-
-            $omzetservis = ServiceTransaction::where('cabang_id', getCabangId())
-            ->where('status_servis', 'Sudah Diambil')
-            ->whereYear('tgl_disetujui', $data->year)
-            ->whereMonth('tgl_disetujui', $data->month)
-            ->sum('omzet');
-
+            $ymKey = sprintf('%04d-%02d', (int) $data->year, (int) $data->month);
+            $bulanprofitkotorservis = $data->total_profit_kotor ?? 0;
+            $operasionalServis = $expenseByYm[$ymKey] ?? 0;
+            $omzetservis = $omzetByYm[$ymKey] ?? 0;
 
             $omzet[] = $omzetservis;
             $profitkotor[] = $bulanprofitkotorservis;
@@ -72,6 +78,6 @@ class DataServisController extends ApiController
             'profitbersih' => $profitbersih,
         ];
 
-        return response()->json($data); // Mengembalikan data dalam format JSON
+        return response()->json($data);
     }
 }

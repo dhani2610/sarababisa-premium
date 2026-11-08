@@ -80,507 +80,220 @@ class DashboardCabangController extends Controller
         }
 
 
-        // HASIL AKHIR
+        // ===============================================================
+        // PRE-AGGREGATE BULK QUERIES ACROSS ALL CABANG & MONTHS (8 QUERIES TOTAL)
+        // ===============================================================
+        $rangeStartDate = \Carbon\Carbon::parse($start . '-01')->startOfMonth()->toDateString();
+        $rangeEndDate   = \Carbon\Carbon::parse($end . '-01')->endOfMonth()->toDateString();
+        $rangeStartTime = $rangeStartDate . ' 00:00:00';
+        $rangeEndTime   = $rangeEndDate . ' 23:59:59';
+
+        // 1. Targets (Anggaran) per cabang & YYYY-MM
+        $targetRows = DB::table('targets')
+            ->whereBetween('created_at', [$rangeStartTime, $rangeEndTime])
+            ->groupBy('cabang_id', DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
+            ->selectRaw("cabang_id, DATE_FORMAT(created_at, '%Y-%m') as ym, SUM(target) as total_target")
+            ->get();
+        $targetMap = [];
+        foreach ($targetRows as $r) {
+            $targetMap[$r->cabang_id][$r->ym] = $r->total_target;
+        }
+
+        // 2. Budgets per cabang (total overall)
+        $budgetMap = DB::table('budgets')
+            ->groupBy('cabang_id')
+            ->selectRaw('cabang_id, SUM(total) as total_budget')
+            ->pluck('total_budget', 'cabang_id');
+
+        // 3. ServiceTransaction (profit, omzet, profittoko) per cabang & YYYY-MM
+        $servisRows = DB::table('service_transactions')
+            ->whereNull('deleted_at')
+            ->where('is_approve', 'Setuju')
+            ->whereBetween('tgl_disetujui', [$rangeStartDate, $rangeEndDate])
+            ->groupBy('cabang_id', DB::raw("DATE_FORMAT(tgl_disetujui, '%Y-%m')"))
+            ->selectRaw("
+                cabang_id,
+                DATE_FORMAT(tgl_disetujui, '%Y-%m') as ym,
+                SUM(profit) as sum_profit,
+                SUM(omzet) as sum_omzet,
+                SUM(profittoko) as sum_profittoko
+            ")
+            ->get();
+        $servisMap = [];
+        foreach ($servisRows as $r) {
+            $servisMap[$r->cabang_id][$r->ym] = $r;
+        }
+
+        // 4. Order + OrderDetail (profit_toko & total where orders.is_approve = 'Setuju') per cabang & YYYY-MM
+        $orderAggRows = DB::table('order_details')
+            ->join('orders', 'order_details.orders_id', '=', 'orders.id')
+            ->whereNull('order_details.deleted_at')
+            ->whereNull('orders.deleted_at')
+            ->where('orders.is_approve', 'Setuju')
+            ->whereBetween('orders.tgl_disetujui', [$rangeStartDate, $rangeEndDate])
+            ->groupBy('orders.cabang_id', DB::raw("DATE_FORMAT(orders.tgl_disetujui, '%Y-%m')"))
+            ->selectRaw("
+                orders.cabang_id as cabang_id,
+                DATE_FORMAT(orders.tgl_disetujui, '%Y-%m') as ym,
+                SUM(order_details.profit_toko) as sum_profit_toko,
+                SUM(order_details.total) as sum_total
+            ")
+            ->get();
+        $orderAggMap = [];
+        foreach ($orderAggRows as $r) {
+            $orderAggMap[$r->cabang_id][$r->ym] = $r;
+        }
+
+        // 5. Order + OrderDetail + Product (sub_total & profit_toko per kategori) per cabang & YYYY-MM
+        $orderCatRows = DB::table('order_details')
+            ->join('orders', 'order_details.orders_id', '=', 'orders.id')
+            ->leftJoin('products', function ($join) {
+                $join->on('order_details.products_id', '=', 'products.id')
+                     ->whereNull('products.deleted_at');
+            })
+            ->whereNull('order_details.deleted_at')
+            ->whereNull('orders.deleted_at')
+            ->whereBetween('orders.tgl_disetujui', [$rangeStartDate, $rangeEndDate])
+            ->groupBy(
+                'orders.cabang_id',
+                DB::raw("DATE_FORMAT(orders.tgl_disetujui, '%Y-%m')"),
+                DB::raw('COALESCE(products.categories_id, 4)')
+            )
+            ->selectRaw("
+                orders.cabang_id as cabang_id,
+                DATE_FORMAT(orders.tgl_disetujui, '%Y-%m') as ym,
+                COALESCE(products.categories_id, 4) as cat_id,
+                SUM(order_details.sub_total) as sum_sub_total,
+                SUM(order_details.profit_toko) as sum_profit_toko
+            ")
+            ->get();
+        $orderCatMap = [];
+        foreach ($orderCatRows as $r) {
+            $orderCatMap[$r->cabang_id][$r->ym][(int) $r->cat_id] = $r;
+        }
+
+        // 6. Pengeluaran (Expense) per cabang & YYYY-MM
+        $expenseRows = DB::table('expenses')
+            ->whereNull('deleted_at')
+            ->where('is_approve', 'Setuju')
+            ->whereBetween('tgl_disetujui', [$rangeStartDate, $rangeEndDate])
+            ->groupBy('cabang_id', DB::raw("DATE_FORMAT(tgl_disetujui, '%Y-%m')"))
+            ->selectRaw("cabang_id, DATE_FORMAT(tgl_disetujui, '%Y-%m') as ym, SUM(price) as sum_price")
+            ->get();
+        $expenseMap = [];
+        foreach ($expenseRows as $r) {
+            $expenseMap[$r->cabang_id][$r->ym] = $r->sum_price;
+        }
+
+        // 7. Insiden (Incident) per cabang & YYYY-MM
+        $incidentRows = DB::table('incidents')
+            ->whereNull('deleted_at')
+            ->whereBetween('created_at', [$rangeStartTime, $rangeEndTime])
+            ->groupBy('cabang_id', DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
+            ->selectRaw("cabang_id, DATE_FORMAT(created_at, '%Y-%m') as ym, SUM(price) as sum_price")
+            ->get();
+        $incidentMap = [];
+        foreach ($incidentRows as $r) {
+            $incidentMap[$r->cabang_id][$r->ym] = $r->sum_price;
+        }
+
+        // 8. Refund per cabang & YYYY-MM
+        $refundRows = DB::table('refunds')
+            ->whereBetween('created_at', [$rangeStartTime, $rangeEndTime])
+            ->groupBy('cabang_id', DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
+            ->selectRaw("cabang_id, DATE_FORMAT(created_at, '%Y-%m') as ym, SUM(nominal_servis) as sum_refund")
+            ->get();
+        $refundMap = [];
+        foreach ($refundRows as $r) {
+            $refundMap[$r->cabang_id][$r->ym] = $r->sum_refund;
+        }
+
+        // ===============================================================
+        // BUILD RESPONSE ARRAYS (ZERO QUERIES INSIDE LOOPS)
+        // ===============================================================
         $dataAnggaran = [];
-
-        // =========================
-        // LOOP PER CABANG ANGGARAN
-        // =========================
-        foreach ($cabang as $cab) {
-
-            // Loop per bulan
-            foreach ($listMonths as $ym) {
-
-                $total = Target::where('cabang_id', $cab->id)
-                    ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$ym])
-                    ->sum('target');
-                // $targets_count = Tar get::where('cabang_id',getCabangId())->get()->count();
-
-
-                // push ke JSON:
-                $dataAnggaran[$cab->nama_cabang][$ym] = $total;
-            }
-        }
-
-       // HASIL AKHIR
         $dataPencapaian = [];
-
-        // =========================
-        // LOOP PER CABANG ALL OMSET
-        // =========================
-        foreach ($cabang as $cab) {
-
-            // Loop per bulan
-            foreach ($listMonths as $ym) {
-
-                // Ambil year & month dari list bulan
-                [$year, $month] = explode('-', $ym);
-
-                // ======================
-                // PROFIT BERSIH SERVIS
-                // ======================
-                $bulanprofitbersihservis = ServiceTransaction::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->where('is_approve', 'Setuju')
-                    ->sum('profit');
-
-                // ======================
-                // PROFIT BERSIH PENJUALAN
-                // ======================
-                $profitpenjualan = Order::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->whereHas('detailOrders', function ($q) use ($year, $month) {
-                        $q->where('is_approve', 'Setuju');
-                    })
-                    ->with(['detailOrders' => function ($q) use ($year, $month) {
-                        $q->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
-                        ->groupBy('orders_id');
-                    }])
-                    ->get();
-
-                $bulanprofitbersihpenjualan = $profitpenjualan->sum(
-                    fn($order) => $order->detailOrders->sum('total_profit')
-                );
-
-                $bulantotalprofitbersih = $bulanprofitbersihservis + $bulanprofitbersihpenjualan;
-
-                $totalbudgets = Budget::where('cabang_id', $cab->id)->sum('total');
-
-                $circumference = 30 * 2 * pi();
-                $percent = $totalbudgets != 0 ? round(($bulantotalprofitbersih / $totalbudgets) * 100) : 0;
-                // ======================
-                // PUSH KE JSON
-                // ======================
-                $dataPencapaian[$cab->nama_cabang][$ym] = $percent;
-            }
-        }
-
-       // HASIL AKHIR
         $dataOmset = [];
-
-        // =========================
-        // LOOP PER CABANG ALL OMSET
-        // =========================
-        foreach ($cabang as $cab) {
-
-            // Loop per bulan
-            foreach ($listMonths as $ym) {
-
-                // Ambil year & month dari list bulan
-                [$year, $month] = explode('-', $ym);
-
-                // ======================
-                // PROFIT BERSIH SERVIS
-                // ======================
-                $bulanprofitbersihservis = ServiceTransaction::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->where('is_approve', 'Setuju')
-                    ->sum('omzet');
-
-                // ======================
-                // PROFIT BERSIH PENJUALAN
-                // ======================
-                $profitpenjualan = Order::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->whereHas('detailOrders', function ($q) use ($year, $month) {
-                        $q->where('is_approve', 'Setuju');
-                    })
-                    ->with(['detailOrders' => function ($q) use ($year, $month) {
-                        $q->select('orders_id', DB::raw('SUM(total) as total_omzet'))
-                        ->groupBy('orders_id');
-                    }])
-                    ->get();
-
-                $bulanprofitbersihpenjualan = $profitpenjualan->sum(
-                    fn($order) => $order->detailOrders->sum('total_omzet')
-                );
-
-                $bulantotalprofitbersih = $bulanprofitbersihservis + $bulanprofitbersihpenjualan;
-
-                // ======================
-                // PROFIT KOTOR SERVIS
-                // ======================
-                $bulanprofitkotorservis = ServiceTransaction::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->where('is_approve', 'Setuju')
-                    ->sum('omzet');
-
-                // ======================
-                // PROFIT KOTOR PENJUALAN
-                // ======================
-                $bulanprofitkotorpenjualan = Order::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->with(['detailOrders' => function ($q) use ($year, $month) {
-                        $q->select('orders_id', DB::raw('SUM(total) as total_omzet'))
-                        ->groupBy('orders_id');
-                    }])
-                    ->get()
-                    ->sum(fn($order) => $order->detailOrders->sum('total_omzet'));
-
-                $bulantotalprofitkotor = $bulanprofitkotorservis + $bulanprofitkotorpenjualan;
-
-                // ======================
-                // OMSET BULANAN
-                // ======================
-                $totalOmsetBulanIni = Budget::where('cabang_id', $cab->id)
-                    ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$ym])
-                    ->sum('total');
-
-                // ======================
-                // PUSH KE JSON
-                // ======================
-                $dataOmset[$cab->nama_cabang][$ym] = [
-                    'omset'               => $bulantotalprofitbersih,
-                ];
-            }
-        }
-
-       // HASIL AKHIR
         $dataOmsetService = [];
+        $dataOmsetProduk = [];
+        $dataProfit = [];
+        $dataProfitService = [];
+        $dataProdukProduk = [];
+        $dataPengeluaran = [];
+        $dataInsiden = [];
+        $dataRefund = [];
 
-        // =========================
-        // LOOP PER CABANG OMSET SERVIS
-        // =========================
         foreach ($cabang as $cab) {
+            $cabId = $cab->id;
+            $cabName = $cab->nama_cabang;
+            $totalbudgets = $budgetMap[$cabId] ?? 0;
 
-            // Loop per bulan
             foreach ($listMonths as $ym) {
+                // 1. Anggaran
+                $dataAnggaran[$cabName][$ym] = $targetMap[$cabId][$ym] ?? 0;
 
-                // Ambil year & month dari list bulan
-                [$year, $month] = explode('-', $ym);
+                // Ambil pre-aggregated Servis & Order
+                $srv = $servisMap[$cabId][$ym] ?? null;
+                $ord = $orderAggMap[$cabId][$ym] ?? null;
 
-                // ======================
-                // PROFIT BERSIH SERVIS
-                // ======================
-                $omset = ServiceTransaction::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->where('is_approve', 'Setuju')
-                    ->sum('omzet');
+                // 2. Pencapaian
+                $servisProfit = $srv ? $srv->sum_profit : 0;
+                $penjualanProfitBersih = $ord ? (int) $ord->sum_profit_toko : 0;
+                $totalProfitUntukPencapaian = $servisProfit + $penjualanProfitBersih;
+                $percent = $totalbudgets != 0 ? round(($totalProfitUntukPencapaian / $totalbudgets) * 100) : 0;
+                $dataPencapaian[$cabName][$ym] = $percent;
 
-
-                // ======================
-                // PUSH KE JSON
-                // ======================
-                $dataOmsetService[$cab->nama_cabang][$ym] = [
-                    'omset'               => $omset,
+                // 3. Omset & Omset Service
+                $servisOmset = $srv ? $srv->sum_omzet : 0;
+                $penjualanOmset = $ord ? (int) $ord->sum_total : 0;
+                $dataOmset[$cabName][$ym] = [
+                    'omset' => $servisOmset + $penjualanOmset,
                 ];
-            }
-        }
+                $dataOmsetService[$cabName][$ym] = [
+                    'omset' => $servisOmset,
+                ];
 
-
-       $dataOmsetProduk = [];
-
-        // =========================
-        // LOOP PER CABANG OMZET PRODUK
-        // =========================
-        foreach ($cabang as $cab) {
-
-            foreach ($listMonths as $ym) {
-
-                [$year, $month] = explode('-', $ym);
-
-                // ======================
-                // AMBIL ORDER + DETAIL + PRODUK
-                // ======================
-                $orders = Order::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->with([
-                        'detailOrders.product' => function ($q) {
-                            $q->select('id', 'categories_id');
-                        }
-                    ])
-                    ->get();
-
-                // ======================
-                // SIAPKAN TEMPAT PENAMPUNG
-                // ======================
-                $kategoriData = [
+                // 4. Omset Produk & Profit Produk per Kategori
+                $kategoriOmset = [
                     1 => ['nama' => 'Handphone', 'total_omset' => 0],
                     2 => ['nama' => 'Sparepart', 'total_omset' => 0],
                     3 => ['nama' => 'Aksesoris', 'total_omset' => 0],
                     4 => ['nama' => 'Tools', 'total_omset' => 0],
                 ];
-
-                // ======================
-                // LOOP DETAIL ORDER
-                // ======================
-                foreach ($orders as $ord) {
-
-                    foreach ($ord->detailOrders as $detail) {
-
-                        $catId = $detail->product->categories_id ?? 4; // default Tools bila tidak ada
-
-                        // Tambahkan data detail-nya
-                        // $kategoriData[$catId]['data'][] = $detail;
-
-                        // OMSET (gunakan sub_total order)
-                        // $kategoriData[$catId]['total_omset'] += $ord->sub_total;
-
-                        // PROFIT
-                        $kategoriData[$catId]['total_omset'] += $detail->sub_total;
-                    }
-                }
-
-                // ======================
-                // INPUT KE JSON BESAR
-                // ======================
-                $dataOmsetProduk[$cab->nama_cabang][$ym] = $kategoriData;
-            }
-        }
-
-        // ===============================PROFIT=================================
-         // HASIL AKHIR
-        $dataProfit = [];
-
-        // =========================
-        // LOOP PER CABANG ALL PROFIT
-        // =========================
-        foreach ($cabang as $cab) {
-
-            // Loop per bulan
-            foreach ($listMonths as $ym) {
-
-                // Ambil year & month dari list bulan
-                [$year, $month] = explode('-', $ym);
-
-                // ======================
-                // PROFIT BERSIH SERVIS
-                // ======================
-                $bulanprofitbersihservis = ServiceTransaction::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->where('is_approve', 'Setuju')
-                    ->sum('profittoko');
-
-                // ======================
-                // PROFIT BERSIH PENJUALAN
-                // ======================
-                $profitpenjualan = Order::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->whereHas('detailOrders', function ($q) use ($year, $month) {
-                        $q->where('is_approve', 'Setuju');
-                    })
-                    ->with(['detailOrders' => function ($q) use ($year, $month) {
-                        $q->select('orders_id', DB::raw('SUM(profit_toko) as total_profit'))
-                        ->groupBy('orders_id');
-                    }])
-                    ->get();
-
-                $bulanprofitbersihpenjualan = $profitpenjualan->sum(
-                    fn($order) => $order->detailOrders->sum('total_profit')
-                );
-
-                $bulantotalprofitbersih = $bulanprofitbersihservis + $bulanprofitbersihpenjualan;
-
-                // ======================
-                // PROFIT KOTOR SERVIS
-                // ======================
-                $bulanprofitkotorservis = ServiceTransaction::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->where('is_approve', 'Setuju')
-                    ->sum('profit');
-
-                // ======================
-                // PROFIT KOTOR PENJUALAN
-                // ======================
-                $bulanprofitkotorpenjualan = Order::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->with(['detailOrders' => function ($q) use ($year, $month) {
-                        $q->select('orders_id', DB::raw('SUM(profit) as total_profit'))
-                        ->groupBy('orders_id');
-                    }])
-                    ->get()
-                    ->sum(fn($order) => $order->detailOrders->sum('total_profit'));
-
-                $bulantotalprofitkotor = $bulanprofitkotorservis + $bulanprofitkotorpenjualan;
-
-                // ======================
-                // OMSET BULANAN
-                // ======================
-                $totalOmsetBulanIni = Budget::where('cabang_id', $cab->id)
-                    ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$ym])
-                    ->sum('total');
-
-                // ======================
-                // PUSH KE JSON
-                // ======================
-                $dataProfit[$cab->nama_cabang][$ym] = [
-                    'profit'               => $bulantotalprofitbersih,
-                ];
-            }
-        }
-
-
-        // HASIL AKHIR
-        $dataProfitService = [];
-
-        // =========================
-        // LOOP PER CABANG PROFIT SERVIS
-        // =========================
-        foreach ($cabang as $cab) {
-
-            // Loop per bulan
-            foreach ($listMonths as $ym) {
-
-                // Ambil year & month dari list bulan
-                [$year, $month] = explode('-', $ym);
-
-                // ======================
-                // PROFIT BERSIH SERVIS
-                // ======================
-                $omset = ServiceTransaction::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->where('is_approve', 'Setuju')
-                    ->sum('profittoko');
-
-
-                // ======================
-                // PUSH KE JSON
-                // ======================
-                $dataProfitService[$cab->nama_cabang][$ym] = [
-                    'omset'               => $omset,
-                ];
-            }
-        }
-
-
-
-       $dataProdukProduk = [];
-
-        // =========================
-        // LOOP PER CABANG PROFIT PRODUK
-        // =========================
-        foreach ($cabang as $cab) {
-
-            foreach ($listMonths as $ym) {
-
-                [$year, $month] = explode('-', $ym);
-
-                // ======================
-                // AMBIL ORDER + DETAIL + PRODUK
-                // ======================
-                $orders = Order::where('cabang_id', $cab->id)
-                    ->whereYear('tgl_disetujui', $year)
-                    ->whereMonth('tgl_disetujui', $month)
-                    ->with([
-                        'detailOrders.product' => function ($q) {
-                            $q->select('id', 'categories_id');
-                        }
-                    ])
-                    ->get();
-
-                // ======================
-                // SIAPKAN TEMPAT PENAMPUNG
-                // ======================
-                $kategoriData = [
+                $kategoriProfit = [
                     1 => ['nama' => 'Handphone', 'total_profit' => 0],
                     2 => ['nama' => 'Sparepart', 'total_profit' => 0],
                     3 => ['nama' => 'Aksesoris', 'total_profit' => 0],
                     4 => ['nama' => 'Tools', 'total_profit' => 0],
                 ];
 
-                // ======================
-                // LOOP DETAIL ORDER
-                // ======================
-                foreach ($orders as $ord) {
-
-                    foreach ($ord->detailOrders as $detail) {
-
-                        $catId = $detail->product->categories_id ?? 4; // default Tools bila tidak ada
-
-                        // Tambahkan data detail-nya
-                        // $kategoriData[$catId]['data'][] = $detail;
-
-                        // OMSET (gunakan sub_total order)
-                        // $kategoriData[$catId]['total_omset'] += $ord->sub_total;
-
-                        // PROFIT
-                        $kategoriData[$catId]['total_profit'] += $detail->profit_toko;
+                if (!empty($orderCatMap[$cabId][$ym])) {
+                    foreach ($orderCatMap[$cabId][$ym] as $catId => $catRow) {
+                        if (!isset($kategoriOmset[$catId])) {
+                            $kategoriOmset[$catId]['total_omset'] = 0;
+                            $kategoriProfit[$catId]['total_profit'] = 0;
+                        }
+                        $kategoriOmset[$catId]['total_omset'] += (int) $catRow->sum_sub_total;
+                        $kategoriProfit[$catId]['total_profit'] += (int) $catRow->sum_profit_toko;
                     }
                 }
 
-                // ======================
-                // INPUT KE JSON BESAR
-                // ======================
-                $dataProdukProduk[$cab->nama_cabang][$ym] = $kategoriData;
-            }
-        }
+                $dataOmsetProduk[$cabName][$ym] = $kategoriOmset;
+                $dataProdukProduk[$cabName][$ym] = $kategoriProfit;
 
-        // ===============================================================
+                // 5. Profit & Profit Service
+                $servisProfitToko = $srv ? $srv->sum_profittoko : 0;
+                $dataProfit[$cabName][$ym] = [
+                    'profit' => $servisProfitToko + $penjualanProfitBersih,
+                ];
+                $dataProfitService[$cabName][$ym] = [
+                    'omset' => $servisProfitToko,
+                ];
 
-        // HASIL AKHIR
-        $dataPengeluaran = [];
-
-        // =========================
-        // LOOP PER CABANG PENGELUARAN
-        // =========================
-        foreach ($cabang as $cab) {
-
-
-            // Loop per bulan
-            foreach ($listMonths as $ym) {
-                [$year, $month] = explode('-', $ym);
-                $pengeluaran_data = Expense::whereMonth('tgl_disetujui',$month)
-                    ->whereYear('tgl_disetujui',$year)
-                    ->where('cabang_id',$cab->id)
-                    ->where('is_approve','Setuju')
-                    ->get()->sum('price');
-                // push ke JSON:
-                $dataPengeluaran[$cab->nama_cabang][$ym] = $pengeluaran_data;
-            }
-        }
-
-        // HASIL AKHIR
-        $dataInsiden = [];
-
-        // =========================
-        // LOOP PER CABANG PENGELUARAN
-        // =========================
-        foreach ($cabang as $cab) {
-
-
-            // Loop per bulan
-            foreach ($listMonths as $ym) {
-                [$year, $month] = explode('-', $ym);
-                $data = Incident::whereMonth('created_at',$month)
-                    ->whereYear('created_at',$year)
-                    ->where('cabang_id',$cab->id)
-                    ->get()->sum('price');
-                // push ke JSON:
-                $dataInsiden[$cab->nama_cabang][$ym] = $data;
-            }
-        }
-
-        // HASIL AKHIR
-        $dataRefund = [];
-
-        // =========================
-        // LOOP PER CABANG PENGELUARAN
-        // =========================
-        foreach ($cabang as $cab) {
-
-
-            // Loop per bulan
-            foreach ($listMonths as $ym) {
-                [$year, $month] = explode('-', $ym);
-                $data = Refund::whereMonth('created_at',$month)
-                    ->whereYear('created_at',$year)
-                    ->where('cabang_id',$cab->id)
-                    ->get()->sum('nominal_servis');
-                // push ke JSON:
-                $dataRefund[$cab->nama_cabang][$ym] = $data;
+                // 6. Pengeluaran, Insiden, Refund
+                $dataPengeluaran[$cabName][$ym] = isset($expenseMap[$cabId][$ym]) ? (int) $expenseMap[$cabId][$ym] : 0;
+                $dataInsiden[$cabName][$ym] = isset($incidentMap[$cabId][$ym]) ? (int) $incidentMap[$cabId][$ym] : 0;
+                $dataRefund[$cabName][$ym] = isset($refundMap[$cabId][$ym]) ? (int) $refundMap[$cabId][$ym] : 0;
             }
         }
 

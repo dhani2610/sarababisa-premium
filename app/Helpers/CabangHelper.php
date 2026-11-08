@@ -29,47 +29,81 @@ if (!function_exists('getCabangId')) {
 if (!function_exists('getCabang')) {
     function getCabang()
     {
-        $data = collect();
-        if (Auth::check()) {
-            if (Auth::user()->id == 1) {
-                $data = Cabang::orderBy('id','asc')->get();
-            }else{
-                $data = Auth::user()->assigned_cabangs;
-                if ($data->isEmpty()) {
-                    $data = Cabang::orderBy('id','asc')->where('id', Auth::user()->cabang_id)->get();
-                }
+        static $cachedUserId = null;
+        static $cachedCabangId = null;
+        static $cachedData = null;
+
+        if (!Auth::check()) {
+            return collect();
+        }
+
+        $uid = Auth::user()->id;
+        $cid = Auth::user()->cabang_id;
+
+        if ($cachedData !== null && $cachedUserId === $uid && $cachedCabangId === $cid) {
+            return $cachedData;
+        }
+
+        if ($uid == 1) {
+            $data = Cabang::orderBy('id', 'asc')->get();
+        } else {
+            $data = Auth::user()->assigned_cabangs;
+            if ($data->isEmpty()) {
+                $data = Cabang::orderBy('id', 'asc')->where('id', $cid)->get();
             }
         }
 
-        // Default fallback ke 1
+        $cachedUserId = $uid;
+        $cachedCabangId = $cid;
+        $cachedData = $data;
+
         return $data;
+    }
+}
+
+if (!function_exists('getCabangByIdCached')) {
+    function getCabangByIdCached($cabangId)
+    {
+        static $cabangModelCache = [];
+        if (empty($cabangId)) {
+            return null;
+        }
+        if (is_object($cabangId)) {
+            $cabangId = $cabangId->id ?? null;
+            if (empty($cabangId)) {
+                return null;
+            }
+        }
+        if (is_array($cabangId)) {
+            return null;
+        }
+        $cabangId = (int) $cabangId;
+        if (!array_key_exists($cabangId, $cabangModelCache)) {
+            $cabangModelCache[$cabangId] = Cabang::find($cabangId);
+        }
+        return $cabangModelCache[$cabangId];
     }
 }
 
 if (!function_exists('getCabangName')) {
     function getCabangName($cabangId)
     {
-        static $cabangCache = [];
-        if (empty($cabangId)) return '';
-        if (is_object($cabangId)) {
-            $cabangId = $cabangId->id ?? null;
-            if (empty($cabangId)) return '';
-        }
-        if (is_array($cabangId)) return '';
-        if (!isset($cabangCache[$cabangId])) {
-            $c = Cabang::find($cabangId);
-            $cabangCache[$cabangId] = $c ? $c->nama_cabang : '';
-        }
-        return $cabangCache[$cabangId];
+        $c = getCabangByIdCached($cabangId);
+        return $c ? ($c->nama_cabang ?? '') : '';
     }
 }
 
 if (!function_exists('getStoreSettingByCabang')) {
     function getStoreSettingByCabang($key = null)
     {
-        $cabangId = getCabangId();
+        static $settingCache = [];
+        $cabangId = (int) getCabangId();
 
-        $setting = StoreSetting::where('cabang_id', $cabangId)->first();
+        if (!array_key_exists($cabangId, $settingCache)) {
+            $settingCache[$cabangId] = StoreSetting::where('cabang_id', $cabangId)->first();
+        }
+
+        $setting = $settingCache[$cabangId];
 
         if (!$setting) {
             return null;
@@ -91,10 +125,10 @@ if (!function_exists('getCabangNameUser')) {
         if (!Auth::check() || !isset(Auth::user()->cabang_id)) {
             return '-';
         }
-        $cbg = Cabang::find(Auth::user()->cabang_id);
+        $cbg = getCabangByIdCached(Auth::user()->cabang_id);
         if (!empty($cbg)) {
             $data = $cbg->nama_cabang ?? '-';
-        }else{
+        } else {
             $data = '-';
         }
         return $data;
@@ -103,10 +137,10 @@ if (!function_exists('getCabangNameUser')) {
 if (!function_exists('expiredDateCabang')) {
     function expiredDateCabang()
     {
-        $cbg = Cabang::find(getCabangId());
+        $cbg = getCabangByIdCached(getCabangId());
         if (!empty($cbg)) {
             $data = $cbg->expired_date ?? null;
-        }else{
+        } else {
             $data = null;
         }
         return $data;
@@ -115,10 +149,10 @@ if (!function_exists('expiredDateCabang')) {
 if (!function_exists('allowTransaksiCabang')) {
     function allowTransaksiCabang()
     {
-        $cbg = Cabang::find(getCabangId());
+        $cbg = getCabangByIdCached(getCabangId());
         if (!empty($cbg)) {
             $data = $cbg->allow_transaksi ?? 1;
-        }else{
+        } else {
             $data = 1;
         }
         return $data;
@@ -187,6 +221,111 @@ if (!function_exists('bonusTeknisiMultiHardware')) {
         return $teknisiServisHardware;
     }
 }
+if (!function_exists('getBonusTeknisiFromData')) {
+    function getBonusTeknisiFromData($tx, $relasi, $user, $modelMap = null, $levelingMap = null)
+    {
+        if (!$tx || !$user) {
+            return 0;
+        }
+
+        $userId = $user->id;
+        $tipe = $relasi ? $relasi->tipe : $tx->tipe;
+        $bonusInterface = $relasi ? (float) $relasi->bonus_interface : (float) $tx->bonus_interface;
+        $profit = $relasi ? (float) $relasi->profit : (float) $tx->profit;
+        $persen = $relasi ? (float) $relasi->persen_teknisi : (float) $tx->persen_teknisi;
+        if ($persen <= 0) {
+            $persen = (float) ($user->persen ?? 0);
+        }
+
+        $bagian = $user->bagian_teknisi ?? '';
+
+        // 1. Tipe Interface Leveling (Khusus Teknisi Interface)
+        if ($bagian === 'Teknisi Interface' && ($tipe === 'Interface Leveling' || empty($tipe))) {
+            if ($bonusInterface > 0) {
+                return $bonusInterface;
+            }
+            // Fallback dynamic lookup leveling
+            $model = ($modelMap !== null && is_array($modelMap))
+                ? ($modelMap[$tx->model_series_id] ?? null)
+                : ModelSerie::find($tx->model_series_id);
+            $tipe_os_id = $model ? $model->id_tipe_os : null;
+            $jenis_barang_id = $tx->types_id;
+            $biaya = (int) ($relasi && $relasi->biaya ? $relasi->biaya : $tx->biaya);
+
+            $leveling = null;
+            if ($levelingMap !== null && is_array($levelingMap)) {
+                $userLevels = $levelingMap[$userId] ?? [];
+                foreach ($userLevels as $lvl) {
+                    if (
+                        $lvl->id_jenis_barang == $jenis_barang_id &&
+                        $lvl->id_tipe_os == $tipe_os_id &&
+                        $lvl->start_rate <= $biaya &&
+                        $lvl->end_rate >= $biaya
+                    ) {
+                        $leveling = $lvl;
+                        break;
+                    }
+                }
+            } else {
+                $leveling = BonusLeveling::where('id_user', $userId)
+                    ->where('id_jenis_barang', $jenis_barang_id)
+                    ->where('id_tipe_os', $tipe_os_id)
+                    ->where('start_rate', '<=', $biaya)
+                    ->where('end_rate', '>=', $biaya)
+                    ->first();
+            }
+
+            if ($leveling && !empty($leveling->nominal_bonus)) {
+                return (float) $leveling->nominal_bonus;
+            }
+            if ($model && !empty($model->nominal_bonus)) {
+                return (float) $model->nominal_bonus;
+            }
+        }
+
+        // 2. Tipe Interface Tetap (Khusus Teknisi Interface)
+        if ($bagian === 'Teknisi Interface' && $tipe === 'Interface') {
+            if ($bonusInterface > 0) {
+                return $bonusInterface;
+            }
+            $model = ($modelMap !== null && is_array($modelMap))
+                ? ($modelMap[$tx->model_series_id] ?? null)
+                : ModelSerie::find($tx->model_series_id);
+            if ($model && !empty($model->nominal_bonus)) {
+                return (float) $model->nominal_bonus;
+            }
+        }
+
+        // 3. Tipe Interface Persentase
+        if ($bagian === 'Teknisi Persentase Interface' || $tipe === 'Interface Persentase') {
+            $pInterface = (float) ($user->persen_bonus_interface ?? 0);
+            if ($pInterface <= 0) {
+                $pInterface = $persen;
+            }
+            if ($pInterface > 0 && $profit > 0) {
+                return ($profit / 100) * $pInterface;
+            }
+        }
+
+        // 4. Jika ada bonus_interface nominal khusus tersimpan > 0
+        if ($bonusInterface > 0) {
+            return $bonusInterface;
+        }
+
+        // 5. Default / Teknisi Hardware (Persentase dari profit)
+        if ($profit > 0 && $persen > 0) {
+            return ($profit / 100) * $persen;
+        }
+
+        // 6. Fallback jika ada selisih profit dengan profittoko
+        if ($relasi && !empty($relasi->profittoko) && $profit > (float) $relasi->profittoko) {
+            return $profit - (float) $relasi->profittoko;
+        }
+
+        return 0;
+    }
+}
+
 if (!function_exists('getBonusTeknisiByTransaction')) {
     function getBonusTeknisiByTransaction($transactionId = null, $userId = null)
     {
@@ -204,74 +343,7 @@ if (!function_exists('getBonusTeknisiByTransaction')) {
         $tx = ServiceTransaction::find($transactionId);
         if (!$tx) return 0;
 
-        $tipe = $relasi ? $relasi->tipe : $tx->tipe;
-        $bonusInterface = $relasi ? (float)$relasi->bonus_interface : (float)$tx->bonus_interface;
-        $profit = $relasi ? (float)$relasi->profit : (float)$tx->profit;
-        $persen = $relasi ? (float)$relasi->persen_teknisi : (float)$tx->persen_teknisi;
-        if ($persen <= 0) $persen = (float)($user->persen ?? 0);
-
-        $bagian = $user->bagian_teknisi ?? '';
-
-        // 1. Tipe Interface Leveling (Khusus Teknisi Interface)
-        if ($bagian === 'Teknisi Interface' && ($tipe === 'Interface Leveling' || empty($tipe))) {
-            if ($bonusInterface > 0) {
-                return $bonusInterface;
-            }
-            // Fallback dynamic lookup leveling
-            $model = ModelSerie::find($tx->model_series_id);
-            $tipe_os_id = $model ? $model->id_tipe_os : null;
-            $jenis_barang_id = $tx->types_id;
-            $biaya = (int)($relasi && $relasi->biaya ? $relasi->biaya : $tx->biaya);
-
-            $leveling = BonusLeveling::where('id_user', $userId)
-                ->where('id_jenis_barang', $jenis_barang_id)
-                ->where('id_tipe_os', $tipe_os_id)
-                ->where('start_rate', '<=', $biaya)
-                ->where('end_rate', '>=', $biaya)
-                ->first();
-
-            if ($leveling && !empty($leveling->nominal_bonus)) {
-                return (float)$leveling->nominal_bonus;
-            }
-            if ($model && !empty($model->nominal_bonus)) {
-                return (float)$model->nominal_bonus;
-            }
-        }
-
-        // 2. Tipe Interface Tetap (Khusus Teknisi Interface)
-        if ($bagian === 'Teknisi Interface' && $tipe === 'Interface') {
-            if ($bonusInterface > 0) return $bonusInterface;
-            $model = ModelSerie::find($tx->model_series_id);
-            if ($model && !empty($model->nominal_bonus)) {
-                return (float)$model->nominal_bonus;
-            }
-        }
-
-        // 3. Tipe Interface Persentase
-        if ($bagian === 'Teknisi Persentase Interface' || $tipe === 'Interface Persentase') {
-            $pInterface = (float)($user->persen_bonus_interface ?? 0);
-            if ($pInterface <= 0) $pInterface = $persen;
-            if ($pInterface > 0 && $profit > 0) {
-                return ($profit / 100) * $pInterface;
-            }
-        }
-
-        // 4. Jika ada bonus_interface nominal khusus tersimpan > 0
-        if ($bonusInterface > 0) {
-            return $bonusInterface;
-        }
-
-        // 5. Default / Teknisi Hardware (Persentase dari profit)
-        if ($profit > 0 && $persen > 0) {
-            return ($profit / 100) * $persen;
-        }
-
-        // 6. Fallback jika ada selisih profit dengan profittoko
-        if ($relasi && !empty($relasi->profittoko) && $profit > (float)$relasi->profittoko) {
-            return $profit - (float)$relasi->profittoko;
-        }
-
-        return 0;
+        return getBonusTeknisiFromData($tx, $relasi, $user);
     }
 }
 
@@ -418,85 +490,119 @@ if (!function_exists('calculateBonusForCabang')) {
         $bonus = 0;
 
         if ($user->role === 'Teknisi') {
-            // 1. Ambil transaksi menggunakan helper multi-teknisi
-            $transactions = ServiceTransaction::whereIn('id', servisIdMultiTeknisi($user->id))
-                ->where(function($q) use ($start_date, $end_date) {
-                    $q->where(function($sub) use ($start_date, $end_date) {
+            $transactions = ServiceTransaction::where('cabang_id', $cabangId)
+                ->where('status_servis', 'Sudah Diambil')
+                ->where('is_approve', 'Setuju')
+                ->where(function ($q) use ($start_date, $end_date) {
+                    $q->where(function ($sub) use ($start_date, $end_date) {
                         $sub->whereNotNull('tgl_ambil')
                             ->whereDate('tgl_ambil', '>=', $start_date)
                             ->whereDate('tgl_ambil', '<=', $end_date);
-                    })->orWhere(function($sub) use ($start_date, $end_date) {
+                    })->orWhere(function ($sub) use ($start_date, $end_date) {
                         $sub->whereNull('tgl_ambil')
                             ->whereDate('tgl_disetujui', '>=', $start_date)
                             ->whereDate('tgl_disetujui', '<=', $end_date);
                     });
                 })
-                ->where('cabang_id', $cabangId)
-                ->where('status_servis', 'Sudah Diambil')
-                ->where('is_approve', 'Setuju')
+                ->where(function ($q) use ($user) {
+                    $q->where('users_id', $user->id)
+                      ->orWhereIn('id', function ($sub) use ($user) {
+                          $sub->select('service_transactions_id')
+                              ->from('teknisi_servis')
+                              ->where('users_id', $user->id);
+                      });
+                })
                 ->get();
 
-            // 2. Hitung bonus per transaksi menggunakan fungsi seragam getBonusTeknisiByTransaction
+            if ($transactions->isEmpty()) {
+                return 0;
+            }
+
+            $txIds = $transactions->pluck('id')->all();
+            $relasiMap = TeknisiServis::whereIn('service_transactions_id', $txIds)
+                ->where('users_id', $user->id)
+                ->get()
+                ->keyBy('service_transactions_id');
+
+            $modelIds = $transactions->pluck('model_series_id')->filter()->unique()->values()->all();
+            $modelMap = !empty($modelIds)
+                ? ModelSerie::whereIn('id', $modelIds)->get()->keyBy('id')->all()
+                : [];
+
+            $levelingMap = [
+                $user->id => BonusLeveling::where('id_user', $user->id)->get()->all(),
+            ];
+
             $bonus = 0;
             foreach ($transactions as $service) {
-                $bonus += getBonusTeknisiByTransaction($service->id, $user->id);
+                $relasi = $relasiMap->get($service->id);
+                $bonus += getBonusTeknisiFromData($service, $relasi, $user, $modelMap, $levelingMap);
             }
 
         } elseif ($user->role === 'Sales') {
-            $data = OrderDetail::where('users_id', $user->id)
-            ->whereHas('order', function ($query) use ($start_date, $end_date, $cabangId) {
-                $query->where('is_approve', 'Setuju')
-                    ->where('cabang_id', $cabangId)
-                    ->whereDate('tgl_disetujui', '>=', $start_date)
-                    ->whereDate('tgl_disetujui', '<=', $end_date);
-            })->get();
+            $totalProfit = \Illuminate\Support\Facades\DB::table('order_details')
+                ->join('orders', 'order_details.orders_id', '=', 'orders.id')
+                ->whereNull('order_details.deleted_at')
+                ->whereNull('orders.deleted_at')
+                ->where('order_details.users_id', $user->id)
+                ->where('orders.is_approve', 'Setuju')
+                ->where('orders.cabang_id', $cabangId)
+                ->whereDate('orders.tgl_disetujui', '>=', $start_date)
+                ->whereDate('orders.tgl_disetujui', '<=', $end_date)
+                ->sum('order_details.profit');
 
-            $bonus = $data->sum('profit') / 100;
-            $bonus *= ($user->persen ?? 0);
+            $bonus = ($totalProfit / 100) * ($user->persen ?? 0);
 
         } else {
             $tipeBonusNota = $user->tipe_bonus_admin ?? 'Persen';
             $persen = $user->persen ?? 0;
             $nominalBonus = $user->nominal_bonus_admin ?? 0;
 
-            $service = ServiceTransaction::where('admin_id', $user->id)
-            ->where('status_servis', 'Sudah Diambil')
-            ->where('is_approve', 'Setuju')
-            ->where('cabang_id', $cabangId)
-            ->where(function($q) use ($start_date, $end_date) {
-                $q->where(function($sub) use ($start_date, $end_date) {
-                    $sub->whereNotNull('tgl_ambil')
-                        ->whereDate('tgl_ambil', '>=', $start_date)
-                        ->whereDate('tgl_ambil', '<=', $end_date);
-                })->orWhere(function($sub) use ($start_date, $end_date) {
-                    $sub->whereNull('tgl_ambil')
-                        ->whereDate('tgl_disetujui', '>=', $start_date)
-                        ->whereDate('tgl_disetujui', '<=', $end_date);
-                });
-            })
-            ->get();
-
-            $sale = OrderDetail::where('admin_id', $user->id)
-            ->whereHas('order', function ($query) use ($start_date, $end_date, $cabangId) {
-                $query->where('is_approve', 'Setuju')
-                    ->where('cabang_id', $cabangId)
-                    ->where(function($q) use ($start_date, $end_date) {
-                        $q->where(function($sub) use ($start_date, $end_date) {
-                            $sub->whereNotNull('tgl_disetujui')
-                                ->whereDate('tgl_disetujui', '>=', $start_date)
-                                ->whereDate('tgl_disetujui', '<=', $end_date);
-                        })->orWhere(function($sub) use ($start_date, $end_date) {
-                            $sub->whereNull('tgl_disetujui')
-                                ->whereDate('created_at', '>=', $start_date)
-                                ->whereDate('created_at', '<=', $end_date);
-                        });
+            $serviceAgg = \Illuminate\Support\Facades\DB::table('service_transactions')
+                ->whereNull('deleted_at')
+                ->where('admin_id', $user->id)
+                ->where('status_servis', 'Sudah Diambil')
+                ->where('is_approve', 'Setuju')
+                ->where('cabang_id', $cabangId)
+                ->where(function ($q) use ($start_date, $end_date) {
+                    $q->where(function ($sub) use ($start_date, $end_date) {
+                        $sub->whereNotNull('tgl_ambil')
+                            ->whereDate('tgl_ambil', '>=', $start_date)
+                            ->whereDate('tgl_ambil', '<=', $end_date);
+                    })->orWhere(function ($sub) use ($start_date, $end_date) {
+                        $sub->whereNull('tgl_ambil')
+                            ->whereDate('tgl_disetujui', '>=', $start_date)
+                            ->whereDate('tgl_disetujui', '<=', $end_date);
                     });
-            })->get();
+                })
+                ->selectRaw('COALESCE(SUM(profit), 0) as total_profit, COUNT(*) as total_nota')
+                ->first();
 
-            $totalProfitService = $service->sum('profit');
-            $totalProfitSale = $sale->sum('profit');
-            $totalNotaService = $service->count();
-            $totalNotaSale = $sale->count();
+            $saleAgg = \Illuminate\Support\Facades\DB::table('order_details')
+                ->join('orders', 'order_details.orders_id', '=', 'orders.id')
+                ->whereNull('order_details.deleted_at')
+                ->whereNull('orders.deleted_at')
+                ->where('order_details.admin_id', $user->id)
+                ->where('orders.is_approve', 'Setuju')
+                ->where('orders.cabang_id', $cabangId)
+                ->where(function ($q) use ($start_date, $end_date) {
+                    $q->where(function ($sub) use ($start_date, $end_date) {
+                        $sub->whereNotNull('orders.tgl_disetujui')
+                            ->whereDate('orders.tgl_disetujui', '>=', $start_date)
+                            ->whereDate('orders.tgl_disetujui', '<=', $end_date);
+                    })->orWhere(function ($sub) use ($start_date, $end_date) {
+                        $sub->whereNull('orders.tgl_disetujui')
+                            ->whereDate('orders.created_at', '>=', $start_date)
+                            ->whereDate('orders.created_at', '<=', $end_date);
+                    });
+                })
+                ->selectRaw('COALESCE(SUM(order_details.profit), 0) as total_profit, COUNT(*) as total_nota')
+                ->first();
+
+            $totalProfitService = (float) ($serviceAgg->total_profit ?? 0);
+            $totalProfitSale = (float) ($saleAgg->total_profit ?? 0);
+            $totalNotaService = (int) ($serviceAgg->total_nota ?? 0);
+            $totalNotaSale = (int) ($saleAgg->total_nota ?? 0);
 
             if ($tipeBonusNota === 'Persen') {
                 $bonus = (($totalProfitService + $totalProfitSale) / 100) * $persen;
@@ -509,6 +615,226 @@ if (!function_exists('calculateBonusForCabang')) {
         }
 
         return $bonus;
+    }
+}
+
+if (!function_exists('calculateTotalWorkerBonusForCabang')) {
+    function calculateTotalWorkerBonusForCabang($workers, $cabangId, $start_date, $end_date)
+    {
+        if ($workers->isEmpty()) {
+            return 0;
+        }
+
+        // Resolve user accounts for all workers in bulk
+        $workerIds = $workers->pluck('id')->all();
+        $workerNames = $workers->pluck('name')->filter()->unique()->values()->all();
+
+        $usersByWorkerId = User::whereIn('workers_id', $workerIds)->get()->keyBy('workers_id');
+        $usersByName = !empty($workerNames)
+            ? User::with('cabangs')->whereIn('name', $workerNames)->get()->groupBy('name')
+            : collect();
+
+        $resolvedUsers = [];
+        foreach ($workers as $w) {
+            $u = $usersByWorkerId->get($w->id);
+            if (!$u && $usersByName->has($w->name)) {
+                $candidates = $usersByName->get($w->name);
+                $u = $candidates->firstWhere('cabang_id', $w->cabang_id)
+                    ?? $candidates->first(function ($cand) use ($w) {
+                        return $cand->cabang_id == $w->cabang_id || $cand->cabangs->contains('id', $w->cabang_id);
+                    })
+                    ?? $candidates->first();
+            }
+            if ($u) {
+                $resolvedUsers[] = $u;
+            }
+        }
+
+        if (empty($resolvedUsers)) {
+            return 0;
+        }
+
+        $teknisiUsers = [];
+        $salesUsers = [];
+        $adminUsers = [];
+        foreach ($resolvedUsers as $u) {
+            if ($u->role === 'Teknisi') {
+                $teknisiUsers[$u->id] = $u;
+            } elseif ($u->role === 'Sales') {
+                $salesUsers[$u->id] = $u;
+            } else {
+                $adminUsers[$u->id] = $u;
+            }
+        }
+
+        $totalBonus = 0;
+
+        // 1. Bulk Teknisi Bonus
+        if (!empty($teknisiUsers)) {
+            $tekIds = array_keys($teknisiUsers);
+            $txs = ServiceTransaction::where('cabang_id', $cabangId)
+                ->where('status_servis', 'Sudah Diambil')
+                ->where('is_approve', 'Setuju')
+                ->where(function ($q) use ($start_date, $end_date) {
+                    $q->where(function ($sub) use ($start_date, $end_date) {
+                        $sub->whereNotNull('tgl_ambil')
+                            ->whereDate('tgl_ambil', '>=', $start_date)
+                            ->whereDate('tgl_ambil', '<=', $end_date);
+                    })->orWhere(function ($sub) use ($start_date, $end_date) {
+                        $sub->whereNull('tgl_ambil')
+                            ->whereDate('tgl_disetujui', '>=', $start_date)
+                            ->whereDate('tgl_disetujui', '<=', $end_date);
+                    });
+                })
+                ->where(function ($q) use ($tekIds) {
+                    $q->whereIn('users_id', $tekIds)
+                      ->orWhereIn('id', function ($sub) use ($tekIds) {
+                          $sub->select('service_transactions_id')
+                              ->from('teknisi_servis')
+                              ->whereIn('users_id', $tekIds);
+                      });
+                })
+                ->get();
+
+            if ($txs->isNotEmpty()) {
+                $txIds = $txs->pluck('id')->all();
+                $relasis = TeknisiServis::whereIn('service_transactions_id', $txIds)
+                    ->whereIn('users_id', $tekIds)
+                    ->get();
+
+                $relasiByUserAndTx = [];
+                foreach ($relasis as $r) {
+                    if (!isset($relasiByUserAndTx[$r->users_id][$r->service_transactions_id])) {
+                        $relasiByUserAndTx[$r->users_id][$r->service_transactions_id] = $r;
+                    }
+                }
+
+                $modelIds = $txs->pluck('model_series_id')->filter()->unique()->values()->all();
+                $modelMap = !empty($modelIds)
+                    ? ModelSerie::whereIn('id', $modelIds)->get()->keyBy('id')->all()
+                    : [];
+
+                $levelings = BonusLeveling::whereIn('id_user', $tekIds)->get();
+                $levelingMap = [];
+                foreach ($levelings as $lvl) {
+                    $levelingMap[$lvl->id_user][] = $lvl;
+                }
+
+                foreach ($resolvedUsers as $u) {
+                    if ($u->role !== 'Teknisi') {
+                        continue;
+                    }
+                    $uid = $u->id;
+                    foreach ($txs as $tx) {
+                        $relasi = $relasiByUserAndTx[$uid][$tx->id] ?? null;
+                        if ($tx->users_id == $uid || $relasi !== null) {
+                            $totalBonus += getBonusTeknisiFromData($tx, $relasi, $u, $modelMap, $levelingMap);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Bulk Sales Bonus
+        if (!empty($salesUsers)) {
+            $salesIds = array_keys($salesUsers);
+            $salesProfits = \Illuminate\Support\Facades\DB::table('order_details')
+                ->join('orders', 'order_details.orders_id', '=', 'orders.id')
+                ->whereNull('order_details.deleted_at')
+                ->whereNull('orders.deleted_at')
+                ->whereIn('order_details.users_id', $salesIds)
+                ->where('orders.is_approve', 'Setuju')
+                ->where('orders.cabang_id', $cabangId)
+                ->whereDate('orders.tgl_disetujui', '>=', $start_date)
+                ->whereDate('orders.tgl_disetujui', '<=', $end_date)
+                ->groupBy('order_details.users_id')
+                ->selectRaw('order_details.users_id, COALESCE(SUM(order_details.profit), 0) as total_profit')
+                ->pluck('total_profit', 'users_id');
+
+            foreach ($resolvedUsers as $u) {
+                if ($u->role !== 'Sales') {
+                    continue;
+                }
+                $p = (float) ($salesProfits[$u->id] ?? 0);
+                $totalBonus += ($p / 100) * ($u->persen ?? 0);
+            }
+        }
+
+        // 3. Bulk Admin Bonus
+        if (!empty($adminUsers)) {
+            $adminIds = array_keys($adminUsers);
+
+            $adminServiceAgg = \Illuminate\Support\Facades\DB::table('service_transactions')
+                ->whereNull('deleted_at')
+                ->whereIn('admin_id', $adminIds)
+                ->where('status_servis', 'Sudah Diambil')
+                ->where('is_approve', 'Setuju')
+                ->where('cabang_id', $cabangId)
+                ->where(function ($q) use ($start_date, $end_date) {
+                    $q->where(function ($sub) use ($start_date, $end_date) {
+                        $sub->whereNotNull('tgl_ambil')
+                            ->whereDate('tgl_ambil', '>=', $start_date)
+                            ->whereDate('tgl_ambil', '<=', $end_date);
+                    })->orWhere(function ($sub) use ($start_date, $end_date) {
+                        $sub->whereNull('tgl_ambil')
+                            ->whereDate('tgl_disetujui', '>=', $start_date)
+                            ->whereDate('tgl_disetujui', '<=', $end_date);
+                    });
+                })
+                ->groupBy('admin_id')
+                ->selectRaw('admin_id, COALESCE(SUM(profit), 0) as total_profit, COUNT(*) as total_nota')
+                ->get()
+                ->keyBy('admin_id');
+
+            $adminSaleAgg = \Illuminate\Support\Facades\DB::table('order_details')
+                ->join('orders', 'order_details.orders_id', '=', 'orders.id')
+                ->whereNull('order_details.deleted_at')
+                ->whereNull('orders.deleted_at')
+                ->whereIn('order_details.admin_id', $adminIds)
+                ->where('orders.is_approve', 'Setuju')
+                ->where('orders.cabang_id', $cabangId)
+                ->where(function ($q) use ($start_date, $end_date) {
+                    $q->where(function ($sub) use ($start_date, $end_date) {
+                        $sub->whereNotNull('orders.tgl_disetujui')
+                            ->whereDate('orders.tgl_disetujui', '>=', $start_date)
+                            ->whereDate('orders.tgl_disetujui', '<=', $end_date);
+                    })->orWhere(function ($sub) use ($start_date, $end_date) {
+                        $sub->whereNull('orders.tgl_disetujui')
+                            ->whereDate('orders.created_at', '>=', $start_date)
+                            ->whereDate('orders.created_at', '<=', $end_date);
+                    });
+                })
+                ->groupBy('order_details.admin_id')
+                ->selectRaw('order_details.admin_id as admin_id, COALESCE(SUM(order_details.profit), 0) as total_profit, COUNT(*) as total_nota')
+                ->get()
+                ->keyBy('admin_id');
+
+            foreach ($resolvedUsers as $u) {
+                if ($u->role === 'Teknisi' || $u->role === 'Sales') {
+                    continue;
+                }
+                $tipeBonusNota = $u->tipe_bonus_admin ?? 'Persen';
+                $persen = $u->persen ?? 0;
+                $nominalBonus = $u->nominal_bonus_admin ?? 0;
+
+                $srv = $adminServiceAgg->get($u->id);
+                $sl = $adminSaleAgg->get($u->id);
+
+                $totalProfitService = (float) ($srv->total_profit ?? 0);
+                $totalProfitSale = (float) ($sl->total_profit ?? 0);
+                $totalNotaService = (int) ($srv->total_nota ?? 0);
+                $totalNotaSale = (int) ($sl->total_nota ?? 0);
+
+                if ($tipeBonusNota === 'Persen') {
+                    $totalBonus += (($totalProfitService + $totalProfitSale) / 100) * $persen;
+                } elseif ($tipeBonusNota === 'Tetap') {
+                    $totalNota = $totalNotaService + $totalNotaSale;
+                    $totalBonus += $totalNota * $nominalBonus;
+                }
+            }
+        }
+
+        return $totalBonus;
     }
 }
 
