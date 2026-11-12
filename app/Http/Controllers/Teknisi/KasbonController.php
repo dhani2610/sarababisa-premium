@@ -38,6 +38,13 @@ class KasbonController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        if (empty($data['workers_id'])) {
+            $data['workers_id'] = auth()->user()?->worker?->id;
+        }
+        if (empty($data['workers_id'])) {
+            return redirect()->route('teknisi-kasbon.index')
+                ->with('error', 'Akun Anda belum terhubung ke Data Karyawan. Hubungi Kepala Toko untuk mengatur Relasi Data Karyawan pada menu Akun.');
+        }
 
         Debt::create($data);
 

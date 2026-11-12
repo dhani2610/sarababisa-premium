@@ -14,6 +14,7 @@
             <x-search-form placeholder="Masukkan nama item kasbon" />
 
             <!-- Create invoice button -->
+            @if($hasWorker)
             <div x-data="{ modalOpen: false }">
                 <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click.prevent="modalOpen = true" aria-controls="tambah-modal">
                     <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
@@ -67,7 +68,7 @@
                             @csrf
                             <div class="px-5 py-4">
                                 <div class="space-y-3">
-                                    <input type="hidden" name="workers_id" value="{{ Auth::user()->worker->id }}">
+                                    <input type="hidden" name="workers_id" value="{{ Auth::user()->worker->id ?? '' }}">
                                     <div>
                                         <label class="block text-sm font-medium mb-1" for="item">Item Kasbon <span class="text-rose-500">*</span></label>
                                         <input id="item" name="item" class="form-input w-full px-2 py-1" type="text" required />
@@ -96,10 +97,34 @@
                     </div>
                 </div>
             </div>
+            @endif
             
         </div>
 
     </div>
+
+    @if(!$hasWorker)
+        <div class="bg-amber-50 border border-amber-300 text-amber-900 rounded-md p-4 mb-5" role="alert">
+            <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <div class="text-sm">
+                    <p class="font-semibold text-amber-900 mb-1">Akun Belum Terhubung ke Data Karyawan</p>
+                    <p class="mb-2">
+                        Akun Anda (<strong>{{ Auth::user()->name }}</strong>) saat ini belum memiliki relasi ke <strong>Data Karyawan</strong> (atau data karyawan sebelumnya telah dihapus), sehingga data kasbon tidak dapat ditampilkan maupun ditambahkan.
+                    </p>
+                    <p class="font-medium mb-1">Cara menghubungkan akun ke data karyawan:</p>
+                    <ol class="list-decimal list-inside space-y-0.5 text-amber-800">
+                        <li>Minta <strong>Kepala Toko</strong> membuka menu <strong>Pengaturan &rarr; Akun</strong>.</li>
+                        <li>Klik tombol <strong>Edit</strong> pada akun <strong>{{ Auth::user()->name }}</strong>.</li>
+                        <li>Pada kolom <strong>Relasi Data Karyawan</strong>, pilih nama karyawan yang sesuai lalu klik <strong>Simpan</strong>.</li>
+                        <li>Jika nama karyawan belum tersedia, tambahkan terlebih dahulu di menu <strong>Karyawan</strong>.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <!-- More actions -->
     <div class="sm:flex sm:justify-between sm:items-center mb-5">
