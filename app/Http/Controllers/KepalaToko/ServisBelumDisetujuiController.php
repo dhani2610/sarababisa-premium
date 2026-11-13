@@ -836,7 +836,7 @@ class ServisBelumDisetujuiController extends Controller
                 $nama_tipe = Type::find($request->types_id);
                 $nama_merek = Brand::find($request->brands_id);
                 $nama_model = ModelSerie::find($request->model_series_id);
-                $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
+                $nama_barang = trim(($nama_tipe->name ?? '') . ' ' . ($nama_merek->name ?? '') . ' ' . ($nama_model->name ?? ''));
                 $nama_pelanggan = Customer::find($request->customers_id);
 
 
@@ -945,10 +945,11 @@ class ServisBelumDisetujuiController extends Controller
                     'qc_masuk' => $qc_masuk_final,
                     'qc_keluar' => $qc_keluar_final,
                     'customers_id' => $request->customers_id,
-                    'nama_pelanggan' => $nama_pelanggan->nama,
+                    'nama_pelanggan' => $nama_pelanggan->nama ?? '',
                     'types_id' => $request->types_id,
                     'brands_id' => $request->brands_id,
                     'model_series_id' => $request->model_series_id,
+                    'nama_barang' => $nama_barang,
                     'kerusakan' => $request->kerusakan,
                     'tipe_status_pembayaran' => $request->tipe_status_pembayaran,
                     'qc_masuk' => $qc_masuk_data,

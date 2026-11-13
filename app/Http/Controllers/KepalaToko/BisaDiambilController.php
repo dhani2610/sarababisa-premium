@@ -934,7 +934,7 @@ class BisaDiambilController extends Controller
                 $nama_tipe = Type::find($request->types_id);
                 $nama_merek = Brand::find($request->brands_id);
                 $nama_model = ModelSerie::find($request->model_series_id);
-                $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
+                $nama_barang = trim(($nama_tipe->name ?? '') . ' ' . ($nama_merek->name ?? '') . ' ' . ($nama_model->name ?? ''));
                 $nama_pelanggan = Customer::find($request->customers_id);
 
 

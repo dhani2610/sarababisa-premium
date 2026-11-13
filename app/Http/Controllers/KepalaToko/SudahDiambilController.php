@@ -1173,7 +1173,7 @@ class SudahDiambilController extends Controller
                 $nama_tipe = Type::find($request->types_id);
                 $nama_merek = Brand::find($request->brands_id);
                 $nama_model = ModelSerie::find($request->model_series_id);
-                $nama_barang = '' . $nama_tipe->name . ' ' . $nama_merek->name . ' ' . $nama_model->name;
+                $nama_barang = trim(($nama_tipe->name ?? '') . ' ' . ($nama_merek->name ?? '') . ' ' . ($nama_model->name ?? ''));
                 $nama_pelanggan = Customer::find($request->customers_id);
 
 
@@ -1286,11 +1286,12 @@ class SudahDiambilController extends Controller
                     'tgl_selesai' => $request->tgl_selesai,
                     'penerima' => $request->penerima,
                     'customers_id' => $request->customers_id,
-                    'nama_pelanggan' => $nama_pelanggan->nama,
+                    'nama_pelanggan' => $nama_pelanggan->nama ?? '',
                     'types_id' => $request->types_id,
                     'brands_id' => $request->brands_id,
                     'capacities_id' => $request->capacities_id,
                     'model_series_id' => $request->model_series_id,
+                    'nama_barang' => $nama_barang,
                     'kerusakan' => $request->kerusakan,
                     'qc_masuk' => $qc_masuk_data,
                     'qc_keluar' => $qc_keluar_data,
