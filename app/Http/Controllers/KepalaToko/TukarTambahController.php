@@ -135,7 +135,12 @@ class TukarTambahController extends Controller
         $merek = Brand::find($request->brands_id);
         $model = ModelSerie::find($request->model_series_id);
 
-        $productName = $merek->name . ' ' . $model->name;
+        $merekName = $merek?->name ?? '';
+        $modelName = $model?->name ?? '';
+        $productName = trim($merekName . ' ' . $modelName);
+        if (empty($productName)) {
+            $productName = 'Handphone';
+        }
 
         // Create product
         $produk = Product::create([

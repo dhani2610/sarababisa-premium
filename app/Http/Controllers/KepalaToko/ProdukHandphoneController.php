@@ -160,14 +160,19 @@ class ProdukHandphoneController extends Controller
         $merek = Brand::find($request->brands_id);
         $model = ModelSerie::find($request->model_series_id);
 
-        $productName = $merek->name . ' ' . $model->name;
+        $merekName = $merek?->name ?? '';
+        $modelName = $model?->name ?? '';
+        $productName = trim($merekName . ' ' . $modelName);
+        if (empty($productName)) {
+            $productName = 'Handphone';
+        }
 
         // Create product
         Product::create([
             'product_name' => $productName,
             'product_code' => $request->product_code,
             'categories_id' => $request->categories_id,
-            'category_name' => $namakategori->category_name,
+            'category_name' => $namakategori?->category_name ?? 'Handphone',
             'warna' => $request->warna,
             'kondisi' => $request->kondisi,
             'brands_id' => $request->brands_id,
@@ -303,7 +308,12 @@ class ProdukHandphoneController extends Controller
         $merek = Brand::find($request->brands_id);
         $model = ModelSerie::find($request->model_series_id);
 
-        $productName = $merek->name . ' ' . $model->name;
+        $merekName = $merek?->name ?? '';
+        $modelName = $model?->name ?? '';
+        $productName = trim($merekName . ' ' . $modelName);
+        if (empty($productName)) {
+            $productName = $item->product_name ?? 'Handphone';
+        }
         // Create product
         $item->update([
             'brands_id' => $request->brands_id,
@@ -315,7 +325,7 @@ class ProdukHandphoneController extends Controller
             'kondisi' => $request->kondisi,
             'product_code' => $request->product_code,
             'categories_id' => $request->categories_id,
-            'category_name' => $namakategori->category_name,
+            'category_name' => $namakategori?->category_name ?? ($item->category_name ?? 'Handphone'),
             'stok' => $request->stok,
             'stok_minimal' => $request->stok_minimal,
             'harga_jual_toko' => $request->harga_jual_toko,
