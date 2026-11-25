@@ -173,11 +173,11 @@
                                         <div class="bg-slate-100 p-3 rounded">
                                             <div class="mb-2">
                                                 <label class="block text-sm font-medium mb-1" for="total_modal_sparepart">Total Modal Sparepart <span class="text-rose-500">*</span></label>
-                                                <input class="form-input w-full px-2 py-1 bg-white input-currency" type="text" name="total_modal_sparepart" id="total_modal_sparepart" required value="{{ number_format($item->modal_sparepart ?? 0, 0, ',', '.') }}" readonly />
+                                                <input class="form-input w-full px-2 py-1 bg-white input-currency" type="text" name="total_modal_sparepart" id="total_modal_sparepart" required value="{{ number_format((float)($item->modal_sparepart ?? 0), 0, ',', '.') }}" readonly />
                                             </div>
                                             <div>
                                                 <label class="block text-sm font-medium mb-1" for="biaya">Total Biaya Servis (Ke Pelanggan) <span class="text-rose-500">*</span></label>
-                                                <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg input-currency" type="text" name="biaya" id="biaya" required value="{{ number_format($item->biaya ?? 0, 0, ',', '.') }}" readonly />
+                                                <input class="form-input w-full px-2 py-1 bg-white font-bold text-lg input-currency" type="text" name="biaya" id="biaya" required value="{{ number_format((float)($item->biaya ?? 0), 0, ',', '.') }}" readonly />
                                             </div>
                                         </div>
 
@@ -190,11 +190,11 @@
 
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="uang_muka">Uang Muka </label>
-                                    <input id="uang_muka" name="uang_muka" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format((int)$item->uang_muka ?? 0, 0, ',', '.') }}" />
+                                    <input id="uang_muka" name="uang_muka" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format((float)($item->uang_muka ?? 0), 0, ',', '.') }}" />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1" for="diskon">Diskon </label>
-                                    <input id="diskon" name="diskon" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format((int)$item->diskon ?? 0, 0, ',', '.') }}" />
+                                    <input id="diskon" name="diskon" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format((float)($item->diskon ?? 0), 0, ',', '.') }}" />
                                 </div>
 
                                 <div>
@@ -223,11 +223,11 @@
                                             <div class="flex flex-row gap-3">
                                                 <div class="w-1/2">
                                                     <label class="block text-sm font-medium mb-1" for="tunai">Tunai</label>
-                                                    <input class="form-input w-full py-1 input-currency" type="text" name="tunai" id="tunai" value="{{ number_format($item->tunai ?? 0, 0, ',', '.') }}" />
+                                                    <input class="form-input w-full py-1 input-currency" type="text" name="tunai" id="tunai" value="{{ number_format((float)($item->tunai ?? 0), 0, ',', '.') }}" />
                                                 </div>
                                                 <div class="w-1/2">
                                                     <label class="block text-sm font-medium mb-1" for="transfer">Transfer</label>
-                                                    <input class="form-input w-full py-1 input-currency" type="text" name="transfer" id="transfer" value="{{ number_format($item->transfer ?? 0, 0, ',', '.') }}" />
+                                                    <input class="form-input w-full py-1 input-currency" type="text" name="transfer" id="transfer" value="{{ number_format((float)($item->transfer ?? 0), 0, ',', '.') }}" />
                                                 </div>
                                             </div>
                                         </div>
@@ -235,7 +235,7 @@
                                         <div x-show="caraPembayaran === 'Kredit'" class="mt-3">
                                             <div>
                                                 <label class="block text-sm font-medium mb-1" for="pay">Jumlah Pembayaran <span class="text-rose-500">*</span></label>
-                                                <input id="pay" name="pay" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format(old('pay') ?? 0, 0, ',', '.') }}" placeholder="0" />
+                                                <input id="pay" name="pay" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format((float)(old('pay') ?? 0), 0, ',', '.') }}" placeholder="0" />
                                             </div>
 
                                             <div class="flex items-center gap-5 mt-3">
