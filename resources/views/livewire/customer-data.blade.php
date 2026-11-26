@@ -661,14 +661,21 @@
                 $.ajax({
                     url: '{{ route('pelanggan.data') }}?offset=' + offset + '&limit=' + batchSize,
                     success: function(response) {
-                        if (response.data.length > 0) {
+                        if (response.data && response.data.length > 0) {
                             table.rows.add(response.data).draw(false); // tambahkan data batch
-                            offset += batchSize;
-                            loading = false;
-                            setTimeout(loadBatch, 100); // lanjut batch berikutnya
+                            if (response.data.length < batchSize) {
+                                console.log('Semua data sudah dimuat');
+                            } else {
+                                offset += batchSize;
+                                loading = false;
+                                setTimeout(loadBatch, 100); // lanjut batch berikutnya
+                            }
                         } else {
                             console.log('Semua data sudah dimuat');
                         }
+                    },
+                    error: function() {
+                        loading = false;
                     }
                 });
             }

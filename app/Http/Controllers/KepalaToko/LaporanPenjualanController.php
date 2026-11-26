@@ -24,13 +24,19 @@ class LaporanPenjualanController extends Controller
 
         // === LOGIC DATATABLES (AJAX) ===
         if ($request->ajax()) {
+            $limit = $request->get('limit', 200);
+            $offset = $request->get('offset', 0);
+
             $data = OrderDetail::where('order_details.cabang_id', $cabang_id)
                 ->whereHas('order', function ($query) {
                     $query->where('is_approve', 'Setuju');
                 })
                 ->with(['product.capacity', 'user', 'order'])
                 ->select('order_details.*')
-                ->latest();
+                ->latest()
+                ->skip($offset)
+                ->take($limit)
+                ->get();
 
             return DataTables::of($data)
                 ->addIndexColumn()

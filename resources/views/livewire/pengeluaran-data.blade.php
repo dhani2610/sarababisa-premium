@@ -359,6 +359,14 @@
                         }
 
                         table.rows.add(res.data).draw(false);
+
+                        if (res.data.length < batchSize) {
+                            isLoading = false;
+                            $('#filter-tipe').prop('disabled', false);
+                            $('#loading-info').addClass('hidden');
+                            return;
+                        }
+
                         offset += batchSize;
 
                         isLoading = false;

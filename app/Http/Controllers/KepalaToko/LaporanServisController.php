@@ -92,12 +92,19 @@ class LaporanServisController extends Controller
 
         // === LOGIKA AJAX DATATABLES ===
         if ($request->ajax()) {
+            $limit = $request->get('limit', 200);
+            $offset = $request->get('offset', 0);
+
             $data = ServiceTransaction::with('user')
                 ->where('cabang_id', $cabang_id)
                 ->where('ppn', '>', 0)
                 ->where('is_approve', 'Setuju')
                 ->whereIn('kondisi_servis', ['Sudah jadi', 'Tidak bisa', 'Dibatalkan'])
-                ->orderBy('tgl_disetujui', 'desc');
+                ->orderBy('tgl_disetujui', 'desc')
+                ->latest()
+                ->skip($offset)
+                ->take($limit)
+                ->get();
 
             return DataTables::of($data)
                 ->addIndexColumn()
