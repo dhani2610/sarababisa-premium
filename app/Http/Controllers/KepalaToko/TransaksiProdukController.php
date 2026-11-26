@@ -802,13 +802,20 @@ class TransaksiProdukController extends Controller
 
     public function deleteSelected(Request $request)
     {
-        $selectedIds  = $request->input('selectedIds');
+        $selectedIds  = $request->input('selectedIds', []);
         if (\App\Helpers\TransactionApprovalHelper::requiresApproval()) {
             $orders = Order::whereIn('id', $selectedIds)->get();
             foreach ($orders as $order) {
                 \App\Helpers\TransactionApprovalHelper::createRequest('pos', $order);
             }
             return response()->json(['message' => 'Permintaan hapus transaksi POS telah diajukan ke Kepala Toko untuk persetujuan.']);
+        }
+
+        $orders = Order::with('detailOrders')->whereIn('id', $selectedIds)->get();
+        foreach ($orders as $order) {
+            if ($order->is_approve !== 'Ditolak') {
+                $order->returnStock();
+            }
         }
 
         Order::whereIn('id', $selectedIds)->delete();
@@ -821,8 +828,18 @@ class TransaksiProdukController extends Controller
         $tanggal = $request->filled('tgl_disetujui')
             ? Carbon::parse($request->input('tgl_disetujui'))->format('Y-m-d')
             : Carbon::now()->format('Y-m-d');
-        $selectedIds = $request->input('selectedIds');
-        Order::whereIn('id', $selectedIds)->update(['is_approve' => 'Setuju', 'tgl_disetujui' => $tanggal]);
+        $selectedIds = $request->input('selectedIds', []);
+
+        $orders = Order::with('detailOrders')->whereIn('id', $selectedIds)->get();
+        foreach ($orders as $order) {
+            $wasRejected = ($order->is_approve === 'Ditolak');
+            $order->is_approve = 'Setuju';
+            $order->tgl_disetujui = $tanggal;
+            $order->save();
+            if ($wasRejected) {
+                $order->deductStock();
+            }
+        }
 
         return response()->json(['message' => 'Data transaksi produk berhasil disetujui.']);
     }
@@ -838,10 +855,19 @@ class TransaksiProdukController extends Controller
     public function rejectSelected(Request $request)
     {
         $tanggal = Carbon::now()->translatedFormat('Y-m-d');
-        $selectedIds = $request->input('selectedIds');
-        Order::whereIn('id', $selectedIds)->update(['is_approve' => 'Ditolak', 'tgl_disetujui' => $tanggal]);
+        $selectedIds = $request->input('selectedIds', []);
 
-        return response()->json(['message' => 'Data transaksi produk berhasil ditolak.']);
+        $orders = Order::with('detailOrders')->whereIn('id', $selectedIds)->get();
+        foreach ($orders as $order) {
+            if ($order->is_approve !== 'Ditolak') {
+                $order->is_approve = 'Ditolak';
+                $order->tgl_disetujui = $tanggal;
+                $order->save();
+                $order->returnStock();
+            }
+        }
+
+        return response()->json(['message' => 'Data transaksi produk berhasil ditolak dan stok telah dikembalikan.']);
     }
 
     /**
@@ -1347,12 +1373,16 @@ class TransaksiProdukController extends Controller
      */
     public function destroy($id)
     {
-        $item = Order::findOrFail($id);
+        $item = Order::with('detailOrders')->findOrFail($id);
 
         if (\App\Helpers\TransactionApprovalHelper::requiresApproval()) {
             \App\Helpers\TransactionApprovalHelper::createRequest('pos', $item);
             toast('Permintaan hapus transaksi POS telah diajukan ke Kepala Toko untuk persetujuan.', 'info');
             return redirect()->back();
+        }
+
+        if ($item->is_approve !== 'Ditolak') {
+            $item->returnStock();
         }
 
         $item->delete();

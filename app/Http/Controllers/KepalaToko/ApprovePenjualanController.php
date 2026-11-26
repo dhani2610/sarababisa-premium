@@ -75,11 +75,23 @@ class ApprovePenjualanController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $item = Order::with('detailOrders')->findOrFail($id);
+        $oldApprove = $item->is_approve;
+        $newApprove = $request->input('is_approve');
+
         $data = $request->all();
-
-        $item = Order::findOrFail($id);
-
         $item->update($data);
+
+        // Jika status diubah menjadi Ditolak dan sebelumnya bukan Ditolak, kembalikan stok
+        if ($newApprove === 'Ditolak' && $oldApprove !== 'Ditolak') {
+            $item->returnStock();
+            toast('Transaksi produk berhasil ditolak dan stok telah dikembalikan.', 'info');
+        } elseif ($newApprove === 'Setuju' && $oldApprove === 'Ditolak') {
+            $item->deductStock();
+            toast('Transaksi produk berhasil disetujui.', 'success');
+        } else {
+            toast('Transaksi produk berhasil diperbarui.', 'success');
+        }
 
         return redirect()->route('transaksi-produk.index');
     }

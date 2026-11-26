@@ -41,8 +41,11 @@ class ApprovalHapusTransaksiController extends Controller
                 $trans->delete();
             }
         } elseif ($item->transaksi_type === 'pos') {
-            $order = Order::find($item->transaksi_id);
+            $order = Order::with('detailOrders')->find($item->transaksi_id);
             if ($order) {
+                if ($order->is_approve !== 'Ditolak') {
+                    $order->returnStock();
+                }
                 $order->delete();
                 OrderDetail::where('orders_id', $order->id)->delete();
             }

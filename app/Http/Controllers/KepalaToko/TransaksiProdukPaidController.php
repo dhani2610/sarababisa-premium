@@ -41,7 +41,13 @@ class TransaksiProdukPaidController extends Controller
 
     public function deleteSelected(Request $request)
     {
-        $selectedIds  = $request->input('selectedIds');
+        $selectedIds  = $request->input('selectedIds', []);
+        $orders = Order::with('detailOrders')->whereIn('id', $selectedIds)->get();
+        foreach ($orders as $order) {
+            if ($order->is_approve !== 'Ditolak') {
+                $order->returnStock();
+            }
+        }
         Order::whereIn('id', $selectedIds)->delete();
         OrderDetail::whereIn('orders_id', $selectedIds)->delete();
         return response()->json(['message' => 'Data transaksi produk berhasil dihapus.']);
@@ -50,8 +56,18 @@ class TransaksiProdukPaidController extends Controller
     public function approveSelected(Request $request)
     {
         $tanggal = Carbon::now()->translatedFormat('Y-m-d');
-        $selectedIds = $request->input('selectedIds');
-        Order::whereIn('id', $selectedIds)->update(['is_approve' => 'Setuju', 'tgl_disetujui' => $tanggal]);
+        $selectedIds = $request->input('selectedIds', []);
+
+        $orders = Order::with('detailOrders')->whereIn('id', $selectedIds)->get();
+        foreach ($orders as $order) {
+            $wasRejected = ($order->is_approve === 'Ditolak');
+            $order->is_approve = 'Setuju';
+            $order->tgl_disetujui = $tanggal;
+            $order->save();
+            if ($wasRejected) {
+                $order->deductStock();
+            }
+        }
 
         return response()->json(['message' => 'Data transaksi produk berhasil disetujui.']);
     }
@@ -59,10 +75,19 @@ class TransaksiProdukPaidController extends Controller
     public function rejectSelected(Request $request)
     {
         $tanggal = Carbon::now()->translatedFormat('Y-m-d');
-        $selectedIds = $request->input('selectedIds');
-        Order::whereIn('id', $selectedIds)->update(['is_approve' => 'Ditolak', 'tgl_disetujui' => $tanggal]);
+        $selectedIds = $request->input('selectedIds', []);
 
-        return response()->json(['message' => 'Data transaksi produk berhasil ditolak.']);
+        $orders = Order::with('detailOrders')->whereIn('id', $selectedIds)->get();
+        foreach ($orders as $order) {
+            if ($order->is_approve !== 'Ditolak') {
+                $order->is_approve = 'Ditolak';
+                $order->tgl_disetujui = $tanggal;
+                $order->save();
+                $order->returnStock();
+            }
+        }
+
+        return response()->json(['message' => 'Data transaksi produk berhasil ditolak dan stok telah dikembalikan.']);
     }
 
     /**
