@@ -173,6 +173,8 @@ class TransaksiServisLangsungController extends Controller
             'qc_keluar' => $request->qc_keluar,
             'cara_pembayaran' => $request->cara_pembayaran,
             'diskon' => $request->diskon,
+            'tipe_diskon' => $request->tipe_diskon ?? 'nominal',
+            'nilai_diskon' => $request->has('nilai_diskon') ? (float) str_replace(',', '.', str_replace('.', '', $request->nilai_diskon)) : 0,
             'garansi' => $request->garansi[0],
             'exp_garansi' => $expired[0],
             'exp_garansi_j' => json_encode($expired),

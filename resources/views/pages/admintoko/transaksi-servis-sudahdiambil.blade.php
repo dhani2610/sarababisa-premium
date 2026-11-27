@@ -137,9 +137,21 @@
                                 @if ($item->kondisi_servis != 'Sudah jadi')
                                 @else
                                     <div>
-                                        <label class="block text-sm font-medium mb-1" for="diskon">Diskon</label>
-                                        <input id="diskon" name="diskon" class="form-input w-full px-2 py-1"
-                                            type="text" placeholder="Kosongkan jika tidak ada diskon" />
+                                        <label class="block text-sm font-medium mb-1">Diskon</label>
+                                        <div class="flex space-x-2">
+                                            <select id="tipe_diskon" name="tipe_diskon" class="form-select text-sm py-1 w-36">
+                                                <option value="nominal" {{ ($item->tipe_diskon ?? 'nominal') === 'nominal' ? 'selected' : '' }}>Nominal (Rp)</option>
+                                                <option value="persen" {{ ($item->tipe_diskon ?? '') === 'persen' ? 'selected' : '' }}>Persen (%)</option>
+                                            </select>
+                                            <div class="relative w-full">
+                                                <input id="nilai_diskon" name="nilai_diskon" class="form-input w-full px-2 py-1" type="text"
+                                                    value="{{ ($item->tipe_diskon ?? 'nominal') === 'persen' ? ($item->nilai_diskon ?? 0) : number_format((float)($item->diskon ?? 0), 0, ',', '.') }}" />
+                                            </div>
+                                        </div>
+                                        <input type="hidden" id="diskon" name="diskon" value="{{ (int)($item->diskon ?? 0) }}" />
+                                        <div id="diskon_info" class="text-xs text-indigo-600 mt-1 {{ ($item->tipe_diskon ?? '') === 'persen' ? '' : 'hidden' }}">
+                                            Potongan: <span id="diskon_nominal_text">Rp. {{ number_format((float)($item->diskon ?? 0), 0, ',', '.') }}</span>
+                                        </div>
                                     </div>
                                 @endif
                                 @if ($item->kondisi_servis != 'Sudah jadi')
@@ -376,8 +388,31 @@ $(document).ready(function () {
         totalBiaya = totalBiaya + Math.round((totalBiaya * ppn) / 100);
     }
 
+    function calculateDiskon() {
+        let tipe = $('#tipe_diskon').val();
+        let valStr = $('#nilai_diskon').val() || '0';
+        let nominalDiskon = 0;
+
+        if (tipe === 'persen') {
+            let persen = parseFloat(valStr.replace(/,/g, '.')) || 0;
+            nominalDiskon = Math.round(totalBiaya * (persen / 100));
+            $('#diskon_info').removeClass('hidden');
+            $('#diskon_nominal_text').text('Rp. ' + nominalDiskon.toLocaleString('id-ID'));
+        } else {
+            nominalDiskon = parseInt(valStr.replace(/\D/g, '')) || 0;
+            $('#diskon_info').addClass('hidden');
+        }
+
+        if (nominalDiskon > totalBiaya) {
+            nominalDiskon = totalBiaya;
+        }
+
+        $('#diskon').val(nominalDiskon);
+        return nominalDiskon;
+    }
+
     function updateSisa(from, to) {
-        let diskon = parseInt($('#diskon').val()) || 0;
+        let diskon = calculateDiskon();
         let fromVal = parseInt($(from).val()) || 0;
 
         let finalvalTotal = totalBiaya - diskon;
@@ -390,6 +425,17 @@ $(document).ready(function () {
         // Hitung sisa dan masukkan ke input lawan
         $(to).val(finalvalTotal - fromVal);
     }
+
+    $('#tipe_diskon').on('change', function() {
+        $('#nilai_diskon').val('0');
+        calculateDiskon();
+        updateSisa('#tunai', '#transfer');
+    });
+
+    $('#nilai_diskon').on('input', function() {
+        calculateDiskon();
+        updateSisa('#tunai', '#transfer');
+    });
 
     $('#tunai').on('input', function () {
         updateSisa('#tunai', '#transfer');
