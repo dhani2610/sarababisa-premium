@@ -172,6 +172,15 @@ class TransaksiServisController extends Controller
 
         return DataTables::of($query)
         ->addIndexColumn()
+        ->filterColumn('nomor_servis', function ($q, $keyword) {
+            $q->where('service_transactions.nomor_servis', 'like', "%{$keyword}%");
+        })
+        ->filterColumn('nama_barang', function ($q, $keyword) {
+            $q->where(function ($sub) use ($keyword) {
+                $sub->where('service_transactions.nama_barang', 'like', "%{$keyword}%")
+                    ->orWhere('service_transactions.imei', 'like', "%{$keyword}%");
+            });
+        })
         ->filterColumn('pelanggan', function ($q, $keyword) {
             $q->where(function ($sub) use ($keyword) {
                 $sub->where('service_transactions.nama_pelanggan', 'like', "%{$keyword}%")
@@ -180,6 +189,15 @@ class TransaksiServisController extends Controller
                            ->orWhere('nomor_hp', 'like', "%{$keyword}%");
                     });
             });
+        })
+        ->filterColumn('penerima', function ($q, $keyword) {
+            $q->where('service_transactions.penerima', 'like', "%{$keyword}%");
+        })
+        ->filterColumn('kelengkapan', function ($q, $keyword) {
+            $q->where('service_transactions.kelengkapan', 'like', "%{$keyword}%");
+        })
+        ->filterColumn('kerusakan', function ($q, $keyword) {
+            $q->where('service_transactions.kerusakan', 'like', "%{$keyword}%");
         })
         ->filterColumn('status', function ($q, $keyword) {
             $q->where('service_transactions.status_servis', 'like', "%{$keyword}%");

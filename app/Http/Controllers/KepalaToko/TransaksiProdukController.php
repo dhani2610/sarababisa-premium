@@ -65,6 +65,12 @@ class TransaksiProdukController extends Controller
 
         return DataTables::of($query)
             ->addIndexColumn()
+            ->filterColumn('invoice_no', function ($q, $keyword) {
+                $q->where('orders.invoice_no', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('created_at', function ($q, $keyword) {
+                $q->where('orders.created_at', 'like', "%{$keyword}%");
+            })
             ->filterColumn('pelanggan', function ($q, $keyword) {
                 $q->where(function ($sub) use ($keyword) {
                     $sub->where('orders.nama_pelanggan', 'like', "%{$keyword}%")
@@ -82,13 +88,33 @@ class TransaksiProdukController extends Controller
             ->filterColumn('pembayaran', function ($q, $keyword) {
                 $q->where('orders.payment_method', 'like', "%{$keyword}%");
             })
+            ->filterColumn('payment_method', function ($q, $keyword) {
+                $q->where('orders.payment_method', 'like', "%{$keyword}%");
+            })
             ->filterColumn('item', function ($q, $keyword) {
                 $q->whereHas('detailOrders', function ($dq) use ($keyword) {
                     $dq->where('product_name', 'like', "%{$keyword}%")
                        ->orWhereHas('product', function ($pq) use ($keyword) {
-                           $pq->where('nomor_seri', 'like', "%{$keyword}%");
+                           $pq->where('nomor_seri', 'like', "%{$keyword}%")
+                              ->orWhere('product_code', 'like', "%{$keyword}%")
+                              ->orWhere('product_name', 'like', "%{$keyword}%")
+                              ->orWhere('keterangan', 'like', "%{$keyword}%");
                        });
                 });
+            })
+            ->filterColumn('status_pembayaran', function ($q, $keyword) {
+                if (stripos('lunas', $keyword) !== false) {
+                    $q->where('orders.due', 0);
+                } elseif (stripos('belum lunas', $keyword) !== false) {
+                    $q->where('orders.due', '>', 0);
+                }
+            })
+            ->filterColumn('tipe_status_pembayaran', function ($q, $keyword) {
+                if (stripos('lunas', $keyword) !== false) {
+                    $q->where('orders.due', 0);
+                } elseif (stripos('belum lunas', $keyword) !== false) {
+                    $q->where('orders.due', '>', 0);
+                }
             })
             ->addColumn('checkbox', fn($row) => '
                 <div class="flex items-center">
@@ -316,6 +342,12 @@ class TransaksiProdukController extends Controller
 
         return DataTables::of($orders)
             ->addIndexColumn()
+            ->filterColumn('invoice_no', function ($q, $keyword) {
+                $q->where('orders.invoice_no', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('created_at', function ($q, $keyword) {
+                $q->where('orders.created_at', 'like', "%{$keyword}%");
+            })
             ->filterColumn('pelanggan', function ($q, $keyword) {
                 $q->where(function ($sub) use ($keyword) {
                     $sub->where('orders.nama_pelanggan', 'like', "%{$keyword}%")
@@ -333,13 +365,33 @@ class TransaksiProdukController extends Controller
             ->filterColumn('pembayaran', function ($q, $keyword) {
                 $q->where('orders.payment_method', 'like', "%{$keyword}%");
             })
+            ->filterColumn('payment_method', function ($q, $keyword) {
+                $q->where('orders.payment_method', 'like', "%{$keyword}%");
+            })
             ->filterColumn('item', function ($q, $keyword) {
                 $q->whereHas('detailOrders', function ($dq) use ($keyword) {
                     $dq->where('product_name', 'like', "%{$keyword}%")
                        ->orWhereHas('product', function ($pq) use ($keyword) {
-                           $pq->where('nomor_seri', 'like', "%{$keyword}%");
+                           $pq->where('nomor_seri', 'like', "%{$keyword}%")
+                              ->orWhere('product_code', 'like', "%{$keyword}%")
+                              ->orWhere('product_name', 'like', "%{$keyword}%")
+                              ->orWhere('keterangan', 'like', "%{$keyword}%");
                        });
                 });
+            })
+            ->filterColumn('status_pembayaran', function ($q, $keyword) {
+                if (stripos('lunas', $keyword) !== false) {
+                    $q->where('orders.due', 0);
+                } elseif (stripos('belum lunas', $keyword) !== false) {
+                    $q->where('orders.due', '>', 0);
+                }
+            })
+            ->filterColumn('tipe_status_pembayaran', function ($q, $keyword) {
+                if (stripos('lunas', $keyword) !== false) {
+                    $q->where('orders.due', 0);
+                } elseif (stripos('belum lunas', $keyword) !== false) {
+                    $q->where('orders.due', '>', 0);
+                }
             })
             ->addColumn('checkbox', fn($row) => '
                 <div class="flex items-center">
@@ -565,6 +617,12 @@ class TransaksiProdukController extends Controller
 
         return DataTables::of($orders)
             ->addIndexColumn()
+            ->filterColumn('invoice_no', function ($q, $keyword) {
+                $q->where('orders.invoice_no', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('created_at', function ($q, $keyword) {
+                $q->where('orders.created_at', 'like', "%{$keyword}%");
+            })
             ->filterColumn('pelanggan', function ($q, $keyword) {
                 $q->where(function ($sub) use ($keyword) {
                     $sub->where('orders.nama_pelanggan', 'like', "%{$keyword}%")
@@ -582,13 +640,33 @@ class TransaksiProdukController extends Controller
             ->filterColumn('pembayaran', function ($q, $keyword) {
                 $q->where('orders.payment_method', 'like', "%{$keyword}%");
             })
+            ->filterColumn('payment_method', function ($q, $keyword) {
+                $q->where('orders.payment_method', 'like', "%{$keyword}%");
+            })
             ->filterColumn('item', function ($q, $keyword) {
                 $q->whereHas('detailOrders', function ($dq) use ($keyword) {
                     $dq->where('product_name', 'like', "%{$keyword}%")
                        ->orWhereHas('product', function ($pq) use ($keyword) {
-                           $pq->where('nomor_seri', 'like', "%{$keyword}%");
+                           $pq->where('nomor_seri', 'like', "%{$keyword}%")
+                              ->orWhere('product_code', 'like', "%{$keyword}%")
+                              ->orWhere('product_name', 'like', "%{$keyword}%")
+                              ->orWhere('keterangan', 'like', "%{$keyword}%");
                        });
                 });
+            })
+            ->filterColumn('status_pembayaran', function ($q, $keyword) {
+                if (stripos('lunas', $keyword) !== false) {
+                    $q->where('orders.due', 0);
+                } elseif (stripos('belum lunas', $keyword) !== false) {
+                    $q->where('orders.due', '>', 0);
+                }
+            })
+            ->filterColumn('tipe_status_pembayaran', function ($q, $keyword) {
+                if (stripos('lunas', $keyword) !== false) {
+                    $q->where('orders.due', 0);
+                } elseif (stripos('belum lunas', $keyword) !== false) {
+                    $q->where('orders.due', '>', 0);
+                }
             })
             ->addColumn('checkbox', fn($row) => '
                 <div class="flex items-center">

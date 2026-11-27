@@ -67,6 +67,21 @@ class BisaDiambilController extends Controller
 
         return DataTables::of($query)
             ->addIndexColumn()
+            ->filterColumn('nomor_servis', function ($q, $keyword) {
+                $q->where('service_transactions.nomor_servis', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('nama_barang', function ($q, $keyword) {
+                $q->where(function ($sub) use ($keyword) {
+                    $sub->where('service_transactions.nama_barang', 'like', "%{$keyword}%")
+                        ->orWhere('service_transactions.imei', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('penerima', function ($q, $keyword) {
+                $q->where('service_transactions.penerima', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('kerusakan', function ($q, $keyword) {
+                $q->where('service_transactions.kerusakan', 'like', "%{$keyword}%");
+            })
             ->filterColumn('pelanggan', function ($q, $keyword) {
                 $q->where(function ($sub) use ($keyword) {
                     $sub->where('service_transactions.nama_pelanggan', 'like', "%{$keyword}%")
@@ -80,7 +95,12 @@ class BisaDiambilController extends Controller
                 $q->where('service_transactions.kondisi_servis', 'like', "%{$keyword}%");
             })
             ->filterColumn('tindakan', function ($q, $keyword) {
-                $q->where('service_transactions.tindakan_servis', 'like', "%{$keyword}%");
+                $q->where(function ($sub) use ($keyword) {
+                    $sub->where('service_transactions.tindakan_servis', 'like', "%{$keyword}%")
+                        ->orWhereHas('teknisi_tambahan', function ($tq) use ($keyword) {
+                            $tq->where('tindakan_servis', 'like', "%{$keyword}%");
+                        });
+                });
             })
             ->filterColumn('teknisi', function ($q, $keyword) {
                 $q->where(function ($sub) use ($keyword) {

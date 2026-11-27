@@ -71,6 +71,48 @@ class SudahDiambilController extends Controller
 
         return DataTables::of($query)
             ->addIndexColumn()
+            ->filterColumn('nomor_servis', function ($q, $keyword) {
+                $q->where('service_transactions.nomor_servis', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('nama_barang', function ($q, $keyword) {
+                $q->where(function ($sub) use ($keyword) {
+                    $sub->where('service_transactions.nama_barang', 'like', "%{$keyword}%")
+                        ->orWhere('service_transactions.imei', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('kerusakan', function ($q, $keyword) {
+                $q->where('service_transactions.kerusakan', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('kondisi_servis', function ($q, $keyword) {
+                $q->where('service_transactions.kondisi_servis', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('tindakan_servis', function ($q, $keyword) {
+                $q->where(function ($sub) use ($keyword) {
+                    $sub->where('service_transactions.tindakan_servis', 'like', "%{$keyword}%")
+                        ->orWhereHas('teknisi_tambahan', function ($tq) use ($keyword) {
+                            $tq->where('tindakan_servis', 'like', "%{$keyword}%");
+                        });
+                });
+            })
+            ->filterColumn('penerima', function ($q, $keyword) {
+                $q->where('service_transactions.penerima', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('pengambil', function ($q, $keyword) {
+                $q->where('service_transactions.pengambil', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('penyerah', function ($q, $keyword) {
+                $q->where('service_transactions.penyerah', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('cara_pembayaran', function ($q, $keyword) {
+                $q->where('service_transactions.cara_pembayaran', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('tipe_status_pembayaran', function ($q, $keyword) {
+                if (stripos('lunas', $keyword) !== false) {
+                    $q->where('service_transactions.tipe_status_pembayaran', 1);
+                } elseif (stripos('belum lunas', $keyword) !== false) {
+                    $q->where('service_transactions.tipe_status_pembayaran', 0);
+                }
+            })
             ->filterColumn('pelanggan', function ($q, $keyword) {
                 $q->where(function ($sub) use ($keyword) {
                     $sub->where('service_transactions.nama_pelanggan', 'like', "%{$keyword}%")
