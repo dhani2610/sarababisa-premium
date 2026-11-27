@@ -575,6 +575,57 @@ class KaryawanController extends Controller
             ->whereDate('tanggal', '>=', $start_date)
             ->whereDate('tanggal', '<=', $end_date)->where('telat',1)->get()->sum('nominal_potongan') : 0;
 
+        // Hitung potongan jika tidak absen (masuk & pulang) pada hari wajib absen yang dipilih
+        $storeSetting = \App\Models\StoreSetting::where('cabang_id', $items->cabang_id)->first();
+        $jumlah_hari_tidak_absen = 0;
+        $nominal_potongan_per_hari = $storeSetting->nominal_potongan_tidak_absen ?? 0;
+        $potongan_tidak_absen = 0;
+
+        if ($storeSetting && $storeSetting->active_setting_absensi && $nominal_potongan_per_hari > 0 && $user) {
+            $hariWajib = is_array($storeSetting->hari_absen) 
+                ? $storeSetting->hari_absen 
+                : (json_decode($storeSetting->hari_absen, true) ?? ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']);
+
+            $dayMap = [
+                1 => 'Senin',
+                2 => 'Selasa',
+                3 => 'Rabu',
+                4 => 'Kamis',
+                5 => 'Jumat',
+                6 => 'Sabtu',
+                0 => 'Minggu',
+            ];
+
+            $pStart = Carbon::parse($start_date);
+            $pEnd = Carbon::parse($end_date);
+            $today = Carbon::today();
+            $checkEnd = $pEnd->greaterThan($today) ? $today : $pEnd;
+
+            for ($currDate = $pStart->copy(); $currDate->lte($checkEnd); $currDate->addDay()) {
+                $dayName = $dayMap[$currDate->dayOfWeek] ?? '';
+                if (in_array($dayName, $hariWajib)) {
+                    $dateStr = $currDate->format('Y-m-d');
+                    
+                    // Cek apakah ada absensi di tanggal ini
+                    $hasAttendance = Attendance::where('user_id', $user->id)
+                        ->whereDate('tanggal', $dateStr)
+                        ->exists();
+
+                    // Cek apakah ada izin/sakit/cuti/alfa yang disetujui (agar tidak dobel potongan)
+                    $hasIzin = Izin::where('user_id', $user->id)
+                        ->where('status', 1)
+                        ->whereDate('tanggal', $dateStr)
+                        ->exists();
+
+                    if (!$hasAttendance && !$hasIzin) {
+                        $jumlah_hari_tidak_absen++;
+                    }
+                }
+            }
+
+            $potongan_tidak_absen = $jumlah_hari_tidak_absen * $nominal_potongan_per_hari;
+        }
+
         $shift = Shift::where('worker_id',$id)->first();
 
         $pdf = PDF::loadView('pages.kepalatoko.karyawan.cetak', [
@@ -598,6 +649,9 @@ class KaryawanController extends Controller
             'totalPotonganServis' => $totalPotonganServis,
             'totalinsiden' => $totalinsiden,
             'potongan_telat' => $potongan_telat,
+            'jumlah_hari_tidak_absen' => $jumlah_hari_tidak_absen,
+            'nominal_potongan_per_hari' => $nominal_potongan_per_hari,
+            'potongan_tidak_absen' => $potongan_tidak_absen,
         ]);
 
         $filename = 'Slip Gaji ' . $namaKaryawan . ' ' . '(' . $namaBulanFile . ')' . '.pdf';

@@ -137,7 +137,13 @@
               @if ($item->product_discount_amount <= 0)
                   <td align="value">0</td>
               @else
-                  <td align="value">: Rp. {{ number_format($item->product_discount_amount) }}</td>
+                  <td align="value">:
+                      @if ($item->product_discount_type === 'percentage' && $item->product_discount_percent > 0)
+                          {{ (floatval($item->product_discount_percent) == intval($item->product_discount_percent)) ? intval($item->product_discount_percent) : $item->product_discount_percent }}% (Rp. {{ number_format($item->product_discount_amount) }})
+                      @else
+                          Rp. {{ number_format($item->product_discount_amount) }}
+                      @endif
+                  </td>
               @endif
               </tr>
               <tr>

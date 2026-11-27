@@ -251,6 +251,8 @@ class SalesIndex extends Component
                     'sub_total'               => $cart_item->price * $cart_item->qty,
                     'total'               => $cart_item->options->sub_total + $cartTax,
                     'product_discount_amount' => $cart_item->options->product_discount,
+                    'product_discount_type'   => $cart_item->options->product_discount_type ?? 'fixed',
+                    'product_discount_percent' => $cart_item->options->product_discount_percent ?? 0,
                     'modal'               => $cart_item->options->modal * $cart_item->qty,
                     'profit'               => $cart_item->options->sub_total - ($cart_item->options->modal * $cart_item->qty),
                     'profit_toko'               => ($cart_item->options->sub_total - ($cart_item->options->modal * $cart_item->qty)) - ($cart_item->options->sub_total - ($cart_item->options->modal * $cart_item->qty)) / 100 * $persen_sales,

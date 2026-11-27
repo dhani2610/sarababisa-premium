@@ -55,7 +55,13 @@ class LaporanServisController extends Controller
                 })
                 ->editColumn('modal_sparepart', fn($row) => number_format($row->modal_sparepart))
                 ->editColumn('biaya', fn($row) => number_format($row->biaya))
-                ->editColumn('diskon', fn($row) => number_format($row->diskon))
+                ->editColumn('diskon', function ($row) {
+                    if ($row->tipe_diskon === 'persen' && $row->nilai_diskon > 0) {
+                        $val = (floatval($row->nilai_diskon) == intval($row->nilai_diskon)) ? intval($row->nilai_diskon) : $row->nilai_diskon;
+                        return $val . '% (Rp. ' . number_format($row->diskon) . ')';
+                    }
+                    return number_format($row->diskon);
+                })
                 ->editColumn('profittoko', fn($row) => number_format($row->profit))
                 ->rawColumns(['teknisi'])
                 ->make(true);
@@ -129,7 +135,13 @@ class LaporanServisController extends Controller
                 })
                 ->editColumn('modal_sparepart', fn($row) => number_format($row->modal_sparepart))
                 ->editColumn('biaya', fn($row) => number_format($row->biaya))
-                ->editColumn('diskon', fn($row) => number_format($row->diskon))
+                ->editColumn('diskon', function ($row) {
+                    if ($row->tipe_diskon === 'persen' && $row->nilai_diskon > 0) {
+                        $val = (floatval($row->nilai_diskon) == intval($row->nilai_diskon)) ? intval($row->nilai_diskon) : $row->nilai_diskon;
+                        return $val . '% (Rp. ' . number_format($row->diskon) . ')';
+                    }
+                    return number_format($row->diskon);
+                })
                 ->addColumn('pajak_display', function($row) {
                     $ppnRate = !empty($row->ppn) ? $row->ppn : 0;
                     $pajak = $row->biaya * ($ppnRate / 100);

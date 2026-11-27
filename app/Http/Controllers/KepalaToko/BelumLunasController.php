@@ -406,7 +406,13 @@ class BelumLunasController extends Controller
             // ✅ Modal, Biaya, Diskon
             ->addColumn('modal_sparepart', fn($row) => 'Rp. '.number_format($row->modal_sparepart))
             ->addColumn('biaya', fn($row) => 'Rp. '.number_format($row->biaya))
-            ->addColumn('diskon', fn($row) => 'Rp. '.number_format($row->diskon))
+            ->addColumn('diskon', function ($row) {
+                if ($row->tipe_diskon === 'persen' && $row->nilai_diskon > 0) {
+                    $val = (floatval($row->nilai_diskon) == intval($row->nilai_diskon)) ? intval($row->nilai_diskon) : $row->nilai_diskon;
+                    return $val . '% (Rp. ' . number_format($row->diskon) . ')';
+                }
+                return 'Rp. ' . number_format($row->diskon);
+            })
 
             // ✅ Cara Pembayaran
             ->addColumn('cara_pembayaran', fn($row) => $row->cara_pembayaran)

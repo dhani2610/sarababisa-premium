@@ -199,8 +199,22 @@
                                     <input id="uang_muka" name="uang_muka" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format((float)($item->uang_muka ?? 0), 0, ',', '.') }}" />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-1" for="diskon">Diskon </label>
-                                    <input id="diskon" name="diskon" class="form-input w-full px-2 py-1 input-currency" type="text" value="{{ number_format((float)($item->diskon ?? 0), 0, ',', '.') }}" />
+                                    <label class="block text-sm font-medium mb-1">Diskon</label>
+                                    <div class="flex space-x-2">
+                                        <select id="tipe_diskon" name="tipe_diskon" class="form-select text-sm py-1 w-36">
+                                            <option value="nominal" {{ ($item->tipe_diskon ?? 'nominal') === 'nominal' ? 'selected' : '' }}>Nominal (Rp)</option>
+                                            <option value="persen" {{ ($item->tipe_diskon ?? '') === 'persen' ? 'selected' : '' }}>Persen (%)</option>
+                                        </select>
+                                        <div class="relative flex-1">
+                                            <input id="nilai_diskon" name="nilai_diskon" class="form-input w-full px-2 py-1" type="text"
+                                                value="{{ ($item->tipe_diskon ?? 'nominal') === 'persen' ? ($item->nilai_diskon ?? 0) : number_format((float)($item->diskon ?? 0), 0, ',', '.') }}"
+                                                placeholder="0" />
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="diskon" name="diskon" value="{{ (int)($item->diskon ?? 0) }}" />
+                                    <div id="diskon_info" class="text-xs text-indigo-600 mt-1 {{ ($item->tipe_diskon ?? '') === 'persen' ? '' : 'hidden' }}">
+                                        Potongan: <span id="diskon_nominal_text">Rp. {{ number_format((float)($item->diskon ?? 0), 0, ',', '.') }}</span>
+                                    </div>
                                 </div>
                                 <div>
                                     <div x-data="{ caraPembayaran: @js($item->cara_pembayaran ?? 'Tunai') }">
@@ -398,9 +412,33 @@
 
             let ppn = {{ $item->ppn ?? 0 }};
 
+            function calculateDiskon() {
+                let biaya = parseRupiah($('#biaya').val());
+                let tipe = $('#tipe_diskon').val();
+                let valStr = $('#nilai_diskon').val() || '0';
+                let nominalDiskon = 0;
+
+                if (tipe === 'persen') {
+                    let persen = parseFloat(valStr.toString().replace(/,/g, '.')) || 0;
+                    nominalDiskon = Math.round(biaya * (persen / 100));
+                    $('#diskon_info').removeClass('hidden');
+                    $('#diskon_nominal_text').text('Rp. ' + formatRupiah(nominalDiskon));
+                } else {
+                    nominalDiskon = parseRupiah(valStr);
+                    $('#diskon_info').addClass('hidden');
+                }
+
+                if (nominalDiskon > biaya) {
+                    nominalDiskon = biaya;
+                }
+
+                $('#diskon').val(nominalDiskon);
+                return nominalDiskon;
+            }
+
             function getTotal() {
                 let biaya = parseRupiah($('#biaya').val());
-                let diskon = parseRupiah($('#diskon').val());
+                let diskon = calculateDiskon();
                 let subtotal = Math.max(biaya - diskon, 0);
 
                 if (ppn > 0) {
@@ -450,11 +488,35 @@
                     }
                 });
 
-                $('#biaya, #diskon').on('input', function () {
+                $('#biaya').on('input', function () {
+                    calculateDiskon();
                     if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
                         $('#tunai').trigger('input');
                     }
                 });
+
+                $('#tipe_diskon').on('change', function() {
+                    let tipe = $(this).val();
+                    $('#nilai_diskon').val('0');
+                    calculateDiskon();
+                    if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
+                        $('#tunai').trigger('input');
+                    }
+                });
+
+                $('#nilai_diskon').on('input', function() {
+                    let tipe = $('#tipe_diskon').val();
+                    if (tipe === 'nominal') {
+                        $(this).val(formatRupiah($(this).val()));
+                    }
+                    calculateDiskon();
+                    if ($('#cara_pembayaran').val() === 'Tunai & Transfer') {
+                        $('#tunai').trigger('input');
+                    }
+                });
+
+                // Initial calculation
+                calculateDiskon();
 
                 $('#cara_pembayaran').on('change', function () {
                     if ($(this).val() === 'Tunai & Transfer') {

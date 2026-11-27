@@ -221,11 +221,21 @@
             </tr>
         </thead>
     </table>
+    @if (($potongan_tidak_absen ?? 0) > 0)
+    <table class="table table-sm table-borderless">
+        <thead>
+            <tr>
+            <th scope="col">Tidak Absen ({{ $jumlah_hari_tidak_absen }} Hari x Rp. {{ number_format($nominal_potongan_per_hari) }})</th>
+            <th scope="col" class="text-right text-danger">Rp. {{ number_format($potongan_tidak_absen) }}</th>
+            </tr>
+        </thead>
+    </table>
+    @endif
     <table class="table table-sm table-borderless">
         <thead>
             <tr>
             <th scope="col">Total Pengurangan</th>
-            <th scope="col" class="text-right text-danger">Rp. {{ number_format($totalkasbon + $totalinsiden +  $totalPotonganServis->sum('nominal') + $izin + $potongan_telat) }}</th>
+            <th scope="col" class="text-right text-danger">Rp. {{ number_format($totalkasbon + $totalinsiden +  $totalPotonganServis->sum('nominal') + $izin + $potongan_telat + ($potongan_tidak_absen ?? 0)) }}</th>
             </tr>
         </thead>
     </table>
@@ -246,7 +256,8 @@
                     $totalinsiden -
                     $totalPotonganServis->sum('nominal') -
                     $izin -
-                    $potongan_telat
+                    $potongan_telat -
+                    ($potongan_tidak_absen ?? 0)
                 ) }}
             </th>
             </tr>
@@ -255,7 +266,7 @@
 
     <div class="text-center">
         @php
-            $angka = $nominalGajiPokok + (int)$items->absen + (int)$items->bpjs + $bonus + $bonusTarget + $overtime - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal') - $izin - $potongan_telat;
+            $angka = $nominalGajiPokok + (int)$items->absen + (int)$items->bpjs + $bonus + $bonusTarget + $overtime - $totalkasbon - $totalinsiden - $totalPotonganServis->sum('nominal') - $izin - $potongan_telat - ($potongan_tidak_absen ?? 0);
         @endphp
         <span class="badge badge-light px-4 py-3">
             <p class="text-capitalize mb-0">

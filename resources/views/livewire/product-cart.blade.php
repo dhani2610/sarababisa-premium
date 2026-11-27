@@ -66,7 +66,7 @@
                                         x-cloak
                                     >
                                         <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full" @click.outside="modalDiskon = false" @keydown.escape.window="modalDiskon = false">
-                                            <form wire:submit.prevent="productDiscount('{{ $cart_item->rowId }}', '{{ $cart_item->id }}')" method="post">
+                                            <form wire:submit.prevent="productDiscount('{{ $cart_item->rowId }}', '{{ $cart_item->id }}')" @submit="modalDiskon = false" method="post">
                                                 <div class="px-5 py-4">
                                                     <div class="text-center text-xl">
                                                         {{ $cart_item->name }}
@@ -105,6 +105,15 @@
 
                             <x-table.td>
                                 Rp. {{ number_format($cart_item->options->unit_price) }}
+                                @if(!empty($cart_item->options->product_discount) && $cart_item->options->product_discount > 0)
+                                    <div class="text-xs text-rose-500 font-semibold mt-0.5">
+                                        Diskon:
+                                        @if(($cart_item->options->product_discount_type ?? '') === 'percentage')
+                                            {{ $cart_item->options->product_discount_percent ?? round(100 * $cart_item->options->product_discount / ($cart_item->options->unit_price > 0 ? $cart_item->options->unit_price : 1)) }}%
+                                        @endif
+                                        (-Rp. {{ number_format($cart_item->options->product_discount) }})
+                                    </div>
+                                @endif
                                 {{-- @include('livewire.includes.product-cart-price') --}}
                             </x-table.td>
 

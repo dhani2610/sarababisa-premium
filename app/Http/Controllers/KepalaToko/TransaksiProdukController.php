@@ -1437,6 +1437,9 @@ class TransaksiProdukController extends Controller
             'due'                    => $request->due,
             'tunai'                  => $tunai,
             'transfer'               => $transfer,
+            'discount_amount'        => $request->has('discount_amount') ? (int) str_replace('.', '', $request->discount_amount) : $item->discount_amount,
+            'tipe_diskon'            => $request->tipe_diskon ?? $item->tipe_diskon,
+            'nilai_diskon'           => $request->has('nilai_diskon') ? (float) str_replace(',', '.', str_replace('.', '', $request->nilai_diskon)) : $item->nilai_diskon,
             'created_at'             => $request->created_at,
         ]);
 

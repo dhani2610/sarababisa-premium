@@ -18,13 +18,27 @@
             pay: '{{ number_format($item->pay, 0, '', '.') }}',
             tunai: '{{ number_format($item->tunai ?? 0, 0, '', '.') }}',
             transfer: '{{ number_format($item->transfer ?? 0, 0, '', '.') }}',
+            tipeDiskon: '{{ $item->tipe_diskon ?? 'nominal' }}',
+            nilaiDiskon: '{{ ($item->tipe_diskon ?? 'nominal') === 'persen' ? ($item->nilai_diskon ?? 0) : number_format((float)($item->discount_amount ?? 0), 0, '', '.') }}',
+            discountAmount: {{ (int)($item->discount_amount ?? 0) }},
+            baseTotal: {{ (int)($item->sub_total ?: ($item->pay + ($item->discount_amount ?? 0))) }},
+
+            calculateDiskon() {
+                if (this.tipeDiskon === 'persen') {
+                    let persen = parseFloat(this.nilaiDiskon.toString().replace(/,/g, '.')) || 0;
+                    this.discountAmount = Math.round(this.baseTotal * (persen / 100));
+                } else {
+                    this.discountAmount = this.parseRupiah(this.nilaiDiskon);
+                    this.nilaiDiskon = this.formatRupiah(this.discountAmount);
+                }
+            },
 
             formatRupiah(val) {
-                let str = val.toString().replace(/\D/g, '');
+                let str = (val || 0).toString().replace(/\D/g, '');
                 return str.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
             },
             parseRupiah(val) {
-                return parseInt(val.toString().replace(/\D/g, '')) || 0;
+                return parseInt((val || 0).toString().replace(/\D/g, '')) || 0;
             },
 
             // Fungsi Split Tunai ke Transfer
@@ -114,6 +128,23 @@
                                                 <option value="{{ $mp->nama }}">{{ $mp->nama }}</option>
                                             @endforeach
                                         </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Diskon</label>
+                                        <div class="flex space-x-2">
+                                            <select name="tipe_diskon" x-model="tipeDiskon" @change="calculateDiskon()" class="form-select text-sm py-1 w-36">
+                                                <option value="nominal">Nominal (Rp)</option>
+                                                <option value="persen">Persen (%)</option>
+                                            </select>
+                                            <div class="relative w-full">
+                                                <input name="nilai_diskon" x-model="nilaiDiskon" @input="calculateDiskon()" class="form-input w-full px-2 py-1" type="text" />
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="discount_amount" :value="discountAmount" />
+                                        <div x-show="tipeDiskon === 'persen'" class="text-xs text-indigo-600 mt-1" x-cloak>
+                                            Potongan: <span x-text="'Rp. ' + formatRupiah(discountAmount)"></span>
+                                        </div>
                                     </div>
 
                                     <div>

@@ -345,7 +345,13 @@
                             {{-- KOLOM DISKON (Rowspan Utama - Diskon biasanya per transaksi) --}}
                             @if ($isFirstRowTransaction)
                                 <td style="width: 50px; text-align: right;" rowspan="{{ $total_rows_transaksi }}">
-                                    Rp. {{ number_format($item->kondisi_servis == 'Dibatalkan' ? 0 : $item->diskon) }}
+                                    @if ($item->kondisi_servis == 'Dibatalkan')
+                                        Rp. 0
+                                    @elseif ($item->tipe_diskon === 'persen' && $item->nilai_diskon > 0)
+                                        {{ (floatval($item->nilai_diskon) == intval($item->nilai_diskon)) ? intval($item->nilai_diskon) : $item->nilai_diskon }}% (Rp. {{ number_format($item->diskon) }})
+                                    @else
+                                        Rp. {{ number_format($item->diskon) }}
+                                    @endif
                                 </td>
                             @endif
 

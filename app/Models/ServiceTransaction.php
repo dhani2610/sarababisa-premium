@@ -45,6 +45,8 @@ class ServiceTransaction extends Model
         'modal_sparepart',
         'is_approve',
         'diskon',
+        'tipe_diskon',
+        'nilai_diskon',
         'created_at',
         'tgl_ambil',
         'pengambil',

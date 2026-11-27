@@ -253,10 +253,16 @@
 
                     $totalDenganPPN = $dibayarkan + $ppn;
                 @endphp
-                @if ($items->diskon != null)
+                @if ($items->diskon != null && $items->diskon > 0)
                     <tr>
                         <td class="title">Diskon</td>
-                        <td class="value">: Rp. {{ number_format($items->diskon) }}</td>
+                        <td class="value">:
+                            @if ($items->tipe_diskon === 'persen' && $items->nilai_diskon > 0)
+                                {{ (floatval($items->nilai_diskon) == intval($items->nilai_diskon)) ? intval($items->nilai_diskon) : $items->nilai_diskon }}% (Rp. {{ number_format($items->diskon) }})
+                            @else
+                                Rp. {{ number_format($items->diskon) }}
+                            @endif
+                        </td>
                     </tr>
                     @if ($ppn == 0)
                     <tr>

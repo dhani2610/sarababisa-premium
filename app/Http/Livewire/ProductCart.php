@@ -65,7 +65,7 @@ class ProductCart extends Component
                 $this->discount_type[$cart_item->id] = $cart_item->options->product_discount_type;
                 $this->item_discount[$cart_item->id] = ($cart_item->options->product_discount_type === 'fixed')
                     ? $cart_item->options->product_discount
-                    : round(100 * $cart_item->options->product_discount / $cart_item->harga_jual);
+                    : round(100 * $cart_item->options->product_discount / ($cart_item->options->unit_price > 0 ? $cart_item->options->unit_price : 1));
             }
         } else {
             $this->updatedGlobalTax();
@@ -257,45 +257,41 @@ class ProductCart extends Component
     public function productDiscount($row_id, $product_id): void
     {
         $cart_item = Cart::instance($this->cart_instance)->get($row_id);
+        $base_price = (float) $cart_item->options->unit_price;
+        $discount_type = $this->discount_type[$product_id] ?? 'fixed';
+        $discount_val = (float) ($this->item_discount[$product_id] ?? 0);
 
-        if ($this->discount_type[$product_id] === 'fixed') {
-            Cart::instance($this->cart_instance)
-                ->update($row_id, [
-                    'price' => $cart_item->price + $cart_item->options->product_discount - $this->item_discount[$product_id],
-                ]);
-
-            $discount_amount = $this->item_discount[$product_id];
-
-            $this->updateCartOptions($row_id, $product_id, $cart_item, $discount_amount);
-        } elseif ($this->discount_type[$product_id] === 'percentage') {
-            $discount_amount = ($cart_item->price + $cart_item->options->product_discount) * $this->item_discount[$product_id] / 100;
-
-            Cart::instance($this->cart_instance)
-                ->update($row_id, [
-                    'price' => $cart_item->price + $cart_item->options->product_discount - $discount_amount,
-                ]);
-
-            $this->updateCartOptions($row_id, $product_id, $cart_item, $discount_amount);
+        if ($discount_type === 'percentage') {
+            // Dibulatkan bulat rupiah sesuai permintaan:
+            // "Mas yg persen it kn diskon psti angka gnjil hrs dbkin pmbultn y"
+            $discount_amount = round($base_price * ($discount_val / 100));
+        } else {
+            $discount_amount = round($discount_val);
         }
-        $this->alert('success', 'Diskon produk berhasil diterapkan!');
 
-        $this->discountModal = false;
-    }
+        if ($discount_amount > $base_price) {
+            $discount_amount = $base_price;
+        }
 
-    public function updateCartOptions($row_id, $product_id, $cart_item, $discount_amount)
-    {
+        $new_price = max(0, $base_price - $discount_amount);
+
         Cart::instance($this->cart_instance)->update($row_id, [
+            'price' => $new_price,
             'options' => [
-                'sub_total'             => $cart_item->price * $cart_item->qty,
-                'code'                  => $cart_item->options->code,
-                'stock'                 => $cart_item->options->stock,
-                'unit'                  => $cart_item->options->unit,
-                'unit_price'            => $cart_item->options->unit_price,
-                'product_discount'      => $discount_amount,
-                'product_discount_type' => $cart_item->options->product_discount_type,
-                'modal'      => $cart_item->options->modal,
+                'sub_total'                => $new_price * $cart_item->qty,
+                'code'                     => $cart_item->options->code,
+                'stock'                    => $cart_item->options->stock,
+                'unit'                     => $cart_item->options->unit,
+                'unit_price'               => $base_price,
+                'product_discount'         => $discount_amount,
+                'product_discount_type'    => $discount_type,
+                'product_discount_percent' => $discount_type === 'percentage' ? $discount_val : 0,
+                'modal'                    => $cart_item->options->modal,
             ],
         ]);
+
+        $this->alert('success', 'Diskon produk berhasil diterapkan!');
+        $this->discountModal = false;
     }
 
     public function render()

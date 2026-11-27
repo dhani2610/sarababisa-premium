@@ -11,6 +11,7 @@
                 <div class="text-sm">Informasi ini akan mengatur bagaimana sistem ingin diterapkan pada beberapa bagian.</div>
             </section>
             <livewire:toggle-tax></livewire:toggle-tax>
+            <livewire:toggle-absensi-setting />
             {{-- <livewire:toggle-bonus></livewire:toggle-bonus>
             <livewire:toggle-modal></livewire:toggle-modal> --}}
             <livewire:toggle-financial-settings />

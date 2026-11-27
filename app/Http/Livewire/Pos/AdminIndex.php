@@ -253,6 +253,8 @@ class AdminIndex extends Component
                     'total'               => $cart_item->options->sub_total,
                     'sub_total'               => $cart_item->options->unit_price * $cart_item->qty,
                     'product_discount_amount' => $cart_item->options->product_discount,
+                    'product_discount_type'   => $cart_item->options->product_discount_type ?? 'fixed',
+                    'product_discount_percent' => $cart_item->options->product_discount_percent ?? 0,
                     'modal'               => $cart_item->options->modal * $cart_item->qty,
                     'profit'               => $cart_item->options->sub_total - ($cart_item->options->modal * $cart_item->qty),
                     'profit_toko'               => ($cart_item->options->sub_total - ($cart_item->options->modal * $cart_item->qty)) - ($cart_item->options->sub_total - ($cart_item->options->modal * $cart_item->qty)) / 100 * ($persen_sales->persen + $persen_admin),

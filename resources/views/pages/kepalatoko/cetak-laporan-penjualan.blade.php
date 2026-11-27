@@ -240,7 +240,16 @@
 					<td style="text-align: center; width: 40px;">{{ $item->quantity }}</td>
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->modal) }}</td>
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->total) }}</td>
-					<td style="width: 60px; text-align: right;">Rp. {{ number_format($item->sub_total - $item->total) }}</td>
+					<td style="width: 70px; text-align: right;">
+                        @php
+                            $nominalPotongan = $item->sub_total - $item->total;
+                        @endphp
+                        @if ($item->product_discount_type === 'percentage' && $item->product_discount_percent > 0)
+                            {{ (floatval($item->product_discount_percent) == intval($item->product_discount_percent)) ? intval($item->product_discount_percent) : $item->product_discount_percent }}% (Rp. {{ number_format($nominalPotongan) }})
+                        @else
+                            Rp. {{ number_format($nominalPotongan) }}
+                        @endif
+                    </td>
 					<td style="width: 70px; text-align: right;">Rp. {{ number_format($item->profit) }}</td>
 					<td style="width: 70px; text-align: left;">
                         <div><strong>Status:</strong><br> {{ $item->order->tipe_status_pembayaran == 1 ? 'Lunas' : 'Belum Lunas' }} <br>

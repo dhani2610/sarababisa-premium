@@ -297,7 +297,13 @@ class ServisBelumDisetujuiController extends Controller
             // ✅ Modal, Biaya, Diskon
             ->addColumn('modal_sparepart', fn($row) => 'Rp. '.number_format($row->modal_sparepart))
             ->addColumn('biaya', fn($row) => 'Rp. '.number_format($row->biaya))
-            ->addColumn('diskon', fn($row) => 'Rp. '.number_format($row->diskon))
+            ->addColumn('diskon', function ($row) {
+                if ($row->tipe_diskon === 'persen' && $row->nilai_diskon > 0) {
+                    $val = (floatval($row->nilai_diskon) == intval($row->nilai_diskon)) ? intval($row->nilai_diskon) : $row->nilai_diskon;
+                    return $val . '% (Rp. ' . number_format($row->diskon) . ')';
+                }
+                return 'Rp. ' . number_format($row->diskon);
+            })
 
             // ✅ Cara Pembayaran
             ->addColumn('cara_pembayaran', fn($row) => $row->cara_pembayaran)
@@ -1002,6 +1008,8 @@ class ServisBelumDisetujuiController extends Controller
                     'qc_keluar' => $qc_keluar_data,
                     'uang_muka' => $request->uang_muka,
                     'diskon' => $request->diskon,
+                    'tipe_diskon' => $request->tipe_diskon ?? 'nominal',
+                    'nilai_diskon' => (float) str_replace(',', '.', str_replace('.', '', (string)($request->nilai_diskon ?? 0))),
                     'cara_pembayaran' => $request->cara_pembayaran,
                     'tipe' => $mainTechDetails['tipe_teknisi'],
                     'garansi' => $mainTechDetails['garansi'],

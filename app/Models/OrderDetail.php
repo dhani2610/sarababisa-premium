@@ -35,6 +35,8 @@ class OrderDetail extends Model
         'payment_method',
         'total',
         'product_discount_amount',
+        'product_discount_type',
+        'product_discount_percent',
         'note',
         'cabang_id',
     ];

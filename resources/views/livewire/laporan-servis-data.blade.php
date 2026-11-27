@@ -204,7 +204,13 @@
                                 <div class="font-medium">{{ number_format($item->biaya) }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                <div class="font-medium">{{ number_format($item->diskon) }}</div>
+                                <div class="font-medium">
+                                    @if ($item->tipe_diskon === 'persen' && $item->nilai_diskon > 0)
+                                        {{ (floatval($item->nilai_diskon) == intval($item->nilai_diskon)) ? intval($item->nilai_diskon) : $item->nilai_diskon }}% (Rp. {{ number_format($item->diskon) }})
+                                    @else
+                                        Rp. {{ number_format($item->diskon) }}
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                 <div class="font-medium">{{ $item->cara_pembayaran }}</div>
