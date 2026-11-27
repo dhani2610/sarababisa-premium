@@ -278,8 +278,7 @@
                         processing: true,
                         serverSide: true,
                         deferRender: true,
-                        searchDelay: 400,
-                        ajax: '{{ route('transaksi-produk.data') }}',
+                            ajax: '{{ route('transaksi-produk.data') }}',
                         columns: [
                             @if (Auth::user()->role == 'Kepala Toko')
                             {
@@ -381,8 +380,37 @@
                             @endif
                         ],
                         order: [],
+                        search: {
+                            return: true
+                        },
                         language: {
                             url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
+                        },
+                        initComplete: function() {
+                            var api = this.api();
+                            var container = $(api.table().container());
+                            var searchInput = container.find('.dataTables_filter input');
+
+                            if (!container.find('.btn-dt-search').length) {
+                                var searchBtn = $('<button type="button" class="btn-dt-search btn-sm bg-indigo-500 hover:bg-indigo-600 text-white ml-2 px-3 py-1.5 rounded text-xs font-semibold inline-flex items-center shadow-sm transition cursor-pointer"><span>Cari</span></button>');
+                                searchInput.after(searchBtn);
+
+                                searchBtn.on('click', function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    api.search(searchInput.val()).draw();
+                                });
+                            }
+
+                            searchInput.on('keyup', function(e) {
+                                if (this.value === '') {
+                                    api.search('').draw();
+                                }
+                            }).on('search', function() {
+                                if (this.value === '') {
+                                    api.search('').draw();
+                                }
+                            });
                         },
                         columnDefs: [{
                                 targets: '_all',
