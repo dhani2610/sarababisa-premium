@@ -241,7 +241,13 @@
                     <td id="data" scope="row" style="border-left-style: solid;"></td>
                     <td id="data"></td>
                     <td id="data" scope="row" style="border-left-style: solid;">Diskon</td>
-                    <td id="data">: Rp. {{ number_format($items->diskon) }}</td>
+                    <td id="data">:
+                        @if ($items->tipe_diskon === 'persen' && $items->nilai_diskon > 0)
+                            {{ (floatval($items->nilai_diskon) == intval($items->nilai_diskon)) ? intval($items->nilai_diskon) : $items->nilai_diskon }}% (Rp. {{ number_format($items->diskon) }})
+                        @else
+                            Rp. {{ number_format($items->diskon) }}
+                        @endif
+                    </td>
                 </tr>
                 <tr style="border-right-style: solid;">
                     @if (json_decode($items->biaya_j))
@@ -346,7 +352,13 @@
                         </td>
                     @endif
                     <td id="data" scope="row" style="border-left-style: solid;">Diskon</td>
-                    <td id="data">: Rp. {{ number_format($items->diskon) }}</td>
+                    <td id="data">:
+                        @if ($items->tipe_diskon === 'persen' && $items->nilai_diskon > 0)
+                            {{ (floatval($items->nilai_diskon) == intval($items->nilai_diskon)) ? intval($items->nilai_diskon) : $items->nilai_diskon }}% (Rp. {{ number_format($items->diskon) }})
+                        @else
+                            Rp. {{ number_format($items->diskon) }}
+                        @endif
+                    </td>
                 </tr>
                 <tr style="border-bottom-style: solid; border-right-style: solid;">
                     <td id="data" scope="row" style="border-left-style: solid;"></td>

@@ -288,7 +288,13 @@
                     <td class="b-left row-line"></td>
                     <td class="row-line"></td>
                     <td class="b-left row-line">Diskon</td>
-                    <td class="row-line">: Rp. {{ number_format($items->diskon) }}</td>
+                    <td class="row-line">:
+                        @if ($items->tipe_diskon === 'persen' && $items->nilai_diskon > 0)
+                            {{ (floatval($items->nilai_diskon) == intval($items->nilai_diskon)) ? intval($items->nilai_diskon) : $items->nilai_diskon }}% (Rp. {{ number_format($items->diskon) }})
+                        @else
+                            Rp. {{ number_format($items->diskon) }}
+                        @endif
+                    </td>
                 </tr>
                 <tr class="b-right">
                     {{ $rincianBiaya() }}
@@ -335,7 +341,13 @@
                     <td class="capital row-line">{{ $tindakanList() }}</td>
                     {{ $rincianBiaya() }}
                     <td class="b-left row-line">Diskon</td>
-                    <td class="row-line">: Rp. {{ number_format($items->diskon) }}</td>
+                    <td class="row-line">:
+                        @if ($items->tipe_diskon === 'persen' && $items->nilai_diskon > 0)
+                            {{ (floatval($items->nilai_diskon) == intval($items->nilai_diskon)) ? intval($items->nilai_diskon) : $items->nilai_diskon }}% (Rp. {{ number_format($items->diskon) }})
+                        @else
+                            Rp. {{ number_format($items->diskon) }}
+                        @endif
+                    </td>
                 </tr>
                 <tr class="b-bottom b-right">
                     <td class="b-left row-line"></td><td class="row-line"></td>

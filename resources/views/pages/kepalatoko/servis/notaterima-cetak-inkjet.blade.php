@@ -181,8 +181,19 @@
                 @else
                     <td>: -</td>
                 @endif
-                <th scope="row" style="border-left-style: solid;"></th>
-                <td></td>
+                @if ($items->diskon != null && $items->diskon > 0)
+                    <td scope="row" style="border-left-style: solid;">Diskon</td>
+                    <td>:
+                        @if ($items->tipe_diskon === 'persen' && $items->nilai_diskon > 0)
+                            {{ (floatval($items->nilai_diskon) == intval($items->nilai_diskon)) ? intval($items->nilai_diskon) : $items->nilai_diskon }}% (Rp. {{ number_format($items->diskon) }})
+                        @else
+                            Rp. {{ number_format($items->diskon) }}
+                        @endif
+                    </td>
+                @else
+                    <th scope="row" style="border-left-style: solid;"></th>
+                    <td></td>
+                @endif
                 <td colspan="2" style="border-left-style: solid;"></td>
             </tr>
         </tbody>

@@ -885,7 +885,6 @@
                                             </div>
                                         </div>
 
-                                    </div>
                                     <!-- Modal footer -->
                                     <div class="pt-4 border-t border-slate-200 mt-4">
                                         <div class="flex flex-wrap justify-between space-x-2">

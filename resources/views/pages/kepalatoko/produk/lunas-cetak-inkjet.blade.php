@@ -242,7 +242,13 @@
         @if ($item->product_discount_amount <= 0)
             <td align="center">-</td>
         @else
-            <td align="center">Rp. {{ number_format($item->product_discount_amount) }}</td>
+            <td align="center">
+                @if ($item->product_discount_type === 'percentage' && $item->product_discount_percent > 0)
+                    {{ (floatval($item->product_discount_percent) == intval($item->product_discount_percent)) ? intval($item->product_discount_percent) : $item->product_discount_percent }}% (Rp. {{ number_format($item->product_discount_amount) }})
+                @else
+                    Rp. {{ number_format($item->product_discount_amount) }}
+                @endif
+            </td>
         @endif
         {{-- Subtotal per item sudah termasuk pajak --}}
         @if ($item->product_discount_amount <= 0)
