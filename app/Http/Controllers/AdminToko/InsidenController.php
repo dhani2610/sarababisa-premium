@@ -8,6 +8,7 @@ use App\Models\Incident;
 use Illuminate\Http\Request;
 use App\Models\ServiceTransaction;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 
 class InsidenController extends Controller
 {
@@ -78,15 +79,38 @@ class InsidenController extends Controller
      */
     public function store(Request $request)
     {
+        $price = (float) str_replace('.', '', $request->price);
+        $workerId = $request->workers_id;
+        $createdAt = $request->created_at ? Carbon::parse($request->created_at) : now();
+
+        $worker = Worker::find($workerId);
+        $user = $worker ? ($worker->user_account ?? \App\Models\User::where('workers_id', $worker->id)->first()) : null;
+
+        $limitToko = $user->nominal_insiden_toko ?? ($worker->nominal_insiden_toko ?? 0);
+        $persenKaryawan = $user->persentase_potongan_insiden ?? ($worker->persentase_potongan_insiden ?? 0);
+
+        $prevTotal = Incident::where('workers_id', $workerId)
+            ->whereMonth('created_at', $createdAt->month)
+            ->whereYear('created_at', $createdAt->year)
+            ->sum('price');
+
+        $sisaKuotaToko = max(0, $limitToko - $prevTotal);
+        $ditanggungPenuhToko = min($price, $sisaKuotaToko);
+        $melebihiLimit = max(0, $price - $ditanggungPenuhToko);
+        $biayaTeknisi = round($melebihiLimit * ($persenKaryawan / 100));
+        $biayaToko = $price - $biayaTeknisi;
+        $persenTeknisi = $price > 0 ? round(($biayaTeknisi / $price) * 100, 2) : 0;
+
         // Transaction create
         Incident::create([
             'name' => $request->name,
-            'price' => $request->price,
+            'price' => $price,
             'cabang_id' => getCabangId(),
-            'workers_id' => $request->workers_id,
-            'persen_teknisi' => $request->persen_teknisi,
-            'biaya_teknisi' => $request->price * $request->persen_teknisi / 100,
-            'biaya_toko' => $request->price - ($request->price * $request->persen_teknisi / 100)
+            'workers_id' => $workerId,
+            'persen_teknisi' => $persenTeknisi,
+            'biaya_teknisi' => $biayaTeknisi,
+            'biaya_toko' => $biayaToko,
+            'created_at' => $createdAt,
         ]);
 
         return redirect()->route('admin-insiden.index');
@@ -130,13 +154,37 @@ class InsidenController extends Controller
     public function update(Request $request, $id)
     {
         $item = Incident::findOrFail($id);
+        $price = (float) str_replace('.', '', $request->price);
+        $workerId = $request->workers_id;
+        $createdAt = $request->created_at ? Carbon::parse($request->created_at) : Carbon::parse($item->created_at);
+
+        $worker = Worker::find($workerId);
+        $user = $worker ? ($worker->user_account ?? \App\Models\User::where('workers_id', $worker->id)->first()) : null;
+
+        $limitToko = $user->nominal_insiden_toko ?? ($worker->nominal_insiden_toko ?? 0);
+        $persenKaryawan = $user->persentase_potongan_insiden ?? ($worker->persentase_potongan_insiden ?? 0);
+
+        $prevTotal = Incident::where('workers_id', $workerId)
+            ->where('id', '!=', $id)
+            ->whereMonth('created_at', $createdAt->month)
+            ->whereYear('created_at', $createdAt->year)
+            ->sum('price');
+
+        $sisaKuotaToko = max(0, $limitToko - $prevTotal);
+        $ditanggungPenuhToko = min($price, $sisaKuotaToko);
+        $melebihiLimit = max(0, $price - $ditanggungPenuhToko);
+        $biayaTeknisi = round($melebihiLimit * ($persenKaryawan / 100));
+        $biayaToko = $price - $biayaTeknisi;
+        $persenTeknisi = $price > 0 ? round(($biayaTeknisi / $price) * 100, 2) : 0;
+
         $item->update([
             'name' => $request->name,
-            'price' => $request->price,
-            'workers_id' => $request->workers_id,
-            'persen_teknisi' => $request->persen_teknisi,
-            'biaya_teknisi' => $request->price * $request->persen_teknisi / 100,
-            'biaya_toko' => $request->price - ($request->price * $request->persen_teknisi / 100),
+            'price' => $price,
+            'workers_id' => $workerId,
+            'persen_teknisi' => $persenTeknisi,
+            'biaya_teknisi' => $biayaTeknisi,
+            'biaya_toko' => $biayaToko,
+            'created_at' => $createdAt,
         ]);
 
         return redirect()->route('admin-insiden.index');

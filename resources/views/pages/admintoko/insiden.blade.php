@@ -91,10 +91,6 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="persen_teknisi">Persen yang dibebankan kepada teknisi <span class="text-rose-500">*</span></label>
-                                            <input id="persen_teknisi" name="persen_teknisi" class="form-input w-full px-2 py-1" type="number" required/>
-                                        </div>
                                     </div>
                                 </div>
                                 <!-- Modal footer -->

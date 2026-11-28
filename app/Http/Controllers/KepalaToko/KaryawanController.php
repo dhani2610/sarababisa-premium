@@ -575,16 +575,16 @@ class KaryawanController extends Controller
             ->whereDate('tanggal', '>=', $start_date)
             ->whereDate('tanggal', '<=', $end_date)->where('telat',1)->get()->sum('nominal_potongan') : 0;
 
-        // Hitung potongan jika tidak absen (masuk & pulang) pada hari wajib absen yang dipilih
-        $storeSetting = \App\Models\StoreSetting::where('cabang_id', $items->cabang_id)->first();
+        // Hitung potongan jika tidak absen pada hari kerja yang dipilih di setting Shift karyawan
+        $shift = Shift::where('worker_id', $id)->first();
         $jumlah_hari_tidak_absen = 0;
-        $nominal_potongan_per_hari = $storeSetting->nominal_potongan_tidak_absen ?? 0;
+        $nominal_potongan_per_hari = $shift->potongan_tidak_masuk ?? 0;
         $potongan_tidak_absen = 0;
 
-        if ($storeSetting && $storeSetting->active_setting_absensi && $nominal_potongan_per_hari > 0 && $user) {
-            $hariWajib = is_array($storeSetting->hari_absen) 
-                ? $storeSetting->hari_absen 
-                : (json_decode($storeSetting->hari_absen, true) ?? ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']);
+        if ($shift && $nominal_potongan_per_hari > 0 && $user) {
+            $hariWajib = is_array($shift->hari_kerja) 
+                ? $shift->hari_kerja 
+                : (json_decode($shift->hari_kerja, true) ?? ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']);
 
             $dayMap = [
                 1 => 'Senin',
@@ -625,8 +625,6 @@ class KaryawanController extends Controller
 
             $potongan_tidak_absen = $jumlah_hari_tidak_absen * $nominal_potongan_per_hari;
         }
-
-        $shift = Shift::where('worker_id',$id)->first();
 
         $pdf = PDF::loadView('pages.kepalatoko.karyawan.cetak', [
             'overtime' => $overtime,

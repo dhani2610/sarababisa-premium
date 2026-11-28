@@ -54,10 +54,6 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1" for="persen_teknisi">Persen beban teknisi (%) <span class="text-rose-500">*</span></label>
-                                            <input id="persen_teknisi" name="persen_teknisi" class="form-input w-full px-2 py-1" type="number" required placeholder="Contoh: 50"/>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="px-5 py-4 border-t border-slate-200 flex justify-end space-x-2">

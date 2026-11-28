@@ -20,6 +20,8 @@ class Worker extends Model
         'bpjs',
         'cabang_id',
         'status_shift',
+        'nominal_insiden_toko',
+        'persentase_potongan_insiden',
     ];
 
     public function user()

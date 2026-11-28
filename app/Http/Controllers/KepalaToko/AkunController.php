@@ -516,6 +516,8 @@ class AkunController extends Controller
             'nomor_hp' => $request->nomor_hp,
             'alamat' => $request->alamat,
             'persen' => (!empty($request->persen) || $request->persen === '0' || $request->persen === 0) ? $request->persen : 0,
+            'nominal_insiden_toko' => (!empty($request->nominal_insiden_toko)) ? (int) str_replace('.', '', $request->nominal_insiden_toko) : 0,
+            'persentase_potongan_insiden' => (!empty($request->persentase_potongan_insiden)) ? (int) $request->persentase_potongan_insiden : 0,
             'persen_bonus_interface' => (!empty($request->persen_bonus_interface) || $request->persen_bonus_interface === '0' || $request->persen_bonus_interface === 0) ? $request->persen_bonus_interface : 0,
             'tipe_bonus_admin' => $request->tipe_bonus_admin,
             'nominal_bonus_admin' => (!empty($request->nominal_bonus_admin) || $request->nominal_bonus_admin === '0' || $request->nominal_bonus_admin === 0) ? $request->nominal_bonus_admin : 0,
@@ -586,6 +588,8 @@ class AkunController extends Controller
         $item->bpjs = 0;
         $item->cabang_id = getCabangId();
         $item->status_shift = 1;
+        $item->nominal_insiden_toko = $data->nominal_insiden_toko ?? 0;
+        $item->persentase_potongan_insiden = $data->persentase_potongan_insiden ?? 0;
         $item->save();
 
         if ((int)$item->status_shift == 1) {
@@ -684,6 +688,8 @@ class AkunController extends Controller
             'nomor_hp' => $request->nomor_hp,
             'alamat' => $request->alamat,
             'persen' => (!empty($request->persen) || $request->persen === '0' || $request->persen === 0) ? $request->persen : 0,
+            'nominal_insiden_toko' => (!empty($request->nominal_insiden_toko)) ? (int) str_replace('.', '', $request->nominal_insiden_toko) : 0,
+            'persentase_potongan_insiden' => (!empty($request->persentase_potongan_insiden)) ? (int) $request->persentase_potongan_insiden : 0,
             'tipe_bonus_admin' => $request->tipe_bonus_admin,
             'persen_investor' => (!empty($request->persen_investor) || $request->persen_investor === '0' || $request->persen_investor === 0) ? $request->persen_investor : 0,
             'persen_bonus_interface' => (!empty($request->persen_bonus_interface) || $request->persen_bonus_interface === '0' || $request->persen_bonus_interface === 0) ? $request->persen_bonus_interface : 0,
@@ -710,6 +716,13 @@ class AkunController extends Controller
         }
 
         $item->update($data);
+
+        if ($item->workers_id) {
+            Worker::where('id', $item->workers_id)->update([
+                'nominal_insiden_toko' => (!empty($request->nominal_insiden_toko)) ? (int) str_replace('.', '', $request->nominal_insiden_toko) : 0,
+                'persentase_potongan_insiden' => (!empty($request->persentase_potongan_insiden)) ? (int) $request->persentase_potongan_insiden : 0,
+            ]);
+        }
 
         if ($request->has('cabang_ids')) {
             $cabangIds = (array) $request->cabang_ids;

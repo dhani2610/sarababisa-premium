@@ -10,6 +10,8 @@
             // State untuk menampung jam (default 1 baris)
             createSlots: [{ masuk: '', pulang: '' }],
             editSlots: [],
+            createDays: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
+            editDays: [],
 
             // Fungsi Tambah Baris
             addSlot(mode) {
@@ -32,11 +34,13 @@
             // Reset Form Tambah saat modal dibuka
             resetCreate() {
                 this.createSlots = [{ masuk: '', pulang: '' }];
+                this.createDays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
                 this.modalOpen = true;
             }
         }"
         @open-edit-modal.window="
             editForm = $event.detail;
+            editDays = Array.isArray($event.detail.hari_kerja) ? $event.detail.hari_kerja : ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
             // LOGIC MAPPING DATA ARRAY DARI CONTROLLER KE ALPINE
             // Kita pastikan data masuk sebagai array
@@ -127,6 +131,19 @@
                                                 <span>+ Tambah Jam</span>
                                             </button>
                                         </div>
+                                        <div class="bg-slate-50 p-3 rounded border border-slate-200">
+                                            <label class="block text-sm font-medium mb-1 text-slate-700">Hari Kerja / Wajib Masuk</label>
+                                            <div class="text-xs text-slate-500 mb-2">Pilih hari wajib kerja. Jika tidak hadir pada hari yang dipilih, akan dikenakan potongan per hari.</div>
+                                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                                @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] as $hari)
+                                                    <label class="inline-flex items-center text-sm">
+                                                        <input type="checkbox" name="hari_kerja[]" value="{{ $hari }}" class="form-checkbox text-indigo-500" x-model="createDays">
+                                                        <span class="ml-2 text-slate-700">{{ $hari }}</span>
+                                                    </label>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
                                         <input name="nominal_gaji" type="hidden" class="form-input w-full sapator">
 
                                         <div class="flex gap-3">
@@ -135,7 +152,7 @@
                                                 <input name="potongan_terlambat" type="text" class="form-input w-full sapator" required>
                                             </div>
                                             <div class="w-1/2">
-                                                <label class="block text-sm font-medium mb-1">Potongan Alfa</label>
+                                                <label class="block text-sm font-medium mb-1">Potongan Tidak Absen / Alfa (Per Hari)</label>
                                                 <input name="potongan_tidak_masuk" type="text" class="form-input w-full sapator" required>
                                             </div>
                                         </div>
@@ -208,7 +225,7 @@
                             <th class="text-center px-2 py-3">Nama Shift</th>
                             <th class="text-center px-2 py-3">Jadwal Shift</th>
                             <th class="text-center px-2 py-3">Potongan Terlambat</th>
-                            <th class="text-center px-2 py-3">Potongan Alfa</th>
+                            <th class="text-center px-2 py-3">Potongan Tidak Absen / Alfa</th>
                             <th class="text-center px-2 py-3">Potongan Izin</th>
                             <th class="text-center px-2 py-3">Potongan Cuti</th>
                             <th class="text-center px-2 py-3">Potongan Sakit</th>
@@ -271,6 +288,19 @@
                                     <span>+ Tambah Jam</span>
                                 </button>
                             </div>
+                            <div class="bg-slate-50 p-3 rounded border border-slate-200">
+                                <label class="block text-sm font-medium mb-1 text-slate-700">Hari Kerja / Wajib Masuk</label>
+                                <div class="text-xs text-slate-500 mb-2">Pilih hari wajib kerja. Jika tidak hadir pada hari yang dipilih, akan dikenakan potongan per hari.</div>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                    @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] as $hari)
+                                        <label class="inline-flex items-center text-sm">
+                                            <input type="checkbox" name="hari_kerja[]" value="{{ $hari }}" class="form-checkbox text-indigo-500" x-model="editDays">
+                                            <span class="ml-2 text-slate-700">{{ $hari }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
                             <input name="nominal_gaji" type="hidden" x-model="editForm.nominal_gaji" class="form-input w-full sapator">
                             {{-- <div>
                                 <label class="block text-sm font-medium mb-1">Gaji Pokok</label>
@@ -282,7 +312,7 @@
                                     <input name="potongan_terlambat" type="text" x-model="editForm.potongan_terlambat" class="form-input w-full sapator" required>
                                 </div>
                                 <div class="w-1/2">
-                                    <label class="block text-sm font-medium mb-1">Potongan Alfa</label>
+                                    <label class="block text-sm font-medium mb-1">Potongan Tidak Absen / Alfa (Per Hari)</label>
                                     <input name="potongan_tidak_masuk" type="text" x-model="editForm.potongan_tidak_masuk" class="form-input w-full sapator" required>
                                 </div>
                             </div>

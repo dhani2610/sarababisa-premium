@@ -143,15 +143,49 @@ class InsidenController extends Controller
      */
     public function store(Request $request)
     {
+        $price = (float) str_replace('.', '', $request->price);
+        $workerId = $request->workers_id;
+        $createdAt = $request->created_at ? Carbon::parse($request->created_at) : now();
+
+        $worker = Worker::find($workerId);
+        $user = $worker ? ($worker->user_account ?? \App\Models\User::where('workers_id', $worker->id)->first()) : null;
+
+        $limitToko = $user->nominal_insiden_toko ?? ($worker->nominal_insiden_toko ?? 0);
+        $persenKaryawan = $user->persentase_potongan_insiden ?? ($worker->persentase_potongan_insiden ?? 0);
+
+        // Hitung total insiden sebelumnya di bulan & tahun yang sama untuk teknisi ini
+        $prevTotal = Incident::where('workers_id', $workerId)
+            ->whereMonth('created_at', $createdAt->month)
+            ->whereYear('created_at', $createdAt->year)
+            ->sum('price');
+
+        // Sisa kuota limit toko yang masih tersedia di bulan ini
+        $sisaKuotaToko = max(0, $limitToko - $prevTotal);
+
+        // Porsi insiden yang bisa ditanggung penuh oleh toko dari sisa kuota
+        $ditanggungPenuhToko = min($price, $sisaKuotaToko);
+
+        // Kelebihan insiden yang melebihi limit toko
+        $melebihiLimit = max(0, $price - $ditanggungPenuhToko);
+
+        // Beban biaya untuk teknisi berdasarkan persentase potongan di akun
+        $biayaTeknisi = round($melebihiLimit * ($persenKaryawan / 100));
+
+        // Sisa biaya ditanggung oleh toko
+        $biayaToko = $price - $biayaTeknisi;
+
+        // Persentase beban teknisi riil
+        $persenTeknisi = $price > 0 ? round(($biayaTeknisi / $price) * 100, 2) : 0;
 
         // Transaction create
         Incident::create([
             'name' => $request->name,
-            'price' => $request->price,
-            'workers_id' => $request->workers_id,
-            'persen_teknisi' => $request->persen_teknisi,
-            'biaya_teknisi' => $request->price * $request->persen_teknisi / 100,
-            'biaya_toko' => $request->price - ($request->price * $request->persen_teknisi / 100),
+            'price' => $price,
+            'workers_id' => $workerId,
+            'persen_teknisi' => $persenTeknisi,
+            'biaya_teknisi' => $biayaTeknisi,
+            'biaya_toko' => $biayaToko,
+            'created_at' => $createdAt,
             'cabang_id' => getCabangId()
         ]);
 
@@ -196,14 +230,49 @@ class InsidenController extends Controller
     public function update(Request $request, $id)
     {
         $item = Incident::findOrFail($id);
+        $price = (float) str_replace('.', '', $request->price);
+        $workerId = $request->workers_id;
+        $createdAt = $request->created_at ? Carbon::parse($request->created_at) : Carbon::parse($item->created_at);
+
+        $worker = Worker::find($workerId);
+        $user = $worker ? ($worker->user_account ?? \App\Models\User::where('workers_id', $worker->id)->first()) : null;
+
+        $limitToko = $user->nominal_insiden_toko ?? ($worker->nominal_insiden_toko ?? 0);
+        $persenKaryawan = $user->persentase_potongan_insiden ?? ($worker->persentase_potongan_insiden ?? 0);
+
+        // Hitung total insiden sebelumnya di bulan & tahun yang sama untuk teknisi ini (kecuali record ini)
+        $prevTotal = Incident::where('workers_id', $workerId)
+            ->where('id', '!=', $id)
+            ->whereMonth('created_at', $createdAt->month)
+            ->whereYear('created_at', $createdAt->year)
+            ->sum('price');
+
+        // Sisa kuota limit toko yang masih tersedia di bulan ini
+        $sisaKuotaToko = max(0, $limitToko - $prevTotal);
+
+        // Porsi insiden yang bisa ditanggung penuh oleh toko dari sisa kuota
+        $ditanggungPenuhToko = min($price, $sisaKuotaToko);
+
+        // Kelebihan insiden yang melebihi limit toko
+        $melebihiLimit = max(0, $price - $ditanggungPenuhToko);
+
+        // Beban biaya untuk teknisi berdasarkan persentase potongan di akun
+        $biayaTeknisi = round($melebihiLimit * ($persenKaryawan / 100));
+
+        // Sisa biaya ditanggung oleh toko
+        $biayaToko = $price - $biayaTeknisi;
+
+        // Persentase beban teknisi riil
+        $persenTeknisi = $price > 0 ? round(($biayaTeknisi / $price) * 100, 2) : 0;
+
         $item->update([
             'name' => $request->name,
-            'price' => $request->price,
-            'workers_id' => $request->workers_id,
-            'persen_teknisi' => $request->persen_teknisi,
-            'biaya_teknisi' => $request->price * $request->persen_teknisi / 100,
-            'biaya_toko' => $request->price - ($request->price * $request->persen_teknisi / 100),
-            'created_at' => $request->created_at,
+            'price' => $price,
+            'workers_id' => $workerId,
+            'persen_teknisi' => $persenTeknisi,
+            'biaya_teknisi' => $biayaTeknisi,
+            'biaya_toko' => $biayaToko,
+            'created_at' => $createdAt,
         ]);
 
         return redirect()->route('insiden.index');

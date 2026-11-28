@@ -36,8 +36,10 @@ class ShiftController extends Controller
                     // Pastikan data berupa array (jaga-jaga jika data lama masih string)
                     $jamMasuk = is_array($row->jam_masuk) ? $row->jam_masuk : [$row->jam_masuk];
                     $jamPulang = is_array($row->jam_pulang) ? $row->jam_pulang : [$row->jam_pulang];
+                    $hariKerja = is_array($row->hari_kerja) ? $row->hari_kerja : (json_decode($row->hari_kerja, true) ?? ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']);
 
-                    $html = '<ul class="text-sm list-disc pl-4">';
+                    $html = '<div class="text-xs font-semibold text-indigo-600 mb-1">' . implode(', ', $hariKerja) . '</div>';
+                    $html .= '<ul class="text-sm list-disc pl-4">';
                     foreach ($jamMasuk as $key => $masuk) {
                         $pulang = $jamPulang[$key] ?? '-';
                         $html .= "<li>{$masuk} - {$pulang}</li>";
@@ -52,11 +54,14 @@ class ShiftController extends Controller
                 ->editColumn('potongan_cuti', fn($row) => 'Rp ' . number_format($row->potongan_cuti, 0, ',', '.'))
                 ->editColumn('potongan_sakit', fn($row) => 'Rp ' . number_format($row->potongan_sakit, 0, ',', '.'))
                 ->addColumn('action', function ($row) {
+                    $hariKerja = is_array($row->hari_kerja) ? $row->hari_kerja : (json_decode($row->hari_kerja, true) ?? ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']);
+
                     // Siapkan data array untuk JSON
                     $data = [
                         'id' => $row->id,
                         'worker_id' => $row->worker_id,
                         'nama_shift' => $row->nama_shift,
+                        'hari_kerja' => $hariKerja,
                         // Kirim array langsung, nanti JS yang looping
                         'jam_masuk' => is_array($row->jam_masuk) ? $row->jam_masuk : [$row->jam_masuk],
                         'jam_pulang' => is_array($row->jam_pulang) ? $row->jam_pulang : [$row->jam_pulang],
@@ -107,6 +112,7 @@ class ShiftController extends Controller
 
         $validated = $request->validate([
             'nama_shift' => 'required|string|max:100',
+            'hari_kerja' => 'nullable|array',
             // Validasi Array
             'jam_masuk' => 'required|array',
             'jam_masuk.*' => 'required', // Setiap item harus ada isinya
@@ -120,6 +126,10 @@ class ShiftController extends Controller
             'potongan_sakit' => 'required|integer',
             'worker_id' => 'required|integer',
         ]);
+
+        if (empty($validated['hari_kerja'])) {
+            $validated['hari_kerja'] = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        }
 
         $validated['cabang_id'] = getCabangId();
 
@@ -149,6 +159,7 @@ class ShiftController extends Controller
 
         $validated = $request->validate([
             'nama_shift' => 'required|string|max:100',
+            'hari_kerja' => 'nullable|array',
             // Validasi Array
             'jam_masuk' => 'required|array',
             'jam_masuk.*' => 'required',
@@ -162,6 +173,10 @@ class ShiftController extends Controller
             'potongan_sakit' => 'required|integer',
             'worker_id' => 'required|integer',
         ]);
+
+        if (empty($validated['hari_kerja'])) {
+            $validated['hari_kerja'] = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        }
 
         $item = Shift::findOrFail($id);
         $validated['cabang_id'] = getCabangId();

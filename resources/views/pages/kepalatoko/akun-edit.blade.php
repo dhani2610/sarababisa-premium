@@ -349,6 +349,36 @@
                                         </select>
                                     </div>
 
+                                    <div class="border-t border-slate-200 pt-3 mt-3">
+                                        <div class="font-semibold text-slate-800 text-sm mb-2">Pengaturan Beban Insiden</div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1" for="nominal_insiden_toko">
+                                                    Nominal Insiden Ditanggung Toko
+                                                </label>
+                                                <div class="relative">
+                                                    <input id="nominal_insiden_toko" name="nominal_insiden_toko"
+                                                        value="{{ $item->nominal_insiden_toko ? number_format($item->nominal_insiden_toko, 0, ',', '.') : '0' }}"
+                                                        class="form-input w-full pl-10 px-2 py-1 input-currency"
+                                                        type="text" placeholder="0" />
+                                                    <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
+                                                        <span class="text-sm text-slate-400 font-medium px-3">Rp.</span>
+                                                    </div>
+                                                </div>
+                                                <span class="text-xs text-slate-400">Batas maksimal insiden yang ditanggung toko</span>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1" for="persentase_potongan_insiden">
+                                                    Nominal Persentase Potongan Insiden (%)
+                                                </label>
+                                                <input id="persentase_potongan_insiden" name="persentase_potongan_insiden"
+                                                    value="{{ $item->persentase_potongan_insiden ?? 0 }}"
+                                                    class="form-input w-full px-2 py-1" type="number" min="0" max="100" placeholder="Contoh: 50" />
+                                                <span class="text-xs text-slate-400">Persen yang dibebankan ke karyawan jika melebihi limit toko</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <!-- BONUS ADMIN TOKO -->
                                     <div id="bonus-admin" style="display: none;">
                                         <div>

@@ -11,6 +11,7 @@ class Shift extends Model
 
     protected $fillable = [
         'nama_shift',
+        'hari_kerja',
         'jam_masuk',
         'jam_pulang',
         'nominal_gaji',
@@ -24,6 +25,7 @@ class Shift extends Model
     ];
 
     protected $casts = [
+        'hari_kerja' => 'array',
         'jam_masuk' => 'array',
         'jam_pulang' => 'array',
     ];
